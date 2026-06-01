@@ -1,1 +1,85 @@
+# Recall
 
+Recall is a minimal, local-first flashcard desktop app for focused learning.
+
+![Recall dashboard](docs/screenshot.png)
+
+## Features
+
+- Deck and card CRUD
+- Focused study mode with flip reveal
+- Correct / Incorrect self-assessment
+- Simple spaced repetition
+- Progress tracking and study streak
+- JSON import/export
+- Dark mode by default with light mode toggle
+- Fully local SQLite storage through Tauri
+- Seed data for first launch demos
+
+## Local-First Promise
+
+Recall does not use accounts, cloud sync, telemetry, analytics, tracking, crash reporting, or external APIs. Data lives on your machine in a local SQLite database. JSON export is provided for portable backups.
+
+## Tech Stack
+
+- Tauri 2
+- React 18
+- TypeScript strict
+- Vite
+- SQLite via `@tauri-apps/plugin-sql`
+- Drizzle ORM schema layer
+- Tailwind CSS
+- Zustand
+- Lucide icons
+- date-fns
+- pnpm
+
+## Requirements
+
+- Node.js 18 or newer
+- pnpm
+- Rust stable toolchain
+- WebView2 on Windows
+
+## Development
+
+```bash
+pnpm install
+pnpm tauri:dev
+```
+
+For frontend-only development:
+
+```bash
+pnpm dev
+```
+
+## Verification
+
+```bash
+pnpm test
+pnpm lint
+pnpm build
+pnpm tauri:build
+```
+
+## Data Portability
+
+Use Settings to export all decks, cards, reviews, study sessions, and settings to one JSON file. Import supports Replace and Merge. Merge skips duplicate cards by deck name and card front.
+
+The SQLite database file is `recall.db` in the app-local data directory managed by Tauri.
+
+## Roadmap
+
+- Image support
+- Audio support
+- LaTeX rendering
+- Cloze deletion
+- Typed-answer mode
+- Global search
+- Advanced spaced repetition
+- Anki import/export
+
+## License
+
+MIT

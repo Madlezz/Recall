@@ -1,0 +1,35 @@
+# Recall Manual QA Checklist
+
+- [ ] App opens with `pnpm tauri:dev`.
+- [ ] App can be used without internet after dependencies are installed.
+- [ ] Dashboard shows seed data on first launch.
+- [ ] User can create a deck.
+- [ ] Empty deck name is rejected.
+- [ ] Duplicate deck name is rejected.
+- [ ] User can edit a deck.
+- [ ] User can delete a deck with confirmation.
+- [ ] User can create a card.
+- [ ] Empty card front/back is rejected.
+- [ ] User can edit a card.
+- [ ] User can delete a card.
+- [ ] User can move a card to another deck.
+- [ ] Deck search filters cards.
+- [ ] Study Mode starts from dashboard.
+- [ ] Study Mode starts from Deck Detail.
+- [ ] Space reveals the answer.
+- [ ] `1` marks Incorrect.
+- [ ] `2` marks Correct.
+- [ ] Card flip animation runs.
+- [ ] Correct updates card stats and due date.
+- [ ] Incorrect updates card stats and due date.
+- [ ] Card becomes mastered after 5 correct streak.
+- [ ] Session summary shows cards, correct, incorrect, accuracy.
+- [ ] Deck/card/review changes persist after app reload.
+- [ ] Theme toggle persists after app reload.
+- [ ] Export JSON writes a valid file.
+- [ ] Import Replace works after confirmation.
+- [ ] Import Merge skips duplicate cards by deck name and card front.
+- [ ] Invalid import shows an error toast.
+- [ ] Invalid import does not change existing data.
+- [ ] Reset all data uses confirmation and restores seed data.
+- [ ] README, MIT license, and CONTRIBUTING files exist.
