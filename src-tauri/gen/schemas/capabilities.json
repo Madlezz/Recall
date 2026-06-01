@@ -1,0 +1,1 @@
+{"default":{"identifier":"default","description":"Main window permissions for Recall local-first storage.","local":true,"windows":["main"],"permissions":["core:default","sql:default","sql:allow-execute","sql:allow-select","dialog:default","dialog:allow-open","dialog:allow-save","fs:default","fs:allow-read-text-file","fs:allow-write-text-file"]}}
