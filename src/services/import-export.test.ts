@@ -25,6 +25,7 @@ const snapshot: RecallStateSnapshot = {
       correctCount: 0,
       incorrectCount: 0,
       streak: 0,
+      easeFactor: 2.5,
       lastReviewedAt: null,
       nextReviewAt: "2026-06-01T00:00:00.000Z",
       createdAt: "2026-06-01T00:00:00.000Z",

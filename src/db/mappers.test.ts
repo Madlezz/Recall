@@ -90,6 +90,7 @@ describe("database mappers", () => {
       correct_count: 0,
       incorrect_count: 0,
       streak: 0,
+      ease_factor: 2.5,
       last_reviewed_at: null,
       next_review_at: "2026-06-01T00:00:00.000Z",
       created_at: "2026-06-01T00:00:00.000Z",

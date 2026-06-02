@@ -181,6 +181,7 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
       correctCount: 0,
       incorrectCount: 0,
       streak: 0,
+      easeFactor: 2.5,
       lastReviewedAt: null,
       nextReviewAt: now,
       createdAt: now,
