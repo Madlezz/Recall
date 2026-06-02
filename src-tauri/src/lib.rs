@@ -168,5 +168,11 @@ fn migrations() -> Vec<Migration> {
         "#,
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 3,
+            description: "add_ease_factor",
+            sql: "ALTER TABLE cards ADD COLUMN ease_factor REAL NOT NULL DEFAULT 2.5;",
+            kind: MigrationKind::Up,
+        },
     ]
 }

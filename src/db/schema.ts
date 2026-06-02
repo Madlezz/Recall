@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { integer, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const decksTable = sqliteTable(
   "decks",
@@ -26,6 +26,7 @@ export const cardsTable = sqliteTable("cards", {
   correctCount: integer("correct_count").notNull(),
   incorrectCount: integer("incorrect_count").notNull(),
   streak: integer("streak").notNull(),
+  easeFactor: real("ease_factor").notNull().default(2.5),
   lastReviewedAt: text("last_reviewed_at"),
   nextReviewAt: text("next_review_at").notNull(),
   createdAt: text("created_at").notNull(),

@@ -23,6 +23,7 @@ export interface Card {
   correctCount: number;
   incorrectCount: number;
   streak: number;
+  easeFactor: number;
   lastReviewedAt: string | null;
   nextReviewAt: string;
   createdAt: string;

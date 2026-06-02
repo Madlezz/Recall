@@ -103,6 +103,7 @@ function card(
     correctCount,
     incorrectCount,
     streak,
+    easeFactor: 2.5,
     lastReviewedAt: lastReviewedAt ? ISO(lastReviewedAt) : null,
     nextReviewAt: ISO(nextReviewAt),
     createdAt: ISO(createdAt),

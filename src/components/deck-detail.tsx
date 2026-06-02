@@ -1,5 +1,9 @@
 import { ArrowLeft, Edit3, Play, Plus, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 import { toast } from "sonner";
 import { CardDialog } from "@/components/card-dialog";
 import { ConfirmAction } from "@/components/confirm-action";
@@ -194,8 +198,12 @@ function CardRow({ card, deckId }: CardRowProps): JSX.Element {
               </Badge>
             ))}
           </div>
-          <h3 className="mt-3 font-medium">{card.front}</h3>
-          <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{card.back}</p>
+          <div className="mt-3 prose prose-sm prose-invert max-w-none line-clamp-1">
+            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{card.front}</ReactMarkdown>
+          </div>
+          <div className="mt-1 prose prose-sm prose-invert max-w-none line-clamp-2 text-muted-foreground">
+            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{card.back}</ReactMarkdown>
+          </div>
           {card.hint ? <p className="mt-2 text-xs text-muted-foreground">Hint: {card.hint}</p> : null}
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">

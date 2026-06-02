@@ -27,6 +27,13 @@ export function parseImportPayload(raw: string): RecallExportPayload {
     throw new Error("Invalid import file");
   }
 
+  // Backwards compatibility for v1 exports
+  for (const card of parsed.cards) {
+    if (card.easeFactor === undefined) {
+      card.easeFactor = 2.5;
+    }
+  }
+
   return parsed;
 }
 
@@ -212,6 +219,7 @@ function isCard(value: unknown): value is Card {
     typeof value.correctCount === "number" &&
     typeof value.incorrectCount === "number" &&
     typeof value.streak === "number" &&
+    (typeof value.easeFactor === "number" || typeof value.easeFactor === "undefined") &&
     (typeof value.lastReviewedAt === "string" || value.lastReviewedAt === null) &&
     typeof value.nextReviewAt === "string" &&
     typeof value.createdAt === "string" &&

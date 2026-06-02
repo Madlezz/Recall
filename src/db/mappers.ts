@@ -21,6 +21,7 @@ export interface CardRow {
   correct_count: number;
   incorrect_count: number;
   streak: number;
+  ease_factor: number;
   last_reviewed_at: string | null;
   next_review_at: string;
   created_at: string;
@@ -92,6 +93,7 @@ export function cardFromRow(row: CardRow): Card {
     correctCount: row.correct_count,
     incorrectCount: row.incorrect_count,
     streak: row.streak,
+    easeFactor: row.ease_factor,
     lastReviewedAt: row.last_reviewed_at,
     nextReviewAt: row.next_review_at,
     createdAt: row.created_at,
@@ -111,6 +113,7 @@ export function cardToRow(card: Card): CardRow {
     correct_count: card.correctCount,
     incorrect_count: card.incorrectCount,
     streak: card.streak,
+    ease_factor: card.easeFactor,
     last_reviewed_at: card.lastReviewedAt,
     next_review_at: card.nextReviewAt,
     created_at: card.createdAt,

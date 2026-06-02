@@ -1,5 +1,9 @@
 import { ArrowLeft, Check, RotateCw, X } from "lucide-react";
 import { useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useRecallStore } from "@/stores/recall-store";
@@ -113,12 +117,16 @@ export function StudyMode(): JSX.Element {
           <div className="study-card relative min-h-[420px]" data-revealed={activeStudy.revealed}>
             <div className="study-card-face absolute inset-0 flex flex-col justify-center rounded-lg border bg-card p-8 shadow-2xl">
               <p className="text-sm text-muted-foreground">{deck?.name ?? "All due cards"}</p>
-              <h1 className="mt-6 text-balance text-3xl font-semibold leading-tight sm:text-4xl">{card.front}</h1>
+              <div className="mt-6 prose prose-invert max-w-none text-balance text-2xl font-medium leading-tight sm:text-3xl">
+                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{card.front}</ReactMarkdown>
+              </div>
               {card.hint ? <p className="mt-8 text-sm text-muted-foreground">Hint: {card.hint}</p> : null}
             </div>
             <div className="study-card-face study-card-back absolute inset-0 flex flex-col justify-center rounded-lg border bg-card p-8 shadow-2xl">
               <p className="text-sm text-muted-foreground">Answer</p>
-              <h2 className="mt-6 text-balance text-3xl font-semibold leading-tight sm:text-4xl">{card.back}</h2>
+              <div className="mt-6 prose prose-invert max-w-none text-balance text-2xl font-medium leading-tight sm:text-3xl">
+                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{card.back}</ReactMarkdown>
+              </div>
             </div>
           </div>
         </div>

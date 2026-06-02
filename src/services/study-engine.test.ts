@@ -13,6 +13,7 @@ const baseCard: Card = {
   correctCount: 2,
   incorrectCount: 1,
   streak: 2,
+  easeFactor: 2.5,
   lastReviewedAt: null,
   nextReviewAt: "2026-06-01T00:00:00.000Z",
   createdAt: "2026-05-25T00:00:00.000Z",
