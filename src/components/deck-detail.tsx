@@ -78,9 +78,13 @@ export function DeckDetail(): JSX.Element {
             actionLabel="Delete deck"
             triggerLabel="Delete"
             destructive
-            onConfirm={() => {
-              void deleteDeck(deck.id);
-              toast.success("Deck deleted");
+            onConfirm={async () => {
+              try {
+                await deleteDeck(deck.id);
+                toast.success("Deck deleted");
+              } catch (error) {
+                toast.error(error instanceof Error ? error.message : "Could not delete deck");
+              }
             }}
           />
         </div>
@@ -161,7 +165,20 @@ interface CardRowProps {
 }
 
 function CardRow({ card, deckId }: CardRowProps): JSX.Element {
+  const [isDeleting, setIsDeleting] = useState(false);
   const deleteCard = useRecallStore((state) => state.deleteCard);
+
+  async function handleDelete(): Promise<void> {
+    setIsDeleting(true);
+    try {
+      await deleteCard(card.id);
+      toast.success("Card deleted");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not delete card");
+    } finally {
+      setIsDeleting(false);
+    }
+  }
 
   return (
     <article className="rounded-lg border bg-card p-4">
@@ -185,10 +202,8 @@ function CardRow({ card, deckId }: CardRowProps): JSX.Element {
           <CardDialog deckId={deckId} card={card} trigger={<Button variant="outline">Edit</Button>} />
           <Button
             variant="ghost"
-            onClick={() => {
-              void deleteCard(card.id);
-              toast.success("Card deleted");
-            }}
+            onClick={() => void handleDelete()}
+            disabled={isDeleting}
           >
             Delete
           </Button>

@@ -18,7 +18,7 @@ import { isTauriRuntime } from "@/db/client";
 import { parseImportPayload } from "@/services/import-export";
 import { openImportPayload, saveExportPayload } from "@/services/native-files";
 import { useRecallStore } from "@/stores/recall-store";
-import type { RecallExportPayload } from "@/types";
+import type { RecallExportPayload, Theme } from "@/types";
 
 type ImportMode = "merge" | "replace";
 
@@ -33,11 +33,46 @@ export function Settings(): JSX.Element {
   const mergeData = useRecallStore((state) => state.mergeData);
   const replaceData = useRecallStore((state) => state.replaceData);
 
+  async function handleTheme(theme: Theme): Promise<void> {
+    try {
+      await setTheme(theme);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not save theme");
+    }
+  }
+
   async function handleExport(): Promise<void> {
-    const payload = exportData();
-    const saved = await saveExportPayload(payload);
-    if (saved) {
-      toast.success("Export ready");
+    try {
+      const payload = exportData();
+      const saved = await saveExportPayload(payload);
+      if (saved) {
+        toast.success("Export ready");
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not export data");
+    }
+  }
+
+  async function handleReset(): Promise<void> {
+    try {
+      await resetData();
+      toast.success("Seed data restored");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not reset data");
+    }
+  }
+
+  async function handleReplace(): Promise<void> {
+    if (!pendingReplace) {
+      return;
+    }
+
+    try {
+      await replaceData(pendingReplace);
+      setPendingReplace(null);
+      toast.success("Import replaced local data");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not replace data");
     }
   }
 
@@ -98,11 +133,11 @@ export function Settings(): JSX.Element {
       <section className="grid gap-4 lg:grid-cols-2">
         <Panel title="Appearance" description="Theme is stored locally.">
           <div className="flex flex-wrap gap-2">
-            <Button variant={settings.theme === "dark" ? "default" : "outline"} onClick={() => setTheme("dark")}>
+            <Button variant={settings.theme === "dark" ? "default" : "outline"} onClick={() => void handleTheme("dark")}>
               <Moon className="h-4 w-4" />
               Dark
             </Button>
-            <Button variant={settings.theme === "light" ? "default" : "outline"} onClick={() => setTheme("light")}>
+            <Button variant={settings.theme === "light" ? "default" : "outline"} onClick={() => void handleTheme("light")}>
               <Sun className="h-4 w-4" />
               Light
             </Button>
@@ -152,10 +187,7 @@ export function Settings(): JSX.Element {
                 <AlertDialogAction asChild>
                   <Button
                     variant="destructive"
-                    onClick={() => {
-                      void resetData();
-                      toast.success("Seed data restored");
-                    }}
+                    onClick={() => void handleReset()}
                   >
                     Reset data
                   </Button>
@@ -179,13 +211,7 @@ export function Settings(): JSX.Element {
             <AlertDialogAction asChild>
               <Button
                 variant="destructive"
-                onClick={() => {
-                  if (pendingReplace) {
-                    void replaceData(pendingReplace);
-                    setPendingReplace(null);
-                    toast.success("Import replaced local data");
-                  }
-                }}
+                onClick={() => void handleReplace()}
               >
                 Replace data
               </Button>

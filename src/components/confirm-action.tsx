@@ -10,6 +10,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 interface ConfirmActionProps {
   title: string;
@@ -17,7 +18,7 @@ interface ConfirmActionProps {
   actionLabel: string;
   triggerLabel: string;
   destructive?: boolean;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void> | void;
 }
 
 export function ConfirmAction({
@@ -28,8 +29,21 @@ export function ConfirmAction({
   destructive = false,
   onConfirm,
 }: ConfirmActionProps): JSX.Element {
+  const [open, setOpen] = useState(false);
+  const [pending, setPending] = useState(false);
+
+  async function handleConfirm(): Promise<void> {
+    setPending(true);
+    try {
+      await onConfirm();
+      setOpen(false);
+    } finally {
+      setPending(false);
+    }
+  }
+
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button variant={destructive ? "destructive" : "outline"}>{triggerLabel}</Button>
       </AlertDialogTrigger>
@@ -41,7 +55,14 @@ export function ConfirmAction({
         <AlertDialogFooter>
           <AlertCancelButton />
           <AlertDialogAction asChild>
-            <Button variant={destructive ? "destructive" : "default"} onClick={onConfirm}>
+            <Button
+              variant={destructive ? "destructive" : "default"}
+              onClick={(event) => {
+                event.preventDefault();
+                void handleConfirm();
+              }}
+              disabled={pending}
+            >
               {actionLabel}
             </Button>
           </AlertDialogAction>

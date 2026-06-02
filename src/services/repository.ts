@@ -17,6 +17,7 @@ import {
 } from "@/db/mappers";
 import { getTauriSqlExecutor, type SqlExecutor } from "@/db/client";
 import { createSeedSnapshot } from "@/data/seed";
+import { isCardStatus, isDeckColor, isReviewResult } from "@/lib/domain";
 import { normalizeName } from "@/lib/utils";
 import { mergeImportPayload } from "@/services/import-export";
 import type { RecallExportPayload, RecallStateSnapshot, Theme } from "@/types";
@@ -59,6 +60,9 @@ export function validateImportSnapshot(snapshot: RecallStateSnapshot): void {
     if (deckNames.has(deckName)) {
       throw new Error("Duplicate deck name");
     }
+    if (!isDeckColor(deck.color)) {
+      throw new Error("Invalid deck color");
+    }
     deckIds.add(deck.id);
     deckNames.add(deckName);
   }
@@ -76,6 +80,9 @@ export function validateImportSnapshot(snapshot: RecallStateSnapshot): void {
     }
     if (cardIds.has(card.id)) {
       throw new Error("Duplicate card id");
+    }
+    if (!isCardStatus(card.status)) {
+      throw new Error("Invalid card status");
     }
     cardIds.add(card.id);
   }
@@ -97,6 +104,9 @@ export function validateImportSnapshot(snapshot: RecallStateSnapshot): void {
     }
     if (!sessionIds.has(review.sessionId)) {
       throw new Error("Review references missing session");
+    }
+    if (!isReviewResult(review.result)) {
+      throw new Error("Invalid review result");
     }
   }
 }

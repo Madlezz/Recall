@@ -1,4 +1,5 @@
 import type { Card, CardStatus, Deck, DeckColor, RecallSettings, Review, ReviewResult, StudySession } from "@/types";
+import { SCHEMA_VERSION, isCardStatus, isDeckColor, isReviewResult } from "@/lib/domain";
 
 export interface DeckRow {
   id: string;
@@ -49,12 +50,8 @@ export interface SettingRow {
   value: string;
 }
 
-const deckColors: DeckColor[] = ["blue", "green", "amber", "rose", "violet", "slate"];
-const cardStatuses: CardStatus[] = ["new", "learning", "mastered"];
-const reviewResults: ReviewResult[] = ["correct", "incorrect"];
-
 export function deckFromRow(row: DeckRow): Deck {
-  if (!deckColors.includes(row.color as DeckColor)) {
+  if (!isDeckColor(row.color)) {
     throw new Error("Invalid deck color");
   }
 
@@ -80,7 +77,7 @@ export function deckToRow(deck: Deck): DeckRow {
 }
 
 export function cardFromRow(row: CardRow): Card {
-  if (!cardStatuses.includes(row.status as CardStatus)) {
+  if (!isCardStatus(row.status)) {
     throw new Error("Invalid card status");
   }
 
@@ -146,7 +143,7 @@ export function studySessionToRow(session: StudySession): StudySessionRow {
 }
 
 export function reviewFromRow(row: ReviewRow): Review {
-  if (!reviewResults.includes(row.result as ReviewResult)) {
+  if (!isReviewResult(row.result)) {
     throw new Error("Invalid review result");
   }
 
@@ -183,7 +180,7 @@ export function settingsToRows(settings: RecallSettings): SettingRow[] {
   return [
     { key: "theme", value: settings.theme },
     { key: "seeded_at", value: settings.seededAt },
-    { key: "schema_version", value: "1" },
+    { key: "schema_version", value: SCHEMA_VERSION },
   ];
 }
 

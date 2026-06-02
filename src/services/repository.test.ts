@@ -96,4 +96,27 @@ describe("validateImportSnapshot", () => {
       }),
     ).toThrow("Review references missing card");
   });
+
+  it("rejects invalid enum values before persistence", () => {
+    expect(() =>
+      validateImportSnapshot({
+        ...validSnapshot,
+        decks: [{ ...validSnapshot.decks[0], color: "neon" as never }],
+      }),
+    ).toThrow("Invalid deck color");
+
+    expect(() =>
+      validateImportSnapshot({
+        ...validSnapshot,
+        cards: [{ ...validSnapshot.cards[0], status: "stuck" as never }],
+      }),
+    ).toThrow("Invalid card status");
+
+    expect(() =>
+      validateImportSnapshot({
+        ...validSnapshot,
+        reviews: [{ ...validSnapshot.reviews[0], result: "maybe" as never }],
+      }),
+    ).toThrow("Invalid review result");
+  });
 });

@@ -1,4 +1,5 @@
 import type { Card, Deck, RecallExportPayload, RecallStateSnapshot, Review, StudySession } from "@/types";
+import { isCardStatus, isDeckColor, isReviewResult } from "@/lib/domain";
 import { createId, normalizeName } from "@/lib/utils";
 
 export function buildExportPayload(snapshot: RecallStateSnapshot, exportedAt = new Date()): RecallExportPayload {
@@ -34,9 +35,13 @@ export function mergeImportPayload(current: RecallStateSnapshot, incoming: Recal
   const decksByName = new Map(current.decks.map((deck) => [normalizeName(deck.name).toLowerCase(), deck]));
   const nextDecks = [...current.decks];
   const nextCards = [...current.cards];
+  const nextStudySessions = [...current.studySessions];
+  const nextReviews = [...current.reviews];
+  const importedCardIdMap = new Map<string, string>();
+  const currentDecksById = new Map(current.decks.map((deck) => [deck.id, deck]));
   const existingCardKeys = new Set(
     current.cards.map((card) => {
-      const deck = current.decks.find((item) => item.id === card.deckId);
+      const deck = currentDecksById.get(card.deckId);
       return duplicateKey(deck?.name ?? "", card.front);
     }),
   );
@@ -68,16 +73,61 @@ export function mergeImportPayload(current: RecallStateSnapshot, incoming: Recal
 
     const nextCard = ensureCardId({ ...incomingCard, deckId }, nextCards);
     nextCards.push(nextCard);
+    importedCardIdMap.set(incomingCard.id, nextCard.id);
     existingCardKeys.add(key);
+  }
+
+  const reviewsBySession = groupReviewsBySession(incoming.reviews);
+  for (const incomingSession of incoming.studySessions) {
+    const incomingReviews = reviewsBySession.get(incomingSession.id) ?? [];
+    if (incomingReviews.length === 0) {
+      continue;
+    }
+
+    const allReviewsBelongToNewCards = incomingReviews.every((review) => importedCardIdMap.has(review.cardId));
+    if (!allReviewsBelongToNewCards) {
+      continue;
+    }
+
+    let deckId: string | null = null;
+    if (incomingSession.deckId !== null) {
+      const mappedDeckId = deckIdMap.get(incomingSession.deckId);
+      if (!mappedDeckId) {
+        continue;
+      }
+      deckId = mappedDeckId;
+    }
+
+    const nextSession = ensureStudySessionId({ ...incomingSession, deckId }, nextStudySessions);
+    nextStudySessions.push(nextSession);
+
+    for (const incomingReview of incomingReviews) {
+      const cardId = importedCardIdMap.get(incomingReview.cardId);
+      if (!cardId) {
+        continue;
+      }
+
+      nextReviews.push(ensureReviewId({ ...incomingReview, cardId, sessionId: nextSession.id }, nextReviews));
+    }
   }
 
   return {
     decks: nextDecks,
     cards: nextCards,
-    studySessions: current.studySessions,
-    reviews: current.reviews,
+    studySessions: nextStudySessions,
+    reviews: nextReviews,
     settings: current.settings,
   };
+}
+
+function groupReviewsBySession(reviews: Review[]): Map<string, Review[]> {
+  const grouped = new Map<string, Review[]>();
+  for (const review of reviews) {
+    const sessionReviews = grouped.get(review.sessionId) ?? [];
+    sessionReviews.push(review);
+    grouped.set(review.sessionId, sessionReviews);
+  }
+  return grouped;
 }
 
 function duplicateKey(deckName: string, front: string): string {
@@ -98,6 +148,22 @@ function ensureCardId(card: Card, cards: Card[]): Card {
   }
 
   return { ...card, id: createId("card") };
+}
+
+function ensureStudySessionId(session: StudySession, sessions: StudySession[]): StudySession {
+  if (!sessions.some((item) => item.id === session.id)) {
+    return session;
+  }
+
+  return { ...session, id: createId("session") };
+}
+
+function ensureReviewId(review: Review, reviews: Review[]): Review {
+  if (!reviews.some((item) => item.id === review.id)) {
+    return review;
+  }
+
+  return { ...review, id: createId("review") };
 }
 
 function isExportPayload(value: unknown): value is RecallExportPayload {
@@ -126,7 +192,7 @@ function isDeck(value: unknown): value is Deck {
     typeof value.id === "string" &&
     typeof value.name === "string" &&
     typeof value.description === "string" &&
-    typeof value.color === "string" &&
+    isDeckColor(value.color) &&
     typeof value.createdAt === "string" &&
     typeof value.updatedAt === "string"
   );
@@ -142,7 +208,7 @@ function isCard(value: unknown): value is Card {
     typeof value.hint === "string" &&
     Array.isArray(value.tags) &&
     value.tags.every((tag) => typeof tag === "string") &&
-    ["new", "learning", "mastered"].includes(String(value.status)) &&
+    isCardStatus(value.status) &&
     typeof value.correctCount === "number" &&
     typeof value.incorrectCount === "number" &&
     typeof value.streak === "number" &&
@@ -173,7 +239,7 @@ function isReview(value: unknown): value is Review {
     typeof value.cardId === "string" &&
     typeof value.sessionId === "string" &&
     typeof value.answeredAt === "string" &&
-    (value.result === "correct" || value.result === "incorrect")
+    isReviewResult(value.result)
   );
 }
 
