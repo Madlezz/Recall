@@ -10,15 +10,15 @@
 
 ## Why Recall?
 
-| Feature                  | Recall                       | Anki              | Quizlet          |
-|--------------------------|------------------------------|-------------------|-------------------|
-| **Algorithm**            | FSRS (best in class)         | SM-2 (outdated)   | Proprietary      |
-| **Setup Required**       | Zero — open and go           | Days of tweaking  | Sign up required |
-| **Privacy**              | 100% offline, no account    | Optional sync     | Cloud-only       |
-| **Rich Content**         | Markdown, LaTeX, code        | Via plugins       | Limited          |
-| **Anki Import**          | One-click `.apkg`            | Native            | ❌               |
-| **Beautiful UI**         | Dark-first, clean design     | Functional        | Gamified         |
-| **Portable**             | Copy one folder anywhere     | Complex profiles  | Web-only         |
+| Feature                  | Recall                       | Anki                | Quizlet            |
+|--------------------------|------------------------------|---------------------|---------------------|
+| **Algorithm**            | FSRS                         | SM-2 / FSRS (plugin)| Proprietary        |
+| **Setup**                | Open and go                  | Configure as needed | Sign up required   |
+| **Privacy**              | 100% offline, no account     | Optional sync       | Cloud-only         |
+| **Rich Content**         | Markdown, LaTeX, code        | Via plugins         | Limited            |
+| **Anki Import**          | One-click `.apkg`            | Native              | ❌                 |
+| **Design**               | Dark-first, clean            | Classic             | Gamified           |
+| **Portable**             | Copy one folder anywhere     | Profile-based       | Web-only           |
 
 ---
 
@@ -102,7 +102,7 @@ pnpm dev            # Web-only (browser, no native features)
 - **"It just works."** — No manual needed. Open → review → done.
 - **Your mom could use it.** — Dead simple UI, clear labels, no jargon.
 - **No settings rabbit holes.** — Sensible defaults. Power features are there if you want them.
-- **Not competing with Anki.** — Anki is a toolbox. Recall is an instrument.
+- **Not competing with Anki.** — Anki is incredible for power users. Recall takes a different path: simplicity first.
 
 ---
 
