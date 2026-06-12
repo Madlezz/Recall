@@ -1,3 +1,6 @@
+mod anki_import;
+
+use anki_import::parse_anki_apkg;
 use tauri_plugin_sql::{Migration, MigrationKind};
 
 const RECALL_DB: &str = "sqlite:recall.db";
@@ -12,6 +15,7 @@ pub fn run() {
                 .add_migrations(RECALL_DB, migrations())
                 .build(),
         )
+        .invoke_handler(tauri::generate_handler![parse_anki_apkg])
         .run(tauri::generate_context!())
         .expect("error while running Recall");
 }
