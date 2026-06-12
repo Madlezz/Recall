@@ -60,6 +60,7 @@ interface RecallStore extends RecallStateSnapshot {
   showDashboard: () => void;
     showSettings: () => void;
     showDeck: (deckId: string) => void;
+    showStats: () => void;
     startMatch: (deckId: string) => void;
       completeOnboarding: () => Promise<void>;
     createDeck: (input: DeckInput) => Promise<string>;
@@ -136,10 +137,14 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
   },
 
   showSettings() {
-    set({ view: "settings", selectedDeckId: null, activeStudy: null });
-  },
+      set({ view: "settings", selectedDeckId: null, activeStudy: null });
+    },
 
-  showDeck(deckId) {
+    showStats() {
+      set({ view: "stats", selectedDeckId: null, activeStudy: null });
+    },
+
+    showDeck(deckId) {
         set({ view: "deck", selectedDeckId: deckId, activeStudy: null });
       },
 

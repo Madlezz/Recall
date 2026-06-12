@@ -1,11 +1,14 @@
 import { Toaster } from "sonner";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Dashboard } from "@/components/dashboard";
 import { DeckDetail } from "@/components/deck-detail";
 import { MatchGame } from "@/components/match-game";
 import { Onboarding } from "@/components/onboarding";
+import { QuickAddDialog } from "@/components/quick-add";
 import { Settings } from "@/components/settings";
+import { ShortcutHelp } from "@/components/shortcut-help";
+import { Stats } from "@/components/stats";
 import { StudyMode } from "@/components/study-mode";
 import { useRecallStore } from "@/stores/recall-store";
 import { toast } from "sonner";
@@ -16,6 +19,8 @@ export function App(): JSX.Element {
   const error = useRecallStore((state) => state.error);
   const initialize = useRecallStore((state) => state.initialize);
   const startReview = useRecallStore((state) => state.startReview);
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   useEffect(() => {
     void initialize();
@@ -30,12 +35,24 @@ export function App(): JSX.Element {
       }
 
       // Press 'R' to start review from dashboard or deck view
-      if (event.key.toLowerCase() === "r" && view !== "study") {
-        event.preventDefault();
-        if (!startReview(null)) {
-          toast.info("No cards due right now");
-        }
-      }
+            if (event.key.toLowerCase() === "r" && view !== "study" && view !== "match") {
+              event.preventDefault();
+              if (!startReview(null)) {
+                toast.info("No cards due right now");
+              }
+            }
+
+            // Ctrl+N to quick-add card
+            if (event.ctrlKey && event.key.toLowerCase() === "n") {
+              event.preventDefault();
+              setShowQuickAdd(true);
+            }
+
+            // ? to show keyboard shortcuts
+            if (event.key === "?" && !event.ctrlKey && !event.metaKey) {
+              event.preventDefault();
+              setShowShortcuts((prev) => !prev);
+            }
     }
 
     window.addEventListener("keydown", handleKeyDown);
@@ -74,12 +91,15 @@ export function App(): JSX.Element {
       ) : (
         <AppShell>
                   {view === "dashboard" ? <Dashboard /> : null}
-                  {view === "deck" ? <DeckDetail /> : null}
-                  {view === "settings" ? <Settings /> : null}
-                  {view === "onboarding" ? <Onboarding /> : null}
+                                    {view === "deck" ? <DeckDetail /> : null}
+                                    {view === "settings" ? <Settings /> : null}
+                                    {view === "stats" ? <Stats /> : null}
+                                    {view === "onboarding" ? <Onboarding /> : null}
                 </AppShell>
       )}
       <Toaster richColors closeButton position="top-right" />
+      <QuickAddDialog open={showQuickAdd} onClose={() => setShowQuickAdd(false)} />
+      <ShortcutHelp open={showShortcuts} onClose={() => setShowShortcuts(false)} />
     </>
   );
 }

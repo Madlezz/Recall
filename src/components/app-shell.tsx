@@ -1,4 +1,4 @@
-import { BookOpen, Database, Home, Settings, Shield, Star, Zap } from "lucide-react";
+import { BookOpen, Database, Home, Settings, Shield, Star, TrendingUp, Zap } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { getDueTodayCount } from "@/lib/stats";
@@ -15,7 +15,8 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
   const decks = useRecallStore((state) => state.decks);
   const cards = useRecallStore((state) => state.cards);
   const showDashboard = useRecallStore((state) => state.showDashboard);
-  const showSettings = useRecallStore((state) => state.showSettings);
+    const showSettings = useRecallStore((state) => state.showSettings);
+    const showStats = useRecallStore((state) => state.showStats);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -31,9 +32,10 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         </button>
 
         <nav className="mt-8 space-y-1">
-          <NavButton active={view === "dashboard"} icon={Home} label="Dashboard" onClick={showDashboard} />
-          <NavButton active={view === "settings"} icon={Settings} label="Settings" onClick={showSettings} />
-        </nav>
+                  <NavButton active={view === "dashboard"} icon={Home} label="Dashboard" onClick={showDashboard} />
+                  <NavButton active={view === "stats"} icon={TrendingUp} label="Stats" onClick={showStats} />
+                  <NavButton active={view === "settings"} icon={Settings} label="Settings" onClick={showSettings} />
+                </nav>
 
         <div className="mt-8 rounded-lg border bg-background/60 p-3">
           <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
