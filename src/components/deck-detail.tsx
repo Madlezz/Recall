@@ -1,4 +1,4 @@
-import { ArrowLeft, Download, Edit3, Play, Plus, Search, Trash2 } from "lucide-react";
+import { ArrowLeft, Download, Edit3, Play, Plus, Search, Trash2, RotateCcw } from "lucide-react";
 import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -24,8 +24,9 @@ export function DeckDetail(): JSX.Element {
   const deck = useRecallStore((state) => state.decks.find((item) => item.id === selectedDeckId));
   const cards = useRecallStore((state) => state.cards);
   const showDashboard = useRecallStore((state) => state.showDashboard);
-  const deleteDeck = useRecallStore((state) => state.deleteDeck);
-  const startReview = useRecallStore((state) => state.startReview);
+    const deleteDeck = useRecallStore((state) => state.deleteDeck);
+    const startReview = useRecallStore((state) => state.startReview);
+    const resetDeckProgress = useRecallStore((state) => state.resetDeckProgress);
 
   const deckCards = useMemo(() => cards.filter((card) => card.deckId === selectedDeckId), [cards, selectedDeckId]);
   const filteredCards = useMemo(() => {
@@ -88,20 +89,34 @@ export function DeckDetail(): JSX.Element {
             Export JSON
           </Button>
           <ConfirmAction
-            title="Delete deck?"
-            description="This permanently deletes the deck and all cards inside it."
-            actionLabel="Delete deck"
-            triggerLabel="Delete"
-            destructive
-            onConfirm={async () => {
-              try {
-                await deleteDeck(deck.id);
-                toast.success("Deck deleted");
-              } catch (error) {
-                toast.error(error instanceof Error ? error.message : "Could not delete deck");
-              }
-            }}
-          />
+                      title="Reset progress?"
+                      description="This resets all cards in this deck back to 'new' state. Card content is kept, but all review history and scheduling data is cleared."
+                      actionLabel="Reset progress"
+                      triggerLabel="Reset"
+                      onConfirm={async () => {
+                        try {
+                          await resetDeckProgress(deck.id);
+                          toast.success("Deck progress reset");
+                        } catch (error) {
+                          toast.error(error instanceof Error ? error.message : "Could not reset deck progress");
+                        }
+                      }}
+                    />
+                    <ConfirmAction
+                      title="Delete deck?"
+                      description="This permanently deletes the deck and all cards inside it."
+                      actionLabel="Delete deck"
+                      triggerLabel="Delete"
+                      destructive
+                      onConfirm={async () => {
+                        try {
+                          await deleteDeck(deck.id);
+                          toast.success("Deck deleted");
+                        } catch (error) {
+                          toast.error(error instanceof Error ? error.message : "Could not delete deck");
+                        }
+                      }}
+                    />
         </div>
       </div>
 

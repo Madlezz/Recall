@@ -53,6 +53,7 @@ interface RecallStore extends RecallStateSnapshot {
   updateCard: (cardId: string, input: CardInput) => Promise<void>;
   deleteCard: (cardId: string) => Promise<void>;
   moveCard: (cardId: string, deckId: string) => Promise<void>;
+  resetDeckProgress: (deckId: string) => Promise<void>;
   startReview: (deckId?: string | null) => boolean;
   revealAnswer: () => void;
   answerCurrentCard: (result: ReviewRating) => Promise<void>;
@@ -234,13 +235,46 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
   },
 
   async moveCard(cardId, deckId) {
-    const card = get().cards.find((item) => item.id === cardId);
-    if (!card || card.deckId === deckId) {
-      return;
-    }
+      const card = get().cards.find((item) => item.id === cardId);
+      if (!card || card.deckId === deckId) {
+        return;
+      }
 
-    await get().updateCard(cardId, { deckId, front: card.front, back: card.back, hint: card.hint, tags: card.tags });
-  },
+      await get().updateCard(cardId, { deckId, front: card.front, back: card.back, hint: card.hint, tags: card.tags });
+    },
+
+    async resetDeckProgress(deckId) {
+      const now = new Date().toISOString();
+      const deckCardIds = new Set(
+        get().cards.filter((card) => card.deckId === deckId).map((card) => card.id),
+      );
+
+      const snapshot = {
+        ...dataState(get()),
+        cards: get().cards.map((card) =>
+          card.deckId === deckId
+            ? {
+                ...card,
+                state: "new" as const,
+                lastReviewDate: null,
+                nextReviewDate: now,
+                stability: 0,
+                difficulty: 0,
+                elapsedDays: 0,
+                scheduledDays: 0,
+                reps: 0,
+                lapses: 0,
+                updatedAt: now,
+              }
+            : card,
+        ),
+        reviewLogs: get().reviewLogs.filter((log) => !deckCardIds.has(log.cardId)),
+        studySessions: get().studySessions.filter((session) => session.deckId !== deckId),
+        decks: touchDeck(get().decks, deckId, now),
+      };
+
+      await persist(set, snapshot);
+    },
 
   startReview(deckId = null) {
     const dueCards = get()
