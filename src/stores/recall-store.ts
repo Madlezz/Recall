@@ -350,6 +350,41 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
     set({ activeStudy: { ...activeStudy, revealed: true } });
   },
 
+  buryCard() {
+    const state = get();
+    const activeStudy = state.activeStudy;
+    if (!activeStudy || activeStudy.completed) {
+      return;
+    }
+
+    // Move to next card without rating (remove current card from session)
+    const cardId = activeStudy.cardIds[activeStudy.currentIndex];
+    const remainingCardIds = activeStudy.cardIds.filter((id) => id !== cardId);
+
+    if (remainingCardIds.length === 0) {
+      // No more cards, complete the session
+      set({
+        activeStudy: {
+          ...activeStudy,
+          cardIds: [],
+          completed: true,
+          previousCardState: null,
+        },
+      });
+      return;
+    }
+
+    const nextIndex = Math.min(activeStudy.currentIndex, remainingCardIds.length - 1);
+    set({
+      activeStudy: {
+        ...activeStudy,
+        cardIds: remainingCardIds,
+        currentIndex: nextIndex,
+        revealed: false,
+      },
+    });
+  },
+
   async answerCurrentCard(result) {
     const state = get();
     const activeStudy = state.activeStudy;

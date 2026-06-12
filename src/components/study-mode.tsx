@@ -1,4 +1,4 @@
-import { ArrowLeft, Check, RotateCcw, RotateCw, Volume2, X } from "lucide-react";
+import { ArrowLeft, Check, EyeOff, RotateCcw, RotateCw, Volume2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { RichCard } from "@/components/RichCard";
@@ -10,15 +10,16 @@ import type { SessionSummary } from "@/types";
 
 export function StudyMode(): JSX.Element {
   const activeStudy = useRecallStore((state) => state.activeStudy);
-  const lastSessionSummary = useRecallStore((state) => state.lastSessionSummary);
-  const cards = useRecallStore((state) => state.cards);
   const decks = useRecallStore((state) => state.decks);
   const revealAnswer = useRecallStore((state) => state.revealAnswer);
   const answerCurrentCard = useRecallStore((state) => state.answerCurrentCard);
-  const undoLastReview = useRecallStore((state) => state.undoLastReview);
   const exitStudy = useRecallStore((state) => state.exitStudy);
+  const buryCard = useRecallStore((state) => state.buryCard);
+  const undoLastReview = useRecallStore((state) => state.undoLastReview);
+  const lastSessionSummary = useRecallStore((state) => state.lastSessionSummary);
   const clearSessionSummary = useRecallStore((state) => state.clearSessionSummary);
   const showDashboard = useRecallStore((state) => state.showDashboard);
+  const cards = useRecallStore((state) => state.cards);
 
   const cardId = activeStudy?.cardIds[activeStudy.currentIndex];
   const card = cards.find((item) => item.id === cardId);
@@ -209,6 +210,10 @@ export function StudyMode(): JSX.Element {
         <Button variant="outline" size="lg" onClick={revealAnswer} disabled={activeStudy.revealed}>
           <RotateCw className="h-4 w-4" />
           Reveal
+        </Button>
+        <Button variant="ghost" size="lg" onClick={buryCard}>
+          <EyeOff className="h-4 w-4" />
+          Bury
         </Button>
         <Button variant="destructive" size="lg" onClick={() => void answerCurrentCard("again")} disabled={!activeStudy.revealed}>
           Again (1)
