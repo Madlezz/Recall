@@ -2,6 +2,7 @@ export type CardState = "new" | "learning" | "review" | "relearning";
 export type ReviewRating = "again" | "hard" | "good" | "easy";
 export type Theme = "dark" | "light";
 export type DeckColor = "blue" | "green" | "amber" | "rose" | "violet" | "slate";
+export type CardType = "basic" | "cloze";
 
 export interface Deck {
   id: string;
@@ -19,6 +20,7 @@ export interface Card {
   back: string;
   hint: string;
   tags: string[];
+  cardType: CardType;
 
   // FSRS fields
   state: CardState;

@@ -19,7 +19,7 @@ export function DailyGoal(): JSX.Element {
   const progress = goal > 0 ? Math.min(done / goal, 1) : 0;
   const achieved = progress >= 1;
 
-  // Celebrate on goal hit — once
+  // Celebrate on goal hit — once per session
   useEffect(() => {
     if (achieved && !celebrated && done > 0) {
       setCelebrated(true);
@@ -30,13 +30,11 @@ export function DailyGoal(): JSX.Element {
         colors: ["#22c55e", "#a855f7", "#f59e0b", "#3b82f6"],
       });
     }
+    // Reset celebration when goal is no longer met (new day or goal increased)
+    if (!achieved && celebrated) {
+      setCelebrated(false);
+    }
   }, [achieved, celebrated, done]);
-
-  // Reset celebration when a new day starts
-  useEffect(() => {
-    const today = new Date().toISOString().slice(0, 10);
-    setCelebrated(false);
-  }, []);
 
   return (
     <div className={`rounded-lg border p-5 transition-all ${achieved ? "bg-emerald-500/10 border-emerald-500/30" : "bg-card"}`}>

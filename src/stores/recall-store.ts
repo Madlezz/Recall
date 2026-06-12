@@ -16,6 +16,7 @@ import {
   applyNewAchievements,
 } from "@/lib/xp";
 import { getStudyStreak } from "@/lib/streak";
+import { hasCloze } from "@/lib/cloze";
 import type {
   ActiveStudySession,
   AppView,
@@ -206,13 +207,14 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
     ensureCardInput(input);
 
     const now = new Date().toISOString();
-    const card: Card = {
-      id: createId("card"),
-      deckId: input.deckId,
-      front: input.front.trim(),
-      back: input.back.trim(),
-      hint: input.hint.trim(),
-      tags: input.tags,
+        const card: Card = {
+          id: createId("card"),
+          deckId: input.deckId,
+          front: input.front.trim(),
+          back: input.back.trim(),
+          hint: input.hint.trim(),
+          tags: input.tags,
+          cardType: hasCloze(input.front) ? "cloze" : "basic",
       state: "new",
       lastReviewDate: null,
       nextReviewDate: now,
@@ -596,7 +598,7 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
         const goodAndEasy = activeStudy.ratings.good + activeStudy.ratings.easy;
         const accuracy = totalRatings > 0 ? Math.round((goodAndEasy / totalRatings) * 100) : 0;
         const newXp = state.settings.xp + activeStudy.sessionXp;
-        const totalReviews = state.reviewLogs.length + totalRatings;
+                const totalReviews = state.reviewLogs.length; // already persisted by persistReview on each answer
         const streak = getStudyStreak(state.reviewLogs);
         const now = new Date();
         const nowIso = now.toISOString();
@@ -641,15 +643,12 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
         };
 
         void persist(set, snapshot, { activeStudy: null, lastSessionSummary });
-        return;
-      }
+                return;
+              }
 
-      if (activeStudy && activeStudy.completed) {
-        set({ activeStudy: null, lastSessionSummary });
-      } else {
-        const deckId = activeStudy?.deckId ?? state.selectedDeckId;
-        set({ view: deckId ? "deck" : "dashboard", selectedDeckId: deckId, activeStudy: null, lastSessionSummary: null });
-      }
+              // Not completed — exit mid-session
+              const deckId = activeStudy?.deckId ?? state.selectedDeckId;
+              set({ view: deckId ? "deck" : "dashboard", selectedDeckId: deckId, activeStudy: null, lastSessionSummary: null });
     },
 
   clearSessionSummary() {

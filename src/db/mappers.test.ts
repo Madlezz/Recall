@@ -17,13 +17,14 @@ import type { Card, Deck, RecallSettings, ReviewLog, StudySession } from "@/type
 describe("database mappers", () => {
   it("round-trips card rows with JSON tags and nullable review date", () => {
     const card: Card = {
-      id: "card-1",
-      deckId: "deck-1",
-      front: "Question",
-      back: "Answer",
-      hint: "",
-      tags: ["sqlite", "tauri"],
-      state: "new",
+          id: "card-1",
+          deckId: "deck-1",
+          front: "Question",
+          back: "Answer",
+          hint: "",
+          tags: ["sqlite", "tauri"],
+          cardType: "basic",
+          state: "new",
       stability: 0,
       difficulty: 0,
       elapsedDays: 0,
@@ -70,12 +71,15 @@ describe("database mappers", () => {
       scheduledDays: 1,
     };
     const settings: RecallSettings = {
-          theme: "dark",
-          seededAt: "2026-06-01T00:00:00.000Z",
-          dailyNewCardLimit: 20,
-          leechThreshold: 5,
-          onboardingComplete: true,
-        };
+              theme: "dark",
+              seededAt: "2026-06-01T00:00:00.000Z",
+              dailyNewCardLimit: 20,
+              leechThreshold: 5,
+              onboardingComplete: true,
+              xp: 0,
+              achievements: [],
+              dailyGoal: 20,
+            };
 
     expect(deckFromRow(deckToRow(deck) as DeckRow)).toEqual(deck);
     expect(studySessionFromRow(studySessionToRow(session) as StudySessionRow)).toEqual(session);
@@ -86,13 +90,14 @@ describe("database mappers", () => {
 
   it("rejects invalid card state and review rating rows", () => {
     const cardRow: CardRow = {
-      id: "card-1",
-      deck_id: "deck-1",
-      front: "Question",
-      back: "Answer",
-      hint: "",
-      tags: "[]",
-      state: "bad",
+          id: "card-1",
+          deck_id: "deck-1",
+          front: "Question",
+          back: "Answer",
+          hint: "",
+          tags: "[]",
+          card_type: "basic",
+          state: "bad",
       stability: 0,
       difficulty: 0,
       elapsed_days: 0,

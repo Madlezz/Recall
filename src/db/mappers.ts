@@ -1,4 +1,4 @@
-import type { Card, CardState, Deck, DeckColor, RecallSettings, ReviewLog, ReviewRating, StudySession } from "@/types";
+import type { Achievement, Card, CardState, CardType, Deck, DeckColor, RecallSettings, ReviewLog, ReviewRating, StudySession } from "@/types";
 import { SCHEMA_VERSION, isCardState, isDeckColor, isReviewRating } from "@/lib/domain";
 
 export interface DeckRow {
@@ -17,6 +17,7 @@ export interface CardRow {
   back: string;
   hint: string;
   tags: string;
+  card_type: string;
   state: string;
   last_review_date: string | null;
   next_review_date: string;
@@ -86,13 +87,14 @@ export function cardFromRow(row: CardRow): Card {
   }
 
   return {
-    id: row.id,
-    deckId: row.deck_id,
-    front: row.front,
-    back: row.back,
-    hint: row.hint,
-    tags: parseTags(row.tags),
-    state: row.state as CardState,
+      id: row.id,
+      deckId: row.deck_id,
+      front: row.front,
+      back: row.back,
+      hint: row.hint,
+      tags: parseTags(row.tags),
+      cardType: (row.card_type === "cloze" ? "cloze" : "basic") as CardType,
+      state: row.state as CardState,
     lastReviewDate: row.last_review_date,
     nextReviewDate: row.next_review_date,
     stability: row.stability,
@@ -108,13 +110,14 @@ export function cardFromRow(row: CardRow): Card {
 
 export function cardToRow(card: Card): CardRow {
   return {
-    id: card.id,
-    deck_id: card.deckId,
-    front: card.front,
-    back: card.back,
-    hint: card.hint,
-    tags: JSON.stringify(card.tags),
-    state: card.state,
+      id: card.id,
+      deck_id: card.deckId,
+      front: card.front,
+      back: card.back,
+      hint: card.hint,
+      tags: JSON.stringify(card.tags),
+      card_type: card.cardType,
+      state: card.state,
     last_review_date: card.lastReviewDate,
     next_review_date: card.nextReviewDate,
     stability: card.stability,
@@ -183,14 +186,24 @@ export function settingsFromRows(rows: SettingRow[]): RecallSettings {
   const theme = values.get("theme") === "light" ? "light" : "dark";
   const dailyNewCardLimitRaw = values.get("daily_new_card_limit");
   const leechThresholdRaw = values.get("leech_threshold");
+  const xpRaw = values.get("xp");
+  const dailyGoalRaw = values.get("daily_goal");
+  let achievements: Achievement[] = [];
+  try {
+    const raw = values.get("achievements");
+    if (raw) achievements = JSON.parse(raw);
+  } catch { /* keep empty */ }
 
   return {
-      theme,
-      seededAt: values.get("seeded_at") ?? new Date(0).toISOString(),
-      dailyNewCardLimit: dailyNewCardLimitRaw ? parseInt(dailyNewCardLimitRaw, 10) : 20,
-      leechThreshold: leechThresholdRaw ? parseInt(leechThresholdRaw, 10) : 5,
-      onboardingComplete: values.get("onboarding_complete") !== "false",
-    };
+    theme,
+    seededAt: values.get("seeded_at") ?? new Date(0).toISOString(),
+    dailyNewCardLimit: dailyNewCardLimitRaw ? parseInt(dailyNewCardLimitRaw, 10) : 20,
+    leechThreshold: leechThresholdRaw ? parseInt(leechThresholdRaw, 10) : 5,
+    onboardingComplete: values.get("onboarding_complete") !== "false",
+    xp: xpRaw ? parseInt(xpRaw, 10) : 0,
+    achievements,
+    dailyGoal: dailyGoalRaw ? parseInt(dailyGoalRaw, 10) : 20,
+  };
 }
 
 export function settingsToRows(settings: RecallSettings): SettingRow[] {
@@ -201,6 +214,9 @@ export function settingsToRows(settings: RecallSettings): SettingRow[] {
     { key: "daily_new_card_limit", value: String(settings.dailyNewCardLimit) },
     { key: "leech_threshold", value: String(settings.leechThreshold) },
     { key: "onboarding_complete", value: String(settings.onboardingComplete) },
+    { key: "xp", value: String(settings.xp) },
+    { key: "achievements", value: JSON.stringify(settings.achievements) },
+    { key: "daily_goal", value: String(settings.dailyGoal) },
   ];
 }
 

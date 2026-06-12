@@ -189,8 +189,8 @@ export function StudyMode(): JSX.Element {
             <div className="study-card-face absolute inset-0 flex flex-col justify-center rounded-lg border bg-card p-8 shadow-2xl">
               <p className="text-sm text-muted-foreground">{deck?.name ?? "All due cards"}</p>
               <div className="mt-6 text-balance text-2xl font-medium leading-tight sm:text-3xl">
-                              <RichCard content={card.front} />
-                            </div>
+                                            <RichCard content={card.front} cardType={card.cardType} revealed={activeStudy.revealed} />
+                                          </div>
               {card.hint ? <p className="mt-8 text-sm text-muted-foreground">Hint: {card.hint}</p> : null}
             </div>
             <div className="study-card-face study-card-back absolute inset-0 flex flex-col justify-center rounded-lg border bg-card p-8 shadow-2xl">

@@ -16,12 +16,13 @@ const snapshot: RecallStateSnapshot = {
   cards: [
     {
       id: "card-1",
-      deckId: "deck-1",
-      front: "What is a discriminated union?",
-      back: "A union narrowed by a shared literal field.",
-      hint: "",
-      tags: ["typescript"],
-      state: "new",
+            deckId: "deck-1",
+            front: "What is a discriminated union?",
+            back: "A union narrowed by a shared literal field.",
+            hint: "",
+            tags: ["typescript"],
+            cardType: "basic",
+            state: "new",
       stability: 0,
       difficulty: 0,
       elapsedDays: 0,
@@ -36,7 +37,7 @@ const snapshot: RecallStateSnapshot = {
   ],
   studySessions: [],
   reviewLogs: [],
-  settings: { theme: "dark", seededAt: "2026-06-01T00:00:00.000Z" },
+  settings: { theme: "dark", seededAt: "2026-06-01T00:00:00.000Z", dailyNewCardLimit: 20, leechThreshold: 5, onboardingComplete: false, xp: 0, achievements: [], dailyGoal: 20 },
 };
 
 describe("import/export", () => {

@@ -81,8 +81,12 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
           <DialogHeader>
             <DialogTitle>{card ? "Edit card" : "New card"}</DialogTitle>
             <DialogDescription>
-              Supports Markdown, code blocks with syntax highlighting, and LaTeX math ($inline$ and $$block$$).
-            </DialogDescription>
+                          Supports Markdown, code blocks with syntax highlighting, and LaTeX math ($inline$ and $$block$$).
+                          <br />
+                          <span className="text-primary font-medium">Cloze deletion:</span> wrap hidden text like{" "}
+                          <code className="bg-muted px-1 rounded text-xs">{"{{c1::hidden answer}}"}</code>{" "}
+                          — it auto-detects and becomes a fill-in-the-blank card.
+                        </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">

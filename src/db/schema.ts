@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS cards (
   back TEXT NOT NULL,
   hint TEXT DEFAULT '',
   tags TEXT NOT NULL DEFAULT '[]',
+  card_type TEXT NOT NULL DEFAULT 'basic',
   state TEXT NOT NULL DEFAULT 'new',
   last_review_date TEXT,
   next_review_date TEXT NOT NULL,
