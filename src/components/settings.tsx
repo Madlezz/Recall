@@ -161,18 +161,32 @@ export function Settings(): JSX.Element {
                 </Panel>
 
                                 <Panel title="Leech Detection" description="Cards failed more than this threshold are flagged as leeches (shown with ⚠️ in deck detail).">
-                                  <div className="flex items-center gap-3">
-                                    <Input
-                                      type="number"
-                                      min="1"
-                                      max="20"
-                                      value={settings.leechThreshold}
-                                      onChange={(e) => void updateSettings({ leechThreshold: Math.max(1, Math.min(20, parseInt(e.target.value) || 5)) })}
-                                      className="w-24"
-                                    />
-                                    <span className="text-sm text-muted-foreground">lapses before flagged</span>
-                                  </div>
-                                </Panel>
+                                                                  <div className="flex items-center gap-3">
+                                                                    <Input
+                                                                      type="number"
+                                                                      min="1"
+                                                                      max="20"
+                                                                      value={settings.leechThreshold}
+                                                                      onChange={(e) => void updateSettings({ leechThreshold: Math.max(1, Math.min(20, parseInt(e.target.value) || 5)) })}
+                                                                      className="w-24"
+                                                                    />
+                                                                    <span className="text-sm text-muted-foreground">lapses before flagged</span>
+                                                                  </div>
+                                                                </Panel>
+
+                                        <Panel title="Daily Goal" description="Cards to review per day. Hit it and celebrate! 🎉">
+                                          <div className="flex items-center gap-3">
+                                            <Input
+                                              type="number"
+                                              min="1"
+                                              max="500"
+                                              value={settings.dailyGoal}
+                                              onChange={(e) => void updateSettings({ dailyGoal: Math.max(1, Math.min(500, parseInt(e.target.value) || 20)) })}
+                                              className="w-24"
+                                            />
+                                            <span className="text-sm text-muted-foreground">cards per day</span>
+                                          </div>
+                                        </Panel>
 
                         <Panel title="Import / Export" description="JSON only. Merge skips duplicates by deck name and card front.">
           <div className="grid gap-3 sm:grid-cols-[160px_1fr_1fr]">

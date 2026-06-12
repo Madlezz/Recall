@@ -3,6 +3,9 @@ import { ArrowRight, BookOpen, Brain, Flame, Layers3, Library, Plus, RotateCw, S
 import { toast } from "sonner";
 import { AnkiImportDialog } from "@/components/anki-import-dialog";
 import { ActivityHeatmap } from "@/components/activity-heatmap";
+import { DailyGoal } from "@/components/daily-goal";
+import { FocusTimer } from "@/components/focus-timer";
+import { ReviewCalendar } from "@/components/review-calendar";
 import { DeckDialog } from "@/components/deck-dialog";
 import { StatTile } from "@/components/stat-tile";
 import { Button } from "@/components/ui/button";
@@ -80,10 +83,21 @@ export function Dashboard(): JSX.Element {
                   </section>
 
             <section className="rounded-lg border bg-card p-5">
-              <ActivityHeatmap />
-            </section>
+                          <ActivityHeatmap />
+                        </section>
 
-      <section>
+                  {/* Daily Goal */}
+                  <section>
+                    <DailyGoal />
+                  </section>
+
+                  {/* Focus + Calendar */}
+                  <section className="grid gap-4 lg:grid-cols-2">
+                    <FocusTimer />
+                    <ReviewCalendar />
+                  </section>
+
+                  <section>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold">Decks</h2>
                     <div className="flex items-center gap-2">

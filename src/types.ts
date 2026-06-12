@@ -62,6 +62,7 @@ export interface RecallSettings {
   onboardingComplete: boolean;
   xp: number;
   achievements: Achievement[];
+  dailyGoal: number;
 }
 
 export interface SessionSummary {

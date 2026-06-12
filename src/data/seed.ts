@@ -79,7 +79,8 @@ export function createSeedSnapshot(now = new Date()): RecallStateSnapshot {
               leechThreshold: 5,
               onboardingComplete: false,
               xp: 0,
-              achievements: [],
+                            achievements: [],
+                            dailyGoal: 20,
             },
   };
 }
