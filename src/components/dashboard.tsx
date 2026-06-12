@@ -1,4 +1,5 @@
-import { ArrowRight, BookOpen, Brain, Flame, Layers3, Plus, RotateCw, Zap } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ArrowRight, BookOpen, Brain, Flame, Layers3, Plus, RotateCw, SortAsc, SortDesc, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { AnkiImportDialog } from "@/components/anki-import-dialog";
 import { ActivityHeatmap } from "@/components/activity-heatmap";
@@ -19,12 +20,27 @@ export function Dashboard(): JSX.Element {
   const reviewLogs = useRecallStore((state) => state.reviewLogs);
   const showDeck = useRecallStore((state) => state.showDeck);
   const startReview = useRecallStore((state) => state.startReview);
+  const [sortBy, setSortBy] = useState<"name" | "due" | "cards">("name");
 
   function handleStartReview(): void {
     if (!startReview(null)) {
       toast.info("No cards due right now");
     }
   }
+
+  const sortedDecks = useMemo(() => {
+    const withStats = decks.map((deck) => {
+      const deckCards = cards.filter((c) => c.deckId === deck.id);
+      const dueCount = deckCards.filter((c) => c.state === "review" || c.state === "learning" || c.state === "relearning").length;
+      return { ...deck, dueCount, totalCards: deckCards.length };
+    });
+
+    return withStats.sort((a, b) => {
+      if (sortBy === "due") return b.dueCount - a.dueCount;
+      if (sortBy === "cards") return b.totalCards - a.totalCards;
+      return a.name.localeCompare(b.name);
+    });
+  }, [decks, cards, sortBy]);
 
   return (
     <div className="animate-fade-in space-y-8">
@@ -67,7 +83,14 @@ export function Dashboard(): JSX.Element {
       <section>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold">Decks</h2>
-          <span className="text-sm text-muted-foreground">{decks.length} total</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">{decks.length} total</span>
+                      <div className="flex rounded-md border border-input overflow-hidden">
+                        <button onClick={() => setSortBy("name")} className={cn("px-2 py-1 text-xs font-medium transition-colors", sortBy === "name" ? "bg-primary text-primary-foreground" : "hover:bg-muted")}>Name</button>
+                        <button onClick={() => setSortBy("due")} className={cn("px-2 py-1 text-xs font-medium transition-colors border-l border-input", sortBy === "due" ? "bg-primary text-primary-foreground" : "hover:bg-muted")}>Due</button>
+                        <button onClick={() => setSortBy("cards")} className={cn("px-2 py-1 text-xs font-medium transition-colors border-l border-input", sortBy === "cards" ? "bg-primary text-primary-foreground" : "hover:bg-muted")}>Cards</button>
+                      </div>
+                    </div>
         </div>
 
         {decks.length === 0 ? (
@@ -77,7 +100,7 @@ export function Dashboard(): JSX.Element {
           </div>
         ) : (
           <div className="grid gap-3 lg:grid-cols-2">
-            {decks.map((deck) => (
+            {sortedDecks.map((deck) => {
               <DeckCard key={deck.id} deck={deck} onOpen={() => showDeck(deck.id)} />
             ))}
           </div>
