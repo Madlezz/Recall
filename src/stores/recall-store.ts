@@ -363,41 +363,97 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
   },
 
   buryCard() {
-    const state = get();
-    const activeStudy = state.activeStudy;
-    if (!activeStudy || activeStudy.completed) {
-      return;
-    }
+      const state = get();
+      const activeStudy = state.activeStudy;
+      if (!activeStudy || activeStudy.completed) {
+        return;
+      }
 
-    // Move to next card without rating (remove current card from session)
-    const cardId = activeStudy.cardIds[activeStudy.currentIndex];
-    const remainingCardIds = activeStudy.cardIds.filter((id) => id !== cardId);
+      // Move to next card without rating (remove current card from session)
+      const cardId = activeStudy.cardIds[activeStudy.currentIndex];
+      const remainingCardIds = activeStudy.cardIds.filter((id) => id !== cardId);
 
-    if (remainingCardIds.length === 0) {
-      // No more cards, complete the session
+      if (remainingCardIds.length === 0) {
+        // No more cards, complete the session
+        set({
+          activeStudy: {
+            ...activeStudy,
+            cardIds: [],
+            completed: true,
+            previousCardState: null,
+          },
+        });
+        return;
+      }
+
+      const nextIndex = Math.min(activeStudy.currentIndex, remainingCardIds.length - 1);
       set({
         activeStudy: {
           ...activeStudy,
-          cardIds: [],
-          completed: true,
-          previousCardState: null,
+          cardIds: remainingCardIds,
+          currentIndex: nextIndex,
+          revealed: false,
         },
       });
-      return;
-    }
+    },
 
-    const nextIndex = Math.min(activeStudy.currentIndex, remainingCardIds.length - 1);
-    set({
-      activeStudy: {
-        ...activeStudy,
-        cardIds: remainingCardIds,
-        currentIndex: nextIndex,
-        revealed: false,
-      },
-    });
-  },
+    async snoozeCard(minutes: number) {
+      const state = get();
+      const activeStudy = state.activeStudy;
+      if (!activeStudy || activeStudy.completed) {
+        return;
+      }
 
-  async answerCurrentCard(result) {
+      const cardId = activeStudy.cardIds[activeStudy.currentIndex];
+      const card = state.cards.find((item) => item.id === cardId);
+      if (!card) {
+        return;
+      }
+
+      // Push the next review date forward by N minutes
+      const now = new Date();
+      const newNextReview = new Date(now.getTime() + minutes * 60 * 1000);
+
+      const updatedCard: Card = {
+        ...card,
+        nextReviewDate: newNextReview.toISOString(),
+        state: card.state === "new" ? "learning" : card.state,
+      };
+
+      const repository = await getRepository();
+      const snapshot = await repository.saveSnapshot({
+        ...dataState(state),
+        cards: state.cards.map((c) => (c.id === card.id ? updatedCard : c)),
+      });
+      commitSnapshot(set, snapshot);
+
+      // Also bury it from the current session so it doesn't reappear immediately
+      const remainingCardIds = activeStudy.cardIds.filter((id) => id !== cardId);
+
+      if (remainingCardIds.length === 0) {
+        set({
+          activeStudy: {
+            ...activeStudy,
+            cardIds: [],
+            completed: true,
+            previousCardState: null,
+          },
+        });
+        return;
+      }
+
+      const nextIndex = Math.min(activeStudy.currentIndex, remainingCardIds.length - 1);
+      set({
+        activeStudy: {
+          ...activeStudy,
+          cardIds: remainingCardIds,
+          currentIndex: nextIndex,
+          revealed: false,
+        },
+      });
+    },
+
+    async answerCurrentCard(result) {
     const state = get();
     const activeStudy = state.activeStudy;
     if (!activeStudy || activeStudy.completed || !activeStudy.revealed) {

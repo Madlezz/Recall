@@ -1,5 +1,5 @@
 import confetti from "canvas-confetti";
-import { ArrowLeft, Check, EyeOff, RotateCcw, RotateCw, Volume2, X } from "lucide-react";
+import { ArrowLeft, Check, Clock, EyeOff, RotateCcw, RotateCw, Volume2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { RichCard } from "@/components/RichCard";
@@ -16,7 +16,8 @@ export function StudyMode(): JSX.Element {
   const answerCurrentCard = useRecallStore((state) => state.answerCurrentCard);
   const exitStudy = useRecallStore((state) => state.exitStudy);
   const buryCard = useRecallStore((state) => state.buryCard);
-  const undoLastReview = useRecallStore((state) => state.undoLastReview);
+    const snoozeCard = useRecallStore((state) => state.snoozeCard);
+    const undoLastReview = useRecallStore((state) => state.undoLastReview);
   const lastSessionSummary = useRecallStore((state) => state.lastSessionSummary);
   const clearSessionSummary = useRecallStore((state) => state.clearSessionSummary);
   const showDashboard = useRecallStore((state) => state.showDashboard);
@@ -213,9 +214,13 @@ export function StudyMode(): JSX.Element {
           Reveal
         </Button>
         <Button variant="ghost" size="lg" onClick={buryCard}>
-          <EyeOff className="h-4 w-4" />
-          Bury
-        </Button>
+                  <EyeOff className="h-4 w-4" />
+                  Bury
+                </Button>
+                <Button variant="ghost" size="lg" onClick={() => { void snoozeCard(120); toast.info("Snoozed for 2 hours"); }}>
+                  <Clock className="h-4 w-4" />
+                  Snooze
+                </Button>
         <Button variant="destructive" size="lg" onClick={() => void answerCurrentCard("again")} disabled={!activeStudy.revealed}>
           Again (1)
         </Button>
