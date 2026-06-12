@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, BookOpen, Brain, Flame, Layers3, Plus, RotateCw, SortAsc, SortDesc, Zap } from "lucide-react";
+import { ArrowRight, BookOpen, Brain, Flame, Layers3, Library, Plus, RotateCw, SortAsc, SortDesc, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { AnkiImportDialog } from "@/components/anki-import-dialog";
 import { ActivityHeatmap } from "@/components/activity-heatmap";
@@ -21,6 +21,7 @@ export function Dashboard(): JSX.Element {
   const showDeck = useRecallStore((state) => state.showDeck);
   const startReview = useRecallStore((state) => state.startReview);
   const [sortBy, setSortBy] = useState<"name" | "due" | "cards">("name");
+  const [showCreateDeck, setShowCreateDeck] = useState(false);
 
   function handleStartReview(): void {
     if (!startReview(null)) {
@@ -94,11 +95,26 @@ export function Dashboard(): JSX.Element {
         </div>
 
         {decks.length === 0 ? (
-          <div className="rounded-lg border border-dashed p-10 text-center">
-            <h3 className="font-semibold">No decks yet</h3>
-            <p className="mt-2 text-sm text-muted-foreground">Create a deck to start collecting cards.</p>
-          </div>
-        ) : (
+                  <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-muted-foreground/30 px-6 py-16 text-center">
+                    <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-muted/60">
+                      <Library className="h-8 w-8 text-muted-foreground/60" />
+                    </div>
+                    <h3 className="text-lg font-semibold">Your library is empty</h3>
+                    <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
+                      Create your first deck and start building your knowledge. Cards you review will appear here.
+                    </p>
+                    <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                      <Button onClick={() => setShowCreateDeck(true)}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create Your First Deck
+                      </Button>
+                      <Button variant="outline" onClick={() => toast.info("Select a .apkg file to import")}>
+                        <ArrowRight className="mr-2 h-4 w-4" />
+                        Import from Anki
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
           <div className="grid gap-3 lg:grid-cols-2">
             {sortedDecks.map((deck) => (
               <DeckCard key={deck.id} deck={deck} onOpen={() => showDeck(deck.id)} />
@@ -106,9 +122,10 @@ export function Dashboard(): JSX.Element {
           </div>
         )}
       </section>
-    </div>
-  );
-}
+            <DeckDialog open={showCreateDeck} onOpenChange={setShowCreateDeck} />
+          </div>
+        );
+      }
 
 interface DeckCardProps {
   deck: Deck;
