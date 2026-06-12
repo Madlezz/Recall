@@ -16,7 +16,7 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { getDeckStats } from "@/lib/stats";
 import { useRecallStore } from "@/stores/recall-store";
-import type { Card } from "@/types";
+import type { Card, RecallSettings } from "@/types";
 import { exportDeckToJson, downloadFile } from "@/services/import-export";
 
 export function DeckDetail(): JSX.Element {
@@ -233,6 +233,8 @@ interface CardRowProps {
 function CardRow({ card, deckId }: CardRowProps): JSX.Element {
   const [isDeleting, setIsDeleting] = useState(false);
   const deleteCard = useRecallStore((state) => state.deleteCard);
+  const leechThreshold = useRecallStore((state) => state.settings.leechThreshold);
+  const isLeech = card.lapses >= leechThreshold;
 
   async function handleDelete(): Promise<void> {
     setIsDeleting(true);
@@ -254,6 +256,11 @@ function CardRow({ card, deckId }: CardRowProps): JSX.Element {
             <Badge tone={card.state === "review" ? "success" : card.state === "learning" || card.state === "relearning" ? "warning" : "muted"}>
               {card.state}
             </Badge>
+            {isLeech ? (
+              <Badge tone="warning" title={`Failed ${card.lapses} times (threshold: ${leechThreshold}). Consider rewriting this card.`}>
+                ⚠️ Leech
+              </Badge>
+            ) : null}
             {card.tags.map((tag) => (
               <Badge key={tag} tone="muted">
                 {tag}
