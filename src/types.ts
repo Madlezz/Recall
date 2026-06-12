@@ -79,8 +79,7 @@ export interface ActiveStudySession {
   currentIndex: number;
   revealed: boolean;
   startedAt: string;
-  correct: number;
-  incorrect: number;
+  ratings: Record<ReviewRating, number>;
   completed: boolean;
 }
 

@@ -1,19 +1,19 @@
-import type { CardStatus, DeckColor, ReviewResult } from "@/types";
+import type { CardState, DeckColor, ReviewRating } from "@/types";
 
 export const SCHEMA_VERSION = "2";
 
 export const deckColors: DeckColor[] = ["blue", "green", "amber", "rose", "violet", "slate"];
-export const cardStatuses: CardStatus[] = ["new", "learning", "mastered"];
-export const reviewResults: ReviewResult[] = ["correct", "incorrect"];
+export const cardStates: CardState[] = ["new", "learning", "review", "relearning"];
+export const reviewRatings: ReviewRating[] = ["again", "hard", "good", "easy"];
 
 export function isDeckColor(value: unknown): value is DeckColor {
   return deckColors.includes(value as DeckColor);
 }
 
-export function isCardStatus(value: unknown): value is CardStatus {
-  return cardStatuses.includes(value as CardStatus);
+export function isCardState(value: unknown): value is CardState {
+  return cardStates.includes(value as CardState);
 }
 
-export function isReviewResult(value: unknown): value is ReviewResult {
-  return reviewResults.includes(value as ReviewResult);
+export function isReviewRating(value: unknown): value is ReviewRating {
+  return reviewRatings.includes(value as ReviewRating);
 }

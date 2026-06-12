@@ -200,8 +200,8 @@ function CardRow({ card, deckId }: CardRowProps): JSX.Element {
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge tone={card.status === "mastered" ? "success" : card.status === "learning" ? "warning" : "muted"}>
-              {card.status}
+            <Badge tone={card.state === "review" ? "success" : card.state === "learning" || card.state === "relearning" ? "warning" : "muted"}>
+              {card.state}
             </Badge>
             {card.tags.map((tag) => (
               <Badge key={tag} tone="muted">

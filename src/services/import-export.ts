@@ -1,5 +1,5 @@
-import type { Card, Deck, RecallExportPayload, RecallStateSnapshot, Review, StudySession } from "@/types";
-import { isCardStatus, isDeckColor, isReviewResult } from "@/lib/domain";
+import type { Card, Deck, RecallExportPayload, RecallStateSnapshot, ReviewLog, StudySession } from "@/types";
+import { isCardState, isDeckColor, isReviewRating } from "@/lib/domain";
 import { createId, normalizeName } from "@/lib/utils";
 
 export function exportDeckToJson(deck: Deck, cards: Card[]): string {
@@ -41,12 +41,12 @@ export function downloadFile(filename: string, content: string): void {
 
 export function buildExportPayload(snapshot: RecallStateSnapshot, exportedAt = new Date()): RecallExportPayload {
   return {
-    version: 1,
+    version: 2,
     exportedAt: exportedAt.toISOString(),
     decks: snapshot.decks,
     cards: snapshot.cards,
     studySessions: snapshot.studySessions,
-    reviews: snapshot.reviews,
+    reviewLogs: snapshot.reviewLogs,
     settings: snapshot.settings,
   };
 }
@@ -64,13 +64,6 @@ export function parseImportPayload(raw: string): RecallExportPayload {
     throw new Error("Invalid import file");
   }
 
-  // Backwards compatibility for v1 exports
-  for (const card of parsed.cards) {
-    if (card.easeFactor === undefined) {
-      card.easeFactor = 2.5;
-    }
-  }
-
   return parsed;
 }
 
@@ -80,7 +73,7 @@ export function mergeImportPayload(current: RecallStateSnapshot, incoming: Recal
   const nextDecks = [...current.decks];
   const nextCards = [...current.cards];
   const nextStudySessions = [...current.studySessions];
-  const nextReviews = [...current.reviews];
+  const nextReviewLogs = [...current.reviewLogs];
   const importedCardIdMap = new Map<string, string>();
   const currentDecksById = new Map(current.decks.map((deck) => [deck.id, deck]));
   const existingCardKeys = new Set(
@@ -121,15 +114,18 @@ export function mergeImportPayload(current: RecallStateSnapshot, incoming: Recal
     existingCardKeys.add(key);
   }
 
-  const reviewsBySession = groupReviewsBySession(incoming.reviews);
+  const reviewLogsByCard = groupReviewLogsByCard(incoming.reviewLogs);
   for (const incomingSession of incoming.studySessions) {
-    const incomingReviews = reviewsBySession.get(incomingSession.id) ?? [];
-    if (incomingReviews.length === 0) {
+    const incomingReviewLogs = reviewLogsByCard.get(incomingSession.id) ?? [];
+    if (incomingReviewLogs.length === 0) {
+      // Include sessions even without review logs
+      const nextSession = ensureStudySessionId({ ...incomingSession }, nextStudySessions);
+      nextStudySessions.push(nextSession);
       continue;
     }
 
-    const allReviewsBelongToNewCards = incomingReviews.every((review) => importedCardIdMap.has(review.cardId));
-    if (!allReviewsBelongToNewCards) {
+    const allReviewLogsBelongToNewCards = incomingReviewLogs.every((reviewLog) => importedCardIdMap.has(reviewLog.cardId));
+    if (!allReviewLogsBelongToNewCards) {
       continue;
     }
 
@@ -145,13 +141,13 @@ export function mergeImportPayload(current: RecallStateSnapshot, incoming: Recal
     const nextSession = ensureStudySessionId({ ...incomingSession, deckId }, nextStudySessions);
     nextStudySessions.push(nextSession);
 
-    for (const incomingReview of incomingReviews) {
-      const cardId = importedCardIdMap.get(incomingReview.cardId);
+    for (const incomingReviewLog of incomingReviewLogs) {
+      const cardId = importedCardIdMap.get(incomingReviewLog.cardId);
       if (!cardId) {
         continue;
       }
 
-      nextReviews.push(ensureReviewId({ ...incomingReview, cardId, sessionId: nextSession.id }, nextReviews));
+      nextReviewLogs.push(ensureReviewLogId({ ...incomingReviewLog, cardId }, nextReviewLogs));
     }
   }
 
@@ -159,17 +155,18 @@ export function mergeImportPayload(current: RecallStateSnapshot, incoming: Recal
     decks: nextDecks,
     cards: nextCards,
     studySessions: nextStudySessions,
-    reviews: nextReviews,
+    reviewLogs: nextReviewLogs,
     settings: current.settings,
   };
 }
 
-function groupReviewsBySession(reviews: Review[]): Map<string, Review[]> {
-  const grouped = new Map<string, Review[]>();
-  for (const review of reviews) {
-    const sessionReviews = grouped.get(review.sessionId) ?? [];
-    sessionReviews.push(review);
-    grouped.set(review.sessionId, sessionReviews);
+function groupReviewLogsByCard(reviewLogs: ReviewLog[]): Map<string, ReviewLog[]> {
+  const grouped = new Map<string, ReviewLog[]>();
+  for (const reviewLog of reviewLogs) {
+    const groupKey = reviewLog.cardId;
+    const group = grouped.get(groupKey) ?? [];
+    group.push(reviewLog);
+    grouped.set(groupKey, group);
   }
   return grouped;
 }
@@ -202,12 +199,12 @@ function ensureStudySessionId(session: StudySession, sessions: StudySession[]): 
   return { ...session, id: createId("session") };
 }
 
-function ensureReviewId(review: Review, reviews: Review[]): Review {
-  if (!reviews.some((item) => item.id === review.id)) {
-    return review;
+function ensureReviewLogId(reviewLog: ReviewLog, reviewLogs: ReviewLog[]): ReviewLog {
+  if (!reviewLogs.some((item) => item.id === reviewLog.id)) {
+    return reviewLog;
   }
 
-  return { ...review, id: createId("review") };
+  return { ...reviewLog, id: createId("review") };
 }
 
 function isExportPayload(value: unknown): value is RecallExportPayload {
@@ -216,17 +213,17 @@ function isExportPayload(value: unknown): value is RecallExportPayload {
   }
 
   return (
-    value.version === 1 &&
+    value.version === 2 &&
     typeof value.exportedAt === "string" &&
     Array.isArray(value.decks) &&
     Array.isArray(value.cards) &&
     Array.isArray(value.studySessions) &&
-    Array.isArray(value.reviews) &&
+    Array.isArray(value.reviewLogs) &&
     isSettings(value.settings) &&
     value.decks.every(isDeck) &&
     value.cards.every(isCard) &&
     value.studySessions.every(isStudySession) &&
-    value.reviews.every(isReview)
+    value.reviewLogs.every(isReviewLog)
   );
 }
 
@@ -252,13 +249,15 @@ function isCard(value: unknown): value is Card {
     typeof value.hint === "string" &&
     Array.isArray(value.tags) &&
     value.tags.every((tag) => typeof tag === "string") &&
-    isCardStatus(value.status) &&
-    typeof value.correctCount === "number" &&
-    typeof value.incorrectCount === "number" &&
-    typeof value.streak === "number" &&
-    (typeof value.easeFactor === "number" || typeof value.easeFactor === "undefined") &&
-    (typeof value.lastReviewedAt === "string" || value.lastReviewedAt === null) &&
-    typeof value.nextReviewAt === "string" &&
+    isCardState(value.state) &&
+    typeof value.stability === "number" &&
+    typeof value.difficulty === "number" &&
+    typeof value.elapsedDays === "number" &&
+    typeof value.scheduledDays === "number" &&
+    typeof value.reps === "number" &&
+    typeof value.lapses === "number" &&
+    (typeof value.lastReviewDate === "string" || value.lastReviewDate === null) &&
+    typeof value.nextReviewDate === "string" &&
     typeof value.createdAt === "string" &&
     typeof value.updatedAt === "string"
   );
@@ -271,20 +270,21 @@ function isStudySession(value: unknown): value is StudySession {
     (typeof value.deckId === "string" || value.deckId === null) &&
     typeof value.startedAt === "string" &&
     typeof value.endedAt === "string" &&
-    typeof value.cardsStudied === "number" &&
-    typeof value.correct === "number" &&
-    typeof value.incorrect === "number"
+    typeof value.cardsStudied === "number"
   );
 }
 
-function isReview(value: unknown): value is Review {
+function isReviewLog(value: unknown): value is ReviewLog {
   return (
     isRecord(value) &&
     typeof value.id === "string" &&
     typeof value.cardId === "string" &&
-    typeof value.sessionId === "string" &&
-    typeof value.answeredAt === "string" &&
-    isReviewResult(value.result)
+    typeof value.reviewDate === "string" &&
+    isReviewRating(value.rating) &&
+    typeof value.stability === "number" &&
+    typeof value.difficulty === "number" &&
+    typeof value.elapsedDays === "number" &&
+    typeof value.scheduledDays === "number"
   );
 }
 

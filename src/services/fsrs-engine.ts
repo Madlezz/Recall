@@ -13,10 +13,7 @@ export function getDueCards(cards: Card[], now = new Date()): Card[] {
     );
 }
 
-export function calculateNextReview(
-  card: Card,
-  rating: ReviewRating
-): Partial<Card> {
+export function applyReview(card: Card, rating: ReviewRating, reviewedAt: Date): Card {
   const fsrsRating =
     rating === "again"
       ? Rating.Again
@@ -48,7 +45,7 @@ export function calculateNextReview(
       : undefined,
   };
 
-  const recordLog = f.repeat(schedulingCard, new Date());
+  const recordLog = f.repeat(schedulingCard, reviewedAt);
   const s = recordLog[fsrsRating].card;
 
   const newState: CardState =
@@ -61,8 +58,9 @@ export function calculateNextReview(
           : "relearning";
 
   return {
+    ...card,
     state: newState,
-    lastReviewDate: new Date().toISOString(),
+    lastReviewDate: reviewedAt.toISOString(),
     nextReviewDate: s.due.toISOString(),
     stability: s.stability,
     difficulty: s.difficulty,
@@ -70,8 +68,17 @@ export function calculateNextReview(
     scheduledDays: s.scheduled_days,
     reps: s.reps,
     lapses: s.lapses,
-    updatedAt: new Date().toISOString(),
+    updatedAt: reviewedAt.toISOString(),
   };
+}
+
+export function calculateNextReview(
+  card: Card,
+  rating: ReviewRating
+): Partial<Card> {
+  const updated = applyReview(card, rating, new Date());
+  const { id, deckId, front, back, hint, tags, createdAt, ...rest } = updated;
+  return rest;
 }
 
 export function createNewCard(

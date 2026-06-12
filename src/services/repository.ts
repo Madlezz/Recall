@@ -3,21 +3,21 @@ import {
   cardToRow,
   deckFromRow,
   deckToRow,
-  reviewFromRow,
-  reviewToRow,
+  reviewLogFromRow,
+  reviewLogToRow,
   settingsFromRows,
   settingsToRows,
   studySessionFromRow,
   studySessionToRow,
   type CardRow,
   type DeckRow,
-  type ReviewRow,
+  type ReviewLogRow,
   type SettingRow,
   type StudySessionRow,
 } from "@/db/mappers";
 import { getTauriSqlExecutor, type SqlExecutor } from "@/db/client";
 import { createSeedSnapshot } from "@/data/seed";
-import { isCardStatus, isDeckColor, isReviewResult } from "@/lib/domain";
+import { isCardState, isDeckColor, isReviewRating } from "@/lib/domain";
 import { normalizeName } from "@/lib/utils";
 import { mergeImportPayload } from "@/services/import-export";
 import type { RecallExportPayload, RecallStateSnapshot, Theme } from "@/types";
@@ -81,8 +81,8 @@ export function validateImportSnapshot(snapshot: RecallStateSnapshot): void {
     if (cardIds.has(card.id)) {
       throw new Error("Duplicate card id");
     }
-    if (!isCardStatus(card.status)) {
-      throw new Error("Invalid card status");
+    if (!isCardState(card.state)) {
+      throw new Error("Invalid card state");
     }
     cardIds.add(card.id);
   }
@@ -98,15 +98,12 @@ export function validateImportSnapshot(snapshot: RecallStateSnapshot): void {
     sessionIds.add(session.id);
   }
 
-  for (const review of snapshot.reviews) {
-    if (!cardIds.has(review.cardId)) {
-      throw new Error("Review references missing card");
+  for (const reviewLog of snapshot.reviewLogs) {
+    if (!cardIds.has(reviewLog.cardId)) {
+      throw new Error("Review log references missing card");
     }
-    if (!sessionIds.has(review.sessionId)) {
-      throw new Error("Review references missing session");
-    }
-    if (!isReviewResult(review.result)) {
-      throw new Error("Invalid review result");
+    if (!isReviewRating(reviewLog.rating)) {
+      throw new Error("Invalid review rating");
     }
   }
 }
@@ -120,11 +117,11 @@ class SqliteRecallRepository implements RecallRepository {
   constructor(private readonly executor: SqlExecutor) {}
 
   async loadAppData(): Promise<RecallStateSnapshot> {
-    const [deckRows, cardRows, sessionRows, reviewRows, settingRows] = await Promise.all([
+    const [deckRows, cardRows, sessionRows, reviewLogRows, settingRows] = await Promise.all([
       this.executor.select<DeckRow>("SELECT * FROM decks ORDER BY created_at ASC"),
       this.executor.select<CardRow>("SELECT * FROM cards ORDER BY created_at ASC"),
       this.executor.select<StudySessionRow>("SELECT * FROM study_sessions ORDER BY started_at ASC"),
-      this.executor.select<ReviewRow>("SELECT * FROM reviews ORDER BY answered_at ASC"),
+      this.executor.select<ReviewLogRow>("SELECT * FROM review_logs ORDER BY review_date ASC"),
       this.executor.select<SettingRow>("SELECT * FROM settings ORDER BY key ASC"),
     ]);
 
@@ -136,7 +133,7 @@ class SqliteRecallRepository implements RecallRepository {
       decks: deckRows.map(deckFromRow),
       cards: cardRows.map(cardFromRow),
       studySessions: sessionRows.map(studySessionFromRow),
-      reviews: reviewRows.map(reviewFromRow),
+      reviewLogs: reviewLogRows.map(reviewLogFromRow),
       settings: settingsFromRows(settingRows),
     };
     validateImportSnapshot(snapshot);
@@ -146,7 +143,7 @@ class SqliteRecallRepository implements RecallRepository {
   async saveSnapshot(snapshot: RecallStateSnapshot): Promise<void> {
     validateImportSnapshot(snapshot);
     await this.executor.transaction(async (tx) => {
-      await tx.execute("DELETE FROM reviews");
+      await tx.execute("DELETE FROM review_logs");
       await tx.execute("DELETE FROM study_sessions");
       await tx.execute("DELETE FROM cards");
       await tx.execute("DELETE FROM decks");
@@ -161,7 +158,7 @@ class SqliteRecallRepository implements RecallRepository {
 
       for (const card of snapshot.cards.map(cardToRow)) {
         await tx.execute(
-          "INSERT INTO cards (id, deck_id, front, back, hint, tags, status, correct_count, incorrect_count, streak, last_reviewed_at, next_review_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          "INSERT INTO cards (id, deck_id, front, back, hint, tags, state, last_review_date, next_review_date, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
           [
             card.id,
             card.deck_id,
@@ -169,12 +166,15 @@ class SqliteRecallRepository implements RecallRepository {
             card.back,
             card.hint,
             card.tags,
-            card.status,
-            card.correct_count,
-            card.incorrect_count,
-            card.streak,
-            card.last_reviewed_at,
-            card.next_review_at,
+            card.state,
+            card.last_review_date,
+            card.next_review_date,
+            card.stability,
+            card.difficulty,
+            card.elapsed_days,
+            card.scheduled_days,
+            card.reps,
+            card.lapses,
             card.created_at,
             card.updated_at,
           ],
@@ -183,23 +183,21 @@ class SqliteRecallRepository implements RecallRepository {
 
       for (const session of snapshot.studySessions.map(studySessionToRow)) {
         await tx.execute(
-          "INSERT INTO study_sessions (id, deck_id, started_at, ended_at, cards_studied, correct, incorrect) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          "INSERT INTO study_sessions (id, deck_id, started_at, ended_at, cards_studied) VALUES (?, ?, ?, ?, ?)",
           [
             session.id,
             session.deck_id,
             session.started_at,
             session.ended_at,
             session.cards_studied,
-            session.correct,
-            session.incorrect,
           ],
         );
       }
 
-      for (const review of snapshot.reviews.map(reviewToRow)) {
+      for (const reviewLog of snapshot.reviewLogs.map(reviewLogToRow)) {
         await tx.execute(
-          "INSERT INTO reviews (id, card_id, session_id, answered_at, result) VALUES (?, ?, ?, ?, ?)",
-          [review.id, review.card_id, review.session_id, review.answered_at, review.result],
+          "INSERT INTO review_logs (id, card_id, rating, review_date, stability, difficulty, elapsed_days, scheduled_days) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+          [reviewLog.id, reviewLog.card_id, reviewLog.rating, reviewLog.review_date, reviewLog.stability, reviewLog.difficulty, reviewLog.elapsed_days, reviewLog.scheduled_days],
         );
       }
 
@@ -295,7 +293,7 @@ function exportPayloadToSnapshot(payload: RecallExportPayload): RecallStateSnaps
     decks: payload.decks,
     cards: payload.cards,
     studySessions: payload.studySessions,
-    reviews: payload.reviews,
+    reviewLogs: payload.reviewLogs,
     settings: payload.settings,
   };
 }

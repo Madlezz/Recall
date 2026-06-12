@@ -17,7 +17,9 @@ export function StudyMode(): JSX.Element {
   const card = cards.find((item) => item.id === cardId);
   const deck = decks.find((item) => item.id === activeStudy?.deckId);
   const total = activeStudy?.cardIds.length ?? 0;
-  const answered = activeStudy ? activeStudy.correct + activeStudy.incorrect : 0;
+  const answered = activeStudy
+    ? Object.values(activeStudy.ratings).reduce((a, b) => a + b, 0)
+    : 0;
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent): void {
@@ -31,11 +33,19 @@ export function StudyMode(): JSX.Element {
       }
 
       if (event.key === "1") {
-        void answerCurrentCard("incorrect");
+        void answerCurrentCard("again");
       }
 
       if (event.key === "2") {
-        void answerCurrentCard("correct");
+        void answerCurrentCard("hard");
+      }
+
+      if (event.key === "3") {
+        void answerCurrentCard("good");
+      }
+
+      if (event.key === "4") {
+        void answerCurrentCard("easy");
       }
     }
 
@@ -57,7 +67,9 @@ export function StudyMode(): JSX.Element {
   }
 
   if (activeStudy.completed) {
-    const accuracy = answered === 0 ? 0 : Math.round((activeStudy.correct / answered) * 100);
+    const totalReviews = answered;
+    const goodAndEasy = activeStudy.ratings.good + activeStudy.ratings.easy;
+    const accuracy = totalReviews === 0 ? 0 : Math.round((goodAndEasy / totalReviews) * 100);
 
     return (
       <div className="flex min-h-[76vh] items-center justify-center">
@@ -68,11 +80,17 @@ export function StudyMode(): JSX.Element {
           <h1 className="mt-5 text-2xl font-semibold">Session complete</h1>
           <p className="mt-2 text-sm text-muted-foreground">{deck?.name ?? "All due cards"}</p>
 
-          <div className="mt-7 grid gap-3 sm:grid-cols-4">
-            <SummaryMetric label="Cards" value={answered} />
-            <SummaryMetric label="Correct" value={activeStudy.correct} />
-            <SummaryMetric label="Incorrect" value={activeStudy.incorrect} />
-            <SummaryMetric label="Accuracy" value={`${accuracy}%`} />
+          <div className="mt-7 grid gap-3 sm:grid-cols-5">
+            <SummaryMetric label="Cards" value={totalReviews} />
+            <SummaryMetric label="Again" value={activeStudy.ratings.again} />
+            <SummaryMetric label="Hard" value={activeStudy.ratings.hard} />
+            <SummaryMetric label="Good" value={activeStudy.ratings.good} />
+            <SummaryMetric label="Easy" value={activeStudy.ratings.easy} />
+          </div>
+
+          <div className="mt-5 flex items-center justify-center gap-4">
+            <span className="text-sm text-muted-foreground">Accuracy (Good+Easy)</span>
+            <span className="text-lg font-semibold">{accuracy}%</span>
           </div>
 
           <div className="mt-7 flex justify-center gap-2">
@@ -134,13 +152,17 @@ export function StudyMode(): JSX.Element {
           <RotateCw className="h-4 w-4" />
           Reveal
         </Button>
-        <Button variant="destructive" size="lg" onClick={() => void answerCurrentCard("incorrect")} disabled={!activeStudy.revealed}>
-          <X className="h-4 w-4" />
-          Incorrect
+        <Button variant="destructive" size="lg" onClick={() => void answerCurrentCard("again")} disabled={!activeStudy.revealed}>
+          Again (1)
         </Button>
-        <Button size="lg" onClick={() => void answerCurrentCard("correct")} disabled={!activeStudy.revealed}>
-          <Check className="h-4 w-4" />
-          Correct
+        <Button variant="outline" size="lg" onClick={() => void answerCurrentCard("hard")} disabled={!activeStudy.revealed}>
+          Hard (2)
+        </Button>
+        <Button size="lg" onClick={() => void answerCurrentCard("good")} disabled={!activeStudy.revealed}>
+          Good (3)
+        </Button>
+        <Button variant="secondary" size="lg" onClick={() => void answerCurrentCard("easy")} disabled={!activeStudy.revealed}>
+          Easy (4)
         </Button>
       </footer>
     </div>

@@ -1,5 +1,5 @@
-import type { Card, CardStatus, Deck, DeckColor, RecallSettings, Review, ReviewResult, StudySession } from "@/types";
-import { SCHEMA_VERSION, isCardStatus, isDeckColor, isReviewResult } from "@/lib/domain";
+import type { Card, CardState, Deck, DeckColor, RecallSettings, ReviewLog, ReviewRating, StudySession } from "@/types";
+import { SCHEMA_VERSION, isCardState, isDeckColor, isReviewRating } from "@/lib/domain";
 
 export interface DeckRow {
   id: string;
@@ -17,13 +17,15 @@ export interface CardRow {
   back: string;
   hint: string;
   tags: string;
-  status: string;
-  correct_count: number;
-  incorrect_count: number;
-  streak: number;
-  ease_factor: number;
-  last_reviewed_at: string | null;
-  next_review_at: string;
+  state: string;
+  last_review_date: string | null;
+  next_review_date: string;
+  stability: number;
+  difficulty: number;
+  elapsed_days: number;
+  scheduled_days: number;
+  reps: number;
+  lapses: number;
   created_at: string;
   updated_at: string;
 }
@@ -34,16 +36,17 @@ export interface StudySessionRow {
   started_at: string;
   ended_at: string;
   cards_studied: number;
-  correct: number;
-  incorrect: number;
 }
 
-export interface ReviewRow {
+export interface ReviewLogRow {
   id: string;
   card_id: string;
-  session_id: string;
-  answered_at: string;
-  result: string;
+  rating: string;
+  review_date: string;
+  stability: number;
+  difficulty: number;
+  elapsed_days: number;
+  scheduled_days: number;
 }
 
 export interface SettingRow {
@@ -78,8 +81,8 @@ export function deckToRow(deck: Deck): DeckRow {
 }
 
 export function cardFromRow(row: CardRow): Card {
-  if (!isCardStatus(row.status)) {
-    throw new Error("Invalid card status");
+  if (!isCardState(row.state)) {
+    throw new Error("Invalid card state");
   }
 
   return {
@@ -89,13 +92,15 @@ export function cardFromRow(row: CardRow): Card {
     back: row.back,
     hint: row.hint,
     tags: parseTags(row.tags),
-    status: row.status as CardStatus,
-    correctCount: row.correct_count,
-    incorrectCount: row.incorrect_count,
-    streak: row.streak,
-    easeFactor: row.ease_factor,
-    lastReviewedAt: row.last_reviewed_at,
-    nextReviewAt: row.next_review_at,
+    state: row.state as CardState,
+    lastReviewDate: row.last_review_date,
+    nextReviewDate: row.next_review_date,
+    stability: row.stability,
+    difficulty: row.difficulty,
+    elapsedDays: row.elapsed_days,
+    scheduledDays: row.scheduled_days,
+    reps: row.reps,
+    lapses: row.lapses,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -109,13 +114,15 @@ export function cardToRow(card: Card): CardRow {
     back: card.back,
     hint: card.hint,
     tags: JSON.stringify(card.tags),
-    status: card.status,
-    correct_count: card.correctCount,
-    incorrect_count: card.incorrectCount,
-    streak: card.streak,
-    ease_factor: card.easeFactor,
-    last_reviewed_at: card.lastReviewedAt,
-    next_review_at: card.nextReviewAt,
+    state: card.state,
+    last_review_date: card.lastReviewDate,
+    next_review_date: card.nextReviewDate,
+    stability: card.stability,
+    difficulty: card.difficulty,
+    elapsed_days: card.elapsedDays,
+    scheduled_days: card.scheduledDays,
+    reps: card.reps,
+    lapses: card.lapses,
     created_at: card.createdAt,
     updated_at: card.updatedAt,
   };
@@ -128,8 +135,6 @@ export function studySessionFromRow(row: StudySessionRow): StudySession {
     startedAt: row.started_at,
     endedAt: row.ended_at,
     cardsStudied: row.cards_studied,
-    correct: row.correct,
-    incorrect: row.incorrect,
   };
 }
 
@@ -140,32 +145,36 @@ export function studySessionToRow(session: StudySession): StudySessionRow {
     started_at: session.startedAt,
     ended_at: session.endedAt,
     cards_studied: session.cardsStudied,
-    correct: session.correct,
-    incorrect: session.incorrect,
   };
 }
 
-export function reviewFromRow(row: ReviewRow): Review {
-  if (!isReviewResult(row.result)) {
-    throw new Error("Invalid review result");
+export function reviewLogFromRow(row: ReviewLogRow): ReviewLog {
+  if (!isReviewRating(row.rating)) {
+    throw new Error("Invalid review rating");
   }
 
   return {
     id: row.id,
     cardId: row.card_id,
-    sessionId: row.session_id,
-    answeredAt: row.answered_at,
-    result: row.result as ReviewResult,
+    rating: row.rating as ReviewRating,
+    reviewDate: row.review_date,
+    stability: row.stability,
+    difficulty: row.difficulty,
+    elapsedDays: row.elapsed_days,
+    scheduledDays: row.scheduled_days,
   };
 }
 
-export function reviewToRow(review: Review): ReviewRow {
+export function reviewLogToRow(review: ReviewLog): ReviewLogRow {
   return {
     id: review.id,
     card_id: review.cardId,
-    session_id: review.sessionId,
-    answered_at: review.answeredAt,
-    result: review.result,
+    rating: review.rating,
+    review_date: review.reviewDate,
+    stability: review.stability,
+    difficulty: review.difficulty,
+    elapsed_days: review.elapsedDays,
+    scheduled_days: review.scheduledDays,
   };
 }
 

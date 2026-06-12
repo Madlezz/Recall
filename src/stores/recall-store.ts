@@ -5,6 +5,7 @@ import { createId, normalizeName } from "@/lib/utils";
 import { buildExportPayload } from "@/services/import-export";
 import { getRecallRepository, type RecallRepository } from "@/services/repository";
 import { applyTheme } from "@/services/storage";
+import { applyReview } from "@/services/fsrs-engine";
 import type {
   ActiveStudySession,
   AppView,
@@ -13,8 +14,8 @@ import type {
   DeckColor,
   RecallExportPayload,
   RecallStateSnapshot,
-  Review,
-  ReviewResult,
+  ReviewLog,
+  ReviewRating,
   StudySession,
   Theme,
 } from "@/types";
@@ -54,7 +55,7 @@ interface RecallStore extends RecallStateSnapshot {
   moveCard: (cardId: string, deckId: string) => Promise<void>;
   startReview: (deckId?: string | null) => boolean;
   revealAnswer: () => void;
-  answerCurrentCard: (result: ReviewResult) => Promise<void>;
+  answerCurrentCard: (result: ReviewRating) => Promise<void>;
   exitStudy: () => void;
   resetData: () => Promise<void>;
   replaceData: (payload: RecallExportPayload) => Promise<void>;
@@ -158,7 +159,7 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
       ...dataState(get()),
       decks: get().decks.filter((deck) => deck.id !== deckId),
       cards: get().cards.filter((card) => card.deckId !== deckId),
-      reviews: get().reviews.filter((review) => !deletedCardIds.has(review.cardId)),
+      reviewLogs: get().reviewLogs.filter((reviewLog) => !deletedCardIds.has(reviewLog.cardId)),
       studySessions: get().studySessions.filter((session) => session.deckId !== deckId),
     };
 
@@ -176,13 +177,15 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
       back: input.back.trim(),
       hint: input.hint.trim(),
       tags: input.tags,
-      status: "new",
-      correctCount: 0,
-      incorrectCount: 0,
-      streak: 0,
-      easeFactor: 2.5,
-      lastReviewedAt: null,
-      nextReviewAt: now,
+      state: "new",
+      lastReviewDate: null,
+      nextReviewDate: now,
+      stability: 0,
+      difficulty: 0,
+      elapsedDays: 0,
+      scheduledDays: 0,
+      reps: 0,
+      lapses: 0,
       createdAt: now,
       updatedAt: now,
     };
@@ -225,7 +228,7 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
     const snapshot = {
       ...dataState(get()),
       cards: get().cards.filter((card) => card.id !== cardId),
-      reviews: get().reviews.filter((review) => review.cardId !== cardId),
+      reviewLogs: get().reviewLogs.filter((reviewLog) => reviewLog.cardId !== cardId),
     };
     await persist(set, snapshot);
   },
@@ -243,7 +246,7 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
     const dueCards = get()
       .cards.filter((card) => (deckId ? card.deckId === deckId : true))
       .filter((card) => isCardDueToday(card))
-      .sort((a, b) => a.nextReviewAt.localeCompare(b.nextReviewAt));
+      .sort((a, b) => a.nextReviewDate.localeCompare(b.nextReviewDate));
 
     if (dueCards.length === 0) {
       return false;
@@ -260,8 +263,7 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
         currentIndex: 0,
         revealed: false,
         startedAt: now,
-        correct: 0,
-        incorrect: 0,
+        ratings: { again: 0, hard: 0, good: 0, easy: 0 },
         completed: false,
       },
     });
@@ -291,27 +293,29 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
     }
 
     const reviewedAt = new Date();
-    // TODO: Replace with FSRS engine in Task 3
-    // const updatedCard = applyReviewResult(card, result, reviewedAt);
-    const updatedCard = card; // Temporary placeholder
-    const review: Review = {
+    const updatedCard = applyReview(card, result as ReviewRating, reviewedAt);
+    const reviewLog: ReviewLog = {
       id: createId("review"),
       cardId,
-      sessionId: activeStudy.id,
-      answeredAt: reviewedAt.toISOString(),
-      result,
+      rating: result as ReviewRating,
+      reviewDate: reviewedAt.toISOString(),
+      stability: updatedCard.stability,
+      difficulty: updatedCard.difficulty,
+      elapsedDays: updatedCard.elapsedDays,
+      scheduledDays: updatedCard.scheduledDays,
     };
-    const nextCorrect = activeStudy.correct + (result === "correct" ? 1 : 0);
-    const nextIncorrect = activeStudy.incorrect + (result === "incorrect" ? 1 : 0);
+    const nextRatings = {
+      ...activeStudy.ratings,
+      [result]: activeStudy.ratings[result] + 1,
+    };
     const isLast = activeStudy.currentIndex >= activeStudy.cardIds.length - 1;
     const nextActiveStudy: ActiveStudySession = isLast
-      ? { ...activeStudy, correct: nextCorrect, incorrect: nextIncorrect, completed: true }
+      ? { ...activeStudy, ratings: nextRatings, completed: true }
       : {
           ...activeStudy,
           currentIndex: activeStudy.currentIndex + 1,
           revealed: false,
-          correct: nextCorrect,
-          incorrect: nextIncorrect,
+          ratings: nextRatings,
         };
     const nextStudySessions: StudySession[] = isLast
       ? [
@@ -322,8 +326,6 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
             startedAt: activeStudy.startedAt,
             endedAt: reviewedAt.toISOString(),
             cardsStudied: activeStudy.cardIds.length,
-            correct: nextCorrect,
-            incorrect: nextIncorrect,
           },
         ]
       : state.studySessions;
@@ -331,7 +333,7 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
       decks: state.decks,
       cards: state.cards.map((item) => (item.id === cardId ? updatedCard : item)),
       studySessions: nextStudySessions,
-      reviews: [...state.reviews, review],
+      reviewLogs: [...state.reviewLogs, reviewLog],
       settings: state.settings,
     };
 
@@ -405,7 +407,7 @@ function dataState(state: RecallStore): RecallStateSnapshot {
     decks: state.decks,
     cards: state.cards,
     studySessions: state.studySessions,
-    reviews: state.reviews,
+    reviewLogs: state.reviewLogs,
     settings: state.settings,
   };
 }

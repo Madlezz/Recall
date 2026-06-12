@@ -1,5 +1,5 @@
 import { differenceInCalendarDays, endOfDay, isAfter, parseISO, startOfDay, subDays } from "date-fns";
-import type { Card, Deck, Review } from "@/types";
+import type { Card, Deck, ReviewLog } from "@/types";
 
 export interface DeckStats {
   total: number;
@@ -9,23 +9,24 @@ export interface DeckStats {
 }
 
 export function isCardDue(card: Card, at = new Date()): boolean {
-  return !isAfter(parseISO(card.nextReviewAt), at);
+  return !isAfter(parseISO(card.nextReviewDate), at);
 }
 
 export function isCardDueToday(card: Card, at = new Date()): boolean {
-  return !isAfter(parseISO(card.nextReviewAt), endOfDay(at));
+  return !isAfter(parseISO(card.nextReviewDate), endOfDay(at));
 }
 
 export function getDeckStats(deck: Deck, cards: Card[]): DeckStats {
   const deckCards = cards.filter((card) => card.deckId === deck.id);
-  const answered = deckCards.reduce((sum, card) => sum + card.correctCount + card.incorrectCount, 0);
-  const correct = deckCards.reduce((sum, card) => sum + card.correctCount, 0);
+  const totalReps = deckCards.reduce((sum, card) => sum + card.reps, 0);
+  const lapses = deckCards.reduce((sum, card) => sum + card.lapses, 0);
+  const accuracy = totalReps === 0 ? 0 : Math.round(((totalReps - lapses) / totalReps) * 100);
 
   return {
     total: deckCards.length,
-    mastered: deckCards.filter((card) => card.status === "mastered").length,
+    mastered: deckCards.filter((card) => card.state === "review").length,
     due: deckCards.filter((card) => isCardDueToday(card)).length,
-    accuracy: answered === 0 ? 0 : Math.round((correct / answered) * 100),
+    accuracy,
   };
 }
 
@@ -33,8 +34,8 @@ export function getDueTodayCount(cards: Card[], at = new Date()): number {
   return cards.filter((card) => isCardDueToday(card, at)).length;
 }
 
-export function getStudyStreak(reviews: Review[], at = new Date()): number {
-  const reviewedDays = new Set(reviews.map((review) => startOfDay(parseISO(review.answeredAt)).toISOString()));
+export function getStudyStreak(reviews: ReviewLog[], at = new Date()): number {
+  const reviewedDays = new Set(reviews.map((review) => startOfDay(parseISO(review.reviewDate)).toISOString()));
   let cursor = startOfDay(at);
   let streak = 0;
 

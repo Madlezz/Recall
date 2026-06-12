@@ -13,7 +13,7 @@ import type { Deck } from "@/types";
 export function Dashboard(): JSX.Element {
   const decks = useRecallStore((state) => state.decks);
   const cards = useRecallStore((state) => state.cards);
-  const reviews = useRecallStore((state) => state.reviews);
+  const reviewLogs = useRecallStore((state) => state.reviewLogs);
   const showDeck = useRecallStore((state) => state.showDeck);
   const startReview = useRecallStore((state) => state.startReview);
 
@@ -51,7 +51,7 @@ export function Dashboard(): JSX.Element {
 
       <section className="grid gap-3 sm:grid-cols-3">
         <StatTile icon={Zap} label="Due today" value={String(getDueTodayCount(cards))} />
-        <StatTile icon={Flame} label="Study streak" value={`${getStudyStreak(reviews)} days`} />
+        <StatTile icon={Flame} label="Study streak" value={`${getStudyStreak(reviewLogs)} days`} />
         <StatTile icon={Layers3} label="Total cards" value={String(cards.length)} />
       </section>
 
