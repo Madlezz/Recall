@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, BookOpen, Brain, Flame, Layers3, Library, Plus, RotateCw, SortAsc, SortDesc, Zap } from "lucide-react";
+import { ArrowRight, BookOpen, Brain, Flame, Layers3, Library, Plus, RotateCw, Shield, SortAsc, SortDesc, Star, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { AnkiImportDialog } from "@/components/anki-import-dialog";
 import { ActivityHeatmap } from "@/components/activity-heatmap";
@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { getDeckColorClass } from "@/lib/deck-colors";
 import { getDeckStats, getDueTodayCount, getLearningCount, getNewCount } from "@/lib/stats";
 import { getStudyStreak } from "@/lib/streak";
+import { getLevel, getLevelTitle, levelProgress } from "@/lib/xp";
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
 import type { Deck } from "@/types";
@@ -70,12 +71,13 @@ export function Dashboard(): JSX.Element {
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-4">
-              <StatTile icon={Flame} label="Streak" value={`${getStudyStreak(reviewLogs)} day${getStudyStreak(reviewLogs) === 1 ? '' : 's'}`} />
-              <StatTile icon={Zap} label="Due today" value={String(getDueTodayCount(cards))} />
-              <StatTile icon={BookOpen} label="New" value={String(getNewCount(cards))} />
-              <StatTile icon={Brain} label="Learning" value={String(getLearningCount(cards))} />
-            </section>
+      <section className="grid gap-3 sm:grid-cols-5">
+                    <StatTile icon={Flame} label="Streak" value={`${getStudyStreak(reviewLogs)} day${getStudyStreak(reviewLogs) === 1 ? '' : 's'}`} />
+                    <StatTile icon={Zap} label="Due today" value={String(getDueTodayCount(cards))} />
+                    <StatTile icon={BookOpen} label="New" value={String(getNewCount(cards))} />
+                    <StatTile icon={Brain} label="Learning" value={String(getLearningCount(cards))} />
+                    <LevelTile />
+                  </section>
 
             <section className="rounded-lg border bg-card p-5">
               <ActivityHeatmap />
@@ -95,25 +97,25 @@ export function Dashboard(): JSX.Element {
         </div>
 
         {decks.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-muted-foreground/30 px-6 py-16 text-center">
-                    <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-muted/60">
-                      <Library className="h-8 w-8 text-muted-foreground/60" />
-                    </div>
-                    <h3 className="text-lg font-semibold">Your library is empty</h3>
-                    <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
-                      Create your first deck and start building your knowledge. Cards you review will appear here.
-                    </p>
-                    <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-                      <Button onClick={() => setShowCreateDeck(true)}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Create Your First Deck
-                      </Button>
-                      <Button variant="outline" onClick={() => toast.info("Select a .apkg file to import")}>
-                        <ArrowRight className="mr-2 h-4 w-4" />
-                        Import from Anki
-                      </Button>
-                    </div>
-                  </div>
+                          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-muted-foreground/30 px-6 py-16 text-center">
+                            <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-muted/60">
+                              <Library className="h-8 w-8 text-muted-foreground/60" />
+                            </div>
+                            <h3 className="text-lg font-semibold">Nothing here yet!</h3>
+                            <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
+                              Time to learn something cool. Create your first deck and the magic begins. ✨
+                            </p>
+                            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                              <Button onClick={() => setShowCreateDeck(true)}>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Create Your First Deck
+                              </Button>
+                              <Button variant="outline" onClick={() => toast.info("Select a .apkg file to import")}>
+                                <ArrowRight className="mr-2 h-4 w-4" />
+                                Import from Anki
+                              </Button>
+                            </div>
+                          </div>
                 ) : (
           <div className="grid gap-3 lg:grid-cols-2">
             {sortedDecks.map((deck) => (
@@ -180,6 +182,23 @@ function Metric({ label, value }: MetricProps): JSX.Element {
     <div className="rounded-md bg-muted/60 p-2">
       <div className="font-semibold">{value}</div>
       <div className="text-xs text-muted-foreground">{label}</div>
+    </div>
+  );
+}
+
+function LevelTile(): JSX.Element {
+  const settings = useRecallStore((state) => state.settings);
+  const xp = settings.xp;
+  const level = getLevel(xp);
+  const title = getLevelTitle(level);
+  const progress = levelProgress(xp);
+
+  return (
+    <div className="rounded-lg bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 p-4 text-center">
+      <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">Level {level}</div>
+      <div className="text-2xl font-bold text-primary">{title}</div>
+      <div className="text-xs text-muted-foreground mt-1">{xp} XP</div>
+      <Progress className="mt-2 h-1.5" value={progress * 100} />
     </div>
   );
 }

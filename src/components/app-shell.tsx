@@ -1,8 +1,9 @@
-import { BookOpen, Database, Home, Settings, Zap } from "lucide-react";
+import { BookOpen, Database, Home, Settings, Shield, Star, Zap } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { getDueTodayCount } from "@/lib/stats";
 import { cn } from "@/lib/utils";
+import { getLevel, getLevelTitle } from "@/lib/xp";
 import { useRecallStore } from "@/stores/recall-store";
 
 interface AppShellProps {
@@ -49,13 +50,15 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
               <div className="text-xs text-muted-foreground">Cards</div>
             </div>
           </div>
-          <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
-            <Zap className="h-3.5 w-3.5 text-primary" />
-            {getDueTodayCount(cards)} due today
-          </div>
-        </div>
-      </aside>
+          <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+                      <Zap className="h-3.5 w-3.5 text-primary" />
+                      {getDueTodayCount(cards)} due today
+                    </div>
+                  </div>
 
+                  <LevelWidget />
+
+                </aside>
       <header className="sticky top-0 z-30 border-b bg-card/90 px-4 py-3 backdrop-blur lg:hidden">
         <div className="flex items-center justify-between">
           <button className="flex items-center gap-2 font-semibold" onClick={showDashboard}>
@@ -94,5 +97,23 @@ function NavButton({ active, icon: Icon, label, onClick }: NavButtonProps): JSX.
       <Icon className="h-4 w-4" />
       {label}
     </button>
+  );
+}
+
+function LevelWidget(): JSX.Element {
+  const settings = useRecallStore((state) => state.settings);
+  const level = getLevel(settings.xp);
+  const title = getLevelTitle(level);
+
+  return (
+    <div className="mt-4 rounded-lg border bg-background/60 p-3">
+      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        <Shield className="h-3.5 w-3.5" />
+        Level {level} · {title}
+      </div>
+      <div className="mt-2 text-xs text-muted-foreground">
+        {settings.xp} XP earned · Keep reviewing to level up!
+      </div>
+    </div>
   );
 }

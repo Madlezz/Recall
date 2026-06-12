@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useRecallStore } from "@/stores/recall-store";
 import { speakText, stopSpeaking, isSpeaking, isTTSSupported } from "@/services/tts";
+import { playFlipSound, playCorrectSound, playAgainSound, playHardSound } from "@/services/audio";
 import type { SessionSummary } from "@/types";
 
 export function StudyMode(): JSX.Element {
@@ -209,7 +210,7 @@ export function StudyMode(): JSX.Element {
             Undo
           </Button>
         ) : null}
-        <Button variant="outline" size="lg" onClick={revealAnswer} disabled={activeStudy.revealed}>
+        <Button variant="outline" size="lg" onClick={() => { playFlipSound(); revealAnswer(); }} disabled={activeStudy.revealed}>
           <RotateCw className="h-4 w-4" />
           Reveal
         </Button>
@@ -221,18 +222,18 @@ export function StudyMode(): JSX.Element {
                   <Clock className="h-4 w-4" />
                   Snooze
                 </Button>
-        <Button variant="destructive" size="lg" onClick={() => void answerCurrentCard("again")} disabled={!activeStudy.revealed}>
-          Again (1)
-        </Button>
-        <Button variant="outline" size="lg" onClick={() => void answerCurrentCard("hard")} disabled={!activeStudy.revealed}>
-          Hard (2)
-        </Button>
-        <Button size="lg" onClick={() => void answerCurrentCard("good")} disabled={!activeStudy.revealed}>
-          Good (3)
-        </Button>
-        <Button variant="secondary" size="lg" onClick={() => void answerCurrentCard("easy")} disabled={!activeStudy.revealed}>
-          Easy (4)
-        </Button>
+        <Button variant="destructive" size="lg" onClick={() => { playAgainSound(); void answerCurrentCard("again"); }} disabled={!activeStudy.revealed}>
+                  Again (1)
+                </Button>
+                <Button variant="outline" size="lg" onClick={() => { playHardSound(); void answerCurrentCard("hard"); }} disabled={!activeStudy.revealed}>
+                  Hard (2)
+                </Button>
+                <Button size="lg" onClick={() => { playCorrectSound(); void answerCurrentCard("good"); }} disabled={!activeStudy.revealed}>
+                  Good (3)
+                </Button>
+                <Button variant="secondary" size="lg" onClick={() => { playCorrectSound(); void answerCurrentCard("easy"); }} disabled={!activeStudy.revealed}>
+                  Easy (4)
+                </Button>
       </footer>
     </div>
   );

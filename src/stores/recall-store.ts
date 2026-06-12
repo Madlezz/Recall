@@ -6,6 +6,16 @@ import { buildExportPayload } from "@/services/import-export";
 import { getRecallRepository, type RecallRepository } from "@/services/repository";
 import { applyTheme } from "@/services/storage";
 import { applyReview } from "@/services/fsrs-engine";
+import { playSessionStartSound } from "@/services/audio";
+import {
+  REVIEW_XP,
+  getLevel,
+  getLevelTitle,
+  levelProgress,
+  checkAchievements,
+  applyNewAchievements,
+} from "@/lib/xp";
+import { getStudyStreak } from "@/lib/streak";
 import type {
   ActiveStudySession,
   AppView,
@@ -334,23 +344,25 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
 
     const newCardsCount = filteredDueCards.filter((card) => card.state === "new").length;
     const now = new Date().toISOString();
-    set({
-      view: "study",
-      selectedDeckId: deckId,
-      activeStudy: {
-        id: createId("session"),
-        deckId,
-        cardIds: filteredDueCards.map((card) => card.id),
-        currentIndex: 0,
-        revealed: false,
-        startedAt: now,
-        ratings: { again: 0, hard: 0, good: 0, easy: 0 },
-        completed: false,
-        previousCardState: null,
-        newCardsCount,
-      },
-    });
-    return true;
+        set({
+          view: "study",
+          selectedDeckId: deckId,
+          activeStudy: {
+            id: createId("session"),
+            deckId,
+            cardIds: filteredDueCards.map((card) => card.id),
+            currentIndex: 0,
+            revealed: false,
+            startedAt: now,
+            ratings: { again: 0, hard: 0, good: 0, easy: 0 },
+            completed: false,
+            previousCardState: null,
+            newCardsCount,
+            sessionXp: 0,
+          },
+        });
+        playSessionStartSound();
+        return true;
   },
 
   revealAnswer() {
@@ -479,19 +491,21 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
       scheduledDays: updatedCard.scheduledDays,
     };
     const nextRatings = {
-      ...activeStudy.ratings,
-      [result]: activeStudy.ratings[result] + 1,
-    };
-    const isLast = activeStudy.currentIndex >= activeStudy.cardIds.length - 1;
-    const nextActiveStudy: ActiveStudySession = isLast
-      ? { ...activeStudy, ratings: nextRatings, completed: true, previousCardState: card }
-      : {
-          ...activeStudy,
-          currentIndex: activeStudy.currentIndex + 1,
-          revealed: false,
-          ratings: nextRatings,
-          previousCardState: card,
+          ...activeStudy.ratings,
+          [result]: activeStudy.ratings[result] + 1,
         };
+        const xpGained = REVIEW_XP[result] ?? 0;
+        const isLast = activeStudy.currentIndex >= activeStudy.cardIds.length - 1;
+        const nextActiveStudy: ActiveStudySession = isLast
+          ? { ...activeStudy, ratings: nextRatings, completed: true, previousCardState: card, sessionXp: activeStudy.sessionXp + xpGained }
+          : {
+              ...activeStudy,
+              currentIndex: activeStudy.currentIndex + 1,
+              revealed: false,
+              ratings: nextRatings,
+              previousCardState: card,
+              sessionXp: activeStudy.sessionXp + xpGained,
+            };
     const nextStudySessions: StudySession[] = isLast
       ? [
           ...state.studySessions,
@@ -556,36 +570,87 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
   },
 
   exitStudy() {
-    const state = get();
-    const activeStudy = state.activeStudy;
-    let lastSessionSummary: SessionSummary | null = null;
+      const state = get();
+      const activeStudy = state.activeStudy;
+      let lastSessionSummary: SessionSummary | null = null;
 
-    if (activeStudy && activeStudy.completed) {
-      const timeSpentMs = Date.now() - new Date(activeStudy.startedAt).getTime();
-      const totalRatings = activeStudy.ratings.again + activeStudy.ratings.hard + activeStudy.ratings.good + activeStudy.ratings.easy;
-      const averageRating = totalRatings > 0 
-        ? (activeStudy.ratings.again * 1 + activeStudy.ratings.hard * 2 + activeStudy.ratings.good * 3 + activeStudy.ratings.easy * 4) / totalRatings
-        : 0;
+      if (activeStudy && activeStudy.completed) {
+        const timeSpentMs = Date.now() - new Date(activeStudy.startedAt).getTime();
+        const totalRatings = activeStudy.ratings.again + activeStudy.ratings.hard + activeStudy.ratings.good + activeStudy.ratings.easy;
+        const averageRating = totalRatings > 0 
+          ? (activeStudy.ratings.again * 1 + activeStudy.ratings.hard * 2 + activeStudy.ratings.good * 3 + activeStudy.ratings.easy * 4) / totalRatings
+          : 0;
 
-      lastSessionSummary = {
-        cardsStudied: activeStudy.cardIds.length,
-        timeSpentMs,
-        averageRating,
-        newCards: activeStudy.newCardsCount,
-        againCount: activeStudy.ratings.again,
-        hardCount: activeStudy.ratings.hard,
-        goodCount: activeStudy.ratings.good,
-        easyCount: activeStudy.ratings.easy,
-      };
-    }
+        lastSessionSummary = {
+          cardsStudied: activeStudy.cardIds.length,
+          timeSpentMs,
+          averageRating,
+          newCards: activeStudy.newCardsCount,
+          againCount: activeStudy.ratings.again,
+          hardCount: activeStudy.ratings.hard,
+          goodCount: activeStudy.ratings.good,
+          easyCount: activeStudy.ratings.easy,
+        };
 
-    if (activeStudy && activeStudy.completed) {
-      set({ activeStudy: null, lastSessionSummary });
-    } else {
-      const deckId = activeStudy?.deckId ?? state.selectedDeckId;
-      set({ view: deckId ? "deck" : "dashboard", selectedDeckId: deckId, activeStudy: null, lastSessionSummary: null });
-    }
-  },
+        // Apply XP + check achievements
+        const goodAndEasy = activeStudy.ratings.good + activeStudy.ratings.easy;
+        const accuracy = totalRatings > 0 ? Math.round((goodAndEasy / totalRatings) * 100) : 0;
+        const newXp = state.settings.xp + activeStudy.sessionXp;
+        const totalReviews = state.reviewLogs.length + totalRatings;
+        const streak = getStudyStreak(state.reviewLogs);
+        const now = new Date();
+        const nowIso = now.toISOString();
+        const reviewHour = now.getHours();
+      
+        // Calculate days since last review (for comeback_kid)
+        const sortedLogs = [...state.reviewLogs].sort((a, b) => b.reviewDate.localeCompare(a.reviewDate));
+        const lastLogDate = sortedLogs.length > 0 ? new Date(sortedLogs[0].reviewDate) : null;
+        const daysSinceLastReview = lastLogDate
+          ? Math.floor((now.getTime() - lastLogDate.getTime()) / (1000 * 60 * 60 * 24))
+          : 999;
+
+        const newAchievementIds = checkAchievements(
+          {
+            xp: newXp,
+            totalReviews,
+            streak,
+            cardsInSession: activeStudy.cardIds.length,
+            accuracy,
+            deckCount: state.decks.length,
+            cardCount: state.cards.length,
+            reviewHour,
+            daysSinceLastReview,
+          },
+          state.settings.achievements,
+        );
+
+        const updatedAchievements = applyNewAchievements(newAchievementIds, state.settings.achievements, nowIso);
+
+        // Persist XP + achievements
+        const updatedSettings = {
+          ...state.settings,
+          xp: newXp,
+          achievements: updatedAchievements,
+        };
+        const snapshot: RecallStateSnapshot = {
+          decks: state.decks,
+          cards: state.cards,
+          studySessions: state.studySessions,
+          reviewLogs: state.reviewLogs,
+          settings: updatedSettings,
+        };
+
+        void persist(set, snapshot, { activeStudy: null, lastSessionSummary });
+        return;
+      }
+
+      if (activeStudy && activeStudy.completed) {
+        set({ activeStudy: null, lastSessionSummary });
+      } else {
+        const deckId = activeStudy?.deckId ?? state.selectedDeckId;
+        set({ view: deckId ? "deck" : "dashboard", selectedDeckId: deckId, activeStudy: null, lastSessionSummary: null });
+      }
+    },
 
   clearSessionSummary() {
     set({ lastSessionSummary: null });
