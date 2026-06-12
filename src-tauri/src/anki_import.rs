@@ -30,10 +30,10 @@ pub async fn parse_anki_apkg(file_path: String) -> Result<Vec<AnkiCard>, String>
 
     let mut stmt = conn
         .prepare(
-            "SELECT n.flds, n.tags, m.name
+            "SELECT DISTINCT n.flds, n.tags, d.name
              FROM notes n
-             JOIN models m ON n.mid = m.id
              JOIN cards c ON c.nid = n.id
+             JOIN decks d ON c.did = d.id
              LIMIT 1000",
         )
         .map_err(|e| e.to_string())?;
@@ -50,6 +50,7 @@ pub async fn parse_anki_apkg(file_path: String) -> Result<Vec<AnkiCard>, String>
                     .get::<_, String>(1)
                     .unwrap_or_default()
                     .split(' ')
+                    .filter(|s| !s.is_empty())
                     .map(|s| s.to_string())
                     .collect(),
             })
