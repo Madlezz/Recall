@@ -185,11 +185,12 @@ export function settingsFromRows(rows: SettingRow[]): RecallSettings {
   const leechThresholdRaw = values.get("leech_threshold");
 
   return {
-    theme,
-    seededAt: values.get("seeded_at") ?? new Date(0).toISOString(),
-    dailyNewCardLimit: dailyNewCardLimitRaw ? parseInt(dailyNewCardLimitRaw, 10) : 20,
-    leechThreshold: leechThresholdRaw ? parseInt(leechThresholdRaw, 10) : 5,
-  };
+      theme,
+      seededAt: values.get("seeded_at") ?? new Date(0).toISOString(),
+      dailyNewCardLimit: dailyNewCardLimitRaw ? parseInt(dailyNewCardLimitRaw, 10) : 20,
+      leechThreshold: leechThresholdRaw ? parseInt(leechThresholdRaw, 10) : 5,
+      onboardingComplete: values.get("onboarding_complete") !== "false",
+    };
 }
 
 export function settingsToRows(settings: RecallSettings): SettingRow[] {
@@ -199,6 +200,7 @@ export function settingsToRows(settings: RecallSettings): SettingRow[] {
     { key: "schema_version", value: SCHEMA_VERSION },
     { key: "daily_new_card_limit", value: String(settings.dailyNewCardLimit) },
     { key: "leech_threshold", value: String(settings.leechThreshold) },
+    { key: "onboarding_complete", value: String(settings.onboardingComplete) },
   ];
 }
 

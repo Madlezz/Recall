@@ -74,6 +74,7 @@ describe("database mappers", () => {
           seededAt: "2026-06-01T00:00:00.000Z",
           dailyNewCardLimit: 20,
           leechThreshold: 5,
+          onboardingComplete: true,
         };
 
     expect(deckFromRow(deckToRow(deck) as DeckRow)).toEqual(deck);
