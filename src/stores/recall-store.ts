@@ -49,7 +49,8 @@ interface RecallStore extends RecallStateSnapshot {
   showDashboard: () => void;
   showSettings: () => void;
   showDeck: (deckId: string) => void;
-  createDeck: (input: DeckInput) => Promise<string>;
+    completeOnboarding: () => Promise<void>;
+    createDeck: (input: DeckInput) => Promise<string>;
   updateDeck: (deckId: string, input: DeckInput) => Promise<void>;
   deleteDeck: (deckId: string) => Promise<void>;
   createCard: (input: CardInput) => Promise<string>;
@@ -85,24 +86,25 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
   error: null,
 
   async initialize() {
-    if (get().isInitialized) {
-      return;
-    }
+      if (get().isInitialized) {
+        return;
+      }
 
-    set({ isLoading: true, error: null });
-    try {
-      const repository = await getRepository();
-      const snapshot = await repository.loadAppData();
-      applyTheme(snapshot.settings.theme);
-      set({ ...snapshot, isLoading: false, isInitialized: true, error: null });
-    } catch (error) {
-      set({
-        isLoading: false,
-        isInitialized: true,
-        error: error instanceof Error ? error.message : "Failed to load app data",
-      });
-    }
-  },
+      set({ isLoading: true, error: null });
+      try {
+        const repository = await getRepository();
+        const snapshot = await repository.loadAppData();
+        applyTheme(snapshot.settings.theme);
+        const view = snapshot.settings.onboardingComplete ? "dashboard" : "onboarding";
+        set({ ...snapshot, view, isLoading: false, isInitialized: true, error: null });
+      } catch (error) {
+        set({
+          isLoading: false,
+          isInitialized: true,
+          error: error instanceof Error ? error.message : "Failed to load app data",
+        });
+      }
+    },
 
   async setTheme(theme) {
     const repository = await getRepository();
@@ -126,10 +128,20 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
   },
 
   showDeck(deckId) {
-    set({ view: "deck", selectedDeckId: deckId, activeStudy: null });
-  },
+      set({ view: "deck", selectedDeckId: deckId, activeStudy: null });
+    },
 
-  async createDeck(input) {
+    async completeOnboarding() {
+      const repository = await getRepository();
+      const snapshot = await repository.saveSettings(
+        { ...dataState(get()).settings, onboardingComplete: true },
+        dataState(get())
+      );
+      commitSnapshot(set, snapshot);
+      set({ view: "dashboard" });
+    },
+
+    async createDeck(input) {
     const name = normalizeName(input.name);
     ensureDeckName(name, get().decks);
 

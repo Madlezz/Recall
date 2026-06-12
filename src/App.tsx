@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Dashboard } from "@/components/dashboard";
 import { DeckDetail } from "@/components/deck-detail";
+import { Onboarding } from "@/components/onboarding";
 import { Settings } from "@/components/settings";
 import { StudyMode } from "@/components/study-mode";
 import { useRecallStore } from "@/stores/recall-store";
@@ -70,10 +71,11 @@ export function App(): JSX.Element {
         </main>
       ) : (
         <AppShell>
-          {view === "dashboard" ? <Dashboard /> : null}
-          {view === "deck" ? <DeckDetail /> : null}
-          {view === "settings" ? <Settings /> : null}
-        </AppShell>
+                  {view === "dashboard" ? <Dashboard /> : null}
+                  {view === "deck" ? <DeckDetail /> : null}
+                  {view === "settings" ? <Settings /> : null}
+                  {view === "onboarding" ? <Onboarding /> : null}
+                </AppShell>
       )}
       <Toaster richColors closeButton position="top-right" />
     </>

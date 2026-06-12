@@ -5,52 +5,56 @@ const ISO = (date: Date): string => date.toISOString();
 
 export function createSeedSnapshot(now = new Date()): RecallStateSnapshot {
   const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
   const yesterday = subDays(today, 1);
   const lastWeek = subDays(today, 7);
 
   const decks: Deck[] = [
     {
-      id: "deck_typescript",
-      name: "TypeScript Systems",
-      description: "Types, narrowing, and maintainable frontend patterns.",
-      color: "blue",
+      id: "deck_languages",
+      name: "🇯🇵 Japanese Basics",
+      description: "Common Japanese words and phrases for everyday conversation.",
+      color: "red",
       createdAt: ISO(lastWeek),
       updatedAt: ISO(yesterday),
     },
     {
-      id: "deck_react",
-      name: "React Fundamentals",
-      description: "Hooks, state, rendering, and UI architecture.",
-      color: "violet",
+      id: "deck_science",
+      name: "🔬 Science Facts",
+      description: "Fun science facts that make you sound smart at parties.",
+      color: "green",
       createdAt: ISO(subDays(today, 6)),
       updatedAt: ISO(today),
     },
     {
-      id: "deck_sql",
-      name: "Local-First Data",
-      description: "SQLite, sync boundaries, and offline data design.",
-      color: "green",
+      id: "deck_history",
+      name: "🏛️ World History",
+      description: "Key dates and events that shaped the modern world.",
+      color: "amber",
       createdAt: ISO(subDays(today, 5)),
       updatedAt: ISO(today),
     },
   ];
 
   const cards: Card[] = [
-    card("card_ts_1", "deck_typescript", "What does `strict` mode protect?", "It enables stronger type checks that catch unsafe assumptions at compile time.", "Think compiler guardrails.", ["typescript"], "learning", yesterday, today, 2.5, 1.2, 1, 2, 3, 1, lastWeek),
-    card("card_ts_2", "deck_typescript", "What is a discriminated union?", "A union of object types narrowed by a shared literal property.", "", ["typescript", "types"], "review", yesterday, addDays(today, 12), 15.0, 0.8, 5, 15, 6, 0, lastWeek),
-    card("card_ts_3", "deck_typescript", "What does `never` represent?", "A value that should not exist, often used for exhaustiveness checks.", "", ["typescript"], "new", null, today, 0, 0, 0, 0, 0, 0, yesterday),
-    card("card_react_1", "deck_react", "Why keep state close to consumers?", "It reduces coupling and avoids needless re-renders across unrelated UI.", "", ["react"], "learning", yesterday, today, 1.0, 1.5, 1, 1, 2, 1, subDays(today, 6)),
-    card("card_react_2", "deck_react", "What should an effect cleanup handle?", "Subscriptions, timers, observers, pending work, and anything with external lifetime.", "External lifetime matters.", ["react", "hooks"], "new", null, today, 0, 0, 0, 0, 0, 0, subDays(today, 4)),
-    card("card_react_3", "deck_react", "When is `useMemo` useful?", "For expensive derived values or stable references passed to memoized children.", "", ["react"], "review", subDays(today, 2), addDays(today, 16), 20.0, 0.5, 6, 20, 7, 1, subDays(today, 4)),
-    card("card_sql_1", "deck_sql", "What does local-first mean here?", "The app works fully offline and stores user data on the device first.", "", ["local-first"], "learning", yesterday, today, 1.5, 1.1, 3, 2, 4, 1, subDays(today, 5)),
-    card("card_sql_2", "deck_sql", "Why use import/export JSON?", "It gives portable backups without accounts, sync, or cloud dependencies.", "", ["portability"], "new", null, today, 0, 0, 0, 0, 0, 0, subDays(today, 2)),
+    card("card_jp_1", "deck_languages", "Hello / Good afternoon", "こんにちは (Konnichiwa)", "Said during daytime", ["greetings"], "review", yesterday, addDays(today, 10), 12.0, 0.8, 4, 12, 5, 1, lastWeek),
+    card("card_jp_2", "deck_languages", "Thank you", "ありがとう (Arigatou)", "Casual form", ["greetings"], "learning", yesterday, today, 2.0, 1.1, 2, 3, 3, 1, lastWeek),
+    card("card_jp_3", "deck_languages", "Excuse me / I'm sorry", "すみません (Sumimasen)", "Very useful phrase", ["phrases"], "new", null, today, 0, 0, 0, 0, 0, 0, yesterday),
+    card("card_sci_1", "deck_science", "What is the speed of light?", "~300,000 km/s in a vacuum", "That's about 7.5 laps around Earth per second!", ["physics"], "review", subDays(today, 2), addDays(today, 20), 18.0, 0.5, 6, 18, 7, 1, subDays(today, 6)),
+    card("card_sci_2", "deck_science", "How many bones in the human body?", "206 bones in an adult", "Babies have ~300, they fuse together", ["biology"], "learning", yesterday, today, 1.5, 1.0, 2, 2, 3, 1, subDays(today, 4)),
+    card("card_sci_3", "deck_science", "What is DNA?", "Deoxyribonucleic Acid — the blueprint of life", "Found in every cell", ["biology"], "new", null, today, 0, 0, 0, 0, 0, 0, subDays(today, 2)),
+    card("card_his_1", "deck_history", "When did World War II end?", "1945", "September 2, 1945 — Japan surrendered", ["dates"], "review", yesterday, addDays(today, 5), 8.0, 0.9, 5, 10, 6, 0, subDays(today, 5)),
+    card("card_his_2", "deck_history", "Who was the first person on the moon?", "Neil Armstrong", "Apollo 11, July 20, 1969", ["people"], "learning", yesterday, today, 1.0, 1.3, 1, 1, 2, 1, subDays(today, 3)),
+    card("card_his_3", "deck_history", "What year did the Berlin Wall fall?", "1989", "November 9, 1989", ["dates"], "new", null, today, 0, 0, 0, 0, 0, 0, subDays(today, 1)),
   ];
 
   const sessionId = "session_seed_1";
   const reviewLogs: ReviewLog[] = [
-    reviewLog("review_seed_1", "card_ts_1", "good", yesterday, 2.5, 1.2, 1, 2),
-    reviewLog("review_seed_2", "card_react_1", "again", yesterday, 0.5, 1.5, 1, 1),
-    reviewLog("review_seed_3", "card_sql_1", "good", yesterday, 1.5, 1.1, 3, 2),
+    reviewLog("review_seed_1", "card_jp_1", "good", yesterday, 12.0, 0.8, 4, 12),
+    reviewLog("review_seed_2", "card_sci_1", "good", yesterday, 18.0, 0.5, 6, 18),
+    reviewLog("review_seed_3", "card_his_1", "good", yesterday, 8.0, 0.9, 5, 10),
+    reviewLog("review_seed_4", "card_jp_2", "again", yesterday, 0.5, 1.1, 2, 3),
+    reviewLog("review_seed_5", "card_his_2", "good", yesterday, 1.0, 1.3, 1, 1),
   ];
 
   const studySessions: StudySession[] = [
@@ -59,7 +63,7 @@ export function createSeedSnapshot(now = new Date()): RecallStateSnapshot {
       deckId: null,
       startedAt: ISO(subDays(yesterday, 0)),
       endedAt: ISO(yesterday),
-      cardsStudied: 3,
+      cardsStudied: 5,
     },
   ];
 
@@ -73,58 +77,26 @@ export function createSeedSnapshot(now = new Date()): RecallStateSnapshot {
           seededAt: ISO(today),
           dailyNewCardLimit: 20,
           leechThreshold: 5,
+          onboardingComplete: false,
         },
   };
 }
 
 function card(
-  id: string,
-  deckId: string,
-  front: string,
-  back: string,
-  hint: string,
-  tags: string[],
-  state: CardState,
-  lastReviewDate: Date | null,
-  nextReviewDate: Date,
-  stability: number,
-  difficulty: number,
-  elapsedDays: number,
-  scheduledDays: number,
-  reps: number,
-  lapses: number,
-  createdAt: Date,
+  id: string, deckId: string, front: string, back: string, hint: string,
+  tags: string[], state: CardState, lastReviewDate: Date | null, nextReviewDate: Date,
+  stability: number, difficulty: number, elapsedDays: number, scheduledDays: number,
+  reps: number, lapses: number, createdAt: Date,
 ): Card {
   return {
-    id,
-    deckId,
-    front,
-    back,
-    hint,
-    tags,
-    state,
+    id, deckId, front, back, hint, tags, state,
     lastReviewDate: lastReviewDate ? ISO(lastReviewDate) : null,
     nextReviewDate: ISO(nextReviewDate),
-    stability,
-    difficulty,
-    elapsedDays,
-    scheduledDays,
-    reps,
-    lapses,
-    createdAt: ISO(createdAt),
-    updatedAt: ISO(createdAt),
+    stability, difficulty, elapsedDays, scheduledDays, reps, lapses,
+    createdAt: ISO(createdAt), updatedAt: ISO(createdAt),
   };
 }
 
 function reviewLog(id: string, cardId: string, rating: ReviewRating, reviewDate: Date, stability: number, difficulty: number, elapsedDays: number, scheduledDays: number): ReviewLog {
-  return {
-    id,
-    cardId,
-    rating,
-    reviewDate: ISO(reviewDate),
-    stability,
-    difficulty,
-    elapsedDays,
-    scheduledDays,
-  };
+  return { id, cardId, rating, reviewDate: ISO(reviewDate), stability, difficulty, elapsedDays, scheduledDays };
 }

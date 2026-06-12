@@ -59,6 +59,7 @@ export interface RecallSettings {
   seededAt: string;
   dailyNewCardLimit: number;
   leechThreshold: number;
+  onboardingComplete: boolean;
 }
 
 export interface SessionSummary {
@@ -98,4 +99,4 @@ export interface ActiveStudySession {
   newCardsCount: number;
 }
 
-export type AppView = "dashboard" | "deck" | "study" | "settings";
+export type AppView = "dashboard" | "deck" | "study" | "settings" | "onboarding";
