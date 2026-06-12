@@ -100,7 +100,7 @@ export function Dashboard(): JSX.Element {
           </div>
         ) : (
           <div className="grid gap-3 lg:grid-cols-2">
-            {sortedDecks.map((deck) => {
+            {sortedDecks.map((deck) => (
               <DeckCard key={deck.id} deck={deck} onOpen={() => showDeck(deck.id)} />
             ))}
           </div>
