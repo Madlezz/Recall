@@ -4,7 +4,6 @@ import { isCardDueToday } from "@/lib/stats";
 import { createId, normalizeName } from "@/lib/utils";
 import { buildExportPayload } from "@/services/import-export";
 import { getRecallRepository, type RecallRepository } from "@/services/repository";
-import { applyReviewResult } from "@/services/study-engine";
 import { applyTheme } from "@/services/storage";
 import type {
   ActiveStudySession,
@@ -292,7 +291,9 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
     }
 
     const reviewedAt = new Date();
-    const updatedCard = applyReviewResult(card, result, reviewedAt);
+    // TODO: Replace with FSRS engine in Task 3
+    // const updatedCard = applyReviewResult(card, result, reviewedAt);
+    const updatedCard = card; // Temporary placeholder
     const review: Review = {
       id: createId("review"),
       cardId,
