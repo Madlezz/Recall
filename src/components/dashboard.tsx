@@ -1,4 +1,4 @@
-import { ArrowRight, Flame, Layers3, Plus, RotateCw, Zap } from "lucide-react";
+import { ArrowRight, BookOpen, Brain, Layers3, Plus, RotateCw, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { AnkiImportDialog } from "@/components/anki-import-dialog";
 import { DeckDialog } from "@/components/deck-dialog";
@@ -6,7 +6,7 @@ import { StatTile } from "@/components/stat-tile";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { getDeckColorClass } from "@/lib/deck-colors";
-import { getDeckStats, getDueTodayCount, getStudyStreak } from "@/lib/stats";
+import { getDeckStats, getDueTodayCount, getLearningCount, getNewCount } from "@/lib/stats";
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
 import type { Deck } from "@/types";
@@ -14,7 +14,6 @@ import type { Deck } from "@/types";
 export function Dashboard(): JSX.Element {
   const decks = useRecallStore((state) => state.decks);
   const cards = useRecallStore((state) => state.cards);
-  const reviewLogs = useRecallStore((state) => state.reviewLogs);
   const showDeck = useRecallStore((state) => state.showDeck);
   const startReview = useRecallStore((state) => state.startReview);
 
@@ -53,8 +52,8 @@ export function Dashboard(): JSX.Element {
 
       <section className="grid gap-3 sm:grid-cols-3">
         <StatTile icon={Zap} label="Due today" value={String(getDueTodayCount(cards))} />
-        <StatTile icon={Flame} label="Study streak" value={`${getStudyStreak(reviewLogs)} days`} />
-        <StatTile icon={Layers3} label="Total cards" value={String(cards.length)} />
+        <StatTile icon={BookOpen} label="New" value={String(getNewCount(cards))} />
+        <StatTile icon={Brain} label="Learning" value={String(getLearningCount(cards))} />
       </section>
 
       <section>

@@ -6,6 +6,9 @@ export interface DeckStats {
   mastered: number;
   due: number;
   accuracy: number;
+  newCards: number;
+  learning: number;
+  review: number;
 }
 
 export function isCardDue(card: Card, at = new Date()): boolean {
@@ -27,11 +30,22 @@ export function getDeckStats(deck: Deck, cards: Card[]): DeckStats {
     mastered: deckCards.filter((card) => card.state === "review").length,
     due: deckCards.filter((card) => isCardDueToday(card)).length,
     accuracy,
+    newCards: deckCards.filter((card) => card.state === "new").length,
+    learning: deckCards.filter((card) => card.state === "learning" || card.state === "relearning").length,
+    review: deckCards.filter((card) => card.state === "review").length,
   };
 }
 
 export function getDueTodayCount(cards: Card[], at = new Date()): number {
   return cards.filter((card) => isCardDueToday(card, at)).length;
+}
+
+export function getNewCount(cards: Card[]): number {
+  return cards.filter((card) => card.state === "new").length;
+}
+
+export function getLearningCount(cards: Card[]): number {
+  return cards.filter((card) => card.state === "learning" || card.state === "relearning").length;
 }
 
 export function getStudyStreak(reviews: ReviewLog[], at = new Date()): number {

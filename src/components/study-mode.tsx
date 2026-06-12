@@ -27,9 +27,19 @@ export function StudyMode(): JSX.Element {
         return;
       }
 
-      if (event.code === "Space") {
+      // Ignore shortcuts when user is focused on an input element
+      const target = event.target as HTMLElement | null;
+      if (target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) {
+        return;
+      }
+
+      if (event.code === "Space" && !activeStudy.revealed) {
         event.preventDefault();
         revealAnswer();
+      }
+
+      if (!activeStudy.revealed) {
+        return;
       }
 
       if (event.key === "1") {

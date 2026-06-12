@@ -1,4 +1,4 @@
-import { ArrowLeft, Download, Edit3, Play, Plus, Search, Trash2, RotateCcw } from "lucide-react";
+import { ArrowLeft, BookOpen, Brain, Download, Edit3, Play, Plus, RefreshCw, Search, Trash2, RotateCcw } from "lucide-react";
 import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -142,10 +142,10 @@ export function DeckDetail(): JSX.Element {
       </section>
 
       <section className="grid gap-3 sm:grid-cols-4">
-        <StatTile icon={Search} label="Cards" value={String(stats.total)} />
         <StatTile icon={Play} label="Due" value={String(stats.due)} />
-        <StatTile icon={Edit3} label="Mastered" value={String(stats.mastered)} />
-        <StatTile icon={Trash2} label="Accuracy" value={`${stats.accuracy}%`} />
+        <StatTile icon={BookOpen} label="New" value={String(stats.newCards)} />
+        <StatTile icon={Brain} label="Learning" value={String(stats.learning)} />
+        <StatTile icon={RefreshCw} label="Review" value={String(stats.review)} />
       </section>
 
       <section className="space-y-4">
