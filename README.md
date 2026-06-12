@@ -1,84 +1,36 @@
 # Recall
 
-Recall is a minimal, local-first flashcard desktop app for focused learning.
+A modern, fully offline, open-source spaced repetition app built for developers and learners who value privacy and portability.
 
-![Recall dashboard](docs/screenshot.png)
+## Why Recall?
+
+| Feature | Recall | Anki | Quizlet |
+|---------|--------|------|---------|
+| **Algorithm** | FSRS (Modern, accurate) | SM-2 (Outdated) | Proprietary |
+| **Anki Import** | ✅ One-click `.apkg` | N/A | ❌ |
+| **Rich Cards** | ✅ Markdown, Code, LaTeX | ⚠️ Clunky plugins | ⚠️ Limited |
+| **Portable** | ✅ Single folder, USB-ready | ⚠️ Complex profile | ❌ Cloud-only |
+| **Account Required** | ❌ No | ⚠️ For sync | ✅ Yes |
+| **Git-Friendly** | ✅ JSON deck format | ❌ Binary `.apkg` | ❌ |
 
 ## Features
 
-- Deck and card CRUD
-- Focused study mode with flip reveal
-- Correct / Incorrect self-assessment
-- Simple spaced repetition
-- Progress tracking and study streak
-- JSON import/export
-- Dark mode by default with light mode toggle
-- Fully local SQLite storage through Tauri
-- Seed data for first launch demos
+- **FSRS Algorithm**: Mathematically superior spaced repetition
+- **Anki Migration**: Import your existing `.apkg` decks seamlessly
+- **Developer-First**: Native syntax highlighting for code cards
+- **100% Offline**: No accounts, no cloud, no tracking
+- **Cross-Platform**: Windows, macOS, Linux
 
-## Local-First Promise
+## Installation
 
-Recall does not use accounts, cloud sync, telemetry, analytics, tracking, crash reporting, or external APIs. Data lives on your machine in a local SQLite database. JSON export is provided for portable backups.
-
-## Tech Stack
-
-- Tauri 2
-- React 18
-- TypeScript strict
-- Vite
-- SQLite via `@tauri-apps/plugin-sql`
-- Drizzle ORM schema layer
-- Tailwind CSS
-- Zustand
-- Lucide icons
-- date-fns
-- pnpm
-
-## Requirements
-
-- Node.js 18 or newer
-- pnpm
-- Rust stable toolchain
-- WebView2 on Windows
+Download the latest release from [Releases](https://github.com/madlezz/recall/releases). No installation required — just run the executable.
 
 ## Development
 
 ```bash
 pnpm install
-pnpm tauri:dev
+pnpm tauri dev
 ```
-
-For frontend-only development:
-
-```bash
-pnpm dev
-```
-
-## Verification
-
-```bash
-pnpm test
-pnpm lint
-pnpm build
-pnpm tauri:build
-```
-
-## Data Portability
-
-Use Settings to export all decks, cards, reviews, study sessions, and settings to one JSON file. Import supports Replace and Merge. Merge skips duplicate cards by deck name and card front.
-
-The SQLite database file is `recall.db` in the app-local data directory managed by Tauri.
-
-## Roadmap
-
-- Image support
-- Audio support
-- LaTeX rendering
-- Cloze deletion
-- Typed-answer mode
-- Global search
-- Advanced spaced repetition
-- Anki import/export
 
 ## License
 
