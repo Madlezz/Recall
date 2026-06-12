@@ -21,9 +21,9 @@ import { exportDeckToJson, downloadFile } from "@/services/import-export";
 
 export function DeckDetail(): JSX.Element {
   const [search, setSearch] = useState("");
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [selectedCardIds, setSelectedCardIds] = useState<Set<string>>(new Set());
-  const selectedDeckId = useRecallStore((state) => state.selectedDeckId);
+    const [selectedTag, setSelectedTag] = useState<string | null>(null);
+    const [selectedCardIds, setSelectedCardIds] = useState<Set<string>>(new Set());
+    const selectedDeckId = useRecallStore((state) => state.selectedDeckId);
   const deck = useRecallStore((state) => state.decks.find((item) => item.id === selectedDeckId));
   const cards = useRecallStore((state) => state.cards);
   const showDashboard = useRecallStore((state) => state.showDashboard);
@@ -259,13 +259,23 @@ export function DeckDetail(): JSX.Element {
         ) : null}
 
         {filteredCards.length === 0 ? (
-          <div className="rounded-lg border border-dashed p-10 text-center">
-            <h3 className="font-semibold">{deckCards.length === 0 ? "No cards yet" : "No matches"}</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {deckCards.length === 0 ? "Add a card to make this deck study-ready." : "Try a different search term."}
-            </p>
-          </div>
-        ) : (
+                  deckCards.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-muted-foreground/30 px-6 py-16 text-center">
+                      <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-muted/60">
+                        <BookOpen className="h-8 w-8 text-muted-foreground/60" />
+                      </div>
+                      <h3 className="text-lg font-semibold">This deck is empty</h3>
+                                    <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
+                                      Add flashcards to start learning. Use the Add Card button above, or try Markdown and LaTeX for rich content.
+                                    </p>
+                    </div>
+                  ) : (
+                    <div className="rounded-lg border border-dashed p-10 text-center">
+                      <h3 className="font-semibold">No matches</h3>
+                      <p className="mt-2 text-sm text-muted-foreground">Try a different search term.</p>
+                    </div>
+                  )
+                ) : (
           <div className="grid gap-3">
             {filteredCards.map((card) => (
                           <CardRow key={card.id} card={card} deckId={deck.id} isSelected={selectedCardIds.has(card.id)} onToggle={toggleCardSelection} />
