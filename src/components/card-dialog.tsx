@@ -1,6 +1,7 @@
 import { Plus } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { RichCard } from "@/components/RichCard";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,7 +13,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { parseTags } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
@@ -73,49 +76,108 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="w-[min(92vw,680px)]">
+      <DialogContent className="w-[min(92vw,900px)] max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>{card ? "Edit card" : "New card"}</DialogTitle>
-            <DialogDescription>Basic front/back cards only for MVP.</DialogDescription>
+            <DialogDescription>
+              Supports Markdown, code blocks with syntax highlighting, and LaTeX math ($inline$ and $$block$$).
+            </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <label className="block space-y-2 text-sm md:col-span-2">
-              <span className="font-medium">Deck</span>
-              <Select value={targetDeckId} onValueChange={setTargetDeckId}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {decks.map((deck) => (
-                    <SelectItem key={deck.id} value={deck.id}>
-                      {deck.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </label>
+          <div className="space-y-4 py-4">
+            <Label htmlFor="deck-select">Deck</Label>
+            <Select value={targetDeckId} onValueChange={setTargetDeckId}>
+              <SelectTrigger id="deck-select">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {decks.map((deck) => (
+                  <SelectItem key={deck.id} value={deck.id}>
+                    {deck.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-            <label className="block space-y-2 text-sm">
-              <span className="font-medium">Front</span>
-              <Textarea value={front} onChange={(event) => setFront(event.target.value)} placeholder="Question" />
-            </label>
+            <Tabs defaultValue="front" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="front">Front</TabsTrigger>
+                <TabsTrigger value="back">Back</TabsTrigger>
+              </TabsList>
 
-            <label className="block space-y-2 text-sm">
-              <span className="font-medium">Back</span>
-              <Textarea value={back} onChange={(event) => setBack(event.target.value)} placeholder="Answer" />
-            </label>
+              <TabsContent value="front" className="space-y-4">
+                <div className="grid gap-2 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="front-input">Content (Markdown)</Label>
+                    <Textarea
+                      id="front-input"
+                      value={front}
+                      onChange={(event) => setFront(event.target.value)}
+                      placeholder="# Question&#10;&#10;```python&#10;print('hello')&#10;```"
+                      className="min-h-[200px] font-mono text-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Preview</Label>
+                    <div className="min-h-[200px] rounded-md border bg-muted/30 p-4">
+                      {front ? (
+                        <RichCard content={front} />
+                      ) : (
+                        <p className="text-sm text-muted-foreground italic">Preview will appear here...</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
 
-            <label className="block space-y-2 text-sm">
-              <span className="font-medium">Hint</span>
-              <Input value={hint} onChange={(event) => setHint(event.target.value)} placeholder="Optional" />
-            </label>
+              <TabsContent value="back" className="space-y-4">
+                <div className="grid gap-2 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="back-input">Content (Markdown)</Label>
+                    <Textarea
+                      id="back-input"
+                      value={back}
+                      onChange={(event) => setBack(event.target.value)}
+                      placeholder="## Answer&#10;&#10;The solution is:&#10;&#10;$$E = mc^2$$"
+                      className="min-h-[200px] font-mono text-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Preview</Label>
+                    <div className="min-h-[200px] rounded-md border bg-muted/30 p-4">
+                      {back ? (
+                        <RichCard content={back} isBack />
+                      ) : (
+                        <p className="text-sm text-muted-foreground italic">Preview will appear here...</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
 
-            <label className="block space-y-2 text-sm">
-              <span className="font-medium">Tags</span>
-              <Input value={tags} onChange={(event) => setTags(event.target.value)} placeholder="react, hooks" />
-            </label>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="hint-input">Hint (optional)</Label>
+                <Input
+                  id="hint-input"
+                  value={hint}
+                  onChange={(event) => setHint(event.target.value)}
+                  placeholder="A subtle clue"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="tags-input">Tags (comma-separated)</Label>
+                <Input
+                  id="tags-input"
+                  value={tags}
+                  onChange={(event) => setTags(event.target.value)}
+                  placeholder="react, hooks, typescript"
+                />
+              </div>
+            </div>
           </div>
 
           <DialogFooter>
