@@ -21,13 +21,15 @@ const validSnapshot: RecallStateSnapshot = {
       back: "A local relational database.",
       hint: "",
       tags: ["sqlite"],
-      status: "new",
-      correctCount: 0,
-      incorrectCount: 0,
-      streak: 0,
-      easeFactor: 2.5,
-      lastReviewedAt: null,
-      nextReviewAt: "2026-06-01T00:00:00.000Z",
+      state: "new",
+      stability: 0,
+      difficulty: 0,
+      elapsedDays: 0,
+      scheduledDays: 0,
+      reps: 0,
+      lapses: 0,
+      lastReviewDate: null,
+      nextReviewDate: "2026-06-01T00:00:00.000Z",
       createdAt: "2026-06-01T00:00:00.000Z",
       updatedAt: "2026-06-01T00:00:00.000Z",
     },
@@ -39,17 +41,18 @@ const validSnapshot: RecallStateSnapshot = {
       startedAt: "2026-06-01T00:00:00.000Z",
       endedAt: "2026-06-01T00:05:00.000Z",
       cardsStudied: 1,
-      correct: 1,
-      incorrect: 0,
     },
   ],
-  reviews: [
+  reviewLogs: [
     {
       id: "review-1",
       cardId: "card-1",
-      sessionId: "session-1",
-      answeredAt: "2026-06-01T00:03:00.000Z",
-      result: "correct",
+      rating: "good",
+      reviewDate: "2026-06-01T00:03:00.000Z",
+      stability: 1.0,
+      difficulty: 5.0,
+      elapsedDays: 0,
+      scheduledDays: 1,
     },
   ],
   settings: {
@@ -75,7 +78,7 @@ describe("validateImportSnapshot", () => {
     ).toThrow("Duplicate deck name");
   });
 
-  it("rejects dangling card, session, and review references", () => {
+  it("rejects dangling card, session, and review log references", () => {
     expect(() =>
       validateImportSnapshot({
         ...validSnapshot,
@@ -93,9 +96,9 @@ describe("validateImportSnapshot", () => {
     expect(() =>
       validateImportSnapshot({
         ...validSnapshot,
-        reviews: [{ ...validSnapshot.reviews[0], cardId: "missing-card" }],
+        reviewLogs: [{ ...validSnapshot.reviewLogs[0], cardId: "missing-card" }],
       }),
-    ).toThrow("Review references missing card");
+    ).toThrow("Review log references missing card");
   });
 
   it("rejects invalid enum values before persistence", () => {
@@ -109,15 +112,15 @@ describe("validateImportSnapshot", () => {
     expect(() =>
       validateImportSnapshot({
         ...validSnapshot,
-        cards: [{ ...validSnapshot.cards[0], status: "stuck" as never }],
+        cards: [{ ...validSnapshot.cards[0], state: "stuck" as never }],
       }),
-    ).toThrow("Invalid card status");
+    ).toThrow("Invalid card state");
 
     expect(() =>
       validateImportSnapshot({
         ...validSnapshot,
-        reviews: [{ ...validSnapshot.reviews[0], result: "maybe" as never }],
+        reviewLogs: [{ ...validSnapshot.reviewLogs[0], rating: "maybe" as never }],
       }),
-    ).toThrow("Invalid review result");
+    ).toThrow("Invalid review rating");
   });
 });

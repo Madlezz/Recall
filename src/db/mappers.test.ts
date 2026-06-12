@@ -1,18 +1,18 @@
 import { describe, expect, it } from "vitest";
-import type { CardRow, DeckRow, ReviewRow, StudySessionRow } from "@/db/mappers";
+import type { CardRow, DeckRow, ReviewLogRow, StudySessionRow } from "@/db/mappers";
 import {
   cardFromRow,
   cardToRow,
   deckFromRow,
   deckToRow,
-  reviewFromRow,
-  reviewToRow,
+  reviewLogFromRow,
+  reviewLogToRow,
   settingsFromRows,
   settingsToRows,
   studySessionFromRow,
   studySessionToRow,
 } from "@/db/mappers";
-import type { Card, Deck, RecallSettings, Review, StudySession } from "@/types";
+import type { Card, Deck, RecallSettings, ReviewLog, StudySession } from "@/types";
 
 describe("database mappers", () => {
   it("round-trips card rows with JSON tags and nullable review date", () => {
@@ -23,13 +23,15 @@ describe("database mappers", () => {
       back: "Answer",
       hint: "",
       tags: ["sqlite", "tauri"],
-      status: "new",
-      correctCount: 0,
-      incorrectCount: 0,
-      streak: 0,
-      easeFactor: 2.5,
-      lastReviewedAt: null,
-      nextReviewAt: "2026-06-01T00:00:00.000Z",
+      state: "new",
+      stability: 0,
+      difficulty: 0,
+      elapsedDays: 0,
+      scheduledDays: 0,
+      reps: 0,
+      lapses: 0,
+      lastReviewDate: null,
+      nextReviewDate: "2026-06-01T00:00:00.000Z",
       createdAt: "2026-06-01T00:00:00.000Z",
       updatedAt: "2026-06-01T00:00:00.000Z",
     };
@@ -37,11 +39,11 @@ describe("database mappers", () => {
     const row = cardToRow(card);
 
     expect(row.tags).toBe("[\"sqlite\",\"tauri\"]");
-    expect(row.last_reviewed_at).toBeNull();
+    expect(row.last_review_date).toBeNull();
     expect(cardFromRow(row)).toEqual(card);
   });
 
-  it("round-trips deck, session, review, and settings rows", () => {
+  it("round-trips deck, session, review log, and settings rows", () => {
     const deck: Deck = {
       id: "deck-1",
       name: "SQLite",
@@ -56,15 +58,16 @@ describe("database mappers", () => {
       startedAt: "2026-06-01T00:00:00.000Z",
       endedAt: "2026-06-01T00:15:00.000Z",
       cardsStudied: 2,
-      correct: 1,
-      incorrect: 1,
     };
-    const review: Review = {
+    const reviewLog: ReviewLog = {
       id: "review-1",
       cardId: "card-1",
-      sessionId: "session-1",
-      answeredAt: "2026-06-01T00:10:00.000Z",
-      result: "correct",
+      rating: "good",
+      reviewDate: "2026-06-01T00:10:00.000Z",
+      stability: 1.0,
+      difficulty: 5.0,
+      elapsedDays: 0,
+      scheduledDays: 1,
     };
     const settings: RecallSettings = {
       theme: "dark",
@@ -73,12 +76,12 @@ describe("database mappers", () => {
 
     expect(deckFromRow(deckToRow(deck) as DeckRow)).toEqual(deck);
     expect(studySessionFromRow(studySessionToRow(session) as StudySessionRow)).toEqual(session);
-    expect(reviewFromRow(reviewToRow(review) as ReviewRow)).toEqual(review);
+    expect(reviewLogFromRow(reviewLogToRow(reviewLog) as ReviewLogRow)).toEqual(reviewLog);
     expect(settingsFromRows(settingsToRows(settings))).toEqual(settings);
     expect(settingsToRows(settings)).toContainEqual({ key: "schema_version", value: "2" });
   });
 
-  it("rejects invalid card status and review result rows", () => {
+  it("rejects invalid card state and review rating rows", () => {
     const cardRow: CardRow = {
       id: "card-1",
       deck_id: "deck-1",
@@ -86,25 +89,30 @@ describe("database mappers", () => {
       back: "Answer",
       hint: "",
       tags: "[]",
-      status: "bad",
-      correct_count: 0,
-      incorrect_count: 0,
-      streak: 0,
-      ease_factor: 2.5,
-      last_reviewed_at: null,
-      next_review_at: "2026-06-01T00:00:00.000Z",
+      state: "bad",
+      stability: 0,
+      difficulty: 0,
+      elapsed_days: 0,
+      scheduled_days: 0,
+      reps: 0,
+      lapses: 0,
+      last_review_date: null,
+      next_review_date: "2026-06-01T00:00:00.000Z",
       created_at: "2026-06-01T00:00:00.000Z",
       updated_at: "2026-06-01T00:00:00.000Z",
     };
-    const reviewRow: ReviewRow = {
+    const reviewLogRow: ReviewLogRow = {
       id: "review-1",
       card_id: "card-1",
-      session_id: "session-1",
-      answered_at: "2026-06-01T00:10:00.000Z",
-      result: "bad",
+      rating: "bad",
+      review_date: "2026-06-01T00:10:00.000Z",
+      stability: 0,
+      difficulty: 0,
+      elapsed_days: 0,
+      scheduled_days: 0,
     };
 
-    expect(() => cardFromRow(cardRow)).toThrow("Invalid card status");
-    expect(() => reviewFromRow(reviewRow)).toThrow("Invalid review result");
+    expect(() => cardFromRow(cardRow)).toThrow("Invalid card state");
+    expect(() => reviewLogFromRow(reviewLogRow)).toThrow("Invalid review rating");
   });
 });

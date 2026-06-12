@@ -114,40 +114,36 @@ export function mergeImportPayload(current: RecallStateSnapshot, incoming: Recal
     existingCardKeys.add(key);
   }
 
-  const reviewLogsByCard = groupReviewLogsByCard(incoming.reviewLogs);
   for (const incomingSession of incoming.studySessions) {
-    const incomingReviewLogs = reviewLogsByCard.get(incomingSession.id) ?? [];
-    if (incomingReviewLogs.length === 0) {
+    const sessionReviewLogs = incoming.reviewLogs.filter(
+      (rl) => importedCardIdMap.has(rl.cardId),
+    );
+
+    if (sessionReviewLogs.length > 0) {
+      let deckId: string | null = null;
+      if (incomingSession.deckId !== null) {
+        const mappedDeckId = deckIdMap.get(incomingSession.deckId);
+        if (!mappedDeckId) {
+          continue;
+        }
+        deckId = mappedDeckId;
+      }
+
+      const nextSession = ensureStudySessionId({ ...incomingSession, deckId }, nextStudySessions);
+      nextStudySessions.push(nextSession);
+
+      for (const incomingReviewLog of sessionReviewLogs) {
+        const cardId = importedCardIdMap.get(incomingReviewLog.cardId);
+        if (!cardId) {
+          continue;
+        }
+
+        nextReviewLogs.push(ensureReviewLogId({ ...incomingReviewLog, cardId }, nextReviewLogs));
+      }
+    } else {
       // Include sessions even without review logs
       const nextSession = ensureStudySessionId({ ...incomingSession }, nextStudySessions);
       nextStudySessions.push(nextSession);
-      continue;
-    }
-
-    const allReviewLogsBelongToNewCards = incomingReviewLogs.every((reviewLog) => importedCardIdMap.has(reviewLog.cardId));
-    if (!allReviewLogsBelongToNewCards) {
-      continue;
-    }
-
-    let deckId: string | null = null;
-    if (incomingSession.deckId !== null) {
-      const mappedDeckId = deckIdMap.get(incomingSession.deckId);
-      if (!mappedDeckId) {
-        continue;
-      }
-      deckId = mappedDeckId;
-    }
-
-    const nextSession = ensureStudySessionId({ ...incomingSession, deckId }, nextStudySessions);
-    nextStudySessions.push(nextSession);
-
-    for (const incomingReviewLog of incomingReviewLogs) {
-      const cardId = importedCardIdMap.get(incomingReviewLog.cardId);
-      if (!cardId) {
-        continue;
-      }
-
-      nextReviewLogs.push(ensureReviewLogId({ ...incomingReviewLog, cardId }, nextReviewLogs));
     }
   }
 
@@ -158,17 +154,6 @@ export function mergeImportPayload(current: RecallStateSnapshot, incoming: Recal
     reviewLogs: nextReviewLogs,
     settings: current.settings,
   };
-}
-
-function groupReviewLogsByCard(reviewLogs: ReviewLog[]): Map<string, ReviewLog[]> {
-  const grouped = new Map<string, ReviewLog[]>();
-  for (const reviewLog of reviewLogs) {
-    const groupKey = reviewLog.cardId;
-    const group = grouped.get(groupKey) ?? [];
-    group.push(reviewLog);
-    grouped.set(groupKey, group);
-  }
-  return grouped;
 }
 
 function duplicateKey(deckName: string, front: string): string {

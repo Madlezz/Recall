@@ -21,19 +21,21 @@ const snapshot: RecallStateSnapshot = {
       back: "A union narrowed by a shared literal field.",
       hint: "",
       tags: ["typescript"],
-      status: "new",
-      correctCount: 0,
-      incorrectCount: 0,
-      streak: 0,
-      easeFactor: 2.5,
-      lastReviewedAt: null,
-      nextReviewAt: "2026-06-01T00:00:00.000Z",
+      state: "new",
+      stability: 0,
+      difficulty: 0,
+      elapsedDays: 0,
+      scheduledDays: 0,
+      reps: 0,
+      lapses: 0,
+      lastReviewDate: null,
+      nextReviewDate: "2026-06-01T00:00:00.000Z",
       createdAt: "2026-06-01T00:00:00.000Z",
       updatedAt: "2026-06-01T00:00:00.000Z",
     },
   ],
   studySessions: [],
-  reviews: [],
+  reviewLogs: [],
   settings: { theme: "dark", seededAt: "2026-06-01T00:00:00.000Z" },
 };
 
@@ -41,14 +43,14 @@ describe("import/export", () => {
   it("exports versioned recall data", () => {
     const payload = buildExportPayload(snapshot, new Date("2026-06-01T12:00:00.000Z"));
 
-    expect(payload.version).toBe(1);
+    expect(payload.version).toBe(2);
     expect(payload.exportedAt).toBe("2026-06-01T12:00:00.000Z");
     expect(payload.decks).toHaveLength(1);
     expect(payload.cards).toHaveLength(1);
   });
 
   it("rejects malformed import payloads", () => {
-    expect(() => parseImportPayload('{"version":1,"decks":"bad"}')).toThrow("Invalid import file");
+    expect(() => parseImportPayload('{"version":2,"decks":"bad"}')).toThrow("Invalid import file");
     expect(() =>
       parseImportPayload(
         JSON.stringify({
@@ -102,17 +104,18 @@ describe("import/export", () => {
             startedAt: "2026-06-01T12:00:00.000Z",
             endedAt: "2026-06-01T12:05:00.000Z",
             cardsStudied: 1,
-            correct: 1,
-            incorrect: 0,
           },
         ],
-        reviews: [
+        reviewLogs: [
           {
             id: "review-2",
             cardId: "card-2",
-            sessionId: "session-2",
-            answeredAt: "2026-06-01T12:04:00.000Z",
-            result: "correct",
+            rating: "good" as const,
+            reviewDate: "2026-06-01T12:04:00.000Z",
+            stability: 1.0,
+            difficulty: 5.0,
+            elapsedDays: 0,
+            scheduledDays: 1,
           },
         ],
       },
@@ -124,13 +127,16 @@ describe("import/export", () => {
     expect(merged.cards.some((card) => card.id === "card-2")).toBe(true);
     expect(merged.studySessions).toHaveLength(1);
     expect(merged.studySessions[0]).toMatchObject({ id: "session-2", deckId: "deck-1" });
-    expect(merged.reviews).toEqual([
+    expect(merged.reviewLogs).toEqual([
       {
         id: "review-2",
         cardId: "card-2",
-        sessionId: "session-2",
-        answeredAt: "2026-06-01T12:04:00.000Z",
-        result: "correct",
+        rating: "good",
+        reviewDate: "2026-06-01T12:04:00.000Z",
+        stability: 1.0,
+        difficulty: 5.0,
+        elapsedDays: 0,
+        scheduledDays: 1,
       },
     ]);
   });
