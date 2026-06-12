@@ -1,10 +1,11 @@
-import { ArrowLeft, Check, RotateCcw, RotateCw, X } from "lucide-react";
-import { useEffect } from "react";
+import { ArrowLeft, Check, RotateCcw, RotateCw, Volume2, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { RichCard } from "@/components/RichCard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useRecallStore } from "@/stores/recall-store";
+import { speakText, stopSpeaking, isSpeaking, isTTSSupported } from "@/services/tts";
 import type { SessionSummary } from "@/types";
 
 export function StudyMode(): JSX.Element {
@@ -74,6 +75,11 @@ export function StudyMode(): JSX.Element {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeStudy, answerCurrentCard, revealAnswer, undoLastReview]);
+
+  // Stop TTS when card changes or study ends
+  useEffect(() => {
+    return () => stopSpeaking();
+  }, [cardId]);
 
   if (!activeStudy && lastSessionSummary) {
     return (
@@ -153,6 +159,18 @@ export function StudyMode(): JSX.Element {
           <ArrowLeft className="h-4 w-4" />
           Exit
         </Button>
+        {isTTSSupported() ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              const text = activeStudy.revealed ? `${card.front} ${card.back}` : card.front;
+              speakText(text);
+            }}
+          >
+            <Volume2 className="h-5 w-5" />
+          </Button>
+        ) : null}
         <div className="min-w-[220px] text-right">
           <div className="text-sm font-medium">
             {activeStudy.currentIndex + 1}/{total}
