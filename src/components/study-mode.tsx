@@ -1,9 +1,6 @@
 import { ArrowLeft, Check, RotateCw, X } from "lucide-react";
 import { useEffect } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
+import { RichCard } from "@/components/RichCard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useRecallStore } from "@/stores/recall-store";
@@ -117,16 +114,16 @@ export function StudyMode(): JSX.Element {
           <div className="study-card relative min-h-[420px]" data-revealed={activeStudy.revealed}>
             <div className="study-card-face absolute inset-0 flex flex-col justify-center rounded-lg border bg-card p-8 shadow-2xl">
               <p className="text-sm text-muted-foreground">{deck?.name ?? "All due cards"}</p>
-              <div className="mt-6 prose prose-invert max-w-none text-balance text-2xl font-medium leading-tight sm:text-3xl">
-                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{card.front}</ReactMarkdown>
-              </div>
+              <div className="mt-6 text-balance text-2xl font-medium leading-tight sm:text-3xl">
+                              <RichCard content={card.front} />
+                            </div>
               {card.hint ? <p className="mt-8 text-sm text-muted-foreground">Hint: {card.hint}</p> : null}
             </div>
             <div className="study-card-face study-card-back absolute inset-0 flex flex-col justify-center rounded-lg border bg-card p-8 shadow-2xl">
               <p className="text-sm text-muted-foreground">Answer</p>
-              <div className="mt-6 prose prose-invert max-w-none text-balance text-2xl font-medium leading-tight sm:text-3xl">
-                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{card.back}</ReactMarkdown>
-              </div>
+              <div className="mt-6 text-balance text-2xl font-medium leading-tight sm:text-3xl">
+                              <RichCard content={card.back} isBack />
+                            </div>
             </div>
           </div>
         </div>
