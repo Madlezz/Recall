@@ -1,3 +1,4 @@
+import confetti from "canvas-confetti";
 import { ArrowLeft, Check, EyeOff, RotateCcw, RotateCw, Volume2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -262,6 +263,23 @@ function ratingLabel(avg: number): string {
 
 function SessionSummaryModal({ summary, onContinue }: { summary: SessionSummary; onContinue: () => void }): JSX.Element {
   const total = summary.againCount + summary.hardCount + summary.goodCount + summary.easyCount;
+
+  useEffect(() => {
+    const goodScore = summary.goodCount + summary.easyCount;
+    const totalRated = total || 1;
+    const accuracy = goodScore / totalRated;
+
+    if (accuracy >= 0.6) {
+      const duration = accuracy >= 0.9 ? 3000 : 2000;
+      const particleCount = accuracy >= 0.9 ? 100 : 50;
+      confetti({
+        particleCount,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ["#a855f7", "#6366f1", "#8b5cf6", "#d946ef"],
+      });
+    }
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
