@@ -6,16 +6,39 @@ import { DeckDetail } from "@/components/deck-detail";
 import { Settings } from "@/components/settings";
 import { StudyMode } from "@/components/study-mode";
 import { useRecallStore } from "@/stores/recall-store";
+import { toast } from "sonner";
 
 export function App(): JSX.Element {
   const view = useRecallStore((state) => state.view);
   const isLoading = useRecallStore((state) => state.isLoading);
   const error = useRecallStore((state) => state.error);
   const initialize = useRecallStore((state) => state.initialize);
+  const startReview = useRecallStore((state) => state.startReview);
 
   useEffect(() => {
     void initialize();
   }, [initialize]);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent): void {
+      // Ignore if typing in an input/textarea
+      const target = event.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+        return;
+      }
+
+      // Press 'R' to start review from dashboard or deck view
+      if (event.key.toLowerCase() === "r" && view !== "study") {
+        event.preventDefault();
+        if (!startReview(null)) {
+          toast.info("No cards due right now");
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [view, startReview]);
 
   if (isLoading) {
     return (
