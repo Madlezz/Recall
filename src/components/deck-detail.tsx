@@ -30,7 +30,8 @@ export function DeckDetail(): JSX.Element {
     const deleteDeck = useRecallStore((state) => state.deleteDeck);
     const deleteCard = useRecallStore((state) => state.deleteCard);
     const startReview = useRecallStore((state) => state.startReview);
-    const resetDeckProgress = useRecallStore((state) => state.resetDeckProgress);
+        const resetDeckProgress = useRecallStore((state) => state.resetDeckProgress);
+        const startMatch = useRecallStore((state) => state.startMatch);
 
   const deckCards = useMemo(() => cards.filter((card) => card.deckId === selectedDeckId), [cards, selectedDeckId]);
 
@@ -170,9 +171,13 @@ export function DeckDetail(): JSX.Element {
             <p className="mt-2 text-sm text-muted-foreground">{deck.description || "No description"}</p>
           </div>
           <Button size="lg" onClick={handleStudyNow}>
-            <Play className="h-4 w-4" />
-            Study Now
-          </Button>
+                      <Play className="h-4 w-4" />
+                      Study Now
+                    </Button>
+                    <Button size="lg" variant="outline" onClick={() => startMatch(currentDeckId)}>
+                      <Brain className="h-4 w-4" />
+                      Match Game
+                    </Button>
         </div>
 
         <div className="max-w-xl space-y-2">

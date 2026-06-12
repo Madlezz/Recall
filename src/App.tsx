@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Dashboard } from "@/components/dashboard";
 import { DeckDetail } from "@/components/deck-detail";
+import { MatchGame } from "@/components/match-game";
 import { Onboarding } from "@/components/onboarding";
 import { Settings } from "@/components/settings";
 import { StudyMode } from "@/components/study-mode";
@@ -65,10 +66,11 @@ export function App(): JSX.Element {
 
   return (
     <>
-      {view === "study" ? (
-        <main className="min-h-screen bg-background px-4 py-5 text-foreground sm:px-6 lg:px-8">
-          <StudyMode />
-        </main>
+      {view === "study" || view === "match" ? (
+              <main className="min-h-screen bg-background px-4 py-5 text-foreground sm:px-6 lg:px-8">
+                {view === "study" ? <StudyMode /> : null}
+                {view === "match" ? <MatchGame /> : null}
+              </main>
       ) : (
         <AppShell>
                   {view === "dashboard" ? <Dashboard /> : null}

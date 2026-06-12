@@ -231,3 +231,19 @@ export function stopSoundscape(): void {
 export function getPlayingSoundscape(): Soundscape {
   return ambientPlaying;
 }
+
+/** Short click-tonk for tile selection */
+export function playTileClickSound(): void {
+  playTone(660, 0.08, "sine", 0.08);
+}
+
+/** Pleasant ding for successful match */
+export function playMatchSound(): void {
+  playTone(784, 0.12, "sine", 0.1);
+  setTimeout(() => playTone(988, 0.15, "sine", 0.1), 70);
+}
+
+/** Low thud for wrong match */
+export function playMismatchSound(): void {
+  playTone(200, 0.2, "triangle", 0.06);
+}

@@ -58,9 +58,10 @@ interface RecallStore extends RecallStateSnapshot {
   setTheme: (theme: Theme) => Promise<void>;
   updateSettings: (settings: Partial<RecallStateSnapshot["settings"]>) => Promise<void>;
   showDashboard: () => void;
-  showSettings: () => void;
-  showDeck: (deckId: string) => void;
-    completeOnboarding: () => Promise<void>;
+    showSettings: () => void;
+    showDeck: (deckId: string) => void;
+    startMatch: (deckId: string) => void;
+      completeOnboarding: () => Promise<void>;
     createDeck: (input: DeckInput) => Promise<string>;
   updateDeck: (deckId: string, input: DeckInput) => Promise<void>;
   deleteDeck: (deckId: string) => Promise<void>;
@@ -139,8 +140,12 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
   },
 
   showDeck(deckId) {
-      set({ view: "deck", selectedDeckId: deckId, activeStudy: null });
-    },
+        set({ view: "deck", selectedDeckId: deckId, activeStudy: null });
+      },
+
+      startMatch(deckId) {
+        set({ view: "match", selectedDeckId: deckId, activeStudy: null });
+      },
 
     async completeOnboarding() {
       const repository = await getRepository();
