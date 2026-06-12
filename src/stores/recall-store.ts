@@ -15,7 +15,8 @@ import {
   checkAchievements,
   applyNewAchievements,
   triggerLevelUpConfetti,
-} from "@/lib/xp";
+    triggerAchievementConfetti,
+  } from "@/lib/xp";
 import { ACHIEVEMENT_DEFS } from "@/types";
 import { getStudyStreak } from "@/lib/streak";
 import { hasCloze } from "@/lib/cloze";
@@ -639,9 +640,14 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
         };
 
         // Trigger level-up confetti
-        if (newLevel > oldLevel) {
-          triggerLevelUpConfetti();
-        }
+                if (newLevel > oldLevel) {
+                  triggerLevelUpConfetti();
+                }
+
+                // Trigger achievement confetti
+                if (newAchievementIds.length > 0) {
+                  triggerAchievementConfetti();
+                }
 
         // Persist XP + achievements
         const updatedSettings = { ...state.settings, xp: newXp, achievements: updatedAchievements };

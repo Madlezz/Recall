@@ -73,7 +73,7 @@ export function checkAchievements(
   tryUnlock("marathon", params.totalReviews >= 1000);
   tryUnlock("perfectionist", params.cardsInSession >= 10 && params.accuracy === 100);
   tryUnlock("night_owl", params.reviewHour >= 0 && params.reviewHour < 5);
-  tryUnlock("early_bird", params.reviewHour >= 5 && params.reviewHour < 6);
+  tryUnlock("early_bird", params.reviewHour >= 5 && params.reviewHour < 8);
   tryUnlock("deck_collector", params.deckCount >= 5);
   tryUnlock("card_hoarder", params.cardCount >= 100);
   tryUnlock("speed_demon", params.cardsInSession >= 50);

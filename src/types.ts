@@ -162,7 +162,7 @@ export const ACHIEVEMENT_DEFS: Record<AchievementId, Omit<Achievement, "id" | "u
   marathon: { title: "Marathon", description: "1,000 total reviews", icon: "🏆" },
   perfectionist: { title: "Perfectionist", description: "100% accuracy in a session (min 10 cards)", icon: "✨" },
   night_owl: { title: "Night Owl", description: "Review after midnight", icon: "🦉" },
-  early_bird: { title: "Early Bird", description: "Review before 6 AM", icon: "🌅" },
+  early_bird: { title: "Early Bird", description: "Review before 8 AM", icon: "🌅" },
   deck_collector: { title: "Deck Collector", description: "Created 5+ decks", icon: "📚" },
   card_hoarder: { title: "Card Hoarder", description: "100+ cards in library", icon: "🗂️" },
   speed_demon: { title: "Speed Demon", description: "Review 50+ cards in one session", icon: "⚡" },

@@ -106,6 +106,8 @@ function LevelWidget(): JSX.Element {
   const settings = useRecallStore((state) => state.settings);
   const level = getLevel(settings.xp);
   const title = getLevelTitle(level);
+  const unlocked = settings.achievements.filter((a) => a.unlockedAt).length;
+  const total = 14; // keep in sync with ACHIEVEMENT_DEFS
 
   return (
     <div className="mt-4 rounded-lg border bg-background/60 p-3">
@@ -113,8 +115,12 @@ function LevelWidget(): JSX.Element {
         <Shield className="h-3.5 w-3.5" />
         Level {level} · {title}
       </div>
-      <div className="mt-2 text-xs text-muted-foreground">
-        {settings.xp} XP earned · Keep reviewing to level up!
+      <div className="mt-2 space-y-1 text-xs text-muted-foreground">
+        <div>{settings.xp} XP earned</div>
+        <div className="flex items-center gap-1">
+          <Star className="h-3 w-3" />
+          {unlocked}/{total} achievements
+        </div>
       </div>
     </div>
   );

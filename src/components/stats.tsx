@@ -1,10 +1,11 @@
 import { useMemo } from "react";
 import { format, subDays } from "date-fns";
-import { BookOpen, Brain, Calendar, Clock, Flame, TrendingUp, Zap } from "lucide-react";
+import { BookOpen, Brain, Calendar, Clock, Flame, Lock, TrendingUp, Zap } from "lucide-react";
 import { useRecallStore } from "@/stores/recall-store";
 import { getStudyStreak } from "@/lib/streak";
 import { getLevel, getLevelTitle, levelProgress } from "@/lib/xp";
 import type { ReviewLog, ReviewRating } from "@/types";
+import { ACHIEVEMENT_DEFS } from "@/types";
 
 // ── Helpers ──
 
@@ -207,6 +208,38 @@ export function Stats(): JSX.Element {
           <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
             <Brain className="h-7 w-7 text-primary" />
           </div>
+        </div>
+      </section>
+
+      {/* Achievements gallery */}
+      <section className="rounded-lg border bg-card p-5">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-4">
+          Achievements ({settings.achievements.filter((a) => a.unlockedAt).length}/{Object.keys(ACHIEVEMENT_DEFS).length})
+        </h3>
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {Object.values(ACHIEVEMENT_DEFS).map((def, i) => {
+            const earned = settings.achievements.find((a) => a.id === Object.keys(ACHIEVEMENT_DEFS)[i]);
+            const unlocked = earned?.unlockedAt != null;
+            return (
+              <div
+                key={def.title}
+                className={`rounded-md border p-3 text-sm transition ${
+                  unlocked
+                    ? "border-primary/30 bg-primary/5"
+                    : "border-muted bg-muted/30 opacity-50"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{def.icon}</span>
+                  <div className="min-w-0">
+                    <div className="font-semibold truncate">{def.title}</div>
+                    <div className="text-xs text-muted-foreground line-clamp-1">{def.description}</div>
+                  </div>
+                  {unlocked ? null : <Lock className="ml-auto h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 
