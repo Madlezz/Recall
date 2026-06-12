@@ -1,5 +1,6 @@
 import { ArrowRight, Flame, Layers3, Plus, RotateCw, Zap } from "lucide-react";
 import { toast } from "sonner";
+import { AnkiImportDialog } from "@/components/anki-import-dialog";
 import { DeckDialog } from "@/components/deck-dialog";
 import { StatTile } from "@/components/stat-tile";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,7 @@ export function Dashboard(): JSX.Element {
               </Button>
             }
           />
+          <AnkiImportDialog />
         </div>
       </section>
 
