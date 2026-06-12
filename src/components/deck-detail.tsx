@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpen, Brain, Download, Edit3, Play, Plus, RefreshCw, Search, Trash2, RotateCcw, X } from "lucide-react";
+import { ArrowLeft, BookOpen, Brain, CheckSquare, Download, Edit3, Play, Plus, RefreshCw, Search, Square, Trash2, RotateCcw, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -22,11 +22,13 @@ import { exportDeckToJson, downloadFile } from "@/services/import-export";
 export function DeckDetail(): JSX.Element {
   const [search, setSearch] = useState("");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [selectedCardIds, setSelectedCardIds] = useState<Set<string>>(new Set());
   const selectedDeckId = useRecallStore((state) => state.selectedDeckId);
   const deck = useRecallStore((state) => state.decks.find((item) => item.id === selectedDeckId));
   const cards = useRecallStore((state) => state.cards);
   const showDashboard = useRecallStore((state) => state.showDashboard);
     const deleteDeck = useRecallStore((state) => state.deleteDeck);
+    const deleteCard = useRecallStore((state) => state.deleteCard);
     const startReview = useRecallStore((state) => state.startReview);
     const resetDeckProgress = useRecallStore((state) => state.resetDeckProgress);
 
@@ -80,6 +82,32 @@ export function DeckDetail(): JSX.Element {
     const json = exportDeckToJson(deck, deckCards);
     downloadFile(`${deck.name.replace(/\s+/g, '_')}.json`, json);
     toast.success("Deck exported");
+  }
+
+  function toggleCardSelection(cardId: string): void {
+    setSelectedCardIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(cardId)) next.delete(cardId);
+      else next.add(cardId);
+      return next;
+    });
+  }
+
+  function toggleSelectAll(): void {
+    setSelectedCardIds((prev) => {
+      if (prev.size === filteredCards.length) return new Set();
+      return new Set(filteredCards.map((c) => c.id));
+    });
+  }
+
+  async function handleBulkDelete(): Promise<void> {
+    if (selectedCardIds.size === 0) return;
+    const count = selectedCardIds.size;
+    for (const id of selectedCardIds) {
+      await deleteCard(id);
+    }
+    setSelectedCardIds(new Set());
+    toast.success(`Deleted ${count} card${count > 1 ? 's' : ''}`);
   }
 
   return (
@@ -185,6 +213,30 @@ export function DeckDetail(): JSX.Element {
           <Input className="pl-9" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search cards" />
         </div>
 
+        {filteredCards.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-3">
+            <Button variant="outline" size="sm" onClick={toggleSelectAll}>
+              {selectedCardIds.size === filteredCards.length ? (
+                <CheckSquare className="h-4 w-4" />
+              ) : (
+                <Square className="h-4 w-4" />
+              )}
+              {selectedCardIds.size === filteredCards.length ? "Deselect All" : "Select All"}
+            </Button>
+            {selectedCardIds.size > 0 ? (
+              <>
+                <span className="text-sm text-muted-foreground">
+                  {selectedCardIds.size} selected
+                </span>
+                <Button variant="destructive" size="sm" onClick={() => void handleBulkDelete()}>
+                  <Trash2 className="h-4 w-4" />
+                  Delete Selected
+                </Button>
+              </>
+            ) : null}
+          </div>
+        ) : null}
+
         {allTags.length > 0 ? (
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-medium text-muted-foreground">Filter by tag:</span>
@@ -216,8 +268,8 @@ export function DeckDetail(): JSX.Element {
         ) : (
           <div className="grid gap-3">
             {filteredCards.map((card) => (
-              <CardRow key={card.id} card={card} deckId={deck.id} />
-            ))}
+                          <CardRow key={card.id} card={card} deckId={deck.id} isSelected={selectedCardIds.has(card.id)} onToggle={toggleCardSelection} />
+                        ))}
           </div>
         )}
       </section>
@@ -228,9 +280,11 @@ export function DeckDetail(): JSX.Element {
 interface CardRowProps {
   card: Card;
   deckId: string;
+  isSelected: boolean;
+  onToggle: (cardId: string) => void;
 }
 
-function CardRow({ card, deckId }: CardRowProps): JSX.Element {
+function CardRow({ card, deckId, isSelected, onToggle }: CardRowProps): JSX.Element {
   const [isDeleting, setIsDeleting] = useState(false);
   const deleteCard = useRecallStore((state) => state.deleteCard);
   const leechThreshold = useRecallStore((state) => state.settings.leechThreshold);
@@ -249,10 +303,17 @@ function CardRow({ card, deckId }: CardRowProps): JSX.Element {
   }
 
   return (
-    <article className="rounded-lg border bg-card p-4">
+    <article className={cn("rounded-lg border bg-card p-4 transition-colors", isSelected && "ring-2 ring-primary/50")}>
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => onToggle(card.id)}
+              className="flex h-5 w-5 items-center justify-center rounded border border-input transition-colors hover:bg-muted"
+              aria-label={isSelected ? "Deselect card" : "Select card"}
+            >
+              {isSelected ? <CheckSquare className="h-4 w-4 text-primary" /> : <Square className="h-4 w-4 text-muted-foreground" />}
+            </button>
             <Badge tone={card.state === "review" ? "success" : card.state === "learning" || card.state === "relearning" ? "warning" : "muted"}>
               {card.state}
             </Badge>
