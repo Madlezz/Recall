@@ -1,5 +1,6 @@
-import { ArrowLeft, Check, RotateCw, X } from "lucide-react";
+import { ArrowLeft, Check, RotateCcw, RotateCw, X } from "lucide-react";
 import { useEffect } from "react";
+import { toast } from "sonner";
 import { RichCard } from "@/components/RichCard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -11,7 +12,8 @@ export function StudyMode(): JSX.Element {
   const decks = useRecallStore((state) => state.decks);
   const revealAnswer = useRecallStore((state) => state.revealAnswer);
   const answerCurrentCard = useRecallStore((state) => state.answerCurrentCard);
-  const exitStudy = useRecallStore((state) => state.exitStudy);
+    const undoLastReview = useRecallStore((state) => state.undoLastReview);
+    const exitStudy = useRecallStore((state) => state.exitStudy);
 
   const cardId = activeStudy?.cardIds[activeStudy.currentIndex];
   const card = cards.find((item) => item.id === cardId);
@@ -30,6 +32,12 @@ export function StudyMode(): JSX.Element {
       // Ignore shortcuts when user is focused on an input element
       const target = event.target as HTMLElement | null;
       if (target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) {
+        return;
+      }
+
+      if (event.ctrlKey && event.key === "z" && !activeStudy.revealed && activeStudy.currentIndex > 0) {
+        event.preventDefault();
+        void undoLastReview().then(() => toast.info("Review undone"));
         return;
       }
 
@@ -61,7 +69,7 @@ export function StudyMode(): JSX.Element {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeStudy, answerCurrentCard, revealAnswer]);
+  }, [activeStudy, answerCurrentCard, revealAnswer, undoLastReview]);
 
   if (!activeStudy) {
     return (
@@ -158,6 +166,12 @@ export function StudyMode(): JSX.Element {
       </section>
 
       <footer className="flex flex-wrap items-center justify-center gap-3 pb-4">
+        {activeStudy.revealed === false && activeStudy.currentIndex > 0 ? (
+          <Button variant="outline" size="lg" onClick={() => void undoLastReview().then(() => toast.info("Review undone"))}>
+            <RotateCcw className="h-4 w-4" />
+            Undo
+          </Button>
+        ) : null}
         <Button variant="outline" size="lg" onClick={revealAnswer} disabled={activeStudy.revealed}>
           <RotateCw className="h-4 w-4" />
           Reveal

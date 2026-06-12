@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpen, Brain, Download, Edit3, Play, Plus, RefreshCw, Search, Trash2, RotateCcw } from "lucide-react";
+import { ArrowLeft, BookOpen, Brain, Download, Edit3, Play, Plus, RefreshCw, Search, Trash2, RotateCcw, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 import { getDeckStats } from "@/lib/stats";
 import { useRecallStore } from "@/stores/recall-store";
 import type { Card } from "@/types";
@@ -20,6 +21,7 @@ import { exportDeckToJson, downloadFile } from "@/services/import-export";
 
 export function DeckDetail(): JSX.Element {
   const [search, setSearch] = useState("");
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const selectedDeckId = useRecallStore((state) => state.selectedDeckId);
   const deck = useRecallStore((state) => state.decks.find((item) => item.id === selectedDeckId));
   const cards = useRecallStore((state) => state.cards);
@@ -29,16 +31,29 @@ export function DeckDetail(): JSX.Element {
     const resetDeckProgress = useRecallStore((state) => state.resetDeckProgress);
 
   const deckCards = useMemo(() => cards.filter((card) => card.deckId === selectedDeckId), [cards, selectedDeckId]);
+
+  const allTags = useMemo(() => {
+    const tags = new Set<string>();
+    deckCards.forEach((card) => card.tags.forEach((tag) => tags.add(tag)));
+    return [...tags].sort();
+  }, [deckCards]);
+
   const filteredCards = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    if (!query) {
-      return deckCards;
+    let result = deckCards;
+
+    if (selectedTag) {
+      result = result.filter((card) => card.tags.includes(selectedTag));
     }
 
-    return deckCards.filter((card) =>
+    const query = search.trim().toLowerCase();
+    if (!query) {
+      return result;
+    }
+
+    return result.filter((card) =>
       [card.front, card.back, card.hint, card.tags.join(" ")].join(" ").toLowerCase().includes(query),
     );
-  }, [deckCards, search]);
+  }, [deckCards, search, selectedTag]);
 
   if (!deck) {
     return (
@@ -169,6 +184,27 @@ export function DeckDetail(): JSX.Element {
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input className="pl-9" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search cards" />
         </div>
+
+        {allTags.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-muted-foreground">Filter by tag:</span>
+            {allTags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => setSelectedTag((current) => (current === tag ? null : tag))}
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                  selectedTag === tag
+                    ? "border-primary bg-primary/15 text-primary"
+                    : "border-transparent bg-muted text-muted-foreground hover:bg-muted/80",
+                )}
+              >
+                {tag}
+                {selectedTag === tag ? <X className="h-3 w-3" /> : null}
+              </button>
+            ))}
+          </div>
+        ) : null}
 
         {filteredCards.length === 0 ? (
           <div className="rounded-lg border border-dashed p-10 text-center">

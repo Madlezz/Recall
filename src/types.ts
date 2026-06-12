@@ -81,6 +81,7 @@ export interface ActiveStudySession {
   startedAt: string;
   ratings: Record<ReviewRating, number>;
   completed: boolean;
+  previousCardState: Card | null;
 }
 
 export type AppView = "dashboard" | "deck" | "study" | "settings";

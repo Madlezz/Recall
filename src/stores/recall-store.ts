@@ -57,6 +57,7 @@ interface RecallStore extends RecallStateSnapshot {
   startReview: (deckId?: string | null) => boolean;
   revealAnswer: () => void;
   answerCurrentCard: (result: ReviewRating) => Promise<void>;
+  undoLastReview: () => Promise<void>;
   exitStudy: () => void;
   resetData: () => Promise<void>;
   replaceData: (payload: RecallExportPayload) => Promise<void>;
@@ -299,6 +300,7 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
         startedAt: now,
         ratings: { again: 0, hard: 0, good: 0, easy: 0 },
         completed: false,
+        previousCardState: null,
       },
     });
     return true;
@@ -344,12 +346,13 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
     };
     const isLast = activeStudy.currentIndex >= activeStudy.cardIds.length - 1;
     const nextActiveStudy: ActiveStudySession = isLast
-      ? { ...activeStudy, ratings: nextRatings, completed: true }
+      ? { ...activeStudy, ratings: nextRatings, completed: true, previousCardState: card }
       : {
           ...activeStudy,
           currentIndex: activeStudy.currentIndex + 1,
           revealed: false,
           ratings: nextRatings,
+          previousCardState: card,
         };
     const nextStudySessions: StudySession[] = isLast
       ? [
@@ -368,6 +371,46 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
       cards: state.cards.map((item) => (item.id === cardId ? updatedCard : item)),
       studySessions: nextStudySessions,
       reviewLogs: [...state.reviewLogs, reviewLog],
+      settings: state.settings,
+    };
+
+    await persistReview(set, snapshot, { activeStudy: nextActiveStudy });
+  },
+
+  async undoLastReview() {
+    const state = get();
+    const activeStudy = state.activeStudy;
+    if (!activeStudy || activeStudy.completed || activeStudy.currentIndex === 0 || !activeStudy.previousCardState) {
+      return;
+    }
+
+    const previousCard = activeStudy.previousCardState;
+    const cardId = previousCard.id;
+    const previousIndex = activeStudy.currentIndex - 1;
+    const previousCardId = activeStudy.cardIds[previousIndex];
+
+    // Find the rating that was applied to the previous card to decrement it
+    const previousReviewLog = state.reviewLogs.find((log) => log.cardId === previousCardId);
+    const ratingToDecrement = previousReviewLog?.rating ?? "good";
+
+    const nextRatings = {
+      ...activeStudy.ratings,
+      [ratingToDecrement]: Math.max(0, activeStudy.ratings[ratingToDecrement] - 1),
+    };
+
+    const nextActiveStudy: ActiveStudySession = {
+      ...activeStudy,
+      currentIndex: previousIndex,
+      revealed: false,
+      ratings: nextRatings,
+      previousCardState: null,
+    };
+
+    const snapshot: RecallStateSnapshot = {
+      decks: state.decks,
+      cards: state.cards.map((item) => (item.id === cardId ? previousCard : item)),
+      studySessions: state.studySessions,
+      reviewLogs: state.reviewLogs.filter((log) => log.cardId !== previousCardId),
       settings: state.settings,
     };
 
