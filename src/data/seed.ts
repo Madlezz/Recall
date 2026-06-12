@@ -69,9 +69,10 @@ export function createSeedSnapshot(now = new Date()): RecallStateSnapshot {
     studySessions,
     reviewLogs,
     settings: {
-      theme: "dark",
-      seededAt: ISO(today),
-    },
+          theme: "dark",
+          seededAt: ISO(today),
+          dailyNewCardLimit: 20,
+        },
   };
 }
 

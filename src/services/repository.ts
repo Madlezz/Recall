@@ -32,6 +32,7 @@ export interface RecallRepository {
   replaceDataFromImport(payload: RecallExportPayload): Promise<RecallStateSnapshot>;
   mergeDataFromImport(current: RecallStateSnapshot, payload: RecallExportPayload): Promise<RecallStateSnapshot>;
   saveTheme(theme: Theme, current: RecallStateSnapshot): Promise<RecallStateSnapshot>;
+  saveSettings(settings: RecallStateSnapshot["settings"], current: RecallStateSnapshot): Promise<RecallStateSnapshot>;
 }
 
 let cachedRepository: Promise<RecallRepository> | null = null;
@@ -237,6 +238,12 @@ class SqliteRecallRepository implements RecallRepository {
     await this.saveSnapshot(snapshot);
     return snapshot;
   }
+
+  async saveSettings(settings: RecallStateSnapshot["settings"], current: RecallStateSnapshot): Promise<RecallStateSnapshot> {
+    const snapshot = { ...current, settings };
+    await this.saveSnapshot(snapshot);
+    return snapshot;
+  }
 }
 
 class LocalStorageRecallRepository implements RecallRepository {
@@ -283,6 +290,12 @@ class LocalStorageRecallRepository implements RecallRepository {
 
   async saveTheme(theme: Theme, current: RecallStateSnapshot): Promise<RecallStateSnapshot> {
     const snapshot = { ...current, settings: { ...current.settings, theme } };
+    await this.saveSnapshot(snapshot);
+    return snapshot;
+  }
+
+  async saveSettings(settings: RecallStateSnapshot["settings"], current: RecallStateSnapshot): Promise<RecallStateSnapshot> {
+    const snapshot = { ...current, settings };
     await this.saveSnapshot(snapshot);
     return snapshot;
   }

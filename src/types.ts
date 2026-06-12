@@ -57,6 +57,7 @@ export interface StudySession {
 export interface RecallSettings {
   theme: Theme;
   seededAt: string;
+  dailyNewCardLimit: number;
 }
 
 export interface RecallStateSnapshot {

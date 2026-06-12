@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createSeedSnapshot } from "@/data/seed";
-import { isCardDueToday } from "@/lib/stats";
+import { getNewCardsReviewedToday, isCardDueToday } from "@/lib/stats";
 import { createId, normalizeName } from "@/lib/utils";
 import { buildExportPayload } from "@/services/import-export";
 import { getRecallRepository, type RecallRepository } from "@/services/repository";
@@ -43,6 +43,7 @@ interface RecallStore extends RecallStateSnapshot {
   error: string | null;
   initialize: () => Promise<void>;
   setTheme: (theme: Theme) => Promise<void>;
+  updateSettings: (settings: Partial<RecallStateSnapshot["settings"]>) => Promise<void>;
   showDashboard: () => void;
   showSettings: () => void;
   showDeck: (deckId: string) => void;
@@ -102,6 +103,13 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
   async setTheme(theme) {
     const repository = await getRepository();
     const snapshot = await repository.saveTheme(theme, dataState(get()));
+    commitSnapshot(set, snapshot);
+  },
+
+  async updateSettings(settings) {
+    const repository = await getRepository();
+    const currentSettings = dataState(get()).settings;
+    const snapshot = await repository.saveSettings({ ...currentSettings, ...settings }, dataState(get()));
     commitSnapshot(set, snapshot);
   },
 
@@ -278,12 +286,33 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
     },
 
   startReview(deckId = null) {
-    const dueCards = get()
-      .cards.filter((card) => (deckId ? card.deckId === deckId : true))
+    const state = get();
+    const limit = state.settings.dailyNewCardLimit;
+
+    const dueCards = state.cards
+      .filter((card) => (deckId ? card.deckId === deckId : true))
       .filter((card) => isCardDueToday(card))
       .sort((a, b) => a.nextReviewDate.localeCompare(b.nextReviewDate));
 
     if (dueCards.length === 0) {
+      return false;
+    }
+
+    const newCardsReviewedToday = getNewCardsReviewedToday(state.reviewLogs);
+    let newCardsAllowed = Math.max(0, limit - newCardsReviewedToday);
+
+    const filteredDueCards = dueCards.filter((card) => {
+      if (card.state === "new") {
+        if (newCardsAllowed > 0) {
+          newCardsAllowed--;
+          return true;
+        }
+        return false;
+      }
+      return true;
+    });
+
+    if (filteredDueCards.length === 0) {
       return false;
     }
 
@@ -294,7 +323,7 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
       activeStudy: {
         id: createId("session"),
         deckId,
-        cardIds: dueCards.map((card) => card.id),
+        cardIds: filteredDueCards.map((card) => card.id),
         currentIndex: 0,
         revealed: false,
         startedAt: now,

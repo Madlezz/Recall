@@ -13,6 +13,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { isTauriRuntime } from "@/db/client";
 import { parseImportPayload } from "@/services/import-export";
@@ -27,8 +28,9 @@ export function Settings(): JSX.Element {
   const [pendingReplace, setPendingReplace] = useState<RecallExportPayload | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const settings = useRecallStore((state) => state.settings);
-  const setTheme = useRecallStore((state) => state.setTheme);
-  const resetData = useRecallStore((state) => state.resetData);
+    const setTheme = useRecallStore((state) => state.setTheme);
+    const updateSettings = useRecallStore((state) => state.updateSettings);
+    const resetData = useRecallStore((state) => state.resetData);
   const exportData = useRecallStore((state) => state.exportData);
   const mergeData = useRecallStore((state) => state.mergeData);
   const replaceData = useRecallStore((state) => state.replaceData);
@@ -132,17 +134,31 @@ export function Settings(): JSX.Element {
 
       <section className="grid gap-4 lg:grid-cols-2">
         <Panel title="Appearance" description="Theme is stored locally.">
-          <div className="flex flex-wrap gap-2">
-            <Button variant={settings.theme === "dark" ? "default" : "outline"} onClick={() => void handleTheme("dark")}>
-              <Moon className="h-4 w-4" />
-              Dark
-            </Button>
-            <Button variant={settings.theme === "light" ? "default" : "outline"} onClick={() => void handleTheme("light")}>
-              <Sun className="h-4 w-4" />
-              Light
-            </Button>
-          </div>
-        </Panel>
+                  <div className="flex flex-wrap gap-2">
+                    <Button variant={settings.theme === "dark" ? "default" : "outline"} onClick={() => void handleTheme("dark")}>
+                      <Moon className="h-4 w-4" />
+                      Dark
+                    </Button>
+                    <Button variant={settings.theme === "light" ? "default" : "outline"} onClick={() => void handleTheme("light")}>
+                      <Sun className="h-4 w-4" />
+                      Light
+                    </Button>
+                  </div>
+                </Panel>
+
+                <Panel title="Daily New Cards" description="Limit how many new cards appear per day to avoid overwhelm.">
+                  <div className="flex items-center gap-3">
+                    <Input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={settings.dailyNewCardLimit}
+                      onChange={(e) => void updateSettings({ dailyNewCardLimit: Math.max(0, Math.min(100, parseInt(e.target.value) || 0)) })}
+                      className="w-24"
+                    />
+                    <span className="text-sm text-muted-foreground">cards per day</span>
+                  </div>
+                </Panel>
 
         <Panel title="Import / Export" description="JSON only. Merge skips duplicates by deck name and card front.">
           <div className="grid gap-3 sm:grid-cols-[160px_1fr_1fr]">

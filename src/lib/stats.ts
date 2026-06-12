@@ -48,6 +48,16 @@ export function getLearningCount(cards: Card[]): number {
   return cards.filter((card) => card.state === "learning" || card.state === "relearning").length;
 }
 
+export function getNewCardsReviewedToday(reviewLogs: ReviewLog[], at = new Date()): number {
+  const todayStart = startOfDay(at);
+  const todayEnd = endOfDay(at);
+
+  return reviewLogs.filter((log) => {
+    const reviewDate = parseISO(log.reviewDate);
+    return reviewDate >= todayStart && reviewDate <= todayEnd && log.elapsedDays === 0;
+  }).length;
+}
+
 export function getStudyStreak(reviews: ReviewLog[], at = new Date()): number {
   const reviewedDays = new Set(reviews.map((review) => startOfDay(parseISO(review.reviewDate)).toISOString()));
   let cursor = startOfDay(at);

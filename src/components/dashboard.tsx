@@ -1,6 +1,7 @@
 import { ArrowRight, BookOpen, Brain, Layers3, Plus, RotateCw, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { AnkiImportDialog } from "@/components/anki-import-dialog";
+import { ActivityHeatmap } from "@/components/activity-heatmap";
 import { DeckDialog } from "@/components/deck-dialog";
 import { StatTile } from "@/components/stat-tile";
 import { Button } from "@/components/ui/button";
@@ -51,10 +52,14 @@ export function Dashboard(): JSX.Element {
       </section>
 
       <section className="grid gap-3 sm:grid-cols-3">
-        <StatTile icon={Zap} label="Due today" value={String(getDueTodayCount(cards))} />
-        <StatTile icon={BookOpen} label="New" value={String(getNewCount(cards))} />
-        <StatTile icon={Brain} label="Learning" value={String(getLearningCount(cards))} />
-      </section>
+              <StatTile icon={Zap} label="Due today" value={String(getDueTodayCount(cards))} />
+              <StatTile icon={BookOpen} label="New" value={String(getNewCount(cards))} />
+              <StatTile icon={Brain} label="Learning" value={String(getLearningCount(cards))} />
+            </section>
+
+            <section className="rounded-lg border bg-card p-5">
+              <ActivityHeatmap />
+            </section>
 
       <section>
         <div className="mb-3 flex items-center justify-between">
