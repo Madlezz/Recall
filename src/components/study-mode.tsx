@@ -276,7 +276,6 @@ function SessionSummaryModal({ summary, onContinue }: { summary: SessionSummary;
     const accuracy = goodScore / totalRated;
 
     if (accuracy >= 0.6) {
-      const duration = accuracy >= 0.9 ? 3000 : 2000;
       const particleCount = accuracy >= 0.9 ? 100 : 50;
       confetti({
         particleCount,
@@ -289,7 +288,7 @@ function SessionSummaryModal({ summary, onContinue }: { summary: SessionSummary;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-      <div className="mx-4 w-full max-w-md rounded-lg border bg-card p-8 shadow-xl">
+      <div className="mx-4 w-full max-w-md rounded-lg border bg-card p-8 shadow-xl max-h-[90vh] overflow-y-auto">
         <div className="text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/12 text-primary">
             <Check className="h-7 w-7" />
@@ -298,7 +297,15 @@ function SessionSummaryModal({ summary, onContinue }: { summary: SessionSummary;
           <p className="mt-1 text-sm text-muted-foreground">{summary.cardsStudied} cards reviewed</p>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-3">
+        {/* XP earned */}
+        {summary.sessionXp > 0 && (
+          <div className="mt-4 rounded-md bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 p-3 text-center">
+            <div className="text-2xl font-bold text-primary">+{summary.sessionXp} XP</div>
+            <div className="text-xs text-muted-foreground">earned this session</div>
+          </div>
+        )}
+
+        <div className="mt-4 grid grid-cols-2 gap-3">
           <div className="rounded-md bg-muted p-3 text-center">
             <div className="text-xl font-semibold">{formatTime(summary.timeSpentMs)}</div>
             <div className="mt-1 text-xs text-muted-foreground">Time spent</div>
@@ -327,6 +334,24 @@ function SessionSummaryModal({ summary, onContinue }: { summary: SessionSummary;
             <div className="text-xs text-muted-foreground">Easy</div>
           </div>
         </div>
+
+        {/* New achievements */}
+        {summary.newAchievements.length > 0 && (
+          <div className="mt-4 rounded-md bg-amber-500/10 border border-amber-500/20 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-500 mb-2">Achievement Unlocked!</p>
+            <div className="space-y-2">
+              {summary.newAchievements.map((a) => (
+                <div key={a.id} className="flex items-center gap-2 text-sm">
+                  <span className="text-lg">{a.icon}</span>
+                  <div>
+                    <div className="font-semibold">{a.title}</div>
+                    <div className="text-xs text-muted-foreground">{a.description}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <Button className="mt-6 w-full" onClick={onContinue}>
           Continue

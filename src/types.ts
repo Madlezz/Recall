@@ -76,6 +76,8 @@ export interface SessionSummary {
   hardCount: number;
   goodCount: number;
   easyCount: number;
+  sessionXp: number;
+  newAchievements: Achievement[];
 }
 
 export interface RecallStateSnapshot {

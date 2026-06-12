@@ -2,46 +2,42 @@
 
 > *Beautiful flashcards that live on your computer. No cloud, no account, no nonsense.*
 
-**Recall** is a desktop flashcard app built for focused learning. It uses the smartest spaced repetition algorithm under the hood, but all you need to do is open it and start reviewing. Your data stays on your machine — always.
+**Recall** is a desktop flashcard app built for focused learning. It uses FSRS — the smartest spaced repetition algorithm — but you just open it and start reviewing. Your data stays on your machine, always.
 
 ---
 
 ## Features
 
-### 🧠 Smart Scheduling
-FSRS scheduling runs silently in the background. You just hit **Again**, **Hard**, **Good**, or **Easy** — Recall figures out the rest. No settings to tweak.
+### 🧠 Smart Study
+- **FSRS scheduling** — Again / Hard / Good / Easy, the algorithm handles the rest
+- **Cloze deletion** — `{{c1::hidden text}}` fill-in-the-blank cards
+- **Rich cards** — Markdown, LaTeX, syntax-highlighted code blocks
+- **Anki import** — bring your `.apkg` decks
+- Keyboard-first: `Space` reveal, `1`–`4` rate, `R` to start review, `Ctrl+N` quick-add
 
-### ⌨️ Built for Speed
-- `Space` to reveal, `1`–`4` to rate
-- `R` from anywhere to start your review
-- `Ctrl+Z` to undo a misclick
-- Everything works with keyboard — or mouse, if you prefer
+### 🎮 Stay Motivated
+- **XP & levels** — earn XP per review, climb from Curious Mind to Legend
+- **Achievements** — 14 milestones (streaks, volume, accuracy, time-based)
+- **Daily goal** — set a target, watch the progress bar, confetti on completion
+- **Session summaries** — ratings breakdown, XP earned, achievement unlocks
+- **Confetti celebrations** — level-ups, achievements, goal hits, good accuracy
 
-### 📝 Rich Cards
-Plain text works great. But if you want more:
-- **Markdown** — headings, lists, formatting
-- **LaTeX** — `$E=mc^2$` → renders beautifully
-- **Code blocks** — with syntax highlighting
+### 🧘 Study Tools
+- **Focus timer** — Pomodoro with 15/25/45m presets
+- **Ambient soundscapes** — Rain, Cafe, Lofi (all synthesized locally, zero files)
+- **Match game** — turn cards into a tile-matching puzzle
+- **Review calendar** — month grid showing study activity heatmap
+- **Sound effects** — card flip, correct/incorrect feedback, level-up fanfares
 
-### 🔒 Privacy by Default
-- No account, no login, no cloud
-- 100% offline — works on a plane, in a cave, anywhere
-- Zero telemetry — we don't even know you exist
-- Portable: copy one folder and move to another computer
+### 📊 Analytics
+- **Stats dashboard** — review volume, rating distribution, time-of-day patterns
+- **Top decks** — see which topics get the most reviews
+- **Activity heatmap** — GitHub-style contribution graph
 
-### 📊 Stay Motivated
-- Study streak counter
-- Activity heatmap (yes, like GitHub's)
-- Session summaries after every review
-- Confetti when you do well (because why not)
-
-### 📂 Import & Export
-- Import your Anki `.apkg` decks
-- Export/import JSON — human-readable and git-friendly
-- Deck-specific exports for sharing
-
-### 🎨 Dark-First Design
-Ships with dark mode as default. Light mode available in settings. Clean, minimal, no clutter.
+### 🔒 Privacy First
+- No account, no cloud, no telemetry
+- 100% offline — SQLite database on your machine
+- JSON export/import — portable and human-readable
 
 ---
 
@@ -54,7 +50,18 @@ pnpm tauri dev       # Full desktop app
 pnpm dev            # Browser-only preview
 ```
 
-Pre-built downloads coming soon.
+---
+
+## Keyboard Shortcuts
+
+| Keys | Action |
+|------|--------|
+| `Space` | Reveal answer |
+| `1`–`4` | Rate Again / Hard / Good / Easy |
+| `R` | Start review |
+| `Ctrl+N` | Quick-add card |
+| `Ctrl+Z` | Undo last review |
+| `?` | Show all shortcuts |
 
 ---
 
@@ -62,21 +69,13 @@ Pre-built downloads coming soon.
 
 | What | With |
 |------|------|
-| Desktop shell | Tauri 2 |
+| Desktop | Tauri 2 |
 | UI | React 18 + TypeScript (strict) |
 | Styling | Tailwind CSS + shadcn/ui |
-| Database | SQLite (via Drizzle ORM) |
+| Storage | SQLite (Drizzle ORM) |
 | State | Zustand |
+| Algorithm | FSRS (ts-fsrs) |
 | Icons | Lucide |
-
----
-
-## Philosophy
-
-- **Open the app, start learning.** No manual needed.
-- **Defaults over settings.** Sensible choices out of the box.
-- **Your data is yours.** No cloud dependency, ever.
-- **Simple ≠ limited.** Rich content, smart scheduling — just hidden until you need it.
 
 ---
 

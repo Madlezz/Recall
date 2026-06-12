@@ -14,7 +14,9 @@ import {
   levelProgress,
   checkAchievements,
   applyNewAchievements,
+  triggerLevelUpConfetti,
 } from "@/lib/xp";
+import { ACHIEVEMENT_DEFS } from "@/types";
 import { getStudyStreak } from "@/lib/streak";
 import { hasCloze } from "@/lib/cloze";
 import type {
@@ -593,6 +595,33 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
           ? (activeStudy.ratings.again * 1 + activeStudy.ratings.hard * 2 + activeStudy.ratings.good * 3 + activeStudy.ratings.easy * 4) / totalRatings
           : 0;
 
+        // Compute XP and achievements first
+        const goodAndEasy = activeStudy.ratings.good + activeStudy.ratings.easy;
+        const accuracy = totalRatings > 0 ? Math.round((goodAndEasy / totalRatings) * 100) : 0;
+        const newXp = state.settings.xp + activeStudy.sessionXp;
+        const totalReviews = state.reviewLogs.length;
+        const streak = getStudyStreak(state.reviewLogs);
+        const now = new Date();
+        const nowIso = now.toISOString();
+        const reviewHour = now.getHours();
+
+        const sortedLogs = [...state.reviewLogs].sort((a, b) => b.reviewDate.localeCompare(a.reviewDate));
+        const lastLogDate = sortedLogs.length > 0 ? new Date(sortedLogs[0].reviewDate) : null;
+        const daysSinceLastReview = lastLogDate
+          ? Math.floor((now.getTime() - lastLogDate.getTime()) / (1000 * 60 * 60 * 24))
+          : 999;
+
+        const oldLevel = getLevel(state.settings.xp);
+        const newLevel = getLevel(newXp);
+
+        const newAchievementIds = checkAchievements(
+          { xp: newXp, totalReviews, streak, cardsInSession: activeStudy.cardIds.length, accuracy, deckCount: state.decks.length, cardCount: state.cards.length, reviewHour, daysSinceLastReview },
+          state.settings.achievements,
+        );
+
+        const updatedAchievements = applyNewAchievements(newAchievementIds, state.settings.achievements, nowIso);
+
+        // Build summary with XP + achievements
         lastSessionSummary = {
           cardsStudied: activeStudy.cardIds.length,
           timeSpentMs,
@@ -602,64 +631,33 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
           hardCount: activeStudy.ratings.hard,
           goodCount: activeStudy.ratings.good,
           easyCount: activeStudy.ratings.easy,
+          sessionXp: activeStudy.sessionXp,
+          newAchievements: newAchievementIds.map((id) => {
+            const def = ACHIEVEMENT_DEFS[id];
+            return { id, title: def.title, description: def.description, icon: def.icon, unlockedAt: nowIso };
+          }),
         };
 
-        // Apply XP + check achievements
-        const goodAndEasy = activeStudy.ratings.good + activeStudy.ratings.easy;
-        const accuracy = totalRatings > 0 ? Math.round((goodAndEasy / totalRatings) * 100) : 0;
-        const newXp = state.settings.xp + activeStudy.sessionXp;
-                const totalReviews = state.reviewLogs.length; // already persisted by persistReview on each answer
-        const streak = getStudyStreak(state.reviewLogs);
-        const now = new Date();
-        const nowIso = now.toISOString();
-        const reviewHour = now.getHours();
-      
-        // Calculate days since last review (for comeback_kid)
-        const sortedLogs = [...state.reviewLogs].sort((a, b) => b.reviewDate.localeCompare(a.reviewDate));
-        const lastLogDate = sortedLogs.length > 0 ? new Date(sortedLogs[0].reviewDate) : null;
-        const daysSinceLastReview = lastLogDate
-          ? Math.floor((now.getTime() - lastLogDate.getTime()) / (1000 * 60 * 60 * 24))
-          : 999;
-
-        const newAchievementIds = checkAchievements(
-          {
-            xp: newXp,
-            totalReviews,
-            streak,
-            cardsInSession: activeStudy.cardIds.length,
-            accuracy,
-            deckCount: state.decks.length,
-            cardCount: state.cards.length,
-            reviewHour,
-            daysSinceLastReview,
-          },
-          state.settings.achievements,
-        );
-
-        const updatedAchievements = applyNewAchievements(newAchievementIds, state.settings.achievements, nowIso);
+        // Trigger level-up confetti
+        if (newLevel > oldLevel) {
+          triggerLevelUpConfetti();
+        }
 
         // Persist XP + achievements
-        const updatedSettings = {
-          ...state.settings,
-          xp: newXp,
-          achievements: updatedAchievements,
-        };
+        const updatedSettings = { ...state.settings, xp: newXp, achievements: updatedAchievements };
         const snapshot: RecallStateSnapshot = {
-          decks: state.decks,
-          cards: state.cards,
-          studySessions: state.studySessions,
-          reviewLogs: state.reviewLogs,
-          settings: updatedSettings,
+          decks: state.decks, cards: state.cards, studySessions: state.studySessions,
+          reviewLogs: state.reviewLogs, settings: updatedSettings,
         };
 
         void persist(set, snapshot, { activeStudy: null, lastSessionSummary });
                 return;
               }
 
-              // Not completed — exit mid-session
+              // Not completed or no active study
               const deckId = activeStudy?.deckId ?? state.selectedDeckId;
               set({ view: deckId ? "deck" : "dashboard", selectedDeckId: deckId, activeStudy: null, lastSessionSummary: null });
-    },
+            },
 
   clearSessionSummary() {
     set({ lastSessionSummary: null });
