@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { Coffee, CloudRain, Headphones, Pause, Play, RotateCcw, Timer, VolumeX, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { startSoundscape, stopSoundscape, getPlayingSoundscape } from "@/services/audio";
+import { getLevel, triggerLevelUpConfetti } from "@/lib/xp";
+import { useRecallStore } from "@/stores/recall-store";
 import type { Soundscape } from "@/services/audio";
 
 const SOUNDSCAPES: { id: Soundscape; label: string; icon: typeof Headphones }[] = [
@@ -19,12 +21,15 @@ function formatTime(seconds: number): string {
 }
 
 export function FocusTimer(): JSX.Element {
+  const settings = useRecallStore((state) => state.settings);
+  const updateSettings = useRecallStore((state) => state.updateSettings);
   const [duration, setDuration] = useState(25 * 60);
   const [remaining, setRemaining] = useState(25 * 60);
   const [running, setRunning] = useState(false);
   const [sc, setSc] = useState<Soundscape>("none");
   const [completed, setCompleted] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const xpAwardedRef = useRef(false);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -42,6 +47,19 @@ export function FocusTimer(): JSX.Element {
         setRunning(false);
         setCompleted(true);
         stopSoundscape();
+
+        // Award XP for completing a focus session
+        if (!xpAwardedRef.current) {
+          xpAwardedRef.current = true;
+          const xp = duration <= 15 * 60 ? 15 : duration <= 25 * 60 ? 25 : 45;
+          const oldLevel = getLevel(settings.xp);
+          const newXp = settings.xp + xp;
+          void updateSettings({ xp: newXp });
+          if (getLevel(newXp) > oldLevel) {
+            setTimeout(() => triggerLevelUpConfetti(), 300);
+          }
+        }
+
         return 0;
       }
       return prev - 1;
@@ -52,6 +70,7 @@ export function FocusTimer(): JSX.Element {
     if (running) return;
     setRunning(true);
     setCompleted(false);
+    xpAwardedRef.current = false;
     if (sc !== "none") startSoundscape(sc);
     intervalRef.current = setInterval(tick, 1000);
   }

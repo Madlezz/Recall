@@ -559,19 +559,24 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
     // Find the rating that was applied to the previous card to decrement it
     const previousReviewLog = state.reviewLogs.find((log) => log.cardId === previousCardId);
     const ratingToDecrement = previousReviewLog?.rating ?? "good";
+        const xpToDeduct = REVIEW_XP[ratingToDecrement] ?? 0;
 
-    const nextRatings = {
-      ...activeStudy.ratings,
-      [ratingToDecrement]: Math.max(0, activeStudy.ratings[ratingToDecrement] - 1),
-    };
+        const nextRatings = {
+          ...activeStudy.ratings,
+          [ratingToDecrement]: Math.max(0, activeStudy.ratings[ratingToDecrement] - 1),
+        };
 
-    const nextActiveStudy: ActiveStudySession = {
-      ...activeStudy,
-      currentIndex: previousIndex,
-      revealed: false,
-      ratings: nextRatings,
-      previousCardState: null,
-    };
+        const nextActiveStudy: ActiveStudySession = {
+                  ...activeStudy,
+                  currentIndex: previousIndex,
+                  revealed: false,
+                  ratings: nextRatings,
+                  previousCardState: null,
+                  sessionXp: Math.max(0, activeStudy.sessionXp - xpToDeduct),
+                  newCardsCount: previousCard.state === "new"
+                    ? Math.max(0, activeStudy.newCardsCount - 1)
+                    : activeStudy.newCardsCount,
+                };
 
     const snapshot: RecallStateSnapshot = {
       decks: state.decks,
