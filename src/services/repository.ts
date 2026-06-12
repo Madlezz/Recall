@@ -74,11 +74,12 @@ export function validateImportSnapshot(snapshot: RecallStateSnapshot): void {
       throw new Error("Card references missing deck");
     }
     if (!card.front.trim()) {
-      throw new Error("Card front is required");
-    }
-    if (!card.back.trim()) {
-      throw new Error("Card back is required");
-    }
+          throw new Error("Card front is required");
+        }
+        const isCloze = /\{\{c\d+::[^}]+\}\}/.test(card.front);
+        if (!card.back.trim() && !isCloze) {
+          throw new Error("Card back is required");
+        }
     if (cardIds.has(card.id)) {
       throw new Error("Duplicate card id");
     }

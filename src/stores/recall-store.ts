@@ -747,7 +747,8 @@ function ensureCardInput(input: CardInput): void {
     throw new Error("Front is required.");
   }
 
-  if (!input.back.trim()) {
+  const isCloze = /\{\{c\d+::[^}]+\}\}/.test(input.front);
+  if (!input.back.trim() && !isCloze) {
     throw new Error("Back is required.");
   }
 }
