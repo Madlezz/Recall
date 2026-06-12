@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
+import { getLevel, triggerLevelUpConfetti } from "@/lib/xp";
 import { playTileClickSound, playMatchSound, playMismatchSound } from "@/services/audio";
 import type { Card } from "@/types";
 
@@ -37,6 +38,8 @@ function buildTiles(cards: Card[]): MatchTile[] {
 
 export function MatchGame(): JSX.Element {
   const cards = useRecallStore((state) => state.cards);
+  const settings = useRecallStore((state) => state.settings);
+  const updateSettings = useRecallStore((state) => state.updateSettings);
   const showDashboard = useRecallStore((state) => state.showDashboard);
   const selectedDeckId = useRecallStore((state) => state.selectedDeckId);
   const decks = useRecallStore((state) => state.decks);
@@ -49,8 +52,7 @@ export function MatchGame(): JSX.Element {
   );
 
   const pairCount = Math.min(6, Math.max(2, Math.floor(deckCards.length / 2)));
-  const maxPairs = Math.floor(deckCards.length);
-  
+
   const [tiles, setTiles] = useState<MatchTile[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [matched, setMatched] = useState<Set<string>>(new Set());
@@ -60,8 +62,10 @@ export function MatchGame(): JSX.Element {
   const [finished, setFinished] = useState(false);
   const [moves, setMoves] = useState(0);
   const [gameCards, setGameCards] = useState<Card[]>([]);
+  const [xpEarned, setXpEarned] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const xpAwarded = useRef(false);
 
   const startGame = useCallback(() => {
     // Clean up any running state
@@ -78,6 +82,8 @@ export function MatchGame(): JSX.Element {
     setRunning(true);
     setFinished(false);
     setMoves(0);
+    setXpEarned(0);
+    xpAwarded.current = false;
 
     intervalRef.current = setInterval(() => {
       setElapsed((prev) => prev + 1);
@@ -137,6 +143,33 @@ export function MatchGame(): JSX.Element {
           origin: { y: 0.4 },
           colors: ["#a855f7", "#6366f1", "#22c55e", "#f59e0b", "#ec4899"],
         });
+
+        // Award XP — only once per game
+        if (!xpAwarded.current) {
+          xpAwarded.current = true;
+          const totalPairs = tiles.length / 2;
+          // moves is stale after setMoves call — use +1
+          const actualMoves = moves + 1;
+          const perfectGame = actualMoves === totalPairs;
+          const fastGame = elapsed < 60;
+          const quickGame = elapsed < 120;
+
+          let xp = 30; // base
+          if (perfectGame) xp += 25; // perfect: every tap was a match
+          if (fastGame) xp += 20;
+          else if (quickGame) xp += 10;
+
+          setXpEarned(xp);
+
+          const oldLevel = getLevel(settings.xp);
+          const newXp = settings.xp + xp;
+          const newLevel = getLevel(newXp);
+
+          void updateSettings({ xp: newXp });
+          if (newLevel > oldLevel) {
+            setTimeout(() => triggerLevelUpConfetti(), 300);
+          }
+        }
       }
     } else {
       // No match — shake
@@ -204,6 +237,11 @@ export function MatchGame(): JSX.Element {
           <p className="mt-1 text-sm text-muted-foreground">
             {totalPairs} pairs in {formatTime(elapsed)} · {moves} moves
           </p>
+          {xpEarned > 0 && (
+            <p className="mt-2 text-sm font-semibold text-primary">
+              +{xpEarned} XP
+            </p>
+          )}
           <Button className="mt-4" onClick={startGame}>
             Play Again
           </Button>
