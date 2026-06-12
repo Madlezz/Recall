@@ -16,6 +16,7 @@ import type {
   RecallStateSnapshot,
   ReviewLog,
   ReviewRating,
+  SessionSummary,
   StudySession,
   Theme,
 } from "@/types";
@@ -38,6 +39,7 @@ interface RecallStore extends RecallStateSnapshot {
   view: AppView;
   selectedDeckId: string | null;
   activeStudy: ActiveStudySession | null;
+  lastSessionSummary: SessionSummary | null;
   isLoading: boolean;
   isInitialized: boolean;
   error: string | null;
@@ -60,7 +62,8 @@ interface RecallStore extends RecallStateSnapshot {
   answerCurrentCard: (result: ReviewRating) => Promise<void>;
   undoLastReview: () => Promise<void>;
   exitStudy: () => void;
-  resetData: () => Promise<void>;
+    clearSessionSummary: () => void;
+    resetData: () => Promise<void>;
   replaceData: (payload: RecallExportPayload) => Promise<void>;
   mergeData: (payload: RecallExportPayload) => Promise<void>;
   exportData: () => RecallExportPayload;
@@ -76,6 +79,7 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
   view: "dashboard",
   selectedDeckId: null,
   activeStudy: null,
+  lastSessionSummary: null,
   isLoading: true,
   isInitialized: false,
   error: null,
@@ -316,6 +320,7 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
       return false;
     }
 
+    const newCardsCount = filteredDueCards.filter((card) => card.state === "new").length;
     const now = new Date().toISOString();
     set({
       view: "study",
@@ -330,6 +335,7 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
         ratings: { again: 0, hard: 0, good: 0, easy: 0 },
         completed: false,
         previousCardState: null,
+        newCardsCount,
       },
     });
     return true;
@@ -447,8 +453,39 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
   },
 
   exitStudy() {
-    const deckId = get().activeStudy?.deckId ?? get().selectedDeckId;
-    set({ view: deckId ? "deck" : "dashboard", selectedDeckId: deckId, activeStudy: null });
+    const state = get();
+    const activeStudy = state.activeStudy;
+    let lastSessionSummary: SessionSummary | null = null;
+
+    if (activeStudy && activeStudy.completed) {
+      const timeSpentMs = Date.now() - new Date(activeStudy.startedAt).getTime();
+      const totalRatings = activeStudy.ratings.again + activeStudy.ratings.hard + activeStudy.ratings.good + activeStudy.ratings.easy;
+      const averageRating = totalRatings > 0 
+        ? (activeStudy.ratings.again * 1 + activeStudy.ratings.hard * 2 + activeStudy.ratings.good * 3 + activeStudy.ratings.easy * 4) / totalRatings
+        : 0;
+
+      lastSessionSummary = {
+        cardsStudied: activeStudy.cardIds.length,
+        timeSpentMs,
+        averageRating,
+        newCards: activeStudy.newCardsCount,
+        againCount: activeStudy.ratings.again,
+        hardCount: activeStudy.ratings.hard,
+        goodCount: activeStudy.ratings.good,
+        easyCount: activeStudy.ratings.easy,
+      };
+    }
+
+    if (activeStudy && activeStudy.completed) {
+      set({ activeStudy: null, lastSessionSummary });
+    } else {
+      const deckId = activeStudy?.deckId ?? state.selectedDeckId;
+      set({ view: deckId ? "deck" : "dashboard", selectedDeckId: deckId, activeStudy: null, lastSessionSummary: null });
+    }
+  },
+
+  clearSessionSummary() {
+    set({ lastSessionSummary: null });
   },
 
   async resetData() {

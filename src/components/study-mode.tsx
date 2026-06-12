@@ -5,15 +5,19 @@ import { RichCard } from "@/components/RichCard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useRecallStore } from "@/stores/recall-store";
+import type { SessionSummary } from "@/types";
 
 export function StudyMode(): JSX.Element {
   const activeStudy = useRecallStore((state) => state.activeStudy);
+  const lastSessionSummary = useRecallStore((state) => state.lastSessionSummary);
   const cards = useRecallStore((state) => state.cards);
   const decks = useRecallStore((state) => state.decks);
   const revealAnswer = useRecallStore((state) => state.revealAnswer);
   const answerCurrentCard = useRecallStore((state) => state.answerCurrentCard);
-    const undoLastReview = useRecallStore((state) => state.undoLastReview);
-    const exitStudy = useRecallStore((state) => state.exitStudy);
+  const undoLastReview = useRecallStore((state) => state.undoLastReview);
+  const exitStudy = useRecallStore((state) => state.exitStudy);
+  const clearSessionSummary = useRecallStore((state) => state.clearSessionSummary);
+  const showDashboard = useRecallStore((state) => state.showDashboard);
 
   const cardId = activeStudy?.cardIds[activeStudy.currentIndex];
   const card = cards.find((item) => item.id === cardId);
@@ -70,6 +74,18 @@ export function StudyMode(): JSX.Element {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeStudy, answerCurrentCard, revealAnswer, undoLastReview]);
+
+  if (!activeStudy && lastSessionSummary) {
+    return (
+      <SessionSummaryModal
+        summary={lastSessionSummary}
+        onContinue={() => {
+          clearSessionSummary();
+          showDashboard();
+        }}
+      />
+    );
+  }
 
   if (!activeStudy) {
     return (
@@ -203,6 +219,72 @@ function SummaryMetric({ label, value }: SummaryMetricProps): JSX.Element {
     <div className="rounded-md bg-muted p-3">
       <div className="text-2xl font-semibold">{value}</div>
       <div className="mt-1 text-xs text-muted-foreground">{label}</div>
+    </div>
+  );
+}
+
+function formatTime(ms: number): string {
+  const sec = Math.floor(ms / 1000);
+  const min = Math.floor(sec / 60);
+  const remain = sec % 60;
+  return `${min}:${String(remain).padStart(2, "0")}`;
+}
+
+function ratingLabel(avg: number): string {
+  if (avg >= 3.5) return "Easy";
+  if (avg >= 2.5) return "Good";
+  if (avg >= 1.5) return "Hard";
+  return "Again-heavy";
+}
+
+function SessionSummaryModal({ summary, onContinue }: { summary: SessionSummary; onContinue: () => void }): JSX.Element {
+  const total = summary.againCount + summary.hardCount + summary.goodCount + summary.easyCount;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+      <div className="mx-4 w-full max-w-md rounded-lg border bg-card p-8 shadow-xl">
+        <div className="text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/12 text-primary">
+            <Check className="h-7 w-7" />
+          </div>
+          <h2 className="mt-5 text-2xl font-semibold">Session Complete</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{summary.cardsStudied} cards reviewed</p>
+        </div>
+
+        <div className="mt-6 grid grid-cols-2 gap-3">
+          <div className="rounded-md bg-muted p-3 text-center">
+            <div className="text-xl font-semibold">{formatTime(summary.timeSpentMs)}</div>
+            <div className="mt-1 text-xs text-muted-foreground">Time spent</div>
+          </div>
+          <div className="rounded-md bg-muted p-3 text-center">
+            <div className="text-xl font-semibold">{ratingLabel(summary.averageRating)}</div>
+            <div className="mt-1 text-xs text-muted-foreground">Avg rating</div>
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-4 gap-2">
+          <div className="rounded-md bg-red-50 dark:bg-red-950/30 p-2 text-center">
+            <div className="font-semibold text-red-600 dark:text-red-400">{summary.againCount}</div>
+            <div className="text-xs text-muted-foreground">Again</div>
+          </div>
+          <div className="rounded-md bg-orange-50 dark:bg-orange-950/30 p-2 text-center">
+            <div className="font-semibold text-orange-600 dark:text-orange-400">{summary.hardCount}</div>
+            <div className="text-xs text-muted-foreground">Hard</div>
+          </div>
+          <div className="rounded-md bg-emerald-50 dark:bg-emerald-950/30 p-2 text-center">
+            <div className="font-semibold text-emerald-600 dark:text-emerald-400">{summary.goodCount}</div>
+            <div className="text-xs text-muted-foreground">Good</div>
+          </div>
+          <div className="rounded-md bg-blue-50 dark:bg-blue-950/30 p-2 text-center">
+            <div className="font-semibold text-blue-600 dark:text-blue-400">{summary.easyCount}</div>
+            <div className="text-xs text-muted-foreground">Easy</div>
+          </div>
+        </div>
+
+        <Button className="mt-6 w-full" onClick={onContinue}>
+          Continue
+        </Button>
+      </div>
     </div>
   );
 }

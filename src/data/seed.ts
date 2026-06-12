@@ -72,6 +72,7 @@ export function createSeedSnapshot(now = new Date()): RecallStateSnapshot {
           theme: "dark",
           seededAt: ISO(today),
           dailyNewCardLimit: 20,
+          leechThreshold: 5,
         },
   };
 }

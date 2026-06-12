@@ -58,6 +58,18 @@ export interface RecallSettings {
   theme: Theme;
   seededAt: string;
   dailyNewCardLimit: number;
+  leechThreshold: number;
+}
+
+export interface SessionSummary {
+  cardsStudied: number;
+  timeSpentMs: number;
+  averageRating: number; // 1-4
+  newCards: number;
+  againCount: number;
+  hardCount: number;
+  goodCount: number;
+  easyCount: number;
 }
 
 export interface RecallStateSnapshot {
@@ -83,6 +95,7 @@ export interface ActiveStudySession {
   ratings: Record<ReviewRating, number>;
   completed: boolean;
   previousCardState: Card | null;
+  newCardsCount: number;
 }
 
 export type AppView = "dashboard" | "deck" | "study" | "settings";

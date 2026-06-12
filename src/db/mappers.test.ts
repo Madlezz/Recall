@@ -70,9 +70,11 @@ describe("database mappers", () => {
       scheduledDays: 1,
     };
     const settings: RecallSettings = {
-      theme: "dark",
-      seededAt: "2026-06-01T00:00:00.000Z",
-    };
+          theme: "dark",
+          seededAt: "2026-06-01T00:00:00.000Z",
+          dailyNewCardLimit: 20,
+          leechThreshold: 5,
+        };
 
     expect(deckFromRow(deckToRow(deck) as DeckRow)).toEqual(deck);
     expect(studySessionFromRow(studySessionToRow(session) as StudySessionRow)).toEqual(session);
