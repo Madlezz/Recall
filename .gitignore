@@ -6,3 +6,7 @@ src-tauri/target
 *.local
 *.log
 *.tsbuildinfo
+.hermes/
+docs/
+recall_prd.md
+CONTRIBUTING.md
