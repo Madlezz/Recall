@@ -1,5 +1,5 @@
-export type CardStatus = "new" | "learning" | "mastered";
-export type ReviewResult = "correct" | "incorrect";
+export type CardState = "new" | "learning" | "review" | "relearning";
+export type ReviewRating = "again" | "hard" | "good" | "easy";
 export type Theme = "dark" | "light";
 export type DeckColor = "blue" | "green" | "amber" | "rose" | "violet" | "slate";
 
@@ -19,15 +19,31 @@ export interface Card {
   back: string;
   hint: string;
   tags: string[];
-  status: CardStatus;
-  correctCount: number;
-  incorrectCount: number;
-  streak: number;
-  easeFactor: number;
-  lastReviewedAt: string | null;
-  nextReviewAt: string;
+
+  // FSRS fields
+  state: CardState;
+  lastReviewDate: string | null;
+  nextReviewDate: string;
+  stability: number;
+  difficulty: number;
+  elapsedDays: number;
+  scheduledDays: number;
+  reps: number;
+  lapses: number;
+
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ReviewLog {
+  id: string;
+  cardId: string;
+  rating: ReviewRating;
+  reviewDate: string;
+  stability: number;
+  difficulty: number;
+  elapsedDays: number;
+  scheduledDays: number;
 }
 
 export interface StudySession {
@@ -36,16 +52,6 @@ export interface StudySession {
   startedAt: string;
   endedAt: string;
   cardsStudied: number;
-  correct: number;
-  incorrect: number;
-}
-
-export interface Review {
-  id: string;
-  cardId: string;
-  sessionId: string;
-  answeredAt: string;
-  result: ReviewResult;
 }
 
 export interface RecallSettings {
@@ -57,12 +63,12 @@ export interface RecallStateSnapshot {
   decks: Deck[];
   cards: Card[];
   studySessions: StudySession[];
-  reviews: Review[];
+  reviewLogs: ReviewLog[];
   settings: RecallSettings;
 }
 
 export interface RecallExportPayload extends RecallStateSnapshot {
-  version: 1;
+  version: 2;
   exportedAt: string;
 }
 
