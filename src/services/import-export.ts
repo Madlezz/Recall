@@ -2,6 +2,43 @@ import type { Card, Deck, RecallExportPayload, RecallStateSnapshot, Review, Stud
 import { isCardStatus, isDeckColor, isReviewResult } from "@/lib/domain";
 import { createId, normalizeName } from "@/lib/utils";
 
+export function exportDeckToJson(deck: Deck, cards: Card[]): string {
+  const payload: RecallExportPayload = {
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    decks: [deck],
+    cards: cards.map(c => ({
+      ...c,
+      // Strip internal FSRS state for cleaner sharing
+      state: "new" as const,
+      lastReviewDate: null,
+      nextReviewDate: new Date().toISOString(),
+      stability: 0,
+      difficulty: 0,
+      elapsedDays: 0,
+      scheduledDays: 0,
+      reps: 0,
+      lapses: 0,
+    })),
+    studySessions: [],
+    reviewLogs: [],
+    settings: { theme: "dark" as const, seededAt: new Date().toISOString() }
+  };
+  return JSON.stringify(payload, null, 2);
+}
+
+export function downloadFile(filename: string, content: string): void {
+  const blob = new Blob([content], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 export function buildExportPayload(snapshot: RecallStateSnapshot, exportedAt = new Date()): RecallExportPayload {
   return {
     version: 1,

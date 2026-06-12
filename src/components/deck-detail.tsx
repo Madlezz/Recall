@@ -1,4 +1,4 @@
-import { ArrowLeft, Edit3, Play, Plus, Search, Trash2 } from "lucide-react";
+import { ArrowLeft, Download, Edit3, Play, Plus, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -16,6 +16,7 @@ import { Progress } from "@/components/ui/progress";
 import { getDeckStats } from "@/lib/stats";
 import { useRecallStore } from "@/stores/recall-store";
 import type { Card } from "@/types";
+import { exportDeckToJson, downloadFile } from "@/services/import-export";
 
 export function DeckDetail(): JSX.Element {
   const [search, setSearch] = useState("");
@@ -59,6 +60,12 @@ export function DeckDetail(): JSX.Element {
     }
   }
 
+  function handleExport(): void {
+    const json = exportDeckToJson(deck, deckCards);
+    downloadFile(`${deck.name.replace(/\s+/g, '_')}.json`, json);
+    toast.success("Deck exported");
+  }
+
   return (
     <div className="animate-fade-in space-y-7">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -76,6 +83,10 @@ export function DeckDetail(): JSX.Element {
               </Button>
             }
           />
+          <Button variant="outline" onClick={handleExport}>
+            <Download className="h-4 w-4" />
+            Export JSON
+          </Button>
           <ConfirmAction
             title="Delete deck?"
             description="This permanently deletes the deck and all cards inside it."
