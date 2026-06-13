@@ -88,6 +88,9 @@ pnpm dev            # Browser-only preview
 - [x] Custom study — configurable sessions: deck, card count, tag, new-only
 - [x] Deck health — retention %, leech count, overdue on dashboard cards
 - [x] CSV import — front,back,hint,tags with preview + deck selector
+- [x] Keyboard shortcuts — B (bury), S (snooze) + elapsed timer in study
+- [x] Sound volume slider — master gain for effects, chimes, soundscapes
+- [x] Bulk tag management — add, set, or remove tags on selected cards
 
 ---
 
