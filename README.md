@@ -87,6 +87,7 @@ pnpm dev            # Browser-only preview
 - [x] Card browser — table view with search, filter, sort, bulk operations
 - [x] Custom study — configurable sessions: deck, card count, tag, new-only
 - [x] Deck health — retention %, leech count, overdue on dashboard cards
+- [x] CSV import — front,back,hint,tags with preview + deck selector
 
 ---
 
