@@ -1,66 +1,38 @@
-import { useMemo } from "react";
-import { format, subDays } from "date-fns";
 import { Brain, Calendar, Flame, Lock, TrendingUp, Zap } from "lucide-react";
-import { useRecallStore } from "@/stores/recall-store";
-import { getStudyStreak } from "@/lib/streak";
-import { getLevel, getLevelTitle } from "@/lib/xp";
-import type { ReviewLog } from "@/types";
+import { useStats } from "./use-stats";
 import { ACHIEVEMENT_DEFS } from "@/types";
 
-// ── Helpers ──
+// ── Sub-components ──
 
-function lastNDays(n: number): string[] {
-  const days: string[] = [];
-  for (let i = n - 1; i >= 0; i--) {
-    days.push(format(subDays(new Date(), i), "yyyy-MM-dd"));
-  }
-  return days;
+function StatCard({ icon: Icon, label, value }: { icon: typeof Flame; label: string; value: string }): JSX.Element {
+  return (
+    <div className="rounded-lg border bg-card p-4">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+        <Icon className="h-3.5 w-3.5" />
+        {label}
+      </div>
+      <div className="text-2xl font-semibold">{value}</div>
+    </div>
+  );
 }
 
-function reviewsByDay(logs: ReviewLog[]): Map<string, number> {
-  const map = new Map<string, number>();
-  for (const log of logs) {
-    const day = log.reviewDate.slice(0, 10);
-    map.set(day, (map.get(day) ?? 0) + 1);
-  }
-  return map;
-}
-
-function ratingsByDay(logs: ReviewLog[]): Map<string, { again: number; hard: number; good: number; easy: number }> {
-  const map = new Map<string, { again: number; hard: number; good: number; easy: number }>();
-  for (const log of logs) {
-    const day = log.reviewDate.slice(0, 10);
-    const entry = map.get(day) ?? { again: 0, hard: 0, good: 0, easy: 0 };
-    entry[log.rating]++;
-    map.set(day, entry);
-  }
-  return map;
-}
-
-function reviewsByHour(logs: ReviewLog[]): number[] {
-  const hours = new Array(24).fill(0) as number[];
-  for (const log of logs) {
-    const h = new Date(log.reviewDate).getHours();
-    hours[h]++;
-  }
-  return hours;
-}
-
-function deckReviewCounts(logs: ReviewLog[], cards: { id: string; deckId: string }[]): Map<string, number> {
-  const cardDeck = new Map(cards.map((c) => [c.id, c.deckId]));
-  const map = new Map<string, number>();
-  for (const log of logs) {
-    const deckId = cardDeck.get(log.cardId);
-    if (deckId) map.set(deckId, (map.get(deckId) ?? 0) + 1);
-  }
-  return map;
+function RatingBar({ color, label, count, total }: { color: string; label: string; count: number; total: number }): JSX.Element {
+  const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-xs font-medium w-12 text-muted-foreground">{label}</span>
+      <div className="flex-1 h-4 bg-muted rounded-full overflow-hidden">
+        <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
+      </div>
+      <span className="text-xs tabular-nums w-16 text-right text-muted-foreground">{count} ({pct}%)</span>
+    </div>
+  );
 }
 
 // ── Sparkline / Mini Bar Chart ──
 
 function MiniBarChart({ data, maxHeight = 60 }: { data: number[]; maxHeight?: number }): JSX.Element {
   const max = Math.max(1, ...data);
-
   return (
     <div className="flex items-end gap-[2px] h-full" style={{ height: maxHeight }}>
       {data.map((val, i) => (
@@ -77,7 +49,6 @@ function MiniBarChart({ data, maxHeight = 60 }: { data: number[]; maxHeight?: nu
 
 function StackedBarChart({ data }: { data: { again: number; hard: number; good: number; easy: number }[] }): JSX.Element {
   const max = Math.max(1, ...data.map((d) => d.again + d.hard + d.good + d.easy));
-
   return (
     <div className="flex items-end gap-[2px] h-[80px]">
       {data.map((d, i) => {
@@ -85,34 +56,10 @@ function StackedBarChart({ data }: { data: { again: number; hard: number; good: 
         const pct = (total / max) * 100;
         return (
           <div key={i} className="flex-1 flex flex-col justify-end min-w-[6px]" style={{ height: `${Math.max(2, pct)}%` }}>
-            {d.easy > 0 && (
-              <div
-                className="w-full bg-blue-500/60 rounded-t-sm"
-                style={{ height: `${(d.easy / total) * 100}%` }}
-                title={`Easy: ${d.easy}`}
-              />
-            )}
-            {d.good > 0 && (
-              <div
-                className="w-full bg-emerald-500/60"
-                style={{ height: `${(d.good / total) * 100}%` }}
-                title={`Good: ${d.good}`}
-              />
-            )}
-            {d.hard > 0 && (
-              <div
-                className="w-full bg-amber-500/60"
-                style={{ height: `${(d.hard / total) * 100}%` }}
-                title={`Hard: ${d.hard}`}
-              />
-            )}
-            {d.again > 0 && (
-              <div
-                className="w-full bg-red-500/60 rounded-b-sm"
-                style={{ height: `${(d.again / total) * 100}%` }}
-                title={`Again: ${d.again}`}
-              />
-            )}
+            {d.easy > 0 && <div className="w-full bg-blue-500/60 rounded-t-sm" style={{ height: `${(d.easy / total) * 100}%` }} title={`Easy: ${d.easy}`} />}
+            {d.good > 0 && <div className="w-full bg-emerald-500/60" style={{ height: `${(d.good / total) * 100}%` }} title={`Good: ${d.good}`} />}
+            {d.hard > 0 && <div className="w-full bg-amber-500/60" style={{ height: `${(d.hard / total) * 100}%` }} title={`Hard: ${d.hard}`} />}
+            {d.again > 0 && <div className="w-full bg-red-500/60 rounded-b-sm" style={{ height: `${(d.again / total) * 100}%` }} title={`Again: ${d.again}`} />}
           </div>
         );
       })}
@@ -123,61 +70,22 @@ function StackedBarChart({ data }: { data: { again: number; hard: number; good: 
 // ── Component ──
 
 export function Stats(): JSX.Element {
-  const reviewLogs = useRecallStore((state) => state.reviewLogs);
-  const cards = useRecallStore((state) => state.cards);
-  const decks = useRecallStore((state) => state.decks);
-  const settings = useRecallStore((state) => state.settings);
-  const studySessions = useRecallStore((state) => state.studySessions);
-
-  const streak = getStudyStreak(reviewLogs);
-  const level = getLevel(settings.xp);
-  const title = getLevelTitle(level);
-
-  const days = useMemo(() => lastNDays(30), []);
-  const byDay = useMemo(() => reviewsByDay(reviewLogs), [reviewLogs]);
-  const byDayRatings = useMemo(() => ratingsByDay(reviewLogs), [reviewLogs]);
-  const byHour = useMemo(() => reviewsByHour(reviewLogs), [reviewLogs]);
-  const deckCounts = useMemo(() => deckReviewCounts(reviewLogs, cards), [reviewLogs, cards]);
-
-  const dayData = useMemo(() => days.map((d) => byDay.get(d) ?? 0), [days, byDay]);
-  const dayRatingData = useMemo(
-    () =>
-      days.map((d) => {
-        const r = byDayRatings.get(d);
-        return r ?? { again: 0, hard: 0, good: 0, easy: 0 };
-      }),
-    [days, byDayRatings],
-  );
-
-  const totalReviews = reviewLogs.length;
-  const maxHour = Math.max(1, ...byHour);
-  const totalSessions = studySessions.length;
-
-  // Overall rating distribution
-  const ratingDist = useMemo(() => {
-    let again = 0, hard = 0, good = 0, easy = 0;
-    for (const log of reviewLogs) {
-      if (log.rating === "again") again++;
-      else if (log.rating === "hard") hard++;
-      else if (log.rating === "good") good++;
-      else easy++;
-    }
-    return { again, hard, good, easy };
-  }, [reviewLogs]);
-
-  const totalRated = ratingDist.again + ratingDist.hard + ratingDist.good + ratingDist.easy;
-  const accuracy = totalRated > 0 ? Math.round(((ratingDist.good + ratingDist.easy) / totalRated) * 100) : 0;
-
-  // Top decks by review count
-  const topDecks = useMemo(() => {
-    return [...deckCounts.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([deckId, count]) => {
-        const deck = decks.find((d) => d.id === deckId);
-        return { name: deck?.name ?? "Unknown Deck", count };
-      });
-  }, [deckCounts, decks]);
+  const {
+    settings,
+    streak,
+    level,
+    title,
+    dayData,
+    dayRatingData,
+    byHour,
+    maxHour,
+    totalReviews,
+    totalSessions,
+    ratingDist,
+    totalRated,
+    accuracy,
+    topDecks,
+  } = useStats();
 
   return (
     <div className="animate-fade-in space-y-8">
@@ -224,9 +132,7 @@ export function Stats(): JSX.Element {
               <div
                 key={def.title}
                 className={`rounded-md border p-3 text-sm transition ${
-                  unlocked
-                    ? "border-primary/30 bg-primary/5"
-                    : "border-muted bg-muted/30 opacity-50"
+                  unlocked ? "border-primary/30 bg-primary/5" : "border-muted bg-muted/30 opacity-50"
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -245,9 +151,7 @@ export function Stats(): JSX.Element {
 
       {/* Rating distribution */}
       <section className="rounded-lg border bg-card p-5">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-4">
-          Rating Distribution
-        </h3>
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-4">Rating Distribution</h3>
         {totalRated === 0 ? (
           <p className="text-sm text-muted-foreground py-4 text-center">Start reviewing to see your rating breakdown</p>
         ) : (
@@ -262,9 +166,7 @@ export function Stats(): JSX.Element {
 
       {/* Review volume (last 30 days) */}
       <section className="rounded-lg border bg-card p-5">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-4">
-          Review Volume — Last 30 Days
-        </h3>
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-4">Review Volume — Last 30 Days</h3>
         {totalReviews === 0 ? (
           <p className="text-sm text-muted-foreground py-4 text-center">Start reviewing to see your activity</p>
         ) : (
@@ -274,9 +176,7 @@ export function Stats(): JSX.Element {
 
       {/* Stacked rating chart */}
       <section className="rounded-lg border bg-card p-5">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-4">
-          Daily Rating Breakdown (30 days)
-        </h3>
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-4">Daily Rating Breakdown (30 days)</h3>
         {totalReviews === 0 ? (
           <p className="text-sm text-muted-foreground py-4 text-center">Start reviewing to see rating trends</p>
         ) : (
@@ -294,9 +194,7 @@ export function Stats(): JSX.Element {
 
       {/* Time-of-day heatmap */}
       <section className="rounded-lg border bg-card p-5">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-4">
-          When You Study
-        </h3>
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-4">When You Study</h3>
         {totalReviews === 0 ? (
           <p className="text-sm text-muted-foreground py-4 text-center">Start reviewing to see your study patterns</p>
         ) : (
@@ -328,9 +226,7 @@ export function Stats(): JSX.Element {
       {/* Top decks */}
       {topDecks.length > 0 && (
         <section className="rounded-lg border bg-card p-5">
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-4">
-            Top Decks
-          </h3>
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-4">Top Decks</h3>
           <div className="space-y-2">
             {topDecks.map(({ name, count }) => (
               <div key={name} className="flex items-center justify-between text-sm">
@@ -341,34 +237,6 @@ export function Stats(): JSX.Element {
           </div>
         </section>
       )}
-    </div>
-  );
-}
-
-// ── Sub-components ──
-
-function StatCard({ icon: Icon, label, value }: { icon: typeof Flame; label: string; value: string }): JSX.Element {
-  return (
-    <div className="rounded-lg border bg-card p-4">
-      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
-        <Icon className="h-3.5 w-3.5" />
-        {label}
-      </div>
-      <div className="text-2xl font-semibold">{value}</div>
-    </div>
-  );
-}
-
-function RatingBar({ color, label, count, total }: { color: string; label: string; count: number; total: number }): JSX.Element {
-  const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-
-  return (
-    <div className="flex items-center gap-3">
-      <span className="text-xs font-medium w-12 text-muted-foreground">{label}</span>
-      <div className="flex-1 h-4 bg-muted rounded-full overflow-hidden">
-        <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
-      </div>
-      <span className="text-xs tabular-nums w-16 text-right text-muted-foreground">{count} ({pct}%)</span>
     </div>
   );
 }
