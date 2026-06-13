@@ -2,7 +2,7 @@
 
 > *Beautiful flashcards that live on your computer. No cloud, no account, no nonsense.*
 
-**Recall** is a desktop flashcard app built for focused learning. It uses FSRS — the smartest spaced repetition algorithm — but you just open it and start reviewing. Your data stays on your machine, always.
+**Recall** is a desktop flashcard app built for focused learning. It uses FSRS-based scheduling for modern spaced repetition — but you just open it and start reviewing. Your data stays on your machine, always.
 
 ---
 
