@@ -1,8 +1,7 @@
 import { open } from "@tauri-apps/plugin-dialog";
 import { toast } from "sonner";
-import { parseAnkiApkg, type AnkiCard } from "@/services/anki-import";
+import { parseAnkiApkg } from "@/services/anki-import";
 import { useRecallStore } from "@/stores/recall-store";
-import { createId } from "@/lib/utils";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {

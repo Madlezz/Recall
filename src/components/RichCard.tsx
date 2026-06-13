@@ -79,7 +79,7 @@ export function RichCard({ content, isBack = false, cardType = "basic", revealed
         remarkPlugins={[remarkMath, remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeHighlight, rehypeKatex]}
         components={{
-          code({ node, inline, className, children, ...props }: any) {
+          code({ inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || "");
             return !inline && match ? (
               <pre className="bg-muted p-4 rounded-lg overflow-x-auto">

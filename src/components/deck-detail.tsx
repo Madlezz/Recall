@@ -1,4 +1,4 @@
-import { ArrowLeft, Beaker, FileSpreadsheet, BookOpen, Brain, Calendar, CheckSquare, Download, Edit3, Play, Plus, RefreshCw, Search, ShieldCheck, Square, Trash2, RotateCcw, X } from "lucide-react";
+import { ArrowLeft, Beaker, FileSpreadsheet, BookOpen, Brain, Calendar, CheckSquare, Download, Edit3, Play, Plus, RefreshCw, Search, ShieldCheck, Square, Trash2, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -18,7 +18,7 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { getDeckStats } from "@/lib/stats";
 import { useRecallStore } from "@/stores/recall-store";
-import type { Card, RecallSettings } from "@/types";
+import type { Card } from "@/types";
 import { exportDeckToJson, downloadFile } from "@/services/import-export";
 import { checkDeckQuality, type CardQualityWarning } from "@/lib/card-quality";
 

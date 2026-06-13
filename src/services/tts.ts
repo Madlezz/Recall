@@ -3,7 +3,7 @@
  * Falls back gracefully if the browser doesn't support speech synthesis.
  */
 
-let currentUtterance: SpeechSynthesisUtterance | null = null;
+let _currentUtterance: SpeechSynthesisUtterance | null = null;
 
 export function speakText(text: string, lang = "en-US"): void {
   if (typeof window === "undefined" || !window.speechSynthesis) {
@@ -37,21 +37,24 @@ export function speakText(text: string, lang = "en-US"): void {
     utterance.voice = matchingVoice;
   }
 
-  currentUtterance = utterance;
+  _currentUtterance = utterance;
   window.speechSynthesis.speak(utterance);
 }
 
 export function stopSpeaking(): void {
   if (typeof window !== "undefined" && window.speechSynthesis) {
     window.speechSynthesis.cancel();
-    currentUtterance = null;
+    _currentUtterance = null;
   }
 }
 
 export function isSpeaking(): boolean {
-  return typeof window !== "undefined" && window.speechSynthesis.speaking;
+  if (typeof window !== "undefined" && window.speechSynthesis) {
+    return window.speechSynthesis.speaking;
+  }
+  return false;
 }
 
 export function isTTSSupported(): boolean {
-  return typeof window !== "undefined" && typeof window.speechSynthesis !== "undefined";
+  return typeof window !== "undefined" && "speechSynthesis" in window;
 }
