@@ -89,6 +89,7 @@ export function createNewCard(
   tags: string[]
 ): Card {
   const now = new Date().toISOString();
+  const isCloze = /\{\{c\d+::[^}]+\}\}/.test(front);
   return {
     id: crypto.randomUUID(),
     deckId,
@@ -96,6 +97,7 @@ export function createNewCard(
     back,
     hint,
     tags,
+    cardType: isCloze ? "cloze" : "basic",
     state: "new",
     lastReviewDate: null,
     nextReviewDate: now,

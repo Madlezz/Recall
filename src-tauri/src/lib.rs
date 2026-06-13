@@ -30,59 +30,59 @@ fn migrations() -> Vec<Migration> {
 
             CREATE TABLE IF NOT EXISTS decks (
                 id TEXT PRIMARY KEY NOT NULL,
-                name TEXT NOT NULL UNIQUE,
-                description TEXT NOT NULL,
-                color TEXT NOT NULL,
+                name TEXT NOT NULL,
+                description TEXT DEFAULT '',
+                color TEXT DEFAULT 'blue',
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL
             );
 
             CREATE TABLE IF NOT EXISTS cards (
                 id TEXT PRIMARY KEY NOT NULL,
-                deck_id TEXT NOT NULL,
+                deck_id TEXT NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
                 front TEXT NOT NULL,
                 back TEXT NOT NULL,
-                hint TEXT NOT NULL,
-                tags TEXT NOT NULL,
-                status TEXT NOT NULL CHECK (status IN ('new', 'learning', 'mastered')),
-                correct_count INTEGER NOT NULL DEFAULT 0,
-                incorrect_count INTEGER NOT NULL DEFAULT 0,
-                streak INTEGER NOT NULL DEFAULT 0,
-                last_reviewed_at TEXT,
-                next_review_at TEXT NOT NULL,
+                hint TEXT DEFAULT '',
+                tags TEXT NOT NULL DEFAULT '[]',
+                card_type TEXT NOT NULL DEFAULT 'basic',
+                state TEXT NOT NULL DEFAULT 'new',
+                last_review_date TEXT,
+                next_review_date TEXT NOT NULL,
+                stability REAL NOT NULL DEFAULT 0,
+                difficulty REAL NOT NULL DEFAULT 0,
+                elapsed_days INTEGER NOT NULL DEFAULT 0,
+                scheduled_days INTEGER NOT NULL DEFAULT 0,
+                reps INTEGER NOT NULL DEFAULT 0,
+                lapses INTEGER NOT NULL DEFAULT 0,
                 created_at TEXT NOT NULL,
-                updated_at TEXT NOT NULL,
-                FOREIGN KEY (deck_id) REFERENCES decks(id) ON DELETE CASCADE
+                updated_at TEXT NOT NULL
             );
 
             CREATE INDEX IF NOT EXISTS cards_deck_id_idx ON cards(deck_id);
-            CREATE INDEX IF NOT EXISTS cards_next_review_at_idx ON cards(next_review_at);
+            CREATE INDEX IF NOT EXISTS cards_next_review_date_idx ON cards(next_review_date);
+
+            CREATE TABLE IF NOT EXISTS review_logs (
+                id TEXT PRIMARY KEY NOT NULL,
+                card_id TEXT NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+                rating TEXT NOT NULL,
+                review_date TEXT NOT NULL,
+                stability REAL NOT NULL,
+                difficulty REAL NOT NULL,
+                elapsed_days INTEGER NOT NULL,
+                scheduled_days INTEGER NOT NULL
+            );
+
+            CREATE INDEX IF NOT EXISTS review_logs_card_id_idx ON review_logs(card_id);
 
             CREATE TABLE IF NOT EXISTS study_sessions (
                 id TEXT PRIMARY KEY NOT NULL,
-                deck_id TEXT,
+                deck_id TEXT REFERENCES decks(id),
                 started_at TEXT NOT NULL,
                 ended_at TEXT NOT NULL,
-                cards_studied INTEGER NOT NULL DEFAULT 0,
-                correct INTEGER NOT NULL DEFAULT 0,
-                incorrect INTEGER NOT NULL DEFAULT 0,
-                FOREIGN KEY (deck_id) REFERENCES decks(id) ON DELETE SET NULL
+                cards_studied INTEGER NOT NULL DEFAULT 0
             );
 
             CREATE INDEX IF NOT EXISTS study_sessions_deck_id_idx ON study_sessions(deck_id);
-
-            CREATE TABLE IF NOT EXISTS reviews (
-                id TEXT PRIMARY KEY NOT NULL,
-                card_id TEXT NOT NULL,
-                session_id TEXT NOT NULL,
-                answered_at TEXT NOT NULL,
-                result TEXT NOT NULL CHECK (result IN ('correct', 'incorrect')),
-                FOREIGN KEY (card_id) REFERENCES cards(id) ON DELETE CASCADE,
-                FOREIGN KEY (session_id) REFERENCES study_sessions(id) ON DELETE CASCADE
-            );
-
-            CREATE INDEX IF NOT EXISTS reviews_card_id_idx ON reviews(card_id);
-            CREATE INDEX IF NOT EXISTS reviews_session_id_idx ON reviews(session_id);
 
             CREATE TABLE IF NOT EXISTS settings (
                 key TEXT PRIMARY KEY NOT NULL,
@@ -103,63 +103,104 @@ fn migrations() -> Vec<Migration> {
                 SELECT CASE WHEN EXISTS (SELECT 1 FROM decks) THEN 0 ELSE 1 END;
 
             INSERT INTO decks (id, name, description, color, created_at, updated_at)
-                SELECT 'deck_typescript', 'TypeScript Systems', 'Types, narrowing, and maintainable frontend patterns.', 'blue',
+                SELECT 'deck_languages', '🇯🇵 Japanese Basics', 'Common Japanese words and phrases for everyday conversation.', 'rose',
                        strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-7 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day')
                 FROM recall_seed_guard WHERE should_seed = 1;
             INSERT INTO decks (id, name, description, color, created_at, updated_at)
-                SELECT 'deck_react', 'React Fundamentals', 'Hooks, state, rendering, and UI architecture.', 'violet',
+                SELECT 'deck_science', '🔬 Science Facts', 'Fun science facts that make you sound smart at parties.', 'green',
                        strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-6 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
                 FROM recall_seed_guard WHERE should_seed = 1;
             INSERT INTO decks (id, name, description, color, created_at, updated_at)
-                SELECT 'deck_sql', 'Local-First Data', 'SQLite, sync boundaries, and offline data design.', 'green',
+                SELECT 'deck_history', '🏛️ World History', 'Key dates and events that shaped the modern world.', 'amber',
                        strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-5 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
                 FROM recall_seed_guard WHERE should_seed = 1;
 
-            INSERT INTO cards (id, deck_id, front, back, hint, tags, status, correct_count, incorrect_count, streak, last_reviewed_at, next_review_at, created_at, updated_at)
-                SELECT 'card_ts_1', 'deck_typescript', 'What does `strict` mode protect?', 'It enables stronger type checks that catch unsafe assumptions at compile time.', 'Think compiler guardrails.', '["typescript"]', 'learning', 2, 1, 2,
-                       strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-7 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-7 days')
+            INSERT INTO cards (id, deck_id, front, back, hint, tags, card_type, state, last_review_date, next_review_date,
+                               stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at)
+                SELECT 'card_jp_1', 'deck_languages', 'Hello / Good afternoon', 'こんにちは (Konnichiwa)', 'Said during daytime', '["greetings"]',
+                       'basic', 'review', strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '+10 days'),
+                       12.0, 0.8, 4, 12, 5, 1, strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-7 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-7 days')
                 FROM recall_seed_guard WHERE should_seed = 1;
-            INSERT INTO cards (id, deck_id, front, back, hint, tags, status, correct_count, incorrect_count, streak, last_reviewed_at, next_review_at, created_at, updated_at)
-                SELECT 'card_ts_2', 'deck_typescript', 'What is a discriminated union?', 'A union of object types narrowed by a shared literal property.', '', '["typescript","types"]', 'mastered', 5, 0, 5,
-                       strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '+12 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-7 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-7 days')
+            INSERT INTO cards (id, deck_id, front, back, hint, tags, card_type, state, last_review_date, next_review_date,
+                               stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at)
+                SELECT 'card_jp_2', 'deck_languages', 'Thank you', 'ありがとう (Arigatou)', 'Casual form', '["greetings"]',
+                       'basic', 'learning', strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'),
+                       2.0, 1.1, 2, 3, 3, 1, strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-7 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-7 days')
                 FROM recall_seed_guard WHERE should_seed = 1;
-            INSERT INTO cards (id, deck_id, front, back, hint, tags, status, correct_count, incorrect_count, streak, last_reviewed_at, next_review_at, created_at, updated_at)
-                SELECT 'card_ts_3', 'deck_typescript', 'What does `never` represent?', 'A value that should not exist, often used for exhaustiveness checks.', '', '["typescript"]', 'new', 0, 0, 0,
-                       NULL, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day')
+            INSERT INTO cards (id, deck_id, front, back, hint, tags, card_type, state, last_review_date, next_review_date,
+                               stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at)
+                SELECT 'card_jp_3', 'deck_languages', 'Excuse me, I''m {{c1::sorry}} — {{c2::すみません}} (Sumimasen)', '',
+                       'Cloze: remember the Japanese phrase', '["phrases","cloze"]',
+                       'cloze', 'new', NULL, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'),
+                       0, 0, 0, 0, 0, 0, strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day')
                 FROM recall_seed_guard WHERE should_seed = 1;
-            INSERT INTO cards (id, deck_id, front, back, hint, tags, status, correct_count, incorrect_count, streak, last_reviewed_at, next_review_at, created_at, updated_at)
-                SELECT 'card_react_1', 'deck_react', 'Why keep state close to consumers?', 'It reduces coupling and avoids needless re-renders across unrelated UI.', '', '["react"]', 'learning', 1, 1, 1,
-                       strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-6 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-6 days')
+            INSERT INTO cards (id, deck_id, front, back, hint, tags, card_type, state, last_review_date, next_review_date,
+                               stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at)
+                SELECT 'card_sci_1', 'deck_science', 'What is the speed of light?', '~300,000 km/s in a vacuum',
+                       'That''s about 7.5 laps around Earth per second!', '["physics"]',
+                       'basic', 'review', strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-2 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '+20 days'),
+                       18.0, 0.5, 6, 18, 7, 1, strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-6 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-6 days')
                 FROM recall_seed_guard WHERE should_seed = 1;
-            INSERT INTO cards (id, deck_id, front, back, hint, tags, status, correct_count, incorrect_count, streak, last_reviewed_at, next_review_at, created_at, updated_at)
-                SELECT 'card_react_2', 'deck_react', 'What should an effect cleanup handle?', 'Subscriptions, timers, observers, pending work, and anything with external lifetime.', 'External lifetime matters.', '["react","hooks"]', 'new', 0, 0, 0,
-                       NULL, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-4 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-4 days')
+            INSERT INTO cards (id, deck_id, front, back, hint, tags, card_type, state, last_review_date, next_review_date,
+                               stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at)
+                SELECT 'card_sci_2', 'deck_science', 'How many bones in the human body?', '206 bones in an adult',
+                       'Babies have ~300, they fuse together', '["biology"]',
+                       'basic', 'learning', strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'),
+                       1.5, 1.0, 2, 2, 3, 1, strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-4 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-4 days')
                 FROM recall_seed_guard WHERE should_seed = 1;
-            INSERT INTO cards (id, deck_id, front, back, hint, tags, status, correct_count, incorrect_count, streak, last_reviewed_at, next_review_at, created_at, updated_at)
-                SELECT 'card_react_3', 'deck_react', 'When is `useMemo` useful?', 'For expensive derived values or stable references passed to memoized children.', '', '["react"]', 'mastered', 6, 1, 5,
-                       strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-2 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '+16 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-4 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-4 days')
+            INSERT INTO cards (id, deck_id, front, back, hint, tags, card_type, state, last_review_date, next_review_date,
+                               stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at)
+                SELECT 'card_sci_3', 'deck_science', 'DNA stands for {{c1::Deoxyribonucleic}} Acid — the {{c2::blueprint of life}}', '',
+                       'Fill in the missing terms', '["biology","cloze"]',
+                       'cloze', 'new', NULL, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'),
+                       0, 0, 0, 0, 0, 0, strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-2 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-2 days')
                 FROM recall_seed_guard WHERE should_seed = 1;
-            INSERT INTO cards (id, deck_id, front, back, hint, tags, status, correct_count, incorrect_count, streak, last_reviewed_at, next_review_at, created_at, updated_at)
-                SELECT 'card_sql_1', 'deck_sql', 'What does local-first mean here?', 'The app works fully offline and stores user data on the device first.', '', '["local-first"]', 'learning', 3, 1, 3,
-                       strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-5 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-5 days')
+            INSERT INTO cards (id, deck_id, front, back, hint, tags, card_type, state, last_review_date, next_review_date,
+                               stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at)
+                SELECT 'card_his_1', 'deck_history', 'When did World War II end?', '1945',
+                       'September 2, 1945 — Japan surrendered', '["dates"]',
+                       'basic', 'review', strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '+5 days'),
+                       8.0, 0.9, 5, 10, 6, 0, strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-5 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-5 days')
                 FROM recall_seed_guard WHERE should_seed = 1;
-            INSERT INTO cards (id, deck_id, front, back, hint, tags, status, correct_count, incorrect_count, streak, last_reviewed_at, next_review_at, created_at, updated_at)
-                SELECT 'card_sql_2', 'deck_sql', 'Why use import/export JSON?', 'It gives portable backups without accounts, sync, or cloud dependencies.', '', '["portability"]', 'new', 0, 0, 0,
-                       NULL, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-2 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-2 days')
+            INSERT INTO cards (id, deck_id, front, back, hint, tags, card_type, state, last_review_date, next_review_date,
+                               stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at)
+                SELECT 'card_his_2', 'deck_history', 'Who was the first person on the moon?', 'Neil Armstrong',
+                       'Apollo 11, July 20, 1969', '["people"]',
+                       'basic', 'learning', strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'),
+                       1.0, 1.3, 1, 1, 2, 1, strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-3 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-3 days')
+                FROM recall_seed_guard WHERE should_seed = 1;
+            INSERT INTO cards (id, deck_id, front, back, hint, tags, card_type, state, last_review_date, next_review_date,
+                               stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at)
+                SELECT 'card_his_3', 'deck_history', 'The {{c1::Berlin Wall}} fell on {{c2::November 9, 1989}}', '',
+                       'Key Cold War event — fill in the blanks', '["dates","cloze"]',
+                       'cloze', 'new', NULL, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'),
+                       0, 0, 0, 0, 0, 0, strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day')
                 FROM recall_seed_guard WHERE should_seed = 1;
 
-            INSERT INTO study_sessions (id, deck_id, started_at, ended_at, cards_studied, correct, incorrect)
-                SELECT 'session_seed_1', NULL, strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), 3, 2, 1
+            INSERT INTO study_sessions (id, deck_id, started_at, ended_at, cards_studied)
+                SELECT 'session_seed_1', NULL,
+                       strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), 5
                 FROM recall_seed_guard WHERE should_seed = 1;
 
-            INSERT INTO reviews (id, card_id, session_id, answered_at, result)
-                SELECT 'review_seed_1', 'card_ts_1', 'session_seed_1', strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), 'correct'
+            INSERT INTO review_logs (id, card_id, rating, review_date, stability, difficulty, elapsed_days, scheduled_days)
+                SELECT 'review_seed_1', 'card_jp_1', 'good',
+                       strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), 12.0, 0.8, 4, 12
                 FROM recall_seed_guard WHERE should_seed = 1;
-            INSERT INTO reviews (id, card_id, session_id, answered_at, result)
-                SELECT 'review_seed_2', 'card_react_1', 'session_seed_1', strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), 'incorrect'
+            INSERT INTO review_logs (id, card_id, rating, review_date, stability, difficulty, elapsed_days, scheduled_days)
+                SELECT 'review_seed_2', 'card_sci_1', 'good',
+                       strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), 18.0, 0.5, 6, 18
                 FROM recall_seed_guard WHERE should_seed = 1;
-            INSERT INTO reviews (id, card_id, session_id, answered_at, result)
-                SELECT 'review_seed_3', 'card_sql_1', 'session_seed_1', strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), 'correct'
+            INSERT INTO review_logs (id, card_id, rating, review_date, stability, difficulty, elapsed_days, scheduled_days)
+                SELECT 'review_seed_3', 'card_his_1', 'good',
+                       strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), 8.0, 0.9, 5, 10
+                FROM recall_seed_guard WHERE should_seed = 1;
+            INSERT INTO review_logs (id, card_id, rating, review_date, stability, difficulty, elapsed_days, scheduled_days)
+                SELECT 'review_seed_4', 'card_jp_2', 'again',
+                       strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), 0.5, 1.1, 2, 3
+                FROM recall_seed_guard WHERE should_seed = 1;
+            INSERT INTO review_logs (id, card_id, rating, review_date, stability, difficulty, elapsed_days, scheduled_days)
+                SELECT 'review_seed_5', 'card_his_2', 'good',
+                       strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'), 1.0, 1.3, 1, 1
                 FROM recall_seed_guard WHERE should_seed = 1;
 
             INSERT OR REPLACE INTO settings (key, value) VALUES ('schema_version', '2');
@@ -167,15 +208,15 @@ fn migrations() -> Vec<Migration> {
             INSERT OR IGNORE INTO settings (key, value)
                 SELECT 'seeded_at', strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
                 FROM recall_seed_guard WHERE should_seed = 1;
+            INSERT OR IGNORE INTO settings (key, value) VALUES ('daily_new_card_limit', '20');
+            INSERT OR IGNORE INTO settings (key, value) VALUES ('leech_threshold', '5');
+            INSERT OR IGNORE INTO settings (key, value) VALUES ('onboarding_complete', 'false');
+            INSERT OR IGNORE INTO settings (key, value) VALUES ('xp', '0');
+            INSERT OR IGNORE INTO settings (key, value) VALUES ('achievements', '[]');
+            INSERT OR IGNORE INTO settings (key, value) VALUES ('daily_goal', '20');
 
             DROP TABLE recall_seed_guard;
         "#,
-            kind: MigrationKind::Up,
-        },
-        Migration {
-            version: 3,
-            description: "add_ease_factor",
-            sql: "ALTER TABLE cards ADD COLUMN ease_factor REAL NOT NULL DEFAULT 2.5;",
             kind: MigrationKind::Up,
         },
     ]

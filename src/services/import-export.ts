@@ -22,7 +22,16 @@ export function exportDeckToJson(deck: Deck, cards: Card[]): string {
     })),
     studySessions: [],
     reviewLogs: [],
-    settings: { theme: "dark" as const, seededAt: new Date().toISOString() }
+    settings: {
+      theme: "dark" as const,
+      seededAt: new Date().toISOString(),
+      dailyNewCardLimit: 20,
+      leechThreshold: 5,
+      onboardingComplete: false,
+      xp: 0,
+      achievements: [],
+      dailyGoal: 20,
+    }
   };
   return JSON.stringify(payload, null, 2);
 }
