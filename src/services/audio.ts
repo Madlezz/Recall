@@ -62,7 +62,7 @@ export function playFlipSound(): void {
 
 /** Pleasant ascending two-note chime for correct answers */
 export function playCorrectSound(): void {
-  const c = getCtx();
+  getCtx();
   playTone(523, 0.15, "sine", 0.1); // C5
   setTimeout(() => playTone(659, 0.2, "sine", 0.1), 80); // E5
 }

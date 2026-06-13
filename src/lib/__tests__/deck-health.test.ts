@@ -3,7 +3,7 @@ import { getDeckHealth } from "@/lib/stats";
 import type { Card, ReviewLog } from "@/types";
 
 const DECK_ID = "deck-1";
-const NOW = "2025-06-15T12:00:00.000Z";
+const _NOW = "2025-06-15T12:00:00.000Z";
 
 function card(overrides: Partial<Card> = {}): Card {
   return {

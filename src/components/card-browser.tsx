@@ -248,11 +248,6 @@ export function CardBrowser(): JSX.Element {
     }
   }
 
-  const selectedCards = useMemo(
-    () => cards.filter((c) => selected.has(c.id)),
-    [cards, selected],
-  );
-
   return (
     <div className="animate-fade-in space-y-4">
       {/* Header */}

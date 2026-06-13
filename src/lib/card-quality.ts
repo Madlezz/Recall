@@ -33,8 +33,8 @@ export function checkCardQuality(card: Card): CardQualityWarning[] {
   }
 
   // 2. Too short — likely too vague
-  const strippedFront = front.replace(/[#*_`~\[\](){}|>\\-]/g, "").trim();
-  const strippedBack = back.replace(/[#*_`~\[\](){}|>\\-]/g, "").trim();
+  const strippedFront = front.replace(/[#*_`~[\](){}|>\\-]/g, "").trim();
+  const strippedBack = back.replace(/[#*_`~[\](){}|>\\-]/g, "").trim();
   if (strippedFront.length < 10 && strippedBack.length < 10) {
     warnings.push({
       cardId: card.id,

@@ -53,7 +53,7 @@ export function hasCloze(text: string): boolean {
 /** Render cloze text as React nodes */
 export function renderCloze(
   text: string,
-  revealed: boolean,
+  _revealed: boolean,
 ): { segments: ClozeSegment[]; isCloze: boolean } {
   const segments = parseCloze(text);
   const hasClozeMarkers = segments.some((s) => s.isCloze);
