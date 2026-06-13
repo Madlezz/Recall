@@ -85,6 +85,7 @@ pnpm dev            # Browser-only preview
 - [x] Screenshots in README
 - [x] Desktop notifications for reviews
 - [x] Card browser — table view with search, filter, sort, bulk operations
+- [x] Custom study — configurable sessions: deck, card count, tag, new-only
 
 ---
 
