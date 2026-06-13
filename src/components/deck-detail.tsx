@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpen, Brain, Calendar, CheckSquare, Download, Edit3, Play, Plus, RefreshCw, Search, Square, Trash2, RotateCcw, X } from "lucide-react";
+import { ArrowLeft, BookOpen, Brain, Calendar, CheckSquare, Download, Edit3, Play, Plus, RefreshCw, Search, ShieldCheck, Square, Trash2, RotateCcw, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -18,6 +18,7 @@ import { getDeckStats } from "@/lib/stats";
 import { useRecallStore } from "@/stores/recall-store";
 import type { Card, RecallSettings } from "@/types";
 import { exportDeckToJson, downloadFile } from "@/services/import-export";
+import { checkDeckQuality, type CardQualityWarning } from "@/lib/card-quality";
 
 export function DeckDetail(): JSX.Element {
   const [search, setSearch] = useState("");
@@ -84,8 +85,9 @@ export function DeckDetail(): JSX.Element {
 
     const [examDateInput, setExamDateInput] = useState(deck.examDeadline?.split("T")[0] ?? "");
     const [showExamPicker, setShowExamPicker] = useState(false);
+      const [qualityWarnings, setQualityWarnings] = useState<CardQualityWarning[] | null>(null);
 
-    async function handleSetExamDeadline(): Promise<void> {
+      async function handleSetExamDeadline(): Promise<void> {
       if (!examDateInput) {
         await setExamDeadline(deck.id, null);
         toast.success("Exam deadline removed");
@@ -155,10 +157,19 @@ export function DeckDetail(): JSX.Element {
             }
           />
           <Button variant="outline" onClick={handleExport}>
-            <Download className="h-4 w-4" />
-            Export JSON
-          </Button>
-          <ConfirmAction
+                      <Download className="h-4 w-4" />
+                      Export JSON
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setQualityWarnings(checkDeckQuality(deckCards).warnings);
+                      }}
+                    >
+                      <ShieldCheck className="h-4 w-4" />
+                      Check Quality
+                    </Button>
+                    <ConfirmAction
                       title="Reset progress?"
                       description="This resets all cards in this deck back to 'new' state. Card content is kept, but all review history and scheduling data is cleared."
                       actionLabel="Reset progress"
@@ -262,9 +273,35 @@ export function DeckDetail(): JSX.Element {
         <StatTile icon={BookOpen} label="New" value={String(stats.newCards)} />
         <StatTile icon={Brain} label="Learning" value={String(stats.learning)} />
         <StatTile icon={RefreshCw} label="Review" value={String(stats.review)} />
-      </section>
+              </section>
 
-      <section className="space-y-4">
+              {/* Quality warnings */}
+              {qualityWarnings !== null ? (
+                <section className="rounded-lg border bg-card p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold">
+                      {qualityWarnings.length === 0 ? (
+                        <span className="text-green-400">✅ All {deckCards.length} cards look great!</span>
+                      ) : (
+                        <span className="text-amber-400">⚠️ {qualityWarnings.length} issue{qualityWarnings.length > 1 ? "s" : ""} found</span>
+                      )}
+                    </h3>
+                    <Button variant="ghost" size="sm" onClick={() => setQualityWarnings(null)}>Dismiss</Button>
+                  </div>
+                  {qualityWarnings.map((warning, i) => (
+                    <div key={i} className={cn(
+                      "rounded-md px-3 py-2 text-sm",
+                      warning.severity === "high" ? "bg-red-500/10 text-red-400 border border-red-500/20" :
+                      warning.severity === "medium" ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" :
+                      "bg-blue-500/10 text-blue-400 border border-blue-500/20",
+                    )}>
+                      <span className="font-medium">"{warning.front}"</span> — {warning.message}
+                    </div>
+                  ))}
+                </section>
+              ) : null}
+
+              <section className="space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold">Cards</h2>
