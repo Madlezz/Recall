@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, Beaker, Library, Plus, RotateCw } from "lucide-react";
+import { ArrowRight, Beaker, Flame, Library, Plus, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { AnkiImportDialog } from "@/components/anki-import-dialog";
 import { ReviewInbox } from "@/components/review-inbox";
@@ -12,7 +12,7 @@ import { CustomStudyDialog } from "@/components/custom-study-dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { getDeckColorClass } from "@/lib/deck-colors";
-import { getDeckStats, getDeckHealth } from "@/lib/stats";
+import { getDeckStats, getDeckHealth, getStudyStreak } from "@/lib/stats";
 import { getLevel, getLevelTitle, levelProgress } from "@/lib/xp";
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
@@ -78,10 +78,11 @@ export function Dashboard(): JSX.Element {
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[1fr_180px]">
-              <ReviewInbox />
-              <LevelTile />
-            </section>
+      <section className="grid gap-4 lg:grid-cols-[1fr_180px_180px]">
+                    <ReviewInbox />
+                    <LevelTile />
+                    <StreakWidget />
+                  </section>
 
             <section className="rounded-lg border bg-card p-5">
                           <ActivityHeatmap />
@@ -168,6 +169,25 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
 
   const healthColor = health.retention >= 85 ? "text-emerald-500" : health.retention >= 70 ? "text-amber-500" : "text-red-500";
 
+  // Last studied date — most recent review for any card in this deck
+  const lastStudied = useMemo(() => {
+    const deckCardIds = new Set(cards.filter((c) => c.deckId === deck.id).map((c) => c.id));
+    const dates = reviewLogs
+      .filter((l) => deckCardIds.has(l.cardId))
+      .map((l) => new Date(l.reviewDate).getTime());
+    if (dates.length === 0) return null;
+    return new Date(Math.max(...dates));
+  }, [cards, reviewLogs, deck.id]);
+
+  function formatLastStudied(d: Date): string {
+    const now = new Date();
+    const diffDays = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays === 0) return "Today";
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return d.toLocaleDateString();
+  }
+
   return (
     <button
       className="group rounded-lg border bg-card p-5 text-left transition hover:border-primary/50 hover:bg-accent/40"
@@ -224,8 +244,13 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
           </span>
         )}
         {stats.newCards > 0 && (
-          <span className="text-muted-foreground">{stats.newCards} new</span>
-        )}
+                  <span className="text-muted-foreground">{stats.newCards} new</span>
+                )}
+                {lastStudied && (
+                  <span className="ml-auto text-muted-foreground">
+                    {formatLastStudied(lastStudied)}
+                  </span>
+                )}
       </div>
     </button>
   );
@@ -241,6 +266,26 @@ function Metric({ label, value }: MetricProps): JSX.Element {
     <div className="rounded-md bg-muted/60 p-2">
       <div className="font-semibold">{value}</div>
       <div className="text-xs text-muted-foreground">{label}</div>
+    </div>
+  );
+}
+
+function StreakWidget(): JSX.Element {
+  const reviewLogs = useRecallStore((state) => state.reviewLogs);
+  const streak = useMemo(() => getStudyStreak(reviewLogs), [reviewLogs]);
+
+  const flameColor = streak >= 30 ? "text-amber-400" : streak >= 7 ? "text-orange-400" : streak >= 3 ? "text-amber-500" : "text-muted-foreground";
+
+  return (
+    <div className="rounded-lg border border-primary/20 bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent p-4 text-center">
+      <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">Streak</div>
+      <div className={cn("text-2xl font-bold", flameColor)}>
+        <Flame className="inline h-6 w-6 mr-1" />
+        {streak}
+      </div>
+      <div className="text-xs text-muted-foreground mt-1">
+        {streak === 0 ? "Study today!" : streak === 1 ? "1 day" : `${streak} days`}
+      </div>
     </div>
   );
 }
