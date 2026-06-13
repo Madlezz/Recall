@@ -88,8 +88,45 @@ export function getEstimatedReviewMinutes(cards: Card[], dailyLimit: number): nu
   return Math.max(1, Math.ceil(seconds / 60));
 }
 
-export function getStudyStreak(reviews: ReviewLog[], at = new Date()): number {
-  const reviewedDays = new Set(reviews.map((review) => startOfDay(parseISO(review.reviewDate)).toISOString()));
+export interface DeckHealth {
+  retention: number;       // 0-100, % of reviews that were good/easy
+  leeches: number;         // cards with lapses >= threshold
+  avgStability: number;    // average stability of review-state cards
+  overdue: number;         // review cards past their due date
+}
+
+export function getDeckHealth(
+  deckId: string,
+  cards: Card[],
+  reviewLogs: ReviewLog[],
+  leechThreshold: number,
+): DeckHealth {
+  const deckCards = cards.filter((c) => c.deckId === deckId);
+  const deckCardIds = new Set(deckCards.map((c) => c.id));
+  const deckLogs = reviewLogs.filter((l) => deckCardIds.has(l.cardId));
+
+  const totalRatings = deckLogs.length;
+  const goodEasy = deckLogs.filter((l) => l.rating === "good" || l.rating === "easy").length;
+  const retention = totalRatings === 0 ? 0 : Math.round((goodEasy / totalRatings) * 100);
+
+  const leeches = deckCards.filter((c) => c.lapses >= leechThreshold).length;
+
+  const reviewCards = deckCards.filter((c) => c.state === "review");
+  const avgStability = reviewCards.length === 0
+    ? 0
+    : Math.round(reviewCards.reduce((sum, c) => sum + c.stability, 0) / reviewCards.length);
+
+  const now = new Date();
+  const overdue = deckCards.filter((c) => {
+    if (c.state === "new") return false;
+    return isAfter(now, parseISO(c.nextReviewDate));
+  }).length;
+
+  return { retention, leeches, avgStability, overdue };
+  }
+
+  export function getStudyStreak(reviews: ReviewLog[], at = new Date()): number {
+    const reviewedDays = new Set(reviews.map((review) => startOfDay(parseISO(review.reviewDate)).toISOString()));
   let cursor = startOfDay(at);
   let streak = 0;
 

@@ -12,7 +12,7 @@ import { CustomStudyDialog } from "@/components/custom-study-dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { getDeckColorClass } from "@/lib/deck-colors";
-import { getDeckStats } from "@/lib/stats";
+import { getDeckStats, getDeckHealth } from "@/lib/stats";
 import { getLevel, getLevelTitle, levelProgress } from "@/lib/xp";
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
@@ -152,8 +152,11 @@ interface DeckCardProps {
 
 function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
   const cards = useRecallStore((state) => state.cards);
+  const reviewLogs = useRecallStore((state) => state.reviewLogs);
+  const leechThreshold = useRecallStore((state) => state.settings.leechThreshold);
   const stats = getDeckStats(deck, cards);
   const progress = stats.total === 0 ? 0 : Math.round((stats.mastered / stats.total) * 100);
+  const health = useMemo(() => getDeckHealth(deck.id, cards, reviewLogs, leechThreshold), [deck.id, cards, reviewLogs, leechThreshold]);
 
   // Exam countdown
   const examDays = useMemo(() => {
@@ -162,6 +165,8 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
     const deadline = new Date(deck.examDeadline);
     return Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
   }, [deck.examDeadline]);
+
+  const healthColor = health.retention >= 85 ? "text-emerald-500" : health.retention >= 70 ? "text-amber-500" : "text-red-500";
 
   return (
     <button
@@ -197,10 +202,30 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
         <Progress value={progress} />
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
+      <div className="mt-3 grid grid-cols-3 gap-2 text-sm">
         <Metric label="Due" value={stats.due} />
         <Metric label="Accuracy" value={`${stats.accuracy}%`} />
         <Metric label="Cards" value={stats.total} />
+      </div>
+
+      {/* Health row */}
+      <div className="mt-3 flex items-center gap-3 border-t pt-3 text-xs text-muted-foreground">
+        <span className={cn("flex items-center gap-1 font-medium", healthColor)}>
+          {health.retention}% retention
+        </span>
+        {health.leeches > 0 && (
+          <span className="flex items-center gap-1 text-amber-500">
+            ⚠️ {health.leeches} {health.leeches === 1 ? "leech" : "leeches"}
+          </span>
+        )}
+        {health.overdue > 0 && (
+          <span className="flex items-center gap-1 text-red-500">
+            {health.overdue} overdue
+          </span>
+        )}
+        {stats.newCards > 0 && (
+          <span className="text-muted-foreground">{stats.newCards} new</span>
+        )}
       </div>
     </button>
   );
