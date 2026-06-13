@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS cards (
   front TEXT NOT NULL,
   back TEXT NOT NULL,
   hint TEXT DEFAULT '',
+  source TEXT DEFAULT '',
   tags TEXT NOT NULL DEFAULT '[]',
   card_type TEXT NOT NULL DEFAULT 'basic',
   state TEXT NOT NULL DEFAULT 'new',

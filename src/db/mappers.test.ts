@@ -17,12 +17,13 @@ import type { Card, Deck, RecallSettings, ReviewLog, StudySession } from "@/type
 describe("database mappers", () => {
   it("round-trips card rows with JSON tags and nullable review date", () => {
     const card: Card = {
-          id: "card-1",
-          deckId: "deck-1",
-          front: "Question",
-          back: "Answer",
-          hint: "",
-          tags: ["sqlite", "tauri"],
+              id: "card-1",
+              deckId: "deck-1",
+              front: "Question",
+              back: "Answer",
+              hint: "",
+              source: "",
+              tags: ["sqlite", "tauri"],
           cardType: "basic",
           state: "new",
       stability: 0,
@@ -90,12 +91,13 @@ describe("database mappers", () => {
 
   it("rejects invalid card state and review rating rows", () => {
     const cardRow: CardRow = {
-          id: "card-1",
-          deck_id: "deck-1",
-          front: "Question",
-          back: "Answer",
-          hint: "",
-          tags: "[]",
+              id: "card-1",
+              deck_id: "deck-1",
+              front: "Question",
+              back: "Answer",
+              hint: "",
+              source: "",
+              tags: "[]",
           card_type: "basic",
           state: "bad",
       stability: 0,

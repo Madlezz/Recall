@@ -20,6 +20,7 @@ export interface CardInput {
   front: string;
   back: string;
   hint: string;
+  source: string;
   tags: string[];
 }
 
@@ -86,7 +87,8 @@ export const deckCardSlice = (
     const card: Card = {
       id: createId("card"), deckId: input.deckId,
       front: input.front.trim(), back: input.back.trim(),
-      hint: input.hint.trim(), tags: input.tags,
+      hint: input.hint.trim(), source: input.source.trim(),
+      tags: input.tags,
       cardType: hasCloze(input.front) ? "cloze" : "basic",
       state: "new", lastReviewDate: null, nextReviewDate: now,
       stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0,
@@ -107,7 +109,7 @@ export const deckCardSlice = (
     await persistSnapshot(set, {
       ...dataState(state),
       cards: state.cards.map((c: Card) =>
-        c.id === cardId ? { ...c, deckId: input.deckId, front: input.front.trim(), back: input.back.trim(), hint: input.hint.trim(), tags: input.tags, updatedAt: now } : c,
+        c.id === cardId ? { ...c, deckId: input.deckId, front: input.front.trim(), back: input.back.trim(), hint: input.hint.trim(), source: input.source.trim(), tags: input.tags, updatedAt: now } : c,
       ),
       decks: touchDeck(state.decks, input.deckId, now),
     });
@@ -125,7 +127,7 @@ export const deckCardSlice = (
   async moveCard(cardId: string, deckId: string) {
     const card = get().cards.find((c: Card) => c.id === cardId);
     if (!card || card.deckId === deckId) return;
-    await get().updateCard(cardId, { deckId, front: card.front, back: card.back, hint: card.hint, tags: card.tags });
+    await get().updateCard(cardId, { deckId, front: card.front, back: card.back, hint: card.hint, source: card.source, tags: card.tags });
   },
 
   async resetDeckProgress(deckId: string) {

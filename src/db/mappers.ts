@@ -17,6 +17,7 @@ export interface CardRow {
   front: string;
   back: string;
   hint: string;
+  source: string;
   tags: string;
   card_type: string;
   state: string;
@@ -90,12 +91,13 @@ export function cardFromRow(row: CardRow): Card {
   }
 
   return {
-      id: row.id,
-      deckId: row.deck_id,
-      front: row.front,
-      back: row.back,
-      hint: row.hint,
-      tags: parseTags(row.tags),
+        id: row.id,
+        deckId: row.deck_id,
+        front: row.front,
+        back: row.back,
+        hint: row.hint,
+        source: row.source ?? "",
+        tags: parseTags(row.tags),
       cardType: (row.card_type === "cloze" ? "cloze" : "basic") as CardType,
       state: row.state as CardState,
     lastReviewDate: row.last_review_date,
@@ -113,12 +115,13 @@ export function cardFromRow(row: CardRow): Card {
 
 export function cardToRow(card: Card): CardRow {
   return {
-      id: card.id,
-      deck_id: card.deckId,
-      front: card.front,
-      back: card.back,
-      hint: card.hint,
-      tags: JSON.stringify(card.tags),
+        id: card.id,
+        deck_id: card.deckId,
+        front: card.front,
+        back: card.back,
+        hint: card.hint,
+        source: card.source ?? "",
+        tags: JSON.stringify(card.tags),
       card_type: card.cardType,
       state: card.state,
     last_review_date: card.lastReviewDate,

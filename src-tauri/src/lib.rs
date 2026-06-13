@@ -220,10 +220,16 @@ fn migrations() -> Vec<Migration> {
             kind: MigrationKind::Up,
                     },
                     Migration {
-                        version: 3,
-                        description: "add_exam_deadline_to_decks",
-                        sql: "ALTER TABLE decks ADD COLUMN exam_deadline TEXT;",
-                        kind: MigrationKind::Up,
-                    },
-                ]
-            }
+                                version: 3,
+                                description: "add_exam_deadline_to_decks",
+                                sql: "ALTER TABLE decks ADD COLUMN exam_deadline TEXT;",
+                                kind: MigrationKind::Up,
+                            },
+                            Migration {
+                                version: 4,
+                                description: "add_source_to_cards",
+                                sql: "ALTER TABLE cards ADD COLUMN source TEXT DEFAULT '';",
+                                kind: MigrationKind::Up,
+                            },
+                        ]
+                    }

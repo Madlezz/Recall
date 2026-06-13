@@ -33,24 +33,26 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
   const [front, setFront] = useState(card?.front ?? "");
   const [back, setBack] = useState(card?.back ?? "");
   const [hint, setHint] = useState(card?.hint ?? "");
-  const [tags, setTags] = useState(card?.tags.join(", ") ?? "");
+    const [source, setSource] = useState(card?.source ?? "");
+    const [tags, setTags] = useState(card?.tags.join(", ") ?? "");
   const decks = useRecallStore((state) => state.decks);
   const createCard = useRecallStore((state) => state.createCard);
   const updateCard = useRecallStore((state) => state.updateCard);
 
   useEffect(() => {
-    if (open) {
-      setTargetDeckId(card?.deckId ?? deckId);
-      setFront(card?.front ?? "");
-      setBack(card?.back ?? "");
-      setHint(card?.hint ?? "");
-      setTags(card?.tags.join(", ") ?? "");
-    }
-  }, [card, deckId, open]);
+      if (open) {
+        setTargetDeckId(card?.deckId ?? deckId);
+        setFront(card?.front ?? "");
+        setBack(card?.back ?? "");
+        setHint(card?.hint ?? "");
+        setSource(card?.source ?? "");
+        setTags(card?.tags.join(", ") ?? "");
+      }
+    }, [card, deckId, open]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
-    const input = { deckId: targetDeckId, front, back, hint, tags: parseTags(tags) };
+    const input = { deckId: targetDeckId, front, back, hint, source, tags: parseTags(tags) };
 
     try {
       if (card) {
@@ -162,26 +164,36 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
             </Tabs>
 
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="hint-input">Hint (optional)</Label>
-                <Input
-                  id="hint-input"
-                  value={hint}
-                  onChange={(event) => setHint(event.target.value)}
-                  placeholder="A subtle clue"
-                />
-              </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="hint-input">Hint (optional)</Label>
+                            <Input
+                              id="hint-input"
+                              value={hint}
+                              onChange={(event) => setHint(event.target.value)}
+                              placeholder="A subtle clue"
+                            />
+                          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="tags-input">Tags (comma-separated)</Label>
-                <Input
-                  id="tags-input"
-                  value={tags}
-                  onChange={(event) => setTags(event.target.value)}
-                  placeholder="react, hooks, typescript"
-                />
-              </div>
-            </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="source-input">Source URL (optional)</Label>
+                            <Input
+                              id="source-input"
+                              value={source}
+                              onChange={(event) => setSource(event.target.value)}
+                              placeholder="https://..."
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="tags-input">Tags (comma-separated)</Label>
+                            <Input
+                              id="tags-input"
+                              value={tags}
+                              onChange={(event) => setTags(event.target.value)}
+                              placeholder="react, hooks, typescript"
+                            />
+                          </div>
+                        </div>
           </div>
 
           <DialogFooter>

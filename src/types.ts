@@ -20,6 +20,7 @@ export interface Card {
   front: string;
   back: string;
   hint: string;
+  source: string;
   tags: string[];
   cardType: CardType;
 
