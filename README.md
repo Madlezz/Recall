@@ -79,9 +79,9 @@ pnpm dev            # Browser-only preview
 
 ## Roadmap
 
-- [ ] Exam deadline mode — set a date, cards prioritize
-- [ ] Source-linked cards — attach references to your knowledge
-- [ ] Card quality checker — flag cards that need improvement
+- [x] Exam deadline mode — set a date, cards prioritize
+- [x] Source-linked cards — attach references to your knowledge
+- [x] Card quality checker — flag cards that need improvement
 - [x] Screenshots in README
 - [ ] Desktop notifications for reviews
 
