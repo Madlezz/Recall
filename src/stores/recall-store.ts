@@ -17,6 +17,7 @@ import {
 } from "@/lib/xp";
 import { ACHIEVEMENT_DEFS } from "@/types";
 import { getStudyStreak } from "@/lib/streak";
+import { sendDueReminder } from "@/services/notifications";
 import type {
   ActiveStudySession,
   AppView,
@@ -98,6 +99,14 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
       applyTheme(snapshot.settings.theme);
       const view = snapshot.settings.onboardingComplete ? "dashboard" : "onboarding";
       set({ ...snapshot, view, isLoading: false, isInitialized: true, error: null });
+
+      // Fire-and-forget: send due reminder notification if enabled
+      if (snapshot.settings.notificationsEnabled) {
+        const dueCount = snapshot.cards.filter((c: Card) => isCardDueToday(c)).length;
+        if (dueCount > 0) {
+          void sendDueReminder(dueCount);
+        }
+      }
     } catch (error) {
       set({
         isLoading: false, isInitialized: true,

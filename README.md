@@ -83,7 +83,7 @@ pnpm dev            # Browser-only preview
 - [x] Source-linked cards — attach references to your knowledge
 - [x] Card quality checker — flag cards that need improvement
 - [x] Screenshots in README
-- [ ] Desktop notifications for reviews
+- [x] Desktop notifications for reviews
 
 ---
 

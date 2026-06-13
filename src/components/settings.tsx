@@ -1,4 +1,4 @@
-import { Download, HardDrive, Layers, Moon, RotateCcw, Sun, Upload } from "lucide-react";
+import { Download, HardDrive, Layers, Moon, RotateCcw, Sun, Upload, Bell, BellOff } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -19,6 +19,7 @@ import { isTauriRuntime } from "@/db/client";
 import { parseImportPayload } from "@/services/import-export";
 import { openImportPayload, saveExportPayload } from "@/services/native-files";
 import { useRecallStore } from "@/stores/recall-store";
+import { sendTestNotification } from "@/services/notifications";
 import type { RecallExportPayload, Theme } from "@/types";
 
 type ImportMode = "merge" | "replace";
@@ -192,7 +193,31 @@ export function Settings(): JSX.Element {
                                           </div>
                                         </Panel>
 
-                        <Panel title="Import / Export" description="JSON only. Merge skips duplicates by deck name and card front.">
+                                                                <Panel title="Notifications" description="Desktop reminders when cards are due. Only works in the Tauri desktop app.">
+                                                                  <div className="flex items-center gap-3">
+                                                                    <Button
+                                                                      variant={settings.notificationsEnabled ? "default" : "outline"}
+                                                                      onClick={() => void updateSettings({ notificationsEnabled: !settings.notificationsEnabled })}
+                                                                    >
+                                                                      {settings.notificationsEnabled ? (
+                                                                        <><Bell className="h-4 w-4" /> Enabled</>
+                                                                      ) : (
+                                                                        <><BellOff className="h-4 w-4" /> Disabled</>
+                                                                      )}
+                                                                    </Button>
+                                                                    {settings.notificationsEnabled ? (
+                                                                      <Button variant="outline" size="sm" onClick={async () => {
+                                                                        const ok = await sendTestNotification();
+                                                                        if (ok) toast.success("Test notification sent!");
+                                                                        else toast.error("Notifications not available (browser mode or permission denied)");
+                                                                      }}>
+                                                                        Test
+                                                                      </Button>
+                                                                    ) : null}
+                                                                  </div>
+                                                                </Panel>
+
+                                                                <Panel title="Import / Export" description="JSON only. Merge skips duplicates by deck name and card front.">
           <div className="grid gap-3 sm:grid-cols-[160px_1fr_1fr]">
             <Select value={importMode} onValueChange={(value) => setImportMode(value as ImportMode)}>
               <SelectTrigger>

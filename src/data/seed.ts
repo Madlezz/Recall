@@ -73,15 +73,16 @@ export function createSeedSnapshot(now = new Date()): RecallStateSnapshot {
     studySessions,
     reviewLogs,
     settings: {
-      theme: "dark",
-      seededAt: ISO(today),
-      dailyNewCardLimit: 20,
-      leechThreshold: 5,
-      onboardingComplete: false,
-      xp: 0,
-      achievements: [],
-      dailyGoal: 20,
-    },
+          theme: "dark",
+          seededAt: ISO(today),
+          dailyNewCardLimit: 20,
+          leechThreshold: 5,
+          onboardingComplete: false,
+          xp: 0,
+          achievements: [],
+          dailyGoal: 20,
+          notificationsEnabled: false,
+        },
   };
 }
 

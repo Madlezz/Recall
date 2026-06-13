@@ -63,10 +63,11 @@ const validSnapshot: RecallStateSnapshot = {
       dailyNewCardLimit: 20,
       leechThreshold: 5,
       onboardingComplete: false,
-      xp: 0,
-      achievements: [],
-      dailyGoal: 20,
-    },
+            xp: 0,
+            achievements: [],
+            dailyGoal: 20,
+            notificationsEnabled: false,
+          },
 };
 
 describe("validateImportSnapshot", () => {

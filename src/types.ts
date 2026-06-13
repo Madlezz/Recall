@@ -67,6 +67,7 @@ export interface RecallSettings {
   xp: number;
   achievements: Achievement[];
   dailyGoal: number;
+  notificationsEnabled: boolean;
 }
 
 export interface SessionSummary {

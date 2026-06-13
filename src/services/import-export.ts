@@ -23,17 +23,18 @@ export function exportDeckToJson(deck: Deck, cards: Card[]): string {
     studySessions: [],
     reviewLogs: [],
     settings: {
-      theme: "dark" as const,
-      seededAt: new Date().toISOString(),
-      dailyNewCardLimit: 20,
-      leechThreshold: 5,
-      onboardingComplete: false,
-      xp: 0,
-      achievements: [],
-      dailyGoal: 20,
-    }
-  };
-  return JSON.stringify(payload, null, 2);
+          theme: "dark" as const,
+          seededAt: new Date().toISOString(),
+          dailyNewCardLimit: 20,
+          leechThreshold: 5,
+          onboardingComplete: false,
+          xp: 0,
+          achievements: [],
+          dailyGoal: 20,
+          notificationsEnabled: false,
+        },
+      };
+      return JSON.stringify(payload, null, 2);
 }
 
 export function downloadFile(filename: string, content: string): void {

@@ -77,10 +77,11 @@ describe("database mappers", () => {
               dailyNewCardLimit: 20,
               leechThreshold: 5,
               onboardingComplete: true,
-              xp: 0,
-              achievements: [],
-              dailyGoal: 20,
-            };
+                            xp: 0,
+                            achievements: [],
+                            dailyGoal: 20,
+                            notificationsEnabled: false,
+                          };
 
     expect(deckFromRow(deckToRow(deck) as DeckRow)).toEqual(deck);
     expect(studySessionFromRow(studySessionToRow(session) as StudySessionRow)).toEqual(session);

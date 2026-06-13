@@ -201,15 +201,16 @@ export function settingsFromRows(rows: SettingRow[]): RecallSettings {
   } catch { /* keep empty */ }
 
   return {
-    theme,
-    seededAt: values.get("seeded_at") ?? new Date(0).toISOString(),
-    dailyNewCardLimit: dailyNewCardLimitRaw ? parseInt(dailyNewCardLimitRaw, 10) : 20,
-    leechThreshold: leechThresholdRaw ? parseInt(leechThresholdRaw, 10) : 5,
-    onboardingComplete: values.get("onboarding_complete") !== "false",
-    xp: xpRaw ? parseInt(xpRaw, 10) : 0,
-    achievements,
-    dailyGoal: dailyGoalRaw ? parseInt(dailyGoalRaw, 10) : 20,
-  };
+      theme,
+      seededAt: values.get("seeded_at") ?? new Date(0).toISOString(),
+      dailyNewCardLimit: dailyNewCardLimitRaw ? parseInt(dailyNewCardLimitRaw, 10) : 20,
+      leechThreshold: leechThresholdRaw ? parseInt(leechThresholdRaw, 10) : 5,
+      onboardingComplete: values.get("onboarding_complete") !== "false",
+      xp: xpRaw ? parseInt(xpRaw, 10) : 0,
+      achievements,
+      dailyGoal: dailyGoalRaw ? parseInt(dailyGoalRaw, 10) : 20,
+      notificationsEnabled: values.get("notifications_enabled") === "true",
+    };
 }
 
 export function settingsToRows(settings: RecallSettings): SettingRow[] {
@@ -221,9 +222,10 @@ export function settingsToRows(settings: RecallSettings): SettingRow[] {
     { key: "leech_threshold", value: String(settings.leechThreshold) },
     { key: "onboarding_complete", value: String(settings.onboardingComplete) },
     { key: "xp", value: String(settings.xp) },
-    { key: "achievements", value: JSON.stringify(settings.achievements) },
-    { key: "daily_goal", value: String(settings.dailyGoal) },
-  ];
+        { key: "achievements", value: JSON.stringify(settings.achievements) },
+        { key: "daily_goal", value: String(settings.dailyGoal) },
+        { key: "notifications_enabled", value: String(settings.notificationsEnabled) },
+      ];
 }
 
 function parseTags(raw: string): string[] {
