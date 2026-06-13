@@ -62,7 +62,7 @@
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
-    "drizzle-kit": "^0.31.10",
+    "drizzle-kit": "1.0.0-rc.4-ca0f029",
     "eslint": "^9.17.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.16",
@@ -72,6 +72,6 @@
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.2",
     "vite": "^6.0.5",
-    "vitest": "^2.1.8"
+    "vitest": "^4.1.8"
   }
 }
