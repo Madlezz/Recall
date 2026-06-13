@@ -1,31 +1,13 @@
 import { ArrowUpDown, ExternalLink, Filter, Search, Tag, X } from "lucide-react";
-import { useMemo, useState } from "react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmAction } from "@/components/confirm-action";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { useCardBrowser, type SortField, type SortDir, STATE_LABELS, STATE_COLORS } from "./use-card-browser";
 import { useRecallStore } from "@/stores/recall-store";
-import type { CardState, Deck } from "@/types";
-
-type SortField = "front" | "deck" | "state" | "nextReview" | "lapses" | "created";
-type SortDir = "asc" | "desc";
-
-const STATE_LABELS: Record<CardState, string> = {
-  new: "New",
-  learning: "Learning",
-  review: "Review",
-  relearning: "Relearning",
-};
-
-const STATE_COLORS: Record<CardState, string> = {
-  new: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
-  learning: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
-  review: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
-  relearning: "bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300",
-};
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
@@ -38,132 +20,68 @@ function formatDate(iso: string): string {
   return `in ${diffDays}d`;
 }
 
+interface SortHeaderProps {
+  field: SortField;
+  label: string;
+  current: SortField;
+  dir: SortDir;
+  onClick: (field: SortField) => void;
+}
+
+function SortHeader({ field, label, current, dir, onClick }: SortHeaderProps): JSX.Element {
+  const active = current === field;
+  return (
+    <th
+      className={cn(
+        "cursor-pointer select-none px-3 py-2 text-left text-xs font-medium transition-colors hover:text-foreground",
+        active ? "text-foreground" : "text-muted-foreground",
+      )}
+      onClick={() => onClick(field)}
+    >
+      <span className="inline-flex items-center gap-1">
+        {label}
+        {active ? (
+          <ArrowUpDown className={cn("h-3 w-3", dir === "desc" && "rotate-180")} />
+        ) : (
+          <ArrowUpDown className="h-3 w-3 opacity-30" />
+        )}
+      </span>
+    </th>
+  );
+}
+
 export function CardBrowser(): JSX.Element {
-  const cards = useRecallStore((s) => s.cards);
-  const decks = useRecallStore((s) => s.decks);
+  const {
+    cards,
+    decks,
+    deckMap,
+    filtered,
+    search,
+    deckFilter,
+    stateFilter,
+    sortField,
+    sortDir,
+    selected,
+    bulkTagInput,
+    bulkTagMode,
+    showBulkTag,
+    setSearch,
+    setDeckFilter,
+    setStateFilter,
+    toggleSelect,
+    selectAll,
+    clearSelection,
+    handleSort,
+    clearFilters,
+    setBulkTagInput,
+    setBulkTagMode,
+    setShowBulkTag,
+    deleteCard,
+    moveCard,
+    updateCard,
+  } = useCardBrowser();
   const showDeck = useRecallStore((s) => s.showDeck);
-  const deleteCard = useRecallStore((s) => s.deleteCard);
-  const moveCard = useRecallStore((s) => s.moveCard);
-  const updateCard = useRecallStore((s) => s.updateCard);
 
-  // ── Filters & sort ──
-  const [search, setSearch] = useState("");
-  const [deckFilter, setDeckFilter] = useState<string>("all");
-  const [stateFilter, setStateFilter] = useState<string>("all");
-  const [sortField, setSortField] = useState<SortField>("nextReview");
-  const [sortDir, setSortDir] = useState<SortDir>("asc");
-
-  // ── Selection ──
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [lastClicked, setLastClicked] = useState<string | null>(null);
-
-  // ── Bulk tag dialog state ──
-  const [bulkTagInput, setBulkTagInput] = useState("");
-  const [bulkTagMode, setBulkTagMode] = useState<"add" | "set" | "remove">("add");
-  const [showBulkTag, setShowBulkTag] = useState(false);
-
-  const deckMap = useMemo(() => {
-    const map = new Map<string, Deck>();
-    for (const d of decks) map.set(d.id, d);
-    return map;
-  }, [decks]);
-
-  const _allTags = useMemo(() => {
-    const set = new Set<string>();
-    for (const c of cards) for (const t of c.tags) set.add(t);
-    return [...set].sort();
-  }, [cards]);
-
-  // ── Filter & sort ──
-  const filtered = useMemo(() => {
-    let result = [...cards];
-
-    const q = search.toLowerCase().trim();
-    if (q) {
-      result = result.filter(
-        (c) =>
-          c.front.toLowerCase().includes(q) ||
-          c.back.toLowerCase().includes(q) ||
-          c.hint.toLowerCase().includes(q) ||
-          c.tags.some((t) => t.toLowerCase().includes(q)),
-      );
-    }
-
-    if (deckFilter !== "all") {
-      result = result.filter((c) => c.deckId === deckFilter);
-    }
-
-    if (stateFilter !== "all") {
-      result = result.filter((c) => c.state === stateFilter);
-    }
-
-    result.sort((a, b) => {
-      let cmp = 0;
-      switch (sortField) {
-        case "front":
-          cmp = a.front.localeCompare(b.front);
-          break;
-        case "deck": {
-          const da = deckMap.get(a.deckId)?.name ?? "";
-          const db = deckMap.get(b.deckId)?.name ?? "";
-          cmp = da.localeCompare(db);
-          break;
-        }
-        case "state":
-          cmp = a.state.localeCompare(b.state);
-          break;
-        case "nextReview":
-          cmp = a.nextReviewDate.localeCompare(b.nextReviewDate);
-          break;
-        case "lapses":
-          cmp = a.lapses - b.lapses;
-          break;
-        case "created":
-          cmp = a.createdAt.localeCompare(b.createdAt);
-          break;
-      }
-      return sortDir === "asc" ? cmp : -cmp;
-    });
-
-    return result;
-  }, [cards, search, deckFilter, stateFilter, sortField, sortDir, deckMap]);
-
-  // ── Selection helpers ──
-  function toggleSelect(cardId: string, shiftKey: boolean) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (shiftKey && lastClicked) {
-        // Range select
-        const visible = filtered.map((c) => c.id);
-        const start = visible.indexOf(lastClicked);
-        const end = visible.indexOf(cardId);
-        if (start !== -1 && end !== -1) {
-          const [from, to] = start < end ? [start, end] : [end, start];
-          for (let i = from; i <= to; i++) next.add(visible[i]);
-        }
-      } else if (next.has(cardId)) {
-        next.delete(cardId);
-      } else {
-        next.add(cardId);
-      }
-      return next;
-    });
-    setLastClicked(cardId);
-  }
-
-  function selectAll() {
-    if (selected.size === filtered.length) {
-      setSelected(new Set());
-    } else {
-      setSelected(new Set(filtered.map((c) => c.id)));
-    }
-  }
-
-  function clearSelection() {
-    setSelected(new Set());
-  }
-
-  // ── Bulk actions ──
   async function bulkDelete() {
     const ids = [...selected];
     for (const id of ids) {
@@ -214,18 +132,10 @@ export function CardBrowser(): JSX.Element {
         } else if (bulkTagMode === "set") {
           newTags = tags;
         } else {
-          // remove
           const removeSet = new Set(tags);
           newTags = card.tags.filter((t) => !removeSet.has(t));
         }
-        await updateCard(id, {
-          deckId: card.deckId,
-          front: card.front,
-          back: card.back,
-          hint: card.hint,
-          source: card.source,
-          tags: newTags,
-        });
+        await updateCard(id, { deckId: card.deckId, front: card.front, back: card.back, hint: card.hint, source: card.source, tags: newTags });
         updated++;
       } catch {
         // skip
@@ -237,15 +147,6 @@ export function CardBrowser(): JSX.Element {
     setBulkTagInput("");
     setBulkTagMode("add");
     clearSelection();
-  }
-
-  function handleSort(field: SortField) {
-    if (sortField === field) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    } else {
-      setSortField(field);
-      setSortDir("asc");
-    }
   }
 
   return (
@@ -281,9 +182,7 @@ export function CardBrowser(): JSX.Element {
           <SelectContent>
             <SelectItem value="all">All decks</SelectItem>
             {decks.map((d) => (
-              <SelectItem key={d.id} value={d.id}>
-                {d.name}
-              </SelectItem>
+              <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -302,15 +201,7 @@ export function CardBrowser(): JSX.Element {
         </Select>
 
         {(search || deckFilter !== "all" || stateFilter !== "all") && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setSearch("");
-              setDeckFilter("all");
-              setStateFilter("all");
-            }}
-          >
+          <Button variant="ghost" size="sm" onClick={clearFilters}>
             <X className="mr-1 h-3.5 w-3.5" />
             Clear
           </Button>
@@ -337,9 +228,7 @@ export function CardBrowser(): JSX.Element {
               </SelectTrigger>
               <SelectContent>
                 {decks.map((d) => (
-                  <SelectItem key={d.id} value={d.id}>
-                    {d.name}
-                  </SelectItem>
+                  <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -347,9 +236,7 @@ export function CardBrowser(): JSX.Element {
             {showBulkTag ? (
               <div className="flex items-center gap-1">
                 <Select value={bulkTagMode} onValueChange={(v) => setBulkTagMode(v as "add" | "set" | "remove")}>
-                  <SelectTrigger className="h-8 w-20 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger className="h-8 w-20 text-xs"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="add">Add</SelectItem>
                     <SelectItem value="set">Set</SelectItem>
@@ -363,31 +250,20 @@ export function CardBrowser(): JSX.Element {
                   className="h-8 w-40 text-xs"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") void applyBulkTags();
-                    if (e.key === "Escape") {
-                      setShowBulkTag(false);
-                      setBulkTagInput("");
-                    }
+                    if (e.key === "Escape") { setShowBulkTag(false); setBulkTagInput(""); }
                   }}
                   autoFocus
                 />
-                <Button size="sm" variant="ghost" onClick={() => void applyBulkTags()}>
-                  Apply
-                </Button>
+                <Button size="sm" variant="ghost" onClick={() => void applyBulkTags()}>Apply</Button>
               </div>
             ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowBulkTag(true)}
-              >
-                <Tag className="mr-1 h-3.5 w-3.5" />
-                Tag
+              <Button variant="outline" size="sm" onClick={() => setShowBulkTag(true)}>
+                <Tag className="mr-1 h-3.5 w-3.5" /> Tag
               </Button>
             )}
 
             <Button variant="ghost" size="sm" onClick={clearSelection}>
-              <X className="mr-1 h-3.5 w-3.5" />
-              Clear
+              <X className="mr-1 h-3.5 w-3.5" /> Clear
             </Button>
           </div>
         </div>
@@ -429,13 +305,7 @@ export function CardBrowser(): JSX.Element {
                 const deck = deckMap.get(card.deckId);
                 const isSelected = selected.has(card.id);
                 return (
-                  <tr
-                    key={card.id}
-                    className={cn(
-                      "border-b transition-colors hover:bg-muted/30",
-                      isSelected && "bg-primary/5",
-                    )}
-                  >
+                  <tr key={card.id} className={cn("border-b transition-colors hover:bg-muted/30", isSelected && "bg-primary/5")}>
                     <td className="px-3 py-2">
                       <input
                         type="checkbox"
@@ -450,29 +320,18 @@ export function CardBrowser(): JSX.Element {
                     </td>
                     <td className="px-3 py-2 whitespace-nowrap">
                       {deck ? (
-                        <button
-                          className="text-primary hover:underline text-xs"
-                          onClick={() => showDeck(deck.id)}
-                        >
+                        <button className="text-primary hover:underline text-xs" onClick={() => showDeck(deck.id)}>
                           {deck.name}
                         </button>
                       ) : (
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
                     </td>
-                    <td className="px-3 py-2 whitespace-nowrap">
-                      <Badge tone="warning" className={cn("text-xs", STATE_COLORS[card.state])}>
-                        {STATE_LABELS[card.state]}
-                      </Badge>
-                    </td>
-                    <td className="px-3 py-2 whitespace-nowrap text-xs text-muted-foreground">
-                      {formatDate(card.nextReviewDate)}
-                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap"><Badge tone="warning" className={cn("text-xs", STATE_COLORS[card.state])}>{STATE_LABELS[card.state]}</Badge></td>
+                    <td className="px-3 py-2 whitespace-nowrap text-xs text-muted-foreground">{formatDate(card.nextReviewDate)}</td>
                     <td className="px-3 py-2 whitespace-nowrap text-xs">
                       {card.lapses > 0 ? (
-                        <span className={card.lapses >= 5 ? "font-semibold text-destructive" : "text-muted-foreground"}>
-                          {card.lapses}
-                        </span>
+                        <span className={card.lapses >= 5 ? "font-semibold text-destructive" : "text-muted-foreground"}>{card.lapses}</span>
                       ) : (
                         <span className="text-muted-foreground">0</span>
                       )}
@@ -480,19 +339,15 @@ export function CardBrowser(): JSX.Element {
                     <td className="px-3 py-2">
                       <div className="flex flex-wrap gap-1">
                         {card.tags.slice(0, 3).map((tag) => (
-                          <Badge key={tag} tone="muted" className="text-xs">
-                            {tag}
-                          </Badge>
+                          <Badge key={tag} tone="muted" className="text-xs">{tag}</Badge>
                         ))}
-                        {card.tags.length > 3 && (
-                          <span className="text-xs text-muted-foreground">+{card.tags.length - 3}</span>
-                        )}
+                        {card.tags.length > 3 && <span className="text-xs text-muted-foreground">+{card.tags.length - 3}</span>}
                       </div>
                     </td>
                     <td className="px-3 py-2">
                       <button
                         className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
-                        onClick={() => showDeck(card.deckId)}
+                        onClick={() => showDeck?.(card.deckId)}
                         title="Open deck"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
@@ -506,37 +361,5 @@ export function CardBrowser(): JSX.Element {
         </table>
       </div>
     </div>
-  );
-}
-
-// ── Sortable header ──
-
-interface SortHeaderProps {
-  field: SortField;
-  label: string;
-  current: SortField;
-  dir: SortDir;
-  onClick: (field: SortField) => void;
-}
-
-function SortHeader({ field, label, current, dir, onClick }: SortHeaderProps): JSX.Element {
-  const active = current === field;
-  return (
-    <th
-      className={cn(
-        "cursor-pointer select-none px-3 py-2 text-left text-xs font-medium transition-colors hover:text-foreground",
-        active ? "text-foreground" : "text-muted-foreground",
-      )}
-      onClick={() => onClick(field)}
-    >
-      <span className="inline-flex items-center gap-1">
-        {label}
-        {active ? (
-          <ArrowUpDown className={cn("h-3 w-3", dir === "desc" && "rotate-180")} />
-        ) : (
-          <ArrowUpDown className="h-3 w-3 opacity-30" />
-        )}
-      </span>
-    </th>
   );
 }
