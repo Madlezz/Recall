@@ -1,8 +1,16 @@
 # Recall
 
+[![CI](https://github.com/Madlezz/Recall/actions/workflows/ci.yml/badge.svg)](https://github.com/Madlezz/Recall/actions/workflows/ci.yml)
+
 > *Beautiful flashcards that live on your computer. No cloud, no account, no nonsense.*
 
 **Recall** is a desktop flashcard app built for focused learning. It uses FSRS-based scheduling for modern spaced repetition — but you just open it and start reviewing. Your data stays on your machine, always.
+
+---
+
+## Screenshots
+
+> *Coming soon — in the meantime, clone and run `pnpm tauri dev` to see it live.*
 
 ---
 
@@ -62,6 +70,16 @@ pnpm dev            # Browser-only preview
 | `Ctrl+N` | Quick-add card |
 | `Ctrl+Z` | Undo last review |
 | `?` | Show all shortcuts |
+
+---
+
+## Roadmap
+
+- [ ] Exam deadline mode — set a date, cards prioritize
+- [ ] Source-linked cards — attach references to your knowledge
+- [ ] Card quality checker — flag cards that need improvement
+- [ ] Screenshots in README
+- [ ] Desktop notifications for reviews
 
 ---
 
