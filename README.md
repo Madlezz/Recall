@@ -1,10 +1,32 @@
 # Recall
 
 [![CI](https://github.com/Madlezz/Recall/actions/workflows/ci.yml/badge.svg)](https://github.com/Madlezz/Recall/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Madlezz/Recall)](https://github.com/Madlezz/Recall/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)](https://github.com/Madlezz/Recall/releases/latest)
 
 > *Beautiful flashcards that live on your computer. No cloud, no account, no nonsense.*
 
 **Recall** is a desktop flashcard app built for focused learning. It uses FSRS-based scheduling for modern spaced repetition — but you just open it and start reviewing. Your data stays on your machine, always.
+
+---
+
+## Why Recall?
+
+| | Recall | Anki | RemNote / Mochi |
+|---|---|---|---|
+| Algorithm | **FSRS** (2023, state-of-art) | SM-2 (1987) | Proprietary |
+| Storage | **Local SQLite** | Local (custom format) | Cloud |
+| Account required | **No** | No | Yes |
+| Open source | **Yes** (MIT) | Yes (AGPL) | No |
+| Native desktop | **Yes** (Tauri, Rust) | Yes (Qt, Python) | Electron |
+| Stack | **React + TypeScript** | Python + Qt | React |
+
+Anki pioneered spaced repetition and has an enormous card ecosystem, but its codebase is
+15+ years old and difficult to extend. Cloud alternatives like RemNote require accounts and
+subscriptions. Recall fills the gap: a **modern, open-source, privacy-first** desktop app
+that implements FSRS — the current scientific standard for spaced repetition — on a maintainable,
+contributor-friendly TypeScript stack.
 
 ---
 
@@ -25,6 +47,9 @@
 - **Cloze deletion** — `{{c1::hidden text}}` fill-in-the-blank cards
 - **Rich cards** — Markdown, LaTeX, syntax-highlighted code blocks
 - **Anki import** — bring your `.apkg` decks
+- **CSV import** — upload a spreadsheet, map columns
+- **Custom study** — deck, count, tag filter, new-only
+- **Card browser** — search, filter, sort, bulk tag/delete/move
 - Keyboard-first: `Space` reveal, `1`–`4` rate, `R` to start review, `Ctrl+N` quick-add
 
 ### 🎮 Stay Motivated
@@ -32,18 +57,17 @@
 - **Achievements** — 14 milestones (streaks, volume, accuracy, time-based)
 - **Daily goal** — set a target, watch the progress bar, confetti on completion
 - **Session summaries** — ratings breakdown, XP earned, achievement unlocks
-- **Confetti celebrations** — level-ups, achievements, goal hits, good accuracy
 
 ### 🧘 Study Tools
 - **Focus timer** — Pomodoro with 15/25/45m presets
-- **Ambient soundscapes** — Rain, Cafe, Lofi (all synthesized locally, zero files)
+- **Ambient soundscapes** — Rain, Cafe, Lofi (synthesized locally, zero files)
 - **Match game** — turn cards into a tile-matching puzzle
 - **Review calendar** — month grid showing study activity heatmap
 - **Sound effects** — card flip, correct/incorrect feedback, level-up fanfares
 
 ### 📊 Analytics
 - **Stats dashboard** — review volume, rating distribution, time-of-day patterns
-- **Top decks** — see which topics get the most reviews
+- **Deck health** — retention %, leeches, overdue per deck
 - **Activity heatmap** — GitHub-style contribution graph
 
 ### 🔒 Privacy First
@@ -59,8 +83,23 @@
 pnpm install
 pnpm tauri dev       # Full desktop app
 # or
-pnpm dev            # Browser-only preview
+pnpm dev             # Browser-only preview
 ```
+
+---
+
+## Download
+
+Pre-built binaries are available on the [Releases page](https://github.com/Madlezz/Recall/releases/latest):
+
+| Platform | File |
+|----------|------|
+| Windows | `Recall_1.0.0_x64-setup.exe` or `.msi` |
+| macOS (Apple Silicon) | `Recall_1.0.0_aarch64.dmg` |
+| macOS (Intel) | `Recall_1.0.0_x64.dmg` |
+| Linux | `Recall_1.0.0_amd64.AppImage` |
+
+Or build from source — see [Quick Start](#quick-start).
 
 ---
 
@@ -71,6 +110,8 @@ pnpm dev            # Browser-only preview
 | `Space` | Reveal answer |
 | `1`–`4` | Rate Again / Hard / Good / Easy |
 | `R` | Start review |
+| `B` | Bury card |
+| `S` | Snooze card |
 | `Ctrl+N` | Quick-add card |
 | `Ctrl+Z` | Undo last review |
 | `?` | Show all shortcuts |
@@ -91,6 +132,18 @@ pnpm dev            # Browser-only preview
 - [x] Keyboard shortcuts — B (bury), S (snooze) + elapsed timer in study
 - [x] Sound volume slider — master gain for effects, chimes, soundscapes
 - [x] Bulk tag management — add, set, or remove tags on selected cards
+
+---
+
+## Contributing
+
+Recall is open to contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions,
+project structure, and code style guidelines.
+
+**Looking for a place to start?**
+- Browse [`good first issue`](https://github.com/Madlezz/Recall/labels/good%20first%20issue) tags
+- Check the roadmap above for planned features
+- Open an issue to discuss before opening a large PR
 
 ---
 
