@@ -59,7 +59,7 @@ type RecallStore = RecallStateSnapshot &
     buryCard: () => void;
     snoozeCard: (minutes: number) => Promise<void>;
     answerCurrentCard: (result: ReviewRating) => Promise<void>;
-    undoLastReview: () => Promise<void>;
+    undoLastReview: () => Promise<boolean>;
     exitStudy: () => Promise<void>;
     clearSessionSummary: () => void;
     resetData: () => Promise<void>;
@@ -304,32 +304,33 @@ export const useRecallStore = create<RecallStore>((set: any, get: any) => ({
   },
 
   async undoLastReview() {
-    const state = get();
-    const active = state.activeStudy;
-    if (!active || active.completed || active.currentIndex === 0 || !active.previousCardState) return;
+      const state = get();
+      const active = state.activeStudy;
+      if (!active || active.completed || active.currentIndex === 0 || !active.previousCardState) return false;
 
-    const previousCard = active.previousCardState;
-    const cardId = previousCard.id;
-    const previousIndex = active.currentIndex - 1;
-    const previousCardId = active.cardIds[previousIndex];
-    const previousReviewLog = state.reviewLogs.find((l: ReviewLog) => l.cardId === previousCardId);
-    const ratingToDecrement = previousReviewLog?.rating ?? "good";
-    const xpToDeduct = REVIEW_XP[ratingToDecrement] ?? 0;
+      const previousCard = active.previousCardState;
+      const cardId = previousCard.id;
+      const previousIndex = active.currentIndex - 1;
+      const previousCardId = active.cardIds[previousIndex];
+      const previousReviewLog = state.reviewLogs.find((l: ReviewLog) => l.cardId === previousCardId);
+      const ratingToDecrement = previousReviewLog?.rating ?? "good";
+      const xpToDeduct = REVIEW_XP[ratingToDecrement] ?? 0;
 
-    const nextRatings = { ...active.ratings, [ratingToDecrement]: Math.max(0, active.ratings[ratingToDecrement] - 1) };
-    const nextActiveStudy: ActiveStudySession = {
-      ...active, currentIndex: previousIndex, revealed: false, ratings: nextRatings, previousCardState: null,
-      sessionXp: Math.max(0, active.sessionXp - xpToDeduct),
-      newCardsCount: previousCard.state === "new" ? Math.max(0, active.newCardsCount - 1) : active.newCardsCount,
-    };
+      const nextRatings = { ...active.ratings, [ratingToDecrement]: Math.max(0, active.ratings[ratingToDecrement] - 1) };
+      const nextActiveStudy: ActiveStudySession = {
+        ...active, currentIndex: previousIndex, revealed: false, ratings: nextRatings, previousCardState: null,
+        sessionXp: Math.max(0, active.sessionXp - xpToDeduct),
+        newCardsCount: previousCard.state === "new" ? Math.max(0, active.newCardsCount - 1) : active.newCardsCount,
+      };
 
-    const snapshot: RecallStateSnapshot = {
-      decks: state.decks, cards: state.cards.map((c: Card) => (c.id === cardId ? previousCard : c)),
-      studySessions: state.studySessions, reviewLogs: state.reviewLogs.filter((l: ReviewLog) => l.cardId !== previousCardId),
-      settings: state.settings,
-    };
-    await persistReviewSnapshot(set, snapshot, { activeStudy: nextActiveStudy });
-  },
+      const snapshot: RecallStateSnapshot = {
+        decks: state.decks, cards: state.cards.map((c: Card) => (c.id === cardId ? previousCard : c)),
+        studySessions: state.studySessions, reviewLogs: state.reviewLogs.filter((l: ReviewLog) => l.cardId !== previousCardId),
+        settings: state.settings,
+      };
+      await persistReviewSnapshot(set, snapshot, { activeStudy: nextActiveStudy });
+      return true;
+    },
 
   async exitStudy() {
     const state = get();

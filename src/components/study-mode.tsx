@@ -46,9 +46,12 @@ export function StudyMode(): JSX.Element {
       }
 
       if (event.ctrlKey && event.key === "z" && !activeStudy.revealed && activeStudy.currentIndex > 0) {
-              event.preventDefault();
-              void undoLastReview().then(() => toast.info("Review undone"));
-              return;
+                    event.preventDefault();
+                    void undoLastReview().then((didUndo) => {
+                      if (didUndo) toast.info("Review undone");
+                      else toast.info("Nothing to undo");
+                    });
+                    return;
             }
 
             // B = bury, S = snooze (only before reveal)
@@ -264,7 +267,10 @@ export function StudyMode(): JSX.Element {
 
       <footer className="flex flex-wrap items-center justify-center gap-3 pb-4">
         {activeStudy.revealed === false && activeStudy.currentIndex > 0 ? (
-          <Button variant="outline" size="lg" onClick={() => void undoLastReview().then(() => toast.info("Review undone"))}>
+          <Button variant="outline" size="lg" onClick={() => void undoLastReview().then((didUndo) => {
+            if (didUndo) toast.info("Review undone");
+            else toast.info("Nothing to undo");
+          })}>
             <RotateCcw className="h-4 w-4" />
             Undo
           </Button>
