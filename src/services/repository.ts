@@ -308,7 +308,22 @@ function exportPayloadToSnapshot(payload: RecallExportPayload): RecallStateSnaps
     cards: payload.cards,
     studySessions: payload.studySessions,
     reviewLogs: payload.reviewLogs,
-    settings: payload.settings,
+    settings: migrateSettings(payload.settings),
+  };
+}
+
+function migrateSettings(settings: Partial<RecallStateSnapshot["settings"]> & { theme: string; seededAt: string }): RecallStateSnapshot["settings"] {
+  return {
+    theme: (settings.theme === "dark" || settings.theme === "light") ? settings.theme : "dark",
+    seededAt: settings.seededAt,
+    dailyNewCardLimit: typeof settings.dailyNewCardLimit === "number" ? settings.dailyNewCardLimit : 20,
+    leechThreshold: typeof settings.leechThreshold === "number" ? settings.leechThreshold : 5,
+    onboardingComplete: typeof settings.onboardingComplete === "boolean" ? settings.onboardingComplete : false,
+    xp: typeof settings.xp === "number" ? settings.xp : 0,
+    achievements: Array.isArray(settings.achievements) ? settings.achievements : [],
+    dailyGoal: typeof settings.dailyGoal === "number" ? settings.dailyGoal : 20,
+    notificationsEnabled: typeof settings.notificationsEnabled === "boolean" ? settings.notificationsEnabled : false,
+    soundVolume: typeof settings.soundVolume === "number" ? settings.soundVolume : 100,
   };
 }
 

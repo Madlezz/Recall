@@ -7,7 +7,7 @@ let ctx: AudioContext | null = null;
 let _masterVolume = 1.0; // 0.0 - 1.0
 
 export function setMasterVolume(volume: number): void {
-  _masterVolume = Math.max(0, Math.min(1, volume));
+  _masterVolume = Number.isFinite(volume) ? Math.max(0, Math.min(1, volume)) : 1.0;
 }
 
 export function getMasterVolume(): number {
