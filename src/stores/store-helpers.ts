@@ -2,7 +2,7 @@ import { applyTheme } from "@/services/storage";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getRecallRepository, type RecallRepository } from "@/services/repository";
 import { normalizeName } from "@/lib/utils";
-import type { Deck, RecallStateSnapshot } from "@/types";
+import type { Card, Deck, RecallStateSnapshot, ReviewLog, StudySession } from "@/types";
 
 let repositoryPromise: Promise<RecallRepository> | null = null;
 
@@ -28,6 +28,25 @@ export async function persistSnapshot(
 ): Promise<void> {
   const repository = await getRepository();
   await repository.saveSnapshot(snapshot);
+  applyTheme(snapshot.settings.theme);
+  set({ ...snapshot, ...extra, error: null });
+}
+
+/**
+ * Persist a single card review to the database using targeted UPDATE + INSERT.
+ * Much faster than saveSnapshot which does DELETE ALL + INSERT ALL.
+ * Also updates Zustand state with the full snapshot for UI reactivity.
+ */
+export async function persistReviewDelta(
+  set: (partial: any) => void,
+  snapshot: RecallStateSnapshot,
+  updatedCard: Card,
+  reviewLog: ReviewLog,
+  session: StudySession | null,
+  extra: Record<string, any> = {},
+): Promise<void> {
+  const repository = await getRepository();
+  await repository.recordReview(updatedCard, reviewLog, session);
   applyTheme(snapshot.settings.theme);
   set({ ...snapshot, ...extra, error: null });
 }

@@ -20,14 +20,15 @@ import { createSeedSnapshot } from "@/data/seed";
 import { isCardState, isDeckColor, isReviewRating } from "@/lib/domain";
 import { normalizeName } from "@/lib/utils";
 import { mergeImportPayload } from "@/services/import-export";
-import type { RecallExportPayload, RecallStateSnapshot, Theme } from "@/types";
+import type { Card, RecallExportPayload, RecallStateSnapshot, ReviewLog, StudySession, Theme } from "@/types";
 
 const STORAGE_KEY = "recall.snapshot.v1";
 
 export interface RecallRepository {
   loadAppData(): Promise<RecallStateSnapshot>;
   saveSnapshot(snapshot: RecallStateSnapshot): Promise<void>;
-  resetToSeedData(): Promise<RecallStateSnapshot>;
+    recordReview(updatedCard: Card, reviewLog: ReviewLog, session: StudySession | null): Promise<void>;
+    resetToSeedData(): Promise<RecallStateSnapshot>;
   replaceDataFromImport(payload: RecallExportPayload): Promise<RecallStateSnapshot>;
   mergeDataFromImport(current: RecallStateSnapshot, payload: RecallExportPayload): Promise<RecallStateSnapshot>;
   saveTheme(theme: Theme, current: RecallStateSnapshot): Promise<RecallStateSnapshot>;
@@ -208,6 +209,38 @@ class SqliteRecallRepository implements RecallRepository {
     });
   }
 
+  async recordReview(updatedCard: Card, reviewLog: ReviewLog, session: StudySession | null): Promise<void> {
+    const cardRow = cardToRow(updatedCard);
+    const logRow = reviewLogToRow(reviewLog);
+    await this.executor.transaction(async (tx) => {
+      await tx.execute(
+        `UPDATE cards SET state=?, last_review_date=?, next_review_date=?,
+         stability=?, difficulty=?, elapsed_days=?, scheduled_days=?,
+         reps=?, lapses=?, updated_at=? WHERE id=?`,
+        [cardRow.state, cardRow.last_review_date, cardRow.next_review_date,
+         cardRow.stability, cardRow.difficulty, cardRow.elapsed_days,
+         cardRow.scheduled_days, cardRow.reps, cardRow.lapses,
+         cardRow.updated_at, cardRow.id],
+      );
+      await tx.execute(
+        `INSERT INTO review_logs (id, card_id, rating, review_date,
+         stability, difficulty, elapsed_days, scheduled_days)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [logRow.id, logRow.card_id, logRow.rating, logRow.review_date,
+         logRow.stability, logRow.difficulty, logRow.elapsed_days, logRow.scheduled_days],
+      );
+      if (session) {
+        const sessionRow = studySessionToRow(session);
+        await tx.execute(
+          `INSERT INTO study_sessions (id, deck_id, started_at, ended_at, cards_studied)
+           VALUES (?, ?, ?, ?, ?)`,
+          [sessionRow.id, sessionRow.deck_id, sessionRow.started_at,
+           sessionRow.ended_at, sessionRow.cards_studied],
+        );
+      }
+    });
+  }
+
   async resetToSeedData(): Promise<RecallStateSnapshot> {
     const snapshot = createSeedSnapshot();
     await this.saveSnapshot(snapshot);
@@ -243,6 +276,10 @@ class SqliteRecallRepository implements RecallRepository {
 }
 
 class LocalStorageRecallRepository implements RecallRepository {
+  async recordReview(_updatedCard: Card, _reviewLog: ReviewLog, _session: StudySession | null): Promise<void> {
+    // localStorage can't do targeted updates; only used in tests
+  }
+
   async loadAppData(): Promise<RecallStateSnapshot> {
     const existing = loadLocalSnapshot();
     if (existing) {

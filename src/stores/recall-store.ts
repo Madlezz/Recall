@@ -28,12 +28,11 @@ import type {
   ReviewLog,
   ReviewRating,
   SessionSummary,
-  StudySession,
-} from "@/types";
+  } from "@/types";
 import { navigationSlice, type NavigationSlice } from "./slices/navigation.slice";
 import { deckCardSlice, type DeckCardSlice, type DeckInput, type CardInput } from "./slices/deck-card.slice";
 import { settingsSlice, type SettingsSlice } from "./slices/settings.slice";
-import { dataState, persistSnapshot, persistReviewSnapshot, getRepository } from "./store-helpers";
+import { dataState, persistSnapshot, persistReviewSnapshot, persistReviewDelta, getRepository } from "./store-helpers";
 
 export interface CustomStudyConfig {
   deckId?: string | null;
@@ -292,15 +291,16 @@ export const useRecallStore = create<RecallStore>((set: any, get: any) => ({
       ? { ...active, ratings: nextRatings, completed: true, previousCardState: card, sessionXp: active.sessionXp + xpGained }
       : { ...active, currentIndex: active.currentIndex + 1, revealed: false, ratings: nextRatings, previousCardState: card, sessionXp: active.sessionXp + xpGained };
 
-    const nextStudySessions: StudySession[] = isLast
-      ? [...state.studySessions, { id: active.id, deckId: active.deckId, startedAt: active.startedAt, endedAt: reviewedAt.toISOString(), cardsStudied: active.cardIds.length }]
-      : state.studySessions;
+    const session = isLast
+          ? { id: active.id, deckId: active.deckId, startedAt: active.startedAt, endedAt: reviewedAt.toISOString(), cardsStudied: active.cardIds.length }
+          : null;
 
-    const snapshot: RecallStateSnapshot = {
-      decks: state.decks, cards: state.cards.map((c: Card) => (c.id === cardId ? updatedCard : c)),
-      studySessions: nextStudySessions, reviewLogs: [...state.reviewLogs, reviewLog], settings: state.settings,
-    };
-    await persistReviewSnapshot(set, snapshot, { activeStudy: nextActiveStudy });
+        const snapshot: RecallStateSnapshot = {
+          decks: state.decks, cards: state.cards.map((c: Card) => (c.id === cardId ? updatedCard : c)),
+          studySessions: isLast ? [...state.studySessions, session!] : state.studySessions,
+          reviewLogs: [...state.reviewLogs, reviewLog], settings: state.settings,
+        };
+        await persistReviewDelta(set, snapshot, updatedCard, reviewLog, session, { activeStudy: nextActiveStudy });
   },
 
   async undoLastReview() {
