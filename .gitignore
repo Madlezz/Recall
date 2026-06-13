@@ -6,6 +6,8 @@ src-tauri/target
 *.local
 *.log
 *.tsbuildinfo
+/test-results/
+.playwright/
 .hermes/
 docs/
 recall_prd.md

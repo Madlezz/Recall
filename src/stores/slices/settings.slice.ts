@@ -7,6 +7,7 @@ export interface SettingsSlice {
   setTheme: (theme: Theme) => Promise<void>;
   updateSettings: (partial: Partial<RecallStateSnapshot["settings"]>) => Promise<void>;
   completeOnboarding: () => Promise<void>;
+  startFresh: () => Promise<void>;
 }
 
 export const settingsSlice = (
@@ -36,6 +37,21 @@ export const settingsSlice = (
       { ...dataState(get()).settings, onboardingComplete: true },
       dataState(get()),
     );
+    applyTheme(snapshot.settings.theme);
+    setMasterVolume(snapshot.settings.soundVolume / 100);
+    set({ ...snapshot, view: "dashboard", error: null });
+  },
+
+  async startFresh() {
+    const repo = await getRepository();
+    const settings = { ...dataState(get()).settings, onboardingComplete: true };
+    const snapshot = await repo.saveSettings(settings, {
+      decks: [],
+      cards: [],
+      studySessions: [],
+      reviewLogs: [],
+      settings,
+    });
     applyTheme(snapshot.settings.theme);
     setMasterVolume(snapshot.settings.soundVolume / 100);
     set({ ...snapshot, view: "dashboard", error: null });

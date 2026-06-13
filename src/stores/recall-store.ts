@@ -66,10 +66,11 @@ type RecallStore = RecallStateSnapshot &
     exitStudy: () => void;
     clearSessionSummary: () => void;
     resetData: () => Promise<void>;
-    replaceData: (payload: RecallExportPayload) => Promise<void>;
-    mergeData: (payload: RecallExportPayload) => Promise<void>;
-    exportData: () => RecallExportPayload;
-  };
+        replaceData: (payload: RecallExportPayload) => Promise<void>;
+        mergeData: (payload: RecallExportPayload) => Promise<void>;
+        exportData: () => RecallExportPayload;
+        startFresh: () => Promise<void>;
+      };
 
 export type { DeckInput, CardInput };
 
