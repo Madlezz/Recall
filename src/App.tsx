@@ -1,4 +1,5 @@
 import { Toaster } from "sonner";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { useState, useEffect } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Dashboard } from "@/components/dashboard";
@@ -83,25 +84,25 @@ export function App(): JSX.Element {
   }
 
   return (
-    <>
-      {view === "study" || view === "match" ? (
-              <main className="min-h-screen bg-background px-4 py-5 text-foreground sm:px-6 lg:px-8">
-                {view === "study" ? <StudyMode /> : null}
-                {view === "match" ? <MatchGame /> : null}
-              </main>
-      ) : (
-        <AppShell>
-                  {view === "dashboard" ? <Dashboard /> : null}
-                                    {view === "deck" ? <DeckDetail /> : null}
-                                    {view === "settings" ? <Settings /> : null}
-                                    {view === "stats" ? <Stats /> : null}
-                                                                        {view === "browser" ? <CardBrowser /> : null}
-                                                                        {view === "onboarding" ? <Onboarding /> : null}
-                </AppShell>
-      )}
-      <Toaster richColors closeButton position="top-right" />
-      <QuickAddDialog open={showQuickAdd} onClose={() => setShowQuickAdd(false)} />
-      <ShortcutHelp open={showShortcuts} onClose={() => setShowShortcuts(false)} />
-    </>
-  );
+      <ErrorBoundary>
+        {view === "study" || view === "match" ? (
+                <main className="min-h-screen bg-background px-4 py-5 text-foreground sm:px-6 lg:px-8">
+                  {view === "study" ? <StudyMode /> : null}
+                  {view === "match" ? <MatchGame /> : null}
+                </main>
+        ) : (
+          <AppShell>
+                    {view === "dashboard" ? <Dashboard /> : null}
+                                      {view === "deck" ? <DeckDetail /> : null}
+                                      {view === "settings" ? <Settings /> : null}
+                                      {view === "stats" ? <Stats /> : null}
+                                                                          {view === "browser" ? <CardBrowser /> : null}
+                                                                          {view === "onboarding" ? <Onboarding /> : null}
+                  </AppShell>
+        )}
+        <Toaster richColors closeButton position="top-right" />
+        <QuickAddDialog open={showQuickAdd} onClose={() => setShowQuickAdd(false)} />
+        <ShortcutHelp open={showShortcuts} onClose={() => setShowShortcuts(false)} />
+      </ErrorBoundary>
+    );
 }

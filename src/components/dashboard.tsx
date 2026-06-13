@@ -14,7 +14,7 @@ import { CsvImportDialog } from "@/components/csv-import-dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { getDeckColorClass } from "@/lib/deck-colors";
-import { getDeckStats, getDeckHealth, getStudyStreak } from "@/lib/stats";
+import { getDeckStats, getDeckHealth, getStudyStreak, isCardDueToday } from "@/lib/stats";
 import { getLevel, getLevelTitle, levelProgress } from "@/lib/xp";
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
@@ -39,7 +39,7 @@ export function Dashboard(): JSX.Element {
   const sortedDecks = useMemo(() => {
     const withStats = decks.map((deck) => {
       const deckCards = cards.filter((c) => c.deckId === deck.id);
-      const dueCount = deckCards.filter((c) => c.state === "review" || c.state === "learning" || c.state === "relearning").length;
+      const dueCount = deckCards.filter((c) => isCardDueToday(c)).length;
       return { ...deck, dueCount, totalCards: deckCards.length };
     });
 

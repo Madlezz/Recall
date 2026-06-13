@@ -61,7 +61,7 @@ type RecallStore = RecallStateSnapshot &
     snoozeCard: (minutes: number) => Promise<void>;
     answerCurrentCard: (result: ReviewRating) => Promise<void>;
     undoLastReview: () => Promise<void>;
-    exitStudy: () => void;
+    exitStudy: () => Promise<void>;
     clearSessionSummary: () => void;
     resetData: () => Promise<void>;
         replaceData: (payload: RecallExportPayload) => Promise<void>;
@@ -331,7 +331,7 @@ export const useRecallStore = create<RecallStore>((set: any, get: any) => ({
     await persistReviewSnapshot(set, snapshot, { activeStudy: nextActiveStudy });
   },
 
-  exitStudy() {
+  async exitStudy() {
     const state = get();
     const active = state.activeStudy;
     let summary: SessionSummary | null = null;
@@ -380,7 +380,7 @@ export const useRecallStore = create<RecallStore>((set: any, get: any) => ({
 
       const updatedSettings = { ...state.settings, xp: newXp, achievements: updatedAchievements };
       const snapshot: RecallStateSnapshot = { decks: state.decks, cards: state.cards, studySessions: state.studySessions, reviewLogs: state.reviewLogs, settings: updatedSettings };
-      void persistSnapshot(set, snapshot, { activeStudy: null, lastSessionSummary: summary });
+      await persistSnapshot(set, snapshot, { activeStudy: null, lastSessionSummary: summary });
       return;
     }
 

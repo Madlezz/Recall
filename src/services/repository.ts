@@ -27,7 +27,6 @@ const STORAGE_KEY = "recall.snapshot.v1";
 export interface RecallRepository {
   loadAppData(): Promise<RecallStateSnapshot>;
   saveSnapshot(snapshot: RecallStateSnapshot): Promise<void>;
-  recordReviewSession(snapshot: RecallStateSnapshot): Promise<void>;
   resetToSeedData(): Promise<RecallStateSnapshot>;
   replaceDataFromImport(payload: RecallExportPayload): Promise<RecallStateSnapshot>;
   mergeDataFromImport(current: RecallStateSnapshot, payload: RecallExportPayload): Promise<RecallStateSnapshot>;
@@ -209,10 +208,6 @@ class SqliteRecallRepository implements RecallRepository {
     });
   }
 
-  async recordReviewSession(snapshot: RecallStateSnapshot): Promise<void> {
-    await this.saveSnapshot(snapshot);
-  }
-
   async resetToSeedData(): Promise<RecallStateSnapshot> {
     const snapshot = createSeedSnapshot();
     await this.saveSnapshot(snapshot);
@@ -262,10 +257,6 @@ class LocalStorageRecallRepository implements RecallRepository {
     if (typeof localStorage !== "undefined") {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
     }
-  }
-
-  async recordReviewSession(snapshot: RecallStateSnapshot): Promise<void> {
-    await this.saveSnapshot(snapshot);
   }
 
   async resetToSeedData(): Promise<RecallStateSnapshot> {

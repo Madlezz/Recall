@@ -38,7 +38,7 @@ export async function persistReviewSnapshot(
   extra: Record<string, any> = {},
 ): Promise<void> {
   const repository = await getRepository();
-  await repository.recordReviewSession(snapshot);
+  await repository.saveSnapshot(snapshot);
   applyTheme(snapshot.settings.theme);
   set({ ...snapshot, ...extra, error: null });
 }
