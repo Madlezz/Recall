@@ -10,15 +10,11 @@ import { applyReview } from "@/services/fsrs-engine";
 import { playSessionStartSound } from "@/services/audio";
 import {
   REVIEW_XP,
-  getLevel,
-  checkAchievements,
-  applyNewAchievements,
   triggerLevelUpConfetti,
   triggerAchievementConfetti,
 } from "@/lib/xp";
-import { ACHIEVEMENT_DEFS } from "@/types";
-import { getStudyStreak } from "@/lib/streak";
 import { sendDueReminder } from "@/services/notifications";
+import { buildSessionSummary } from "@/lib/session-summary";
 import type {
   ActiveStudySession,
   Card,
@@ -333,61 +329,27 @@ export const useRecallStore = create<RecallStore>((set: any, get: any) => ({
     },
 
   async exitStudy() {
-    const state = get();
-    const active = state.activeStudy;
-    let summary: SessionSummary | null = null;
+      const state = get();
+      const active = state.activeStudy;
 
-    if (active && active.completed) {
-      const timeSpentMs = Date.now() - new Date(active.startedAt).getTime();
-      const totalRatings = active.ratings.again + active.ratings.hard + active.ratings.good + active.ratings.easy;
-      const averageRating = totalRatings > 0
-        ? (active.ratings.again * 1 + active.ratings.hard * 2 + active.ratings.good * 3 + active.ratings.easy * 4) / totalRatings : 0;
+      if (active && active.completed) {
+        const result = buildSessionSummary(active, state.settings, state.reviewLogs, state.decks, state.cards);
 
-      const goodAndEasy = active.ratings.good + active.ratings.easy;
-      const accuracy = totalRatings > 0 ? Math.round((goodAndEasy / totalRatings) * 100) : 0;
-      const newXp = state.settings.xp + active.sessionXp;
-      const totalReviews = state.reviewLogs.length;
-      const streak = getStudyStreak(state.reviewLogs);
-      const now = new Date();
-      const nowIso = now.toISOString();
-      const reviewHour = now.getHours();
+        if (result.didLevelUp) triggerLevelUpConfetti();
+        if (result.newAchievementIds.length > 0) triggerAchievementConfetti();
 
-      const sortedLogs = [...state.reviewLogs].sort((a: ReviewLog, b: ReviewLog) => b.reviewDate.localeCompare(a.reviewDate));
-      const lastLogDate = sortedLogs.length > 0 ? new Date(sortedLogs[0].reviewDate) : null;
-      const daysSinceLastReview = lastLogDate
-        ? Math.floor((now.getTime() - lastLogDate.getTime()) / (1000 * 60 * 60 * 24)) : 999;
+        const snapshot: RecallStateSnapshot = {
+          decks: state.decks, cards: state.cards,
+          studySessions: state.studySessions, reviewLogs: state.reviewLogs,
+          settings: result.updatedSettings,
+        };
+        await persistSnapshot(set, snapshot, { activeStudy: null, lastSessionSummary: result.summary });
+        return;
+      }
 
-      const oldLevel = getLevel(state.settings.xp);
-      const newLevel = getLevel(newXp);
-
-      const newAchievementIds = checkAchievements(
-        { xp: newXp, totalReviews, streak, cardsInSession: active.cardIds.length, accuracy, deckCount: state.decks.length, cardCount: state.cards.length, reviewHour, daysSinceLastReview },
-        state.settings.achievements,
-      );
-      const updatedAchievements = applyNewAchievements(newAchievementIds, state.settings.achievements, nowIso);
-
-      summary = {
-        cardsStudied: active.cardIds.length, timeSpentMs, averageRating, newCards: active.newCardsCount,
-        againCount: active.ratings.again, hardCount: active.ratings.hard, goodCount: active.ratings.good, easyCount: active.ratings.easy,
-        sessionXp: active.sessionXp,
-        newAchievements: newAchievementIds.map((id: string) => {
-          const def = ACHIEVEMENT_DEFS[id as keyof typeof ACHIEVEMENT_DEFS];
-          return { id, title: def.title, description: def.description, icon: def.icon, unlockedAt: nowIso };
-        }),
-      };
-
-      if (newLevel > oldLevel) triggerLevelUpConfetti();
-      if (newAchievementIds.length > 0) triggerAchievementConfetti();
-
-      const updatedSettings = { ...state.settings, xp: newXp, achievements: updatedAchievements };
-      const snapshot: RecallStateSnapshot = { decks: state.decks, cards: state.cards, studySessions: state.studySessions, reviewLogs: state.reviewLogs, settings: updatedSettings };
-      await persistSnapshot(set, snapshot, { activeStudy: null, lastSessionSummary: summary });
-      return;
-    }
-
-    const deckId = active?.deckId ?? state.selectedDeckId;
-    set({ view: deckId ? "deck" : "dashboard", selectedDeckId: deckId, activeStudy: null, lastSessionSummary: null });
-  },
+      const deckId = active?.deckId ?? state.selectedDeckId;
+      set({ view: deckId ? "deck" : "dashboard", selectedDeckId: deckId, activeStudy: null, lastSessionSummary: null });
+    },
 
   clearSessionSummary() { set({ lastSessionSummary: null }); },
 
