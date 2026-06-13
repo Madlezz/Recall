@@ -84,6 +84,7 @@ pnpm dev            # Browser-only preview
 - [x] Card quality checker — flag cards that need improvement
 - [x] Screenshots in README
 - [x] Desktop notifications for reviews
+- [x] Card browser — table view with search, filter, sort, bulk operations
 
 ---
 

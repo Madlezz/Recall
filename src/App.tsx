@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Dashboard } from "@/components/dashboard";
 import { DeckDetail } from "@/components/deck-detail";
+import { CardBrowser } from "@/components/card-browser";
 import { MatchGame } from "@/components/match-game";
 import { Onboarding } from "@/components/onboarding";
 import { QuickAddDialog } from "@/components/quick-add";
@@ -94,7 +95,8 @@ export function App(): JSX.Element {
                                     {view === "deck" ? <DeckDetail /> : null}
                                     {view === "settings" ? <Settings /> : null}
                                     {view === "stats" ? <Stats /> : null}
-                                    {view === "onboarding" ? <Onboarding /> : null}
+                                                                        {view === "browser" ? <CardBrowser /> : null}
+                                                                        {view === "onboarding" ? <Onboarding /> : null}
                 </AppShell>
       )}
       <Toaster richColors closeButton position="top-right" />

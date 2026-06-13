@@ -110,7 +110,7 @@ export interface ActiveStudySession {
   sessionXp: number;
 }
 
-export type AppView = "dashboard" | "deck" | "study" | "settings" | "onboarding" | "match" | "stats";
+export type AppView = "dashboard" | "deck" | "study" | "settings" | "onboarding" | "match" | "stats" | "browser";
 
 // ── XP, Levels & Achievements ──
 

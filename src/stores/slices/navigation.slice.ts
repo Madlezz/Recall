@@ -7,6 +7,7 @@ export interface NavigationSlice {
   showSettings: () => void;
   showDeck: (deckId: string) => void;
   showStats: () => void;
+  showBrowser: () => void;
   startMatch: (deckId: string) => void;
 }
 
@@ -25,6 +26,9 @@ export const navigationSlice = (
   },
   showStats() {
     _set({ view: "stats", selectedDeckId: null, activeStudy: null });
+  },
+  showBrowser() {
+    _set({ view: "browser", selectedDeckId: null, activeStudy: null });
   },
   showDeck(deckId: string) {
     _set({ view: "deck", selectedDeckId: deckId, activeStudy: null });
