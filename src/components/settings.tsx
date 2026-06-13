@@ -1,4 +1,4 @@
-import { Download, Moon, RotateCcw, Sun, Upload } from "lucide-react";
+import { Download, HardDrive, Layers, Moon, RotateCcw, Sun, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -28,7 +28,11 @@ export function Settings(): JSX.Element {
   const [pendingReplace, setPendingReplace] = useState<RecallExportPayload | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const settings = useRecallStore((state) => state.settings);
-    const setTheme = useRecallStore((state) => state.setTheme);
+      const cards = useRecallStore((state) => state.cards);
+      const decks = useRecallStore((state) => state.decks);
+      const reviewLogs = useRecallStore((state) => state.reviewLogs);
+      const studySessions = useRecallStore((state) => state.studySessions);
+      const setTheme = useRecallStore((state) => state.setTheme);
     const updateSettings = useRecallStore((state) => state.updateSettings);
     const resetData = useRecallStore((state) => state.resetData);
   const exportData = useRecallStore((state) => state.exportData);
@@ -209,9 +213,40 @@ export function Settings(): JSX.Element {
             </Button>
           </div>
           <input ref={fileInputRef} type="file" accept="application/json,.json" className="hidden" onChange={handleImport} />
-        </Panel>
+                  </Panel>
 
-        <Panel title="Reset" description="Restore seeded demo data and clear local progress.">
+                  <Panel title="Data Health" description="Your data lives on this device. Export regularly for safe backup.">
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="flex items-center gap-2 text-muted-foreground">
+                          <Layers className="h-4 w-4" />
+                          Cards
+                        </span>
+                        <span className="font-semibold tabular-nums">{cards.length} in {decks.length} decks</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="flex items-center gap-2 text-muted-foreground">
+                          <HardDrive className="h-4 w-4" />
+                          Reviews
+                        </span>
+                        <span className="font-semibold tabular-nums">{reviewLogs.length} total</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="flex items-center gap-2 text-muted-foreground">
+                          <HardDrive className="h-4 w-4" />
+                          Sessions
+                        </span>
+                        <span className="font-semibold tabular-nums">{studySessions.length} completed</span>
+                      </div>
+                    </div>
+                    <div className="mt-4 rounded-md bg-muted/50 p-3 text-xs text-muted-foreground">
+                      <span className="font-medium">Storage:</span>{" "}
+                      {typeof window !== "undefined" && (window as any).__TAURI__ ? "SQLite (recall.db)" : "Browser localStorage"}
+                      {" · "}Export JSON for portable backup
+                    </div>
+                  </Panel>
+
+                  <Panel title="Reset" description="Restore seeded demo data and clear local progress.">
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive">

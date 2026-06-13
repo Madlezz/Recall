@@ -58,6 +58,36 @@ export function getNewCardsReviewedToday(reviewLogs: ReviewLog[], at = new Date(
   }).length;
 }
 
+/** Cards past their review date (excluding new/learning) */
+export function getOverdueCount(cards: Card[], at = new Date()): number {
+  const now = at;
+  return cards.filter((card) => {
+    if (card.state === "new" || card.state === "learning") return false;
+    return isAfter(now, parseISO(card.nextReviewDate));
+  }).length;
+}
+
+/** Cards flagged as leeches (lapses >= threshold) */
+export function getLeechCount(cards: Card[], leechThreshold: number): number {
+  return cards.filter((card) => card.lapses >= leechThreshold).length;
+}
+
+/** Estimated review time in minutes (~5s per review, ~10s learning, ~8s new) */
+export function getEstimatedReviewMinutes(cards: Card[], dailyLimit: number): number {
+  const newCards = Math.min(
+    cards.filter((c) => c.state === "new").length,
+    dailyLimit,
+  );
+  const reviewCards = cards.filter((c) => {
+    if (c.state === "new") return false;
+    return isCardDueToday(c);
+  }).length;
+  const learningCards = cards.filter((c) => c.state === "learning" || c.state === "relearning").length;
+
+  const seconds = reviewCards * 5 + learningCards * 10 + newCards * 8;
+  return Math.max(1, Math.ceil(seconds / 60));
+}
+
 export function getStudyStreak(reviews: ReviewLog[], at = new Date()): number {
   const reviewedDays = new Set(reviews.map((review) => startOfDay(parseISO(review.reviewDate)).toISOString()));
   let cursor = startOfDay(at);

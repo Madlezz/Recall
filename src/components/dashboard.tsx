@@ -1,18 +1,17 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, BookOpen, Brain, Flame, Layers3, Library, Plus, RotateCw, Shield, SortAsc, SortDesc, Star, Zap } from "lucide-react";
+import { ArrowRight, Library, Plus, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { AnkiImportDialog } from "@/components/anki-import-dialog";
+import { ReviewInbox } from "@/components/review-inbox";
 import { ActivityHeatmap } from "@/components/activity-heatmap";
 import { DailyGoal } from "@/components/daily-goal";
 import { FocusTimer } from "@/components/focus-timer";
 import { ReviewCalendar } from "@/components/review-calendar";
 import { DeckDialog } from "@/components/deck-dialog";
-import { StatTile } from "@/components/stat-tile";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { getDeckColorClass } from "@/lib/deck-colors";
-import { getDeckStats, getDueTodayCount, getLearningCount, getNewCount } from "@/lib/stats";
-import { getStudyStreak } from "@/lib/streak";
+import { getDeckStats } from "@/lib/stats";
 import { getLevel, getLevelTitle, levelProgress } from "@/lib/xp";
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
@@ -20,9 +19,8 @@ import type { Deck } from "@/types";
 
 export function Dashboard(): JSX.Element {
   const decks = useRecallStore((state) => state.decks);
-  const cards = useRecallStore((state) => state.cards);
-  const reviewLogs = useRecallStore((state) => state.reviewLogs);
-  const showDeck = useRecallStore((state) => state.showDeck);
+    const cards = useRecallStore((state) => state.cards);
+    const showDeck = useRecallStore((state) => state.showDeck);
   const startReview = useRecallStore((state) => state.startReview);
   const [sortBy, setSortBy] = useState<"name" | "due" | "cards">("name");
   const [showCreateDeck, setShowCreateDeck] = useState(false);
@@ -74,13 +72,10 @@ export function Dashboard(): JSX.Element {
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-5">
-                    <StatTile icon={Flame} label="Streak" value={`${getStudyStreak(reviewLogs)} day${getStudyStreak(reviewLogs) === 1 ? '' : 's'}`} />
-                    <StatTile icon={Zap} label="Due today" value={String(getDueTodayCount(cards))} />
-                    <StatTile icon={BookOpen} label="New" value={String(getNewCount(cards))} />
-                    <StatTile icon={Brain} label="Learning" value={String(getLearningCount(cards))} />
-                    <LevelTile />
-                  </section>
+      <section className="grid gap-4 lg:grid-cols-[1fr_180px]">
+              <ReviewInbox />
+              <LevelTile />
+            </section>
 
             <section className="rounded-lg border bg-card p-5">
                           <ActivityHeatmap />
