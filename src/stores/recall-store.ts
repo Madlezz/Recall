@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createSeedSnapshot } from "@/data/seed";
 import { getNewCardsReviewedToday, isCardDueToday } from "@/lib/stats";
-import { createId, normalizeName } from "@/lib/utils";
+import { createId } from "@/lib/utils";
 import { buildExportPayload } from "@/services/import-export";
 import { getRecallRepository, type RecallRepository } from "@/services/repository";
 import { applyTheme } from "@/services/storage";
@@ -10,16 +10,13 @@ import { playSessionStartSound } from "@/services/audio";
 import {
   REVIEW_XP,
   getLevel,
-  getLevelTitle,
-  levelProgress,
   checkAchievements,
   applyNewAchievements,
   triggerLevelUpConfetti,
-    triggerAchievementConfetti,
-  } from "@/lib/xp";
+  triggerAchievementConfetti,
+} from "@/lib/xp";
 import { ACHIEVEMENT_DEFS } from "@/types";
 import { getStudyStreak } from "@/lib/streak";
-import { hasCloze } from "@/lib/cloze";
 import type {
   ActiveStudySession,
   AppView,
@@ -32,69 +29,53 @@ import type {
   ReviewRating,
   SessionSummary,
   StudySession,
-  Theme,
 } from "@/types";
+import { navigationSlice, type NavigationSlice } from "./slices/navigation.slice";
+import { deckCardSlice, type DeckCardSlice, type DeckInput, type CardInput } from "./slices/deck-card.slice";
+import { settingsSlice, type SettingsSlice } from "./slices/settings.slice";
+import { dataState, persistSnapshot, persistReviewSnapshot, getRepository } from "./store-helpers";
 
-interface DeckInput {
-  name: string;
-  description: string;
-  color: DeckColor;
-}
+// ── Store type ──
 
-interface CardInput {
-  deckId: string;
-  front: string;
-  back: string;
-  hint: string;
-  tags: string[];
-}
-
-interface RecallStore extends RecallStateSnapshot {
-  view: AppView;
-  selectedDeckId: string | null;
-  activeStudy: ActiveStudySession | null;
-  lastSessionSummary: SessionSummary | null;
-  isLoading: boolean;
-  isInitialized: boolean;
-  error: string | null;
-  initialize: () => Promise<void>;
-  setTheme: (theme: Theme) => Promise<void>;
-  updateSettings: (settings: Partial<RecallStateSnapshot["settings"]>) => Promise<void>;
-  showDashboard: () => void;
-    showSettings: () => void;
-    showDeck: (deckId: string) => void;
-    showStats: () => void;
-    startMatch: (deckId: string) => void;
-      completeOnboarding: () => Promise<void>;
-    createDeck: (input: DeckInput) => Promise<string>;
-  updateDeck: (deckId: string, input: DeckInput) => Promise<void>;
-  deleteDeck: (deckId: string) => Promise<void>;
-  createCard: (input: CardInput) => Promise<string>;
-  updateCard: (cardId: string, input: CardInput) => Promise<void>;
-  deleteCard: (cardId: string) => Promise<void>;
-  moveCard: (cardId: string, deckId: string) => Promise<void>;
-  resetDeckProgress: (deckId: string) => Promise<void>;
-  startReview: (deckId?: string | null) => boolean;
-  revealAnswer: () => void;
-  answerCurrentCard: (result: ReviewRating) => Promise<void>;
-  undoLastReview: () => Promise<void>;
-  exitStudy: () => void;
+type RecallStore = RecallStateSnapshot &
+  NavigationSlice &
+  DeckCardSlice &
+  SettingsSlice & {
+    activeStudy: ActiveStudySession | null;
+    lastSessionSummary: SessionSummary | null;
+    isLoading: boolean;
+    isInitialized: boolean;
+    error: string | null;
+    initialize: () => Promise<void>;
+    startReview: (deckId?: string | null) => boolean;
+    revealAnswer: () => void;
+    buryCard: () => void;
+    snoozeCard: (minutes: number) => Promise<void>;
+    answerCurrentCard: (result: ReviewRating) => Promise<void>;
+    undoLastReview: () => Promise<void>;
+    exitStudy: () => void;
     clearSessionSummary: () => void;
     resetData: () => Promise<void>;
-  replaceData: (payload: RecallExportPayload) => Promise<void>;
-  mergeData: (payload: RecallExportPayload) => Promise<void>;
-  exportData: () => RecallExportPayload;
-}
+    replaceData: (payload: RecallExportPayload) => Promise<void>;
+    mergeData: (payload: RecallExportPayload) => Promise<void>;
+    exportData: () => RecallExportPayload;
+  };
+
+export type { DeckInput, CardInput };
+
+// ── Initial state ──
 
 const initialSnapshot = createSeedSnapshot();
-let repositoryPromise: Promise<RecallRepository> | null = null;
-
 applyTheme(initialSnapshot.settings.theme);
+
+// ── Store ──
 
 export const useRecallStore = create<RecallStore>((set, get) => ({
   ...initialSnapshot,
-  view: "dashboard",
-  selectedDeckId: null,
+  ...navigationSlice(set, get),
+  ...deckCardSlice(set, get),
+  ...settingsSlice(set, get),
+
   activeStudy: null,
   lastSessionSummary: null,
   isLoading: true,
@@ -102,666 +83,254 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
   error: null,
 
   async initialize() {
-      if (get().isInitialized) {
-        return;
-      }
-
-      set({ isLoading: true, error: null });
-      try {
-        const repository = await getRepository();
-        const snapshot = await repository.loadAppData();
-        applyTheme(snapshot.settings.theme);
-        const view = snapshot.settings.onboardingComplete ? "dashboard" : "onboarding";
-        set({ ...snapshot, view, isLoading: false, isInitialized: true, error: null });
-      } catch (error) {
-        set({
-          isLoading: false,
-          isInitialized: true,
-          error: error instanceof Error ? error.message : "Failed to load app data",
-        });
-      }
-    },
-
-  async setTheme(theme) {
-    const repository = await getRepository();
-    const snapshot = await repository.saveTheme(theme, dataState(get()));
-    commitSnapshot(set, snapshot);
+    if (get().isInitialized) return;
+    set({ isLoading: true, error: null });
+    try {
+      const repository = await getRecallRepository();
+      const snapshot = await repository.loadAppData();
+      applyTheme(snapshot.settings.theme);
+      const view = snapshot.settings.onboardingComplete ? "dashboard" : "onboarding";
+      set({ ...snapshot, view, isLoading: false, isInitialized: true, error: null });
+    } catch (error) {
+      set({
+        isLoading: false, isInitialized: true,
+        error: error instanceof Error ? error.message : "Failed to load app data",
+      });
+    }
   },
 
-  async updateSettings(settings) {
-    const repository = await getRepository();
-    const currentSettings = dataState(get()).settings;
-    const snapshot = await repository.saveSettings({ ...currentSettings, ...settings }, dataState(get()));
-    commitSnapshot(set, snapshot);
-  },
-
-  showDashboard() {
-    set({ view: "dashboard", selectedDeckId: null, activeStudy: null });
-  },
-
-  showSettings() {
-      set({ view: "settings", selectedDeckId: null, activeStudy: null });
-    },
-
-    showStats() {
-      set({ view: "stats", selectedDeckId: null, activeStudy: null });
-    },
-
-    showDeck(deckId) {
-        set({ view: "deck", selectedDeckId: deckId, activeStudy: null });
-      },
-
-      startMatch(deckId) {
-        set({ view: "match", selectedDeckId: deckId, activeStudy: null });
-      },
-
-    async completeOnboarding() {
-      const repository = await getRepository();
-      const snapshot = await repository.saveSettings(
-        { ...dataState(get()).settings, onboardingComplete: true },
-        dataState(get())
-      );
-      commitSnapshot(set, snapshot);
-      set({ view: "dashboard" });
-    },
-
-    async createDeck(input) {
-    const name = normalizeName(input.name);
-    ensureDeckName(name, get().decks);
-
-    const now = new Date().toISOString();
-    const deck: Deck = {
-      id: createId("deck"),
-      name,
-      description: input.description.trim(),
-      color: input.color,
-      createdAt: now,
-      updatedAt: now,
-    };
-    const snapshot = { ...dataState(get()), decks: [...get().decks, deck] };
-
-    await persist(set, snapshot);
-    return deck.id;
-  },
-
-  async updateDeck(deckId, input) {
-    const name = normalizeName(input.name);
-    ensureDeckName(
-      name,
-      get().decks.filter((deck) => deck.id !== deckId),
-    );
-
-    const now = new Date().toISOString();
-    const snapshot = {
-      ...dataState(get()),
-      decks: get().decks.map((deck) =>
-        deck.id === deckId
-          ? { ...deck, name, description: input.description.trim(), color: input.color, updatedAt: now }
-          : deck,
-      ),
-    };
-    await persist(set, snapshot);
-  },
-
-  async deleteDeck(deckId) {
-    const deletedCardIds = new Set(get().cards.filter((card) => card.deckId === deckId).map((card) => card.id));
-    const snapshot = {
-      ...dataState(get()),
-      decks: get().decks.filter((deck) => deck.id !== deckId),
-      cards: get().cards.filter((card) => card.deckId !== deckId),
-      reviewLogs: get().reviewLogs.filter((reviewLog) => !deletedCardIds.has(reviewLog.cardId)),
-      studySessions: get().studySessions.filter((session) => session.deckId !== deckId),
-    };
-
-    await persist(set, snapshot, { view: "dashboard", selectedDeckId: null, activeStudy: null });
-  },
-
-  async createCard(input) {
-    ensureCardInput(input);
-
-    const now = new Date().toISOString();
-        const card: Card = {
-          id: createId("card"),
-          deckId: input.deckId,
-          front: input.front.trim(),
-          back: input.back.trim(),
-          hint: input.hint.trim(),
-          tags: input.tags,
-          cardType: hasCloze(input.front) ? "cloze" : "basic",
-      state: "new",
-      lastReviewDate: null,
-      nextReviewDate: now,
-      stability: 0,
-      difficulty: 0,
-      elapsedDays: 0,
-      scheduledDays: 0,
-      reps: 0,
-      lapses: 0,
-      createdAt: now,
-      updatedAt: now,
-    };
-    const snapshot = {
-      ...dataState(get()),
-      cards: [...get().cards, card],
-      decks: touchDeck(get().decks, input.deckId, now),
-    };
-
-    await persist(set, snapshot);
-    return card.id;
-  },
-
-  async updateCard(cardId, input) {
-    ensureCardInput(input);
-
-    const now = new Date().toISOString();
-    const snapshot = {
-      ...dataState(get()),
-      cards: get().cards.map((card) =>
-        card.id === cardId
-          ? {
-              ...card,
-              deckId: input.deckId,
-              front: input.front.trim(),
-              back: input.back.trim(),
-              hint: input.hint.trim(),
-              tags: input.tags,
-              updatedAt: now,
-            }
-          : card,
-      ),
-      decks: touchDeck(get().decks, input.deckId, now),
-    };
-
-    await persist(set, snapshot);
-  },
-
-  async deleteCard(cardId) {
-    const snapshot = {
-      ...dataState(get()),
-      cards: get().cards.filter((card) => card.id !== cardId),
-      reviewLogs: get().reviewLogs.filter((reviewLog) => reviewLog.cardId !== cardId),
-    };
-    await persist(set, snapshot);
-  },
-
-  async moveCard(cardId, deckId) {
-      const card = get().cards.find((item) => item.id === cardId);
-      if (!card || card.deckId === deckId) {
-        return;
-      }
-
-      await get().updateCard(cardId, { deckId, front: card.front, back: card.back, hint: card.hint, tags: card.tags });
-    },
-
-    async resetDeckProgress(deckId) {
-      const now = new Date().toISOString();
-      const deckCardIds = new Set(
-        get().cards.filter((card) => card.deckId === deckId).map((card) => card.id),
-      );
-
-      const snapshot = {
-        ...dataState(get()),
-        cards: get().cards.map((card) =>
-          card.deckId === deckId
-            ? {
-                ...card,
-                state: "new" as const,
-                lastReviewDate: null,
-                nextReviewDate: now,
-                stability: 0,
-                difficulty: 0,
-                elapsedDays: 0,
-                scheduledDays: 0,
-                reps: 0,
-                lapses: 0,
-                updatedAt: now,
-              }
-            : card,
-        ),
-        reviewLogs: get().reviewLogs.filter((log) => !deckCardIds.has(log.cardId)),
-        studySessions: get().studySessions.filter((session) => session.deckId !== deckId),
-        decks: touchDeck(get().decks, deckId, now),
-      };
-
-      await persist(set, snapshot);
-    },
+  // ── Study session ──
 
   startReview(deckId = null) {
     const state = get();
     const limit = state.settings.dailyNewCardLimit;
-
     const dueCards = state.cards
-      .filter((card) => (deckId ? card.deckId === deckId : true))
-      .filter((card) => isCardDueToday(card))
-      .sort((a, b) => a.nextReviewDate.localeCompare(b.nextReviewDate));
-
-    if (dueCards.length === 0) {
-      return false;
-    }
+      .filter((card: Card) => (deckId ? card.deckId === deckId : true))
+      .filter((card: Card) => isCardDueToday(card))
+      .sort((a: Card, b: Card) => a.nextReviewDate.localeCompare(b.nextReviewDate));
+    if (dueCards.length === 0) return false;
 
     const newCardsReviewedToday = getNewCardsReviewedToday(state.reviewLogs);
     let newCardsAllowed = Math.max(0, limit - newCardsReviewedToday);
-
-    const filteredDueCards = dueCards.filter((card) => {
+    const filteredDueCards = dueCards.filter((card: Card) => {
       if (card.state === "new") {
-        if (newCardsAllowed > 0) {
-          newCardsAllowed--;
-          return true;
-        }
+        if (newCardsAllowed > 0) { newCardsAllowed--; return true; }
         return false;
       }
       return true;
     });
+    if (filteredDueCards.length === 0) return false;
 
-    if (filteredDueCards.length === 0) {
-      return false;
-    }
-
-    const newCardsCount = filteredDueCards.filter((card) => card.state === "new").length;
+    const newCardsCount = filteredDueCards.filter((c: Card) => c.state === "new").length;
     const now = new Date().toISOString();
-        set({
-          view: "study",
-          selectedDeckId: deckId,
-          activeStudy: {
-            id: createId("session"),
-            deckId,
-            cardIds: filteredDueCards.map((card) => card.id),
-            currentIndex: 0,
-            revealed: false,
-            startedAt: now,
-            ratings: { again: 0, hard: 0, good: 0, easy: 0 },
-            completed: false,
-            previousCardState: null,
-            newCardsCount,
-            sessionXp: 0,
-          },
-        });
-        playSessionStartSound();
-        return true;
+    set({
+      view: "study", selectedDeckId: deckId,
+      activeStudy: {
+        id: createId("session"), deckId,
+        cardIds: filteredDueCards.map((c: Card) => c.id),
+        currentIndex: 0, revealed: false, startedAt: now,
+        ratings: { again: 0, hard: 0, good: 0, easy: 0 },
+        completed: false, previousCardState: null,
+        newCardsCount, sessionXp: 0,
+      },
+    });
+    playSessionStartSound();
+    return true;
   },
 
   revealAnswer() {
-    const activeStudy = get().activeStudy;
-    if (!activeStudy || activeStudy.completed) {
-      return;
-    }
-
-    set({ activeStudy: { ...activeStudy, revealed: true } });
+    const active = get().activeStudy;
+    if (!active || active.completed) return;
+    set({ activeStudy: { ...active, revealed: true } });
   },
 
   buryCard() {
-      const state = get();
-      const activeStudy = state.activeStudy;
-      if (!activeStudy || activeStudy.completed) {
-        return;
-      }
-
-      // Move to next card without rating (remove current card from session)
-      const cardId = activeStudy.cardIds[activeStudy.currentIndex];
-      const remainingCardIds = activeStudy.cardIds.filter((id) => id !== cardId);
-
-      if (remainingCardIds.length === 0) {
-        // No more cards, complete the session
-        set({
-          activeStudy: {
-            ...activeStudy,
-            cardIds: [],
-            completed: true,
-            previousCardState: null,
-          },
-        });
-        return;
-      }
-
-      const nextIndex = Math.min(activeStudy.currentIndex, remainingCardIds.length - 1);
-      set({
-        activeStudy: {
-          ...activeStudy,
-          cardIds: remainingCardIds,
-          currentIndex: nextIndex,
-          revealed: false,
-        },
-      });
-    },
-
-    async snoozeCard(minutes: number) {
-      const state = get();
-      const activeStudy = state.activeStudy;
-      if (!activeStudy || activeStudy.completed) {
-        return;
-      }
-
-      const cardId = activeStudy.cardIds[activeStudy.currentIndex];
-      const card = state.cards.find((item) => item.id === cardId);
-      if (!card) {
-        return;
-      }
-
-      // Push the next review date forward by N minutes
-      const now = new Date();
-      const newNextReview = new Date(now.getTime() + minutes * 60 * 1000);
-
-      const updatedCard: Card = {
-        ...card,
-        nextReviewDate: newNextReview.toISOString(),
-        state: card.state === "new" ? "learning" : card.state,
-      };
-
-      const repository = await getRepository();
-      const snapshot = await repository.saveSnapshot({
-        ...dataState(state),
-        cards: state.cards.map((c) => (c.id === card.id ? updatedCard : c)),
-      });
-      commitSnapshot(set, snapshot);
-
-      // Also bury it from the current session so it doesn't reappear immediately
-      const remainingCardIds = activeStudy.cardIds.filter((id) => id !== cardId);
-
-      if (remainingCardIds.length === 0) {
-        set({
-          activeStudy: {
-            ...activeStudy,
-            cardIds: [],
-            completed: true,
-            previousCardState: null,
-          },
-        });
-        return;
-      }
-
-      const nextIndex = Math.min(activeStudy.currentIndex, remainingCardIds.length - 1);
-      set({
-        activeStudy: {
-          ...activeStudy,
-          cardIds: remainingCardIds,
-          currentIndex: nextIndex,
-          revealed: false,
-        },
-      });
-    },
-
-    async answerCurrentCard(result) {
     const state = get();
-    const activeStudy = state.activeStudy;
-    if (!activeStudy || activeStudy.completed || !activeStudy.revealed) {
+    const active = state.activeStudy;
+    if (!active || active.completed) return;
+    const cardId = active.cardIds[active.currentIndex];
+    const remaining = active.cardIds.filter((id: string) => id !== cardId);
+    if (remaining.length === 0) {
+      set({ activeStudy: { ...active, cardIds: [], completed: true, previousCardState: null } });
       return;
     }
+    set({
+      activeStudy: {
+        ...active, cardIds: remaining,
+        currentIndex: Math.min(active.currentIndex, remaining.length - 1),
+        revealed: false,
+      },
+    });
+  },
 
-    const cardId = activeStudy.cardIds[activeStudy.currentIndex];
-    const card = state.cards.find((item) => item.id === cardId);
-    if (!card) {
+  async snoozeCard(minutes: number) {
+    const state = get();
+    const active = state.activeStudy;
+    if (!active || active.completed) return;
+    const cardId = active.cardIds[active.currentIndex];
+    const card = state.cards.find((c: Card) => c.id === cardId);
+    if (!card) return;
+
+    const newNextReview = new Date(Date.now() + minutes * 60 * 1000);
+    const updatedCard: Card = { ...card, nextReviewDate: newNextReview.toISOString(), state: card.state === "new" ? "learning" : card.state };
+    const repo = await getRepository();
+    const snapshot = await repo.saveSnapshot({
+      ...dataState(state), cards: state.cards.map((c: Card) => (c.id === card.id ? updatedCard : c)),
+    });
+    applyTheme(snapshot.settings.theme);
+    set({ ...snapshot, error: null });
+
+    const remaining = active.cardIds.filter((id: string) => id !== cardId);
+    if (remaining.length === 0) {
+      set({ activeStudy: { ...active, cardIds: [], completed: true, previousCardState: null } });
       return;
     }
+    set({ activeStudy: { ...active, cardIds: remaining, currentIndex: Math.min(active.currentIndex, remaining.length - 1), revealed: false } });
+  },
+
+  async answerCurrentCard(result: ReviewRating) {
+    const state = get();
+    const active = state.activeStudy;
+    if (!active || active.completed || !active.revealed) return;
+
+    const cardId = active.cardIds[active.currentIndex];
+    const card = state.cards.find((c: Card) => c.id === cardId);
+    if (!card) return;
 
     const reviewedAt = new Date();
-    const updatedCard = applyReview(card, result as ReviewRating, reviewedAt);
+    const updatedCard = applyReview(card, result, reviewedAt);
     const reviewLog: ReviewLog = {
-      id: createId("review"),
-      cardId,
-      rating: result as ReviewRating,
-      reviewDate: reviewedAt.toISOString(),
-      stability: updatedCard.stability,
-      difficulty: updatedCard.difficulty,
-      elapsedDays: updatedCard.elapsedDays,
-      scheduledDays: updatedCard.scheduledDays,
+      id: createId("review"), cardId,
+      rating: result, reviewDate: reviewedAt.toISOString(),
+      stability: updatedCard.stability, difficulty: updatedCard.difficulty,
+      elapsedDays: updatedCard.elapsedDays, scheduledDays: updatedCard.scheduledDays,
     };
-    const nextRatings = {
-          ...activeStudy.ratings,
-          [result]: activeStudy.ratings[result] + 1,
-        };
-        const xpGained = REVIEW_XP[result] ?? 0;
-        const isLast = activeStudy.currentIndex >= activeStudy.cardIds.length - 1;
-        const nextActiveStudy: ActiveStudySession = isLast
-          ? { ...activeStudy, ratings: nextRatings, completed: true, previousCardState: card, sessionXp: activeStudy.sessionXp + xpGained }
-          : {
-              ...activeStudy,
-              currentIndex: activeStudy.currentIndex + 1,
-              revealed: false,
-              ratings: nextRatings,
-              previousCardState: card,
-              sessionXp: activeStudy.sessionXp + xpGained,
-            };
-    const nextStudySessions: StudySession[] = isLast
-      ? [
-          ...state.studySessions,
-          {
-            id: activeStudy.id,
-            deckId: activeStudy.deckId,
-            startedAt: activeStudy.startedAt,
-            endedAt: reviewedAt.toISOString(),
-            cardsStudied: activeStudy.cardIds.length,
-          },
-        ]
-      : state.studySessions;
-    const snapshot: RecallStateSnapshot = {
-      decks: state.decks,
-      cards: state.cards.map((item) => (item.id === cardId ? updatedCard : item)),
-      studySessions: nextStudySessions,
-      reviewLogs: [...state.reviewLogs, reviewLog],
-      settings: state.settings,
-    };
+    const nextRatings = { ...active.ratings, [result]: active.ratings[result] + 1 };
+    const xpGained = REVIEW_XP[result] ?? 0;
+    const isLast = active.currentIndex >= active.cardIds.length - 1;
 
-    await persistReview(set, snapshot, { activeStudy: nextActiveStudy });
+    const nextActiveStudy: ActiveStudySession = isLast
+      ? { ...active, ratings: nextRatings, completed: true, previousCardState: card, sessionXp: active.sessionXp + xpGained }
+      : { ...active, currentIndex: active.currentIndex + 1, revealed: false, ratings: nextRatings, previousCardState: card, sessionXp: active.sessionXp + xpGained };
+
+    const nextStudySessions: StudySession[] = isLast
+      ? [...state.studySessions, { id: active.id, deckId: active.deckId, startedAt: active.startedAt, endedAt: reviewedAt.toISOString(), cardsStudied: active.cardIds.length }]
+      : state.studySessions;
+
+    const snapshot: RecallStateSnapshot = {
+      decks: state.decks, cards: state.cards.map((c: Card) => (c.id === cardId ? updatedCard : c)),
+      studySessions: nextStudySessions, reviewLogs: [...state.reviewLogs, reviewLog], settings: state.settings,
+    };
+    await persistReviewSnapshot(set, snapshot, { activeStudy: nextActiveStudy });
   },
 
   async undoLastReview() {
     const state = get();
-    const activeStudy = state.activeStudy;
-    if (!activeStudy || activeStudy.completed || activeStudy.currentIndex === 0 || !activeStudy.previousCardState) {
-      return;
-    }
+    const active = state.activeStudy;
+    if (!active || active.completed || active.currentIndex === 0 || !active.previousCardState) return;
 
-    const previousCard = activeStudy.previousCardState;
+    const previousCard = active.previousCardState;
     const cardId = previousCard.id;
-    const previousIndex = activeStudy.currentIndex - 1;
-    const previousCardId = activeStudy.cardIds[previousIndex];
-
-    // Find the rating that was applied to the previous card to decrement it
-    const previousReviewLog = state.reviewLogs.find((log) => log.cardId === previousCardId);
+    const previousIndex = active.currentIndex - 1;
+    const previousCardId = active.cardIds[previousIndex];
+    const previousReviewLog = state.reviewLogs.find((l: ReviewLog) => l.cardId === previousCardId);
     const ratingToDecrement = previousReviewLog?.rating ?? "good";
-        const xpToDeduct = REVIEW_XP[ratingToDecrement] ?? 0;
+    const xpToDeduct = REVIEW_XP[ratingToDecrement] ?? 0;
 
-        const nextRatings = {
-          ...activeStudy.ratings,
-          [ratingToDecrement]: Math.max(0, activeStudy.ratings[ratingToDecrement] - 1),
-        };
-
-        const nextActiveStudy: ActiveStudySession = {
-                  ...activeStudy,
-                  currentIndex: previousIndex,
-                  revealed: false,
-                  ratings: nextRatings,
-                  previousCardState: null,
-                  sessionXp: Math.max(0, activeStudy.sessionXp - xpToDeduct),
-                  newCardsCount: previousCard.state === "new"
-                    ? Math.max(0, activeStudy.newCardsCount - 1)
-                    : activeStudy.newCardsCount,
-                };
-
-    const snapshot: RecallStateSnapshot = {
-      decks: state.decks,
-      cards: state.cards.map((item) => (item.id === cardId ? previousCard : item)),
-      studySessions: state.studySessions,
-      reviewLogs: state.reviewLogs.filter((log) => log.cardId !== previousCardId),
-      settings: state.settings,
+    const nextRatings = { ...active.ratings, [ratingToDecrement]: Math.max(0, active.ratings[ratingToDecrement] - 1) };
+    const nextActiveStudy: ActiveStudySession = {
+      ...active, currentIndex: previousIndex, revealed: false, ratings: nextRatings, previousCardState: null,
+      sessionXp: Math.max(0, active.sessionXp - xpToDeduct),
+      newCardsCount: previousCard.state === "new" ? Math.max(0, active.newCardsCount - 1) : active.newCardsCount,
     };
 
-    await persistReview(set, snapshot, { activeStudy: nextActiveStudy });
+    const snapshot: RecallStateSnapshot = {
+      decks: state.decks, cards: state.cards.map((c: Card) => (c.id === cardId ? previousCard : c)),
+      studySessions: state.studySessions, reviewLogs: state.reviewLogs.filter((l: ReviewLog) => l.cardId !== previousCardId),
+      settings: state.settings,
+    };
+    await persistReviewSnapshot(set, snapshot, { activeStudy: nextActiveStudy });
   },
 
   exitStudy() {
-      const state = get();
-      const activeStudy = state.activeStudy;
-      let lastSessionSummary: SessionSummary | null = null;
+    const state = get();
+    const active = state.activeStudy;
+    let summary: SessionSummary | null = null;
 
-      if (activeStudy && activeStudy.completed) {
-        const timeSpentMs = Date.now() - new Date(activeStudy.startedAt).getTime();
-        const totalRatings = activeStudy.ratings.again + activeStudy.ratings.hard + activeStudy.ratings.good + activeStudy.ratings.easy;
-        const averageRating = totalRatings > 0 
-          ? (activeStudy.ratings.again * 1 + activeStudy.ratings.hard * 2 + activeStudy.ratings.good * 3 + activeStudy.ratings.easy * 4) / totalRatings
-          : 0;
+    if (active && active.completed) {
+      const timeSpentMs = Date.now() - new Date(active.startedAt).getTime();
+      const totalRatings = active.ratings.again + active.ratings.hard + active.ratings.good + active.ratings.easy;
+      const averageRating = totalRatings > 0
+        ? (active.ratings.again * 1 + active.ratings.hard * 2 + active.ratings.good * 3 + active.ratings.easy * 4) / totalRatings : 0;
 
-        // Compute XP and achievements first
-        const goodAndEasy = activeStudy.ratings.good + activeStudy.ratings.easy;
-        const accuracy = totalRatings > 0 ? Math.round((goodAndEasy / totalRatings) * 100) : 0;
-        const newXp = state.settings.xp + activeStudy.sessionXp;
-        const totalReviews = state.reviewLogs.length;
-        const streak = getStudyStreak(state.reviewLogs);
-        const now = new Date();
-        const nowIso = now.toISOString();
-        const reviewHour = now.getHours();
+      const goodAndEasy = active.ratings.good + active.ratings.easy;
+      const accuracy = totalRatings > 0 ? Math.round((goodAndEasy / totalRatings) * 100) : 0;
+      const newXp = state.settings.xp + active.sessionXp;
+      const totalReviews = state.reviewLogs.length;
+      const streak = getStudyStreak(state.reviewLogs);
+      const now = new Date();
+      const nowIso = now.toISOString();
+      const reviewHour = now.getHours();
 
-        const sortedLogs = [...state.reviewLogs].sort((a, b) => b.reviewDate.localeCompare(a.reviewDate));
-        const lastLogDate = sortedLogs.length > 0 ? new Date(sortedLogs[0].reviewDate) : null;
-        const daysSinceLastReview = lastLogDate
-          ? Math.floor((now.getTime() - lastLogDate.getTime()) / (1000 * 60 * 60 * 24))
-          : 999;
+      const sortedLogs = [...state.reviewLogs].sort((a: ReviewLog, b: ReviewLog) => b.reviewDate.localeCompare(a.reviewDate));
+      const lastLogDate = sortedLogs.length > 0 ? new Date(sortedLogs[0].reviewDate) : null;
+      const daysSinceLastReview = lastLogDate
+        ? Math.floor((now.getTime() - lastLogDate.getTime()) / (1000 * 60 * 60 * 24)) : 999;
 
-        const oldLevel = getLevel(state.settings.xp);
-        const newLevel = getLevel(newXp);
+      const oldLevel = getLevel(state.settings.xp);
+      const newLevel = getLevel(newXp);
 
-        const newAchievementIds = checkAchievements(
-          { xp: newXp, totalReviews, streak, cardsInSession: activeStudy.cardIds.length, accuracy, deckCount: state.decks.length, cardCount: state.cards.length, reviewHour, daysSinceLastReview },
-          state.settings.achievements,
-        );
+      const newAchievementIds = checkAchievements(
+        { xp: newXp, totalReviews, streak, cardsInSession: active.cardIds.length, accuracy, deckCount: state.decks.length, cardCount: state.cards.length, reviewHour, daysSinceLastReview },
+        state.settings.achievements,
+      );
+      const updatedAchievements = applyNewAchievements(newAchievementIds, state.settings.achievements, nowIso);
 
-        const updatedAchievements = applyNewAchievements(newAchievementIds, state.settings.achievements, nowIso);
+      summary = {
+        cardsStudied: active.cardIds.length, timeSpentMs, averageRating, newCards: active.newCardsCount,
+        againCount: active.ratings.again, hardCount: active.ratings.hard, goodCount: active.ratings.good, easyCount: active.ratings.easy,
+        sessionXp: active.sessionXp,
+        newAchievements: newAchievementIds.map((id: string) => {
+          const def = ACHIEVEMENT_DEFS[id as keyof typeof ACHIEVEMENT_DEFS];
+          return { id, title: def.title, description: def.description, icon: def.icon, unlockedAt: nowIso };
+        }),
+      };
 
-        // Build summary with XP + achievements
-        lastSessionSummary = {
-          cardsStudied: activeStudy.cardIds.length,
-          timeSpentMs,
-          averageRating,
-          newCards: activeStudy.newCardsCount,
-          againCount: activeStudy.ratings.again,
-          hardCount: activeStudy.ratings.hard,
-          goodCount: activeStudy.ratings.good,
-          easyCount: activeStudy.ratings.easy,
-          sessionXp: activeStudy.sessionXp,
-          newAchievements: newAchievementIds.map((id) => {
-            const def = ACHIEVEMENT_DEFS[id];
-            return { id, title: def.title, description: def.description, icon: def.icon, unlockedAt: nowIso };
-          }),
-        };
+      if (newLevel > oldLevel) triggerLevelUpConfetti();
+      if (newAchievementIds.length > 0) triggerAchievementConfetti();
 
-        // Trigger level-up confetti
-                if (newLevel > oldLevel) {
-                  triggerLevelUpConfetti();
-                }
+      const updatedSettings = { ...state.settings, xp: newXp, achievements: updatedAchievements };
+      const snapshot: RecallStateSnapshot = { decks: state.decks, cards: state.cards, studySessions: state.studySessions, reviewLogs: state.reviewLogs, settings: updatedSettings };
+      void persistSnapshot(set, snapshot, { activeStudy: null, lastSessionSummary: summary });
+      return;
+    }
 
-                // Trigger achievement confetti
-                if (newAchievementIds.length > 0) {
-                  triggerAchievementConfetti();
-                }
-
-        // Persist XP + achievements
-        const updatedSettings = { ...state.settings, xp: newXp, achievements: updatedAchievements };
-        const snapshot: RecallStateSnapshot = {
-          decks: state.decks, cards: state.cards, studySessions: state.studySessions,
-          reviewLogs: state.reviewLogs, settings: updatedSettings,
-        };
-
-        void persist(set, snapshot, { activeStudy: null, lastSessionSummary });
-                return;
-              }
-
-              // Not completed or no active study
-              const deckId = activeStudy?.deckId ?? state.selectedDeckId;
-              set({ view: deckId ? "deck" : "dashboard", selectedDeckId: deckId, activeStudy: null, lastSessionSummary: null });
-            },
-
-  clearSessionSummary() {
-    set({ lastSessionSummary: null });
+    const deckId = active?.deckId ?? state.selectedDeckId;
+    set({ view: deckId ? "deck" : "dashboard", selectedDeckId: deckId, activeStudy: null, lastSessionSummary: null });
   },
+
+  clearSessionSummary() { set({ lastSessionSummary: null }); },
 
   async resetData() {
-    const repository = await getRepository();
-    const snapshot = await repository.resetToSeedData();
-    commitSnapshot(set, snapshot, { view: "dashboard", selectedDeckId: null, activeStudy: null });
+    const repo = await getRepository();
+    const snapshot = await repo.resetToSeedData();
+    applyTheme(snapshot.settings.theme);
+    set({ ...snapshot, view: "dashboard", selectedDeckId: null, activeStudy: null, error: null });
   },
 
-  async replaceData(payload) {
-    const repository = await getRepository();
-    const snapshot = await repository.replaceDataFromImport(payload);
-    commitSnapshot(set, snapshot, { view: "dashboard", selectedDeckId: null, activeStudy: null });
+  async replaceData(payload: RecallExportPayload) {
+    const repo = await getRepository();
+    const snapshot = await repo.replaceDataFromImport(payload);
+    applyTheme(snapshot.settings.theme);
+    set({ ...snapshot, view: "dashboard", selectedDeckId: null, activeStudy: null, error: null });
   },
 
-  async mergeData(payload) {
-    const repository = await getRepository();
-    const snapshot = await repository.mergeDataFromImport(dataState(get()), payload);
-    commitSnapshot(set, snapshot, { view: "dashboard", selectedDeckId: null, activeStudy: null });
+  async mergeData(payload: RecallExportPayload) {
+    const repo = await getRepository();
+    const snapshot = await repo.mergeDataFromImport(dataState(get()), payload);
+    applyTheme(snapshot.settings.theme);
+    set({ ...snapshot, view: "dashboard", selectedDeckId: null, activeStudy: null, error: null });
   },
 
-  exportData() {
-    return buildExportPayload(dataState(get()));
-  },
+  exportData() { return buildExportPayload(dataState(get())); },
 }));
-
-async function getRepository(): Promise<RecallRepository> {
-  repositoryPromise ??= getRecallRepository();
-  return repositoryPromise;
-}
-
-async function persist(
-  set: (partial: Partial<RecallStore>) => void,
-  snapshot: RecallStateSnapshot,
-  extra: Partial<Pick<RecallStore, "view" | "selectedDeckId" | "activeStudy">> = {},
-): Promise<void> {
-  const repository = await getRepository();
-  await repository.saveSnapshot(snapshot);
-  commitSnapshot(set, snapshot, extra);
-}
-
-async function persistReview(
-  set: (partial: Partial<RecallStore>) => void,
-  snapshot: RecallStateSnapshot,
-  extra: Partial<Pick<RecallStore, "activeStudy">>,
-): Promise<void> {
-  const repository = await getRepository();
-  await repository.recordReviewSession(snapshot);
-  commitSnapshot(set, snapshot, extra);
-}
-
-function commitSnapshot(
-  set: (partial: Partial<RecallStore>) => void,
-  snapshot: RecallStateSnapshot,
-  extra: Partial<Pick<RecallStore, "view" | "selectedDeckId" | "activeStudy">> = {},
-): void {
-  applyTheme(snapshot.settings.theme);
-  set({ ...snapshot, ...extra, error: null });
-}
-
-function dataState(state: RecallStore): RecallStateSnapshot {
-  return {
-    decks: state.decks,
-    cards: state.cards,
-    studySessions: state.studySessions,
-    reviewLogs: state.reviewLogs,
-    settings: state.settings,
-  };
-}
-
-function ensureDeckName(name: string, decks: Deck[]): void {
-  if (!name) {
-    throw new Error("Deck name is required.");
-  }
-
-  if (decks.some((deck) => normalizeName(deck.name).toLowerCase() === name.toLowerCase())) {
-    throw new Error("Deck name must be unique.");
-  }
-}
-
-function ensureCardInput(input: CardInput): void {
-  if (!input.front.trim()) {
-    throw new Error("Front is required.");
-  }
-
-  const isCloze = /\{\{c\d+::[^}]+\}\}/.test(input.front);
-  if (!input.back.trim() && !isCloze) {
-    throw new Error("Back is required.");
-  }
-}
-
-function touchDeck(decks: Deck[], deckId: string, updatedAt: string): Deck[] {
-  return decks.map((deck) => (deck.id === deckId ? { ...deck, updatedAt } : deck));
-}
