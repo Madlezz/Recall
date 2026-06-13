@@ -81,6 +81,7 @@ describe("database mappers", () => {
                             achievements: [],
                             dailyGoal: 20,
                             notificationsEnabled: false,
+                            soundVolume: 100,
                           };
 
     expect(deckFromRow(deckToRow(deck) as DeckRow)).toEqual(deck);

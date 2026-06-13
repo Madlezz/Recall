@@ -32,6 +32,7 @@ export function exportDeckToJson(deck: Deck, cards: Card[]): string {
           achievements: [],
           dailyGoal: 20,
           notificationsEnabled: false,
+          soundVolume: 100,
         },
       };
       return JSON.stringify(payload, null, 2);

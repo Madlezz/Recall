@@ -67,6 +67,7 @@ const validSnapshot: RecallStateSnapshot = {
             achievements: [],
             dailyGoal: 20,
             notificationsEnabled: false,
+            soundVolume: 100,
           },
 };
 

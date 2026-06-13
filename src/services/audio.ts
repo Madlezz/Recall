@@ -4,6 +4,15 @@
  */
 
 let ctx: AudioContext | null = null;
+let _masterVolume = 1.0; // 0.0 - 1.0
+
+export function setMasterVolume(volume: number): void {
+  _masterVolume = Math.max(0, Math.min(1, volume));
+}
+
+export function getMasterVolume(): number {
+  return _masterVolume;
+}
 
 function getCtx(): AudioContext {
   if (!ctx || ctx.state === "closed") {
@@ -27,7 +36,7 @@ function playTone(
   const gain = c.createGain();
   osc.type = type;
   osc.frequency.value = frequency;
-  gain.gain.setValueAtTime(volume, c.currentTime);
+  gain.gain.setValueAtTime(volume * _masterVolume, c.currentTime);
   if (ramp) gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + duration);
   osc.connect(gain);
   gain.connect(c.destination);
@@ -43,7 +52,7 @@ export function playFlipSound(): void {
   osc.type = "sine";
   osc.frequency.setValueAtTime(300, c.currentTime);
   osc.frequency.exponentialRampToValueAtTime(600, c.currentTime + 0.08);
-  gain.gain.setValueAtTime(0.06, c.currentTime);
+  gain.gain.setValueAtTime(0.06 * _masterVolume, c.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.12);
   osc.connect(gain);
   gain.connect(c.destination);
@@ -134,7 +143,7 @@ export function startRain(): void {
   filter.frequency.value = 800;
   filter.Q.value = 0.5;
   const gain = c.createGain();
-  gain.gain.value = 0.04;
+  gain.gain.value = 0.04 * _masterVolume;
   noise.connect(filter);
   filter.connect(gain);
   gain.connect(c.destination);
@@ -152,7 +161,7 @@ export function startCafe(): void {
   lowpass.type = "lowpass";
   lowpass.frequency.value = 200;
   const rumbleGain = c.createGain();
-  rumbleGain.gain.value = 0.025;
+  rumbleGain.gain.value = 0.025 * _masterVolume;
   noise.connect(lowpass);
   lowpass.connect(rumbleGain);
   rumbleGain.connect(c.destination);
@@ -163,7 +172,7 @@ export function startCafe(): void {
   const pingInterval = setInterval(() => {
     if (ambientPlaying !== "cafe") { clearInterval(pingInterval); return; }
     const freq = 800 + Math.random() * 1200;
-    const pingVol = 0.01 + Math.random() * 0.02;
+    const pingVol = (0.01 + Math.random() * 0.02) * _masterVolume;
     const osc = c.createOscillator();
     const pingGain = c.createGain();
     osc.type = "sine";
@@ -200,7 +209,7 @@ export function startLofi(): void {
   filter.frequency.value = 600;
   filter.Q.value = 0.7;
   
-  mainGain.gain.value = 0.06;
+  mainGain.gain.value = 0.06 * _masterVolume;
   
   lfo.connect(lfoGain);
   lfoGain.connect(osc.frequency);

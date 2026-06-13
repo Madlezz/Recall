@@ -5,6 +5,7 @@ import { createId } from "@/lib/utils";
 import { buildExportPayload } from "@/services/import-export";
 import { getRecallRepository, type RecallRepository } from "@/services/repository";
 import { applyTheme } from "@/services/storage";
+import { setMasterVolume } from "@/services/audio";
 import { applyReview } from "@/services/fsrs-engine";
 import { playSessionStartSound } from "@/services/audio";
 import {
@@ -105,7 +106,8 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
       const repository = await getRecallRepository();
       const snapshot = await repository.loadAppData();
       applyTheme(snapshot.settings.theme);
-      const view = snapshot.settings.onboardingComplete ? "dashboard" : "onboarding";
+            setMasterVolume(snapshot.settings.soundVolume / 100);
+            const view = snapshot.settings.onboardingComplete ? "dashboard" : "onboarding";
       set({ ...snapshot, view, isLoading: false, isInitialized: true, error: null });
 
       // Fire-and-forget: send due reminder notification if enabled

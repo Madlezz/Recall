@@ -1,4 +1,4 @@
-import { Download, HardDrive, Layers, Moon, RotateCcw, Sun, Upload, Bell, BellOff } from "lucide-react";
+import { Download, HardDrive, Layers, Moon, RotateCcw, Sun, Upload, Bell, BellOff, Volume2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -139,17 +139,34 @@ export function Settings(): JSX.Element {
 
       <section className="grid gap-4 lg:grid-cols-2">
         <Panel title="Appearance" description="Theme is stored locally.">
-                  <div className="flex flex-wrap gap-2">
-                    <Button variant={settings.theme === "dark" ? "default" : "outline"} onClick={() => void handleTheme("dark")}>
-                      <Moon className="h-4 w-4" />
-                      Dark
-                    </Button>
-                    <Button variant={settings.theme === "light" ? "default" : "outline"} onClick={() => void handleTheme("light")}>
-                      <Sun className="h-4 w-4" />
-                      Light
-                    </Button>
-                  </div>
-                </Panel>
+                          <div className="flex flex-wrap gap-2">
+                            <Button variant={settings.theme === "dark" ? "default" : "outline"} onClick={() => void handleTheme("dark")}>
+                              <Moon className="h-4 w-4" />
+                              Dark
+                            </Button>
+                            <Button variant={settings.theme === "light" ? "default" : "outline"} onClick={() => void handleTheme("light")}>
+                              <Sun className="h-4 w-4" />
+                              Light
+                            </Button>
+                          </div>
+                        </Panel>
+
+                        <Panel title="Sound Volume" description="Master volume for card sounds, chimes, and ambient soundscapes.">
+                          <div className="flex items-center gap-3">
+                            <Volume2 className="h-4 w-4 text-muted-foreground" />
+                            <input
+                              type="range"
+                              min="0"
+                              max="100"
+                              value={settings.soundVolume}
+                              onChange={(e) => void updateSettings({ soundVolume: parseInt(e.target.value, 10) })}
+                              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-muted accent-primary"
+                            />
+                            <span className="w-8 text-right text-sm tabular-nums text-muted-foreground">
+                              {settings.soundVolume}%
+                            </span>
+                          </div>
+                        </Panel>
 
                 <Panel title="Daily New Cards" description="Limit how many new cards appear per day to avoid overwhelm.">
                   <div className="flex items-center gap-3">

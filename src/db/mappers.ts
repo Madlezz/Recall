@@ -210,7 +210,8 @@ export function settingsFromRows(rows: SettingRow[]): RecallSettings {
       achievements,
       dailyGoal: dailyGoalRaw ? parseInt(dailyGoalRaw, 10) : 20,
       notificationsEnabled: values.get("notifications_enabled") === "true",
-    };
+            soundVolume: parseInt(values.get("sound_volume") ?? "100", 10),
+          };
 }
 
 export function settingsToRows(settings: RecallSettings): SettingRow[] {
@@ -225,6 +226,7 @@ export function settingsToRows(settings: RecallSettings): SettingRow[] {
         { key: "achievements", value: JSON.stringify(settings.achievements) },
         { key: "daily_goal", value: String(settings.dailyGoal) },
         { key: "notifications_enabled", value: String(settings.notificationsEnabled) },
+    { key: "sound_volume", value: String(settings.soundVolume) },
       ];
 }
 

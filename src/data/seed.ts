@@ -82,7 +82,8 @@ export function createSeedSnapshot(now = new Date()): RecallStateSnapshot {
           achievements: [],
           dailyGoal: 20,
           notificationsEnabled: false,
-        },
+                    soundVolume: 100,
+                  },
   };
 }
 
