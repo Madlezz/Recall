@@ -14,6 +14,9 @@ const defaultSettings: RecallSettings = {
   dailyGoal: 50,
   notificationsEnabled: false,
   soundVolume: 80,
+  backupFolder: null,
+  backupSchedule: "never" as const,
+  lastBackupAt: null,
 };
 
 const defaultDeck: Deck = {

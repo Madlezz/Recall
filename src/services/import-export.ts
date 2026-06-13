@@ -33,9 +33,12 @@ export function exportDeckToJson(deck: Deck, cards: Card[]): string {
           dailyGoal: 20,
           notificationsEnabled: false,
           soundVolume: 100,
-        },
-      };
-      return JSON.stringify(payload, null, 2);
+                    backupFolder: null,
+                    backupSchedule: "never" as const,
+                    lastBackupAt: null,
+                  },
+                };
+                return JSON.stringify(payload, null, 2);
 }
 
 export function downloadFile(filename: string, content: string): void {

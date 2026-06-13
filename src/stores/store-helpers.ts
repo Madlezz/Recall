@@ -1,6 +1,7 @@
 import { applyTheme } from "@/services/storage";
 import { getRecallRepository, type RecallRepository } from "@/services/repository";
 import { normalizeName } from "@/lib/utils";
+import { buildExportPayload } from "@/services/import-export";
 import type { Card, Deck, RecallStateSnapshot, ReviewLog, StudySession } from "@/types";
 
 let repositoryPromise: Promise<RecallRepository> | null = null;
@@ -85,4 +86,32 @@ export function ensureCardInput(input: { front: string; back: string }): void {
 
 export function touchDeck(decks: Deck[], deckId: string, updatedAt: string): Deck[] {
   return decks.map((d) => (d.id === deckId ? { ...d, updatedAt } : d));
+}
+
+/** Write a backup JSON file if the schedule says so. Returns the new lastBackupAt or null. */
+export async function runBackupIfDue(state: RecallStateSnapshot): Promise<string | null> {
+  const { backupFolder, backupSchedule, lastBackupAt } = state.settings;
+  if (!backupFolder || backupSchedule === "never") return null;
+
+  const now = new Date();
+  const lastBackup = lastBackupAt ? new Date(lastBackupAt) : null;
+  const daysSince = lastBackup
+    ? Math.floor((now.getTime() - lastBackup.getTime()) / (1000 * 60 * 60 * 24))
+    : 999;
+
+  const due = backupSchedule === "daily" ? daysSince >= 1 : daysSince >= 7;
+  if (!due) return null;
+
+  try {
+    // Dynamic import — only works in Tauri runtime
+    const payload = buildExportPayload(state);
+    const filename = `recall-backup-${now.toISOString().slice(0, 10)}.json`;
+    const { writeTextFile } = await import("@tauri-apps/plugin-fs");
+    const { join } = await import("@tauri-apps/api/path");
+    await writeTextFile(await join(backupFolder, filename), JSON.stringify(payload, null, 2));
+    return now.toISOString();
+  } catch {
+    // Silently fail — backup is non-critical; user will see missing backup date in settings
+    return null;
+  }
 }

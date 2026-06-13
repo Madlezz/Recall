@@ -17,15 +17,15 @@ import type { Card, Deck, RecallSettings, ReviewLog, StudySession } from "@/type
 describe("database mappers", () => {
   it("round-trips card rows with JSON tags and nullable review date", () => {
     const card: Card = {
-              id: "card-1",
-              deckId: "deck-1",
-              front: "Question",
-              back: "Answer",
-              hint: "",
-              source: "",
-              tags: ["sqlite", "tauri"],
-          cardType: "basic",
-          state: "new",
+      id: "card-1",
+      deckId: "deck-1",
+      front: "Question",
+      back: "Answer",
+      hint: "",
+      source: "",
+      tags: ["sqlite", "tauri"],
+      cardType: "basic",
+      state: "new",
       stability: 0,
       difficulty: 0,
       elapsedDays: 0,
@@ -39,8 +39,7 @@ describe("database mappers", () => {
     };
 
     const row = cardToRow(card);
-
-    expect(row.tags).toBe("[\"sqlite\",\"tauri\"]");
+    expect(row.tags).toBe('["sqlite","tauri"]');
     expect(row.last_review_date).toBeNull();
     expect(cardFromRow(row)).toEqual(card);
   });
@@ -72,17 +71,20 @@ describe("database mappers", () => {
       scheduledDays: 1,
     };
     const settings: RecallSettings = {
-              theme: "dark",
-              seededAt: "2026-06-01T00:00:00.000Z",
-              dailyNewCardLimit: 20,
-              leechThreshold: 5,
-              onboardingComplete: true,
-                            xp: 0,
-                            achievements: [],
-                            dailyGoal: 20,
-                            notificationsEnabled: false,
-                            soundVolume: 100,
-                          };
+      theme: "dark",
+      seededAt: "2026-06-01T00:00:00.000Z",
+      dailyNewCardLimit: 20,
+      leechThreshold: 5,
+      onboardingComplete: true,
+      xp: 0,
+      achievements: [],
+      dailyGoal: 20,
+      notificationsEnabled: false,
+      soundVolume: 100,
+      backupFolder: null,
+      backupSchedule: "never",
+      lastBackupAt: null,
+    };
 
     expect(deckFromRow(deckToRow(deck) as DeckRow)).toEqual(deck);
     expect(studySessionFromRow(studySessionToRow(session) as StudySessionRow)).toEqual(session);
@@ -93,15 +95,15 @@ describe("database mappers", () => {
 
   it("rejects invalid card state and review rating rows", () => {
     const cardRow: CardRow = {
-              id: "card-1",
-              deck_id: "deck-1",
-              front: "Question",
-              back: "Answer",
-              hint: "",
-              source: "",
-              tags: "[]",
-          card_type: "basic",
-          state: "bad",
+      id: "card-1",
+      deck_id: "deck-1",
+      front: "Question",
+      back: "Answer",
+      hint: "",
+      source: "",
+      tags: "[]",
+      card_type: "basic",
+      state: "bad",
       stability: 0,
       difficulty: 0,
       elapsed_days: 0,

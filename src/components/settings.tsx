@@ -1,4 +1,4 @@
-import { Download, HardDrive, Layers, Moon, RotateCcw, Sun, Upload, Bell, BellOff, Volume2 } from "lucide-react";
+import { Download, FolderOpen, HardDrive, Layers, Moon, RotateCcw, Save, Sun, Upload, Bell, BellOff, Volume2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -285,6 +285,57 @@ export function Settings(): JSX.Element {
                       <span className="font-medium">Storage:</span>{" "}
                       {typeof window !== "undefined" && (window as any).__TAURI__ ? "SQLite (recall.db)" : "Browser localStorage"}
                       {" · "}Export JSON for portable backup
+                    </div>
+                  </Panel>
+
+                  {/* Auto-backup */}
+                  <Panel title="Auto-Backup" description="Automatically export a JSON backup on a schedule. Choose a local folder.">
+                    <div className="space-y-3">
+                      <Select
+                        value={settings.backupSchedule}
+                        onValueChange={(v) => void updateSettings({ backupSchedule: v as "daily" | "weekly" | "never" })}
+                      >
+                        <SelectTrigger className="w-40">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="never">Never</SelectItem>
+                          <SelectItem value="daily">Daily</SelectItem>
+                          <SelectItem value="weekly">Weekly</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={async () => {
+                            try {
+                              const { open } = await import("@tauri-apps/plugin-dialog");
+                              const folder = await open({ directory: true, title: "Choose backup folder" });
+                              if (folder) {
+                                await updateSettings({ backupFolder: folder as string });
+                                toast.success("Backup folder set");
+                              }
+                            } catch {
+                              toast.error("Folder picker only works in the Tauri desktop app");
+                            }
+                          }}
+                        >
+                          <FolderOpen className="h-4 w-4 mr-1" />
+                          {settings.backupFolder ? "Change Folder" : "Pick Folder"}
+                        </Button>
+                        {settings.backupFolder ? (
+                          <span className="text-xs text-muted-foreground truncate max-w-[200px]">{settings.backupFolder}</span>
+                        ) : null}
+                      </div>
+                      {settings.lastBackupAt ? (
+                        <p className="text-xs text-muted-foreground">
+                          <Save className="inline h-3 w-3 mr-1" />
+                          Last backup: {new Date(settings.lastBackupAt).toLocaleDateString()}
+                        </p>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">No backups yet. Set a schedule and pick a folder.</p>
+                      )}
                     </div>
                   </Panel>
 

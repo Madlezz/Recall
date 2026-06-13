@@ -69,7 +69,12 @@ export interface RecallSettings {
   dailyGoal: number;
     notificationsEnabled: boolean;
     soundVolume: number; // 0-100
+    backupFolder: string | null;
+    backupSchedule: BackupSchedule;
+    lastBackupAt: string | null;
   }
+
+export type BackupSchedule = "daily" | "weekly" | "never";
 
 export interface SessionSummary {
   cardsStudied: number;

@@ -28,7 +28,7 @@ import type {
 import { navigationSlice, type NavigationSlice } from "./slices/navigation.slice";
 import { deckCardSlice, type DeckCardSlice, type DeckInput, type CardInput } from "./slices/deck-card.slice";
 import { settingsSlice, type SettingsSlice } from "./slices/settings.slice";
-import { dataState, persistSnapshot, persistReviewSnapshot, persistReviewDelta, getRepository, loadReviewLogs } from "./store-helpers";
+import { dataState, persistSnapshot, persistReviewSnapshot, persistReviewDelta, getRepository, loadReviewLogs, runBackupIfDue } from "./store-helpers";
 
 export interface CustomStudyConfig {
   deckId?: string | null;
@@ -106,7 +106,14 @@ export const useRecallStore = create<RecallStore>((set: any, get: any) => ({
             const view = snapshot.settings.onboardingComplete ? "dashboard" : "onboarding";
       set({ ...snapshot, view, isLoading: false, isInitialized: true, error: null });
 
-      // Fire-and-forget: send due reminder notification if enabled
+            // Fire-and-forget: auto-backup if schedule says so
+            void runBackupIfDue(snapshot).then((backupAt) => {
+              if (backupAt) {
+                set({ settings: { ...snapshot.settings, lastBackupAt: backupAt } });
+              }
+            });
+
+            // Fire-and-forget: send due reminder notification if enabled
       if (snapshot.settings.notificationsEnabled) {
         const dueCount = snapshot.cards.filter((c: Card) => isCardDueToday(c)).length;
         if (dueCount > 0) {

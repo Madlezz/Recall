@@ -390,8 +390,11 @@ function migrateSettings(settings: Partial<RecallStateSnapshot["settings"]> & { 
     achievements: Array.isArray(settings.achievements) ? settings.achievements : [],
     dailyGoal: typeof settings.dailyGoal === "number" ? settings.dailyGoal : 20,
     notificationsEnabled: typeof settings.notificationsEnabled === "boolean" ? settings.notificationsEnabled : false,
-    soundVolume: typeof settings.soundVolume === "number" ? settings.soundVolume : 100,
-  };
+        soundVolume: typeof settings.soundVolume === "number" ? settings.soundVolume : 100,
+        backupFolder: typeof settings.backupFolder === "string" ? settings.backupFolder : null,
+        backupSchedule: (settings.backupSchedule === "daily" || settings.backupSchedule === "weekly") ? settings.backupSchedule : "never",
+        lastBackupAt: typeof settings.lastBackupAt === "string" ? settings.lastBackupAt : null,
+      };
 }
 
 function loadLocalSnapshot(): RecallStateSnapshot | null {

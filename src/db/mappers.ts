@@ -211,6 +211,9 @@ export function settingsFromRows(rows: SettingRow[]): RecallSettings {
       dailyGoal: dailyGoalRaw ? parseInt(dailyGoalRaw, 10) : 20,
       notificationsEnabled: values.get("notifications_enabled") === "true",
             soundVolume: parseInt(values.get("sound_volume") ?? "100", 10),
+            backupFolder: values.get("backup_folder") || null,
+                        backupSchedule: (values.get("backup_schedule") ?? "never") as "daily" | "weekly" | "never",
+                        lastBackupAt: values.get("last_backup_at") || null,
           };
 }
 
@@ -227,6 +230,9 @@ export function settingsToRows(settings: RecallSettings): SettingRow[] {
         { key: "daily_goal", value: String(settings.dailyGoal) },
         { key: "notifications_enabled", value: String(settings.notificationsEnabled) },
     { key: "sound_volume", value: String(settings.soundVolume) },
+        { key: "backup_folder", value: settings.backupFolder ?? "" },
+        { key: "backup_schedule", value: settings.backupSchedule },
+        { key: "last_backup_at", value: settings.lastBackupAt ?? "" },
       ];
 }
 
