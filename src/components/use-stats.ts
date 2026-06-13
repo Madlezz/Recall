@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { format, subDays } from "date-fns";
 import { useRecallStore } from "@/stores/recall-store";
 import { getStudyStreak } from "@/lib/streak";
@@ -58,6 +58,12 @@ export function useStats() {
   const decks = useRecallStore((state) => state.decks);
   const settings = useRecallStore((state) => state.settings);
   const studySessions = useRecallStore((state) => state.studySessions);
+  const loadAllReviewLogs = useRecallStore((state) => state.loadAllReviewLogs);
+
+  // Load full review log history when stats page mounts
+  useEffect(() => {
+    void loadAllReviewLogs();
+  }, [loadAllReviewLogs]);
 
   const streak = getStudyStreak(reviewLogs);
   const level = getLevel(settings.xp);

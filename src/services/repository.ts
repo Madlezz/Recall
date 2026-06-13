@@ -33,7 +33,14 @@ export interface RecallRepository {
   mergeDataFromImport(current: RecallStateSnapshot, payload: RecallExportPayload): Promise<RecallStateSnapshot>;
   saveTheme(theme: Theme, current: RecallStateSnapshot): Promise<RecallStateSnapshot>;
   saveSettings(settings: RecallStateSnapshot["settings"], current: RecallStateSnapshot): Promise<RecallStateSnapshot>;
+  /** Load review logs, optionally filtered to entries on or after `since` (ISO date). */
+  loadReviewLogs(since?: string): Promise<ReviewLog[]>;
+  /** Count total review logs (for data-health indicators). */
+  countReviewLogs(): Promise<number>;
 }
+
+/** Number of days of review logs to eagerly load at startup. */
+export const REVIEW_LOG_WINDOW_DAYS = 90;
 
 let cachedRepository: Promise<RecallRepository> | null = null;
 
@@ -119,28 +126,49 @@ class SqliteRecallRepository implements RecallRepository {
   constructor(private readonly executor: SqlExecutor) {}
 
   async loadAppData(): Promise<RecallStateSnapshot> {
-    const [deckRows, cardRows, sessionRows, reviewLogRows, settingRows] = await Promise.all([
-      this.executor.select<DeckRow>("SELECT * FROM decks ORDER BY created_at ASC"),
-      this.executor.select<CardRow>("SELECT * FROM cards ORDER BY created_at ASC"),
-      this.executor.select<StudySessionRow>("SELECT * FROM study_sessions ORDER BY started_at ASC"),
-      this.executor.select<ReviewLogRow>("SELECT * FROM review_logs ORDER BY review_date ASC"),
-      this.executor.select<SettingRow>("SELECT * FROM settings ORDER BY key ASC"),
-    ]);
+      // Compute the 90-day window: load only recent review logs
+      const recentSince = new Date(Date.now() - REVIEW_LOG_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString();
+      const [deckRows, cardRows, sessionRows, reviewLogRows, settingRows] = await Promise.all([
+        this.executor.select<DeckRow>("SELECT * FROM decks ORDER BY created_at ASC"),
+        this.executor.select<CardRow>("SELECT * FROM cards ORDER BY created_at ASC"),
+        this.executor.select<StudySessionRow>("SELECT * FROM study_sessions ORDER BY started_at ASC"),
+        this.executor.select<ReviewLogRow>(
+          "SELECT * FROM review_logs WHERE review_date >= ? ORDER BY review_date ASC",
+          [recentSince],
+        ),
+        this.executor.select<SettingRow>("SELECT * FROM settings ORDER BY key ASC"),
+      ]);
 
-    if (deckRows.length === 0) {
-      return this.resetToSeedData();
+      if (deckRows.length === 0) {
+        return this.resetToSeedData();
+      }
+
+      const snapshot: RecallStateSnapshot = {
+        decks: deckRows.map(deckFromRow),
+        cards: cardRows.map(cardFromRow),
+        studySessions: sessionRows.map(studySessionFromRow),
+        reviewLogs: reviewLogRows.map(reviewLogFromRow),
+        settings: settingsFromRows(settingRows),
+      };
+      validateImportSnapshot(snapshot);
+      return snapshot;
     }
 
-    const snapshot: RecallStateSnapshot = {
-      decks: deckRows.map(deckFromRow),
-      cards: cardRows.map(cardFromRow),
-      studySessions: sessionRows.map(studySessionFromRow),
-      reviewLogs: reviewLogRows.map(reviewLogFromRow),
-      settings: settingsFromRows(settingRows),
-    };
-    validateImportSnapshot(snapshot);
-    return snapshot;
-  }
+    async loadReviewLogs(since?: string): Promise<ReviewLog[]> {
+      const sql = since
+        ? "SELECT * FROM review_logs WHERE review_date >= ? ORDER BY review_date ASC"
+        : "SELECT * FROM review_logs ORDER BY review_date ASC";
+      const params = since ? [since] : [];
+      const rows = await this.executor.select<ReviewLogRow>(sql, params);
+      return rows.map(reviewLogFromRow);
+    }
+
+    async countReviewLogs(): Promise<number> {
+      const rows = await this.executor.select<{ cnt: number }>(
+        "SELECT COUNT(*) AS cnt FROM review_logs",
+      );
+      return rows[0]?.cnt ?? 0;
+    }
 
   async saveSnapshot(snapshot: RecallStateSnapshot): Promise<void> {
     validateImportSnapshot(snapshot);
@@ -278,6 +306,17 @@ class SqliteRecallRepository implements RecallRepository {
 class LocalStorageRecallRepository implements RecallRepository {
   async recordReview(_updatedCard: Card, _reviewLog: ReviewLog, _session: StudySession | null): Promise<void> {
     // localStorage can't do targeted updates; only used in tests
+  }
+
+  async loadReviewLogs(since?: string): Promise<ReviewLog[]> {
+    return this.loadAppData().then((s) => {
+      if (!since) return s.reviewLogs;
+      return s.reviewLogs.filter((l) => l.reviewDate >= since);
+    });
+  }
+
+  async countReviewLogs(): Promise<number> {
+    return this.loadAppData().then((s) => s.reviewLogs.length);
   }
 
   async loadAppData(): Promise<RecallStateSnapshot> {

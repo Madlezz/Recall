@@ -28,7 +28,7 @@ import type {
 import { navigationSlice, type NavigationSlice } from "./slices/navigation.slice";
 import { deckCardSlice, type DeckCardSlice, type DeckInput, type CardInput } from "./slices/deck-card.slice";
 import { settingsSlice, type SettingsSlice } from "./slices/settings.slice";
-import { dataState, persistSnapshot, persistReviewSnapshot, persistReviewDelta, getRepository } from "./store-helpers";
+import { dataState, persistSnapshot, persistReviewSnapshot, persistReviewDelta, getRepository, loadReviewLogs } from "./store-helpers";
 
 export interface CustomStudyConfig {
   deckId?: string | null;
@@ -58,7 +58,8 @@ type RecallStore = RecallStateSnapshot &
     undoLastReview: () => Promise<boolean>;
     exitStudy: () => Promise<void>;
     clearSessionSummary: () => void;
-    resetData: () => Promise<void>;
+        loadAllReviewLogs: () => Promise<void>;
+        resetData: () => Promise<void>;
         replaceData: (payload: RecallExportPayload) => Promise<void>;
         mergeData: (payload: RecallExportPayload) => Promise<void>;
         exportData: () => RecallExportPayload;
@@ -353,7 +354,18 @@ export const useRecallStore = create<RecallStore>((set: any, get: any) => ({
 
   clearSessionSummary() { set({ lastSessionSummary: null }); },
 
-  async resetData() {
+    async loadAllReviewLogs() {
+      const state = get();
+      const logs = await loadReviewLogs();
+      // Merge: keep existing recent logs, add older ones we don't yet have
+      const existingIds = new Set(state.reviewLogs.map((l: ReviewLog) => l.id));
+      const newLogs = logs.filter((l) => !existingIds.has(l.id));
+      if (newLogs.length > 0) {
+        set({ reviewLogs: [...state.reviewLogs, ...newLogs] });
+      }
+    },
+
+    async resetData() {
     const repo = await getRepository();
     const snapshot = await repo.resetToSeedData();
     applyTheme(snapshot.settings.theme);

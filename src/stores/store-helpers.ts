@@ -10,6 +10,12 @@ export async function getRepository(): Promise<RecallRepository> {
   return repositoryPromise;
 }
 
+/** Load review logs from DB, optionally filtered by date. */
+export async function loadReviewLogs(since?: string): Promise<ReviewLog[]> {
+  const repo = await getRepository();
+  return repo.loadReviewLogs(since);
+}
+
 /** Zustand set function narrowed to the snapshot subset we persist. */
 export type StoreSet = (partial: RecallStateSnapshot & Record<string, unknown>) => void;
 
