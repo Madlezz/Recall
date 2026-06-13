@@ -59,6 +59,7 @@ export function CardBrowser(): JSX.Element {
 
   // ── Bulk tag dialog state ──
   const [bulkTagInput, setBulkTagInput] = useState("");
+  const [bulkTagMode, setBulkTagMode] = useState<"add" | "set" | "remove">("add");
   const [showBulkTag, setShowBulkTag] = useState(false);
 
   const deckMap = useMemo(() => {
@@ -199,7 +200,7 @@ export function CardBrowser(): JSX.Element {
       .split(",")
       .map((t) => t.trim())
       .filter(Boolean);
-    if (tags.length === 0) return;
+    if (tags.length === 0 && bulkTagMode !== "remove") return;
 
     const ids = [...selected];
     let updated = 0;
@@ -207,22 +208,34 @@ export function CardBrowser(): JSX.Element {
       const card = cards.find((c) => c.id === id);
       if (!card) continue;
       try {
+        let newTags: string[];
+        if (bulkTagMode === "add") {
+          newTags = [...new Set([...card.tags, ...tags])];
+        } else if (bulkTagMode === "set") {
+          newTags = tags;
+        } else {
+          // remove
+          const removeSet = new Set(tags);
+          newTags = card.tags.filter((t) => !removeSet.has(t));
+        }
         await updateCard(id, {
           deckId: card.deckId,
           front: card.front,
           back: card.back,
           hint: card.hint,
           source: card.source,
-          tags: [...new Set([...card.tags, ...tags])],
+          tags: newTags,
         });
         updated++;
       } catch {
         // skip
       }
     }
-    toast.success(`Tagged ${updated} card(s)`);
+    const verb = bulkTagMode === "remove" ? "Untagged" : "Tagged";
+    toast.success(`${verb} ${updated} card(s)`);
     setShowBulkTag(false);
     setBulkTagInput("");
+    setBulkTagMode("add");
     clearSelection();
   }
 
@@ -338,8 +351,18 @@ export function CardBrowser(): JSX.Element {
 
             {showBulkTag ? (
               <div className="flex items-center gap-1">
+                <Select value={bulkTagMode} onValueChange={(v) => setBulkTagMode(v as "add" | "set" | "remove")}>
+                  <SelectTrigger className="h-8 w-20 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="add">Add</SelectItem>
+                    <SelectItem value="set">Set</SelectItem>
+                    <SelectItem value="remove">Remove</SelectItem>
+                  </SelectContent>
+                </Select>
                 <Input
-                  placeholder="tag1, tag2..."
+                  placeholder={bulkTagMode === "remove" ? "tag to remove..." : "tag1, tag2..."}
                   value={bulkTagInput}
                   onChange={(e) => setBulkTagInput(e.target.value)}
                   className="h-8 w-40 text-xs"
