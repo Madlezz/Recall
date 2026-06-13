@@ -1,6 +1,6 @@
 import confetti from "canvas-confetti";
-import { ArrowLeft, Check, Clock, EyeOff, RotateCcw, RotateCw, Volume2, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowLeft, Check, Clock, EyeOff, RotateCcw, RotateCw, Timer, Volume2, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { RichCard } from "@/components/RichCard";
 import { Button } from "@/components/ui/button";
@@ -46,12 +46,27 @@ export function StudyMode(): JSX.Element {
       }
 
       if (event.ctrlKey && event.key === "z" && !activeStudy.revealed && activeStudy.currentIndex > 0) {
-        event.preventDefault();
-        void undoLastReview().then(() => toast.info("Review undone"));
-        return;
-      }
+              event.preventDefault();
+              void undoLastReview().then(() => toast.info("Review undone"));
+              return;
+            }
 
-      if (event.code === "Space" && !activeStudy.revealed) {
+            // B = bury, S = snooze (only before reveal)
+            if (!activeStudy.revealed) {
+              if (event.key.toLowerCase() === "b") {
+                event.preventDefault();
+                buryCard();
+                return;
+              }
+              if (event.key.toLowerCase() === "s") {
+                event.preventDefault();
+                void snoozeCard(120);
+                toast.info("Snoozed for 2 hours");
+                return;
+              }
+            }
+
+            if (event.code === "Space" && !activeStudy.revealed) {
         event.preventDefault();
         revealAnswer();
       }
@@ -79,12 +94,30 @@ export function StudyMode(): JSX.Element {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeStudy, answerCurrentCard, revealAnswer, undoLastReview]);
+  }, [activeStudy, answerCurrentCard, revealAnswer, undoLastReview, buryCard, snoozeCard]);
 
   // Stop TTS when card changes or study ends
   useEffect(() => {
     return () => stopSpeaking();
   }, [cardId]);
+
+  // ── Elapsed timer ──
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    if (!activeStudy || activeStudy.completed) return;
+    const start = new Date(activeStudy.startedAt).getTime();
+    const tick = () => setElapsed(Date.now() - start);
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [activeStudy?.id, activeStudy?.completed]);
+
+  function formatElapsed(ms: number): string {
+    const sec = Math.floor(ms / 1000);
+    const min = Math.floor(sec / 60);
+    const remain = sec % 60;
+    return `${min}:${String(remain).padStart(2, "0")}`;
+  }
 
   if (!activeStudy && lastSessionSummary) {
     return (
@@ -165,18 +198,22 @@ export function StudyMode(): JSX.Element {
           Exit
         </Button>
         {isTTSSupported() ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              const text = activeStudy.revealed ? `${card.front} ${card.back}` : card.front;
-              speakText(text);
-            }}
-          >
-            <Volume2 className="h-5 w-5" />
-          </Button>
-        ) : null}
-        <div className="min-w-[220px] text-right">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      const text = activeStudy.revealed ? `${card.front} ${card.back}` : card.front;
+                      speakText(text);
+                    }}
+                  >
+                    <Volume2 className="h-5 w-5" />
+                  </Button>
+                ) : null}
+                <div className="flex items-center gap-1 text-sm tabular-nums text-muted-foreground">
+                  <Timer className="h-4 w-4" />
+                  {formatElapsed(elapsed)}
+                </div>
+                <div className="min-w-[220px] text-right">
           <div className="text-sm font-medium">
             {activeStudy.currentIndex + 1}/{total}
           </div>
