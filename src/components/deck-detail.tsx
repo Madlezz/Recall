@@ -89,14 +89,14 @@ export function DeckDetail(): JSX.Element {
 
       async function handleSetExamDeadline(): Promise<void> {
       if (!examDateInput) {
-        await setExamDeadline(deck.id, null);
-        toast.success("Exam deadline removed");
-        setShowExamPicker(false);
-        return;
-      }
-      // Set to end of day
-      const deadline = new Date(examDateInput + "T23:59:59").toISOString();
-      await setExamDeadline(deck.id, deadline);
+        await setExamDeadline(currentDeckId, null);
+                toast.success("Exam deadline removed");
+                setShowExamPicker(false);
+                return;
+              }
+              // Set to end of day
+              const deadline = new Date(examDateInput + "T23:59:59").toISOString();
+              await setExamDeadline(currentDeckId, deadline);
       toast.success(`Exam set for ${examDateInput}`);
       setShowExamPicker(false);
     }
@@ -108,7 +108,8 @@ export function DeckDetail(): JSX.Element {
   }
 
   function handleExport(): void {
-    const json = exportDeckToJson(deck, deckCards);
+      if (!deck) return;
+      const json = exportDeckToJson(deck, deckCards);
     downloadFile(`${deck.name.replace(/\s+/g, '_')}.json`, json);
     toast.success("Deck exported");
   }

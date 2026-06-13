@@ -91,6 +91,7 @@ export function AnkiImportDialog(): JSX.Element {
             front: ankiCard.front.trim(),
             back: ankiCard.back.trim(),
             hint: "",
+            source: "",
             tags: ankiCard.tags.filter((t) => t.trim() !== ""),
           });
           imported++;

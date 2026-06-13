@@ -16,12 +16,14 @@ const validSnapshot: RecallStateSnapshot = {
   cards: [
     {
       id: "card-1",
-      deckId: "deck-1",
-      front: "What is SQLite?",
-      back: "A local relational database.",
-      hint: "",
-      tags: ["sqlite"],
-      state: "new",
+            deckId: "deck-1",
+            front: "What is SQLite?",
+            back: "A local relational database.",
+            hint: "",
+            source: "",
+            tags: ["sqlite"],
+            cardType: "basic",
+            state: "new",
       stability: 0,
       difficulty: 0,
       elapsedDays: 0,
@@ -56,9 +58,15 @@ const validSnapshot: RecallStateSnapshot = {
     },
   ],
   settings: {
-    theme: "dark",
-    seededAt: "2026-06-01T00:00:00.000Z",
-  },
+      theme: "dark",
+      seededAt: "2026-06-01T00:00:00.000Z",
+      dailyNewCardLimit: 20,
+      leechThreshold: 5,
+      onboardingComplete: false,
+      xp: 0,
+      achievements: [],
+      dailyGoal: 20,
+    },
 };
 
 describe("validateImportSnapshot", () => {

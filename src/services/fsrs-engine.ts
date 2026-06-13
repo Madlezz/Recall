@@ -96,6 +96,7 @@ export function createNewCard(
     front,
     back,
     hint,
+    source: "",
     tags,
     cardType: isCloze ? "cloze" : "basic",
     state: "new",

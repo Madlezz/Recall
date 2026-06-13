@@ -92,8 +92,8 @@ function card(
   reps: number, lapses: number, createdAt: Date,
 ): Card {
   return {
-    id, deckId, cardType, front, back, hint, tags, state,
-    lastReviewDate: lastReviewDate ? ISO(lastReviewDate) : null,
+      id, deckId, cardType, front, back, hint, source: "", tags, state,
+      lastReviewDate: lastReviewDate ? ISO(lastReviewDate) : null,
     nextReviewDate: ISO(nextReviewDate),
     stability, difficulty, elapsedDays, scheduledDays, reps, lapses,
     createdAt: ISO(createdAt), updatedAt: ISO(createdAt),

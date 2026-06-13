@@ -175,21 +175,19 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
   },
 
   async snoozeCard(minutes: number) {
-    const state = get();
-    const active = state.activeStudy;
-    if (!active || active.completed) return;
-    const cardId = active.cardIds[active.currentIndex];
-    const card = state.cards.find((c: Card) => c.id === cardId);
-    if (!card) return;
+      const state = get();
+      const active = state.activeStudy;
+      if (!active || active.completed) return;
+      const cardId = active.cardIds[active.currentIndex];
+      const card = state.cards.find((c: Card) => c.id === cardId);
+      if (!card) return;
 
-    const newNextReview = new Date(Date.now() + minutes * 60 * 1000);
-    const updatedCard: Card = { ...card, nextReviewDate: newNextReview.toISOString(), state: card.state === "new" ? "learning" : card.state };
-    const repo = await getRepository();
-    const snapshot = await repo.saveSnapshot({
-      ...dataState(state), cards: state.cards.map((c: Card) => (c.id === card.id ? updatedCard : c)),
-    });
-    applyTheme(snapshot.settings.theme);
-    set({ ...snapshot, error: null });
+      const newNextReview = new Date(Date.now() + minutes * 60 * 1000);
+      const updatedCard: Card = { ...card, nextReviewDate: newNextReview.toISOString(), state: card.state === "new" ? "learning" : card.state };
+      const snapshot: RecallStateSnapshot = {
+        ...dataState(state), cards: state.cards.map((c: Card) => (c.id === card.id ? updatedCard : c)),
+      };
+      await persistSnapshot(set, snapshot);
 
     const remaining = active.cardIds.filter((id: string) => id !== cardId);
     if (remaining.length === 0) {

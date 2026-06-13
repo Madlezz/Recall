@@ -37,7 +37,7 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
     if (!deckId || !front.trim() || !back.trim()) return;
 
     try {
-      await createCard({ deckId, front, back, hint: "", tags: [] });
+      await createCard({ deckId, front, back, hint: "", source: "", tags: [] });
       toast.success("Card added!");
       setFront("");
       setBack("");

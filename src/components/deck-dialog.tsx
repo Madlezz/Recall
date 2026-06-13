@@ -22,10 +22,14 @@ import type { Deck, DeckColor } from "@/types";
 interface DeckDialogProps {
   deck?: Deck;
   trigger?: ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function DeckDialog({ deck, trigger }: DeckDialogProps): JSX.Element {
-  const [open, setOpen] = useState(false);
+export function DeckDialog({ deck, trigger, open: controlledOpen, onOpenChange }: DeckDialogProps): JSX.Element {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const handleOpenChange = controlledOpen !== undefined ? onOpenChange! : setInternalOpen;
   const [name, setName] = useState(deck?.name ?? "");
   const [description, setDescription] = useState(deck?.description ?? "");
   const [color, setColor] = useState<DeckColor>(deck?.color ?? "blue");
@@ -34,12 +38,12 @@ export function DeckDialog({ deck, trigger }: DeckDialogProps): JSX.Element {
   const showDeck = useRecallStore((state) => state.showDeck);
 
   useEffect(() => {
-    if (open) {
+    if (isOpen) {
       setName(deck?.name ?? "");
       setDescription(deck?.description ?? "");
       setColor(deck?.color ?? "blue");
     }
-  }, [deck, open]);
+  }, [deck, isOpen]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -53,14 +57,14 @@ export function DeckDialog({ deck, trigger }: DeckDialogProps): JSX.Element {
         showDeck(deckId);
         toast.success("Deck created");
       }
-      setOpen(false);
+      handleOpenChange(false);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not save deck");
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {trigger ?? (
           <Button>
@@ -112,7 +116,7 @@ export function DeckDialog({ deck, trigger }: DeckDialogProps): JSX.Element {
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
               Cancel
             </Button>
             <Button type="submit">{deck ? "Save changes" : "Create deck"}</Button>

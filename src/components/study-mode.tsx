@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { useRecallStore } from "@/stores/recall-store";
 import { speakText, stopSpeaking, isSpeaking, isTTSSupported } from "@/services/tts";
 import { playFlipSound, playCorrectSound, playAgainSound, playHardSound } from "@/services/audio";
+import { cn } from "@/lib/utils";
 import type { SessionSummary } from "@/types";
 
 export function StudyMode(): JSX.Element {

@@ -1,4 +1,4 @@
-export function getStudyStreak(reviewLogs: { repliedAt: string }[]): number {
+export function getStudyStreak(reviewLogs: { reviewDate: string }[]): number {
   if (reviewLogs.length === 0) return 0;
 
   const today = new Date();
@@ -6,7 +6,7 @@ export function getStudyStreak(reviewLogs: { repliedAt: string }[]): number {
 
   const uniqueDates = new Set<number>();
   for (const log of reviewLogs) {
-    const d = new Date(log.repliedAt);
+    const d = new Date(log.reviewDate);
     d.setHours(0, 0, 0, 0);
     const timestamp = d.getTime();
     uniqueDates.add(timestamp);
