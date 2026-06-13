@@ -1,4 +1,4 @@
-import { ArrowLeft, Beaker, FileSpreadsheet, BookOpen, Brain, Calendar, CheckSquare, Download, Edit3, Play, Plus, RefreshCw, Search, ShieldCheck, Square, Trash2, X } from "lucide-react";
+import { ArrowLeft, Beaker, FileSpreadsheet, FileText, BookOpen, Brain, Calendar, CheckSquare, Download, Edit3, Play, Plus, RefreshCw, Search, ShieldCheck, Square, Trash2, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { getDeckStats } from "@/lib/stats";
+import { BulkAddDialog } from "@/components/bulk-add-dialog";
+import { type BulkCardInput } from "@/lib/bulk-parser";
 import { useRecallStore } from "@/stores/recall-store";
 import type { Card } from "@/types";
 import { exportDeckToJson, downloadFile } from "@/services/import-export";
@@ -30,9 +32,10 @@ export function DeckDetail(): JSX.Element {
   const deck = useRecallStore((state) => state.decks.find((item) => item.id === selectedDeckId));
   const cards = useRecallStore((state) => state.cards);
   const showDashboard = useRecallStore((state) => state.showDashboard);
-    const deleteDeck = useRecallStore((state) => state.deleteDeck);
-        const deleteCard = useRecallStore((state) => state.deleteCard);
-        const startReview = useRecallStore((state) => state.startReview);
+      const deleteDeck = useRecallStore((state) => state.deleteDeck);
+          const deleteCard = useRecallStore((state) => state.deleteCard);
+          const createCard = useRecallStore((state) => state.createCard);
+          const startReview = useRecallStore((state) => state.startReview);
             const resetDeckProgress = useRecallStore((state) => state.resetDeckProgress);
             const startMatch = useRecallStore((state) => state.startMatch);
       const setExamDeadline = useRecallStore((state) => state.setExamDeadline);
@@ -75,6 +78,7 @@ export function DeckDetail(): JSX.Element {
     const [qualityWarnings, setQualityWarnings] = useState<CardQualityWarning[] | null>(null);
     const [showCustomStudy, setShowCustomStudy] = useState(false);
     const [showCsvImport, setShowCsvImport] = useState(false);
+    const [showBulkAdd, setShowBulkAdd] = useState(false);
 
     if (!deck) {
       return (
@@ -321,14 +325,18 @@ export function DeckDetail(): JSX.Element {
             <p className="text-sm text-muted-foreground">Search, edit, or move cards inside this deck.</p>
           </div>
           <CardDialog
-            deckId={deck.id}
-            trigger={
-              <Button>
-                <Plus className="h-4 w-4" />
-                Add Card
-              </Button>
-            }
-          />
+                      deckId={deck.id}
+                      trigger={
+                        <Button>
+                          <Plus className="h-4 w-4" />
+                          Add Card
+                        </Button>
+                      }
+                    />
+                    <Button variant="outline" onClick={() => setShowBulkAdd(true)}>
+                      <FileText className="h-4 w-4" />
+                      Bulk Add
+                    </Button>
         </div>
 
         <div className="relative max-w-md">
@@ -408,6 +416,28 @@ export function DeckDetail(): JSX.Element {
       </section>
             <CustomStudyDialog open={showCustomStudy} onClose={() => setShowCustomStudy(false)} deckId={deck.id} />
             <CsvImportDialog open={showCsvImport} onClose={() => setShowCsvImport(false)} deckId={deck.id} />
+            <BulkAddDialog
+              open={showBulkAdd}
+              onClose={() => setShowBulkAdd(false)}
+              deckId={deck.id}
+              onImport={async (bulkCards) => {
+                const state = useRecallStore.getState();
+                const allDecks = state.decks;
+                for (const bc of bulkCards) {
+                  const targetDeckId = bc.nextDeckName
+                    ? (allDecks.find((d) => d.name.toLowerCase() === bc.nextDeckName?.toLowerCase())?.id ?? deck.id)
+                    : deck.id;
+                  await createCard({
+                    deckId: targetDeckId,
+                    front: bc.front,
+                    back: bc.back,
+                    hint: bc.hint ?? "",
+                    source: bc.source ?? "",
+                    tags: bc.tags,
+                  });
+                }
+              }}
+            />
           </div>
   );
 }
