@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpen, Brain, Calendar, CheckSquare, Download, Edit3, Play, Plus, RefreshCw, Search, ShieldCheck, Square, Trash2, RotateCcw, X } from "lucide-react";
+import { ArrowLeft, Beaker, BookOpen, Brain, Calendar, CheckSquare, Download, Edit3, Play, Plus, RefreshCw, Search, ShieldCheck, Square, Trash2, RotateCcw, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -7,6 +7,7 @@ import rehypeKatex from "rehype-katex";
 import { toast } from "sonner";
 import { CardDialog } from "@/components/card-dialog";
 import { ConfirmAction } from "@/components/confirm-action";
+import { CustomStudyDialog } from "@/components/custom-study-dialog";
 import { DeckDialog } from "@/components/deck-dialog";
 import { StatTile } from "@/components/stat-tile";
 import { Badge } from "@/components/ui/badge";
@@ -86,6 +87,7 @@ export function DeckDetail(): JSX.Element {
     const [examDateInput, setExamDateInput] = useState(deck.examDeadline?.split("T")[0] ?? "");
     const [showExamPicker, setShowExamPicker] = useState(false);
       const [qualityWarnings, setQualityWarnings] = useState<CardQualityWarning[] | null>(null);
+      const [showCustomStudy, setShowCustomStudy] = useState(false);
 
       async function handleSetExamDeadline(): Promise<void> {
       if (!examDateInput) {
@@ -168,8 +170,12 @@ export function DeckDetail(): JSX.Element {
                       }}
                     >
                       <ShieldCheck className="h-4 w-4" />
-                      Check Quality
-                    </Button>
+                                            Check Quality
+                                          </Button>
+                                          <Button variant="outline" onClick={() => setShowCustomStudy(true)}>
+                                            <Beaker className="h-4 w-4" />
+                                            Custom Study
+                                          </Button>
                     <ConfirmAction
                       title="Reset progress?"
                       description="This resets all cards in this deck back to 'new' state. Card content is kept, but all review history and scheduling data is cleared."
@@ -394,7 +400,8 @@ export function DeckDetail(): JSX.Element {
           </div>
         )}
       </section>
-    </div>
+            <CustomStudyDialog open={showCustomStudy} onClose={() => setShowCustomStudy(false)} deckId={deck.id} />
+          </div>
   );
 }
 

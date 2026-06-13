@@ -36,6 +36,13 @@ import { deckCardSlice, type DeckCardSlice, type DeckInput, type CardInput } fro
 import { settingsSlice, type SettingsSlice } from "./slices/settings.slice";
 import { dataState, persistSnapshot, persistReviewSnapshot, getRepository } from "./store-helpers";
 
+export interface CustomStudyConfig {
+  deckId?: string | null;
+  count?: number;
+  tagFilter?: string;
+  newOnly?: boolean;
+}
+
 // ── Store type ──
 
 type RecallStore = RecallStateSnapshot &
@@ -49,6 +56,7 @@ type RecallStore = RecallStateSnapshot &
     error: string | null;
     initialize: () => Promise<void>;
     startReview: (deckId?: string | null) => boolean;
+    startCustomStudy: (config: CustomStudyConfig) => boolean;
     revealAnswer: () => void;
     buryCard: () => void;
     snoozeCard: (minutes: number) => Promise<void>;
@@ -152,6 +160,57 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
         ratings: { again: 0, hard: 0, good: 0, easy: 0 },
         completed: false, previousCardState: null,
         newCardsCount, sessionXp: 0,
+      },
+    });
+    playSessionStartSound();
+    return true;
+  },
+
+  startCustomStudy(config: CustomStudyConfig) {
+    const state = get();
+    let pool = state.cards.filter((card: Card) =>
+      config.deckId ? card.deckId === config.deckId : true,
+    );
+
+    if (config.tagFilter) {
+      const tag = config.tagFilter.toLowerCase();
+      pool = pool.filter((c: Card) => c.tags.some((t) => t.toLowerCase() === tag));
+    }
+
+    if (config.newOnly) {
+      pool = pool.filter((c: Card) => c.state === "new");
+    }
+
+    if (pool.length === 0) return false;
+
+    // Shuffle
+    const shuffled = [...pool];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    const selected = config.count && config.count > 0
+      ? shuffled.slice(0, config.count)
+      : shuffled;
+
+    const newCardsCount = selected.filter((c: Card) => c.state === "new").length;
+    const now = new Date().toISOString();
+    set({
+      view: "study",
+      selectedDeckId: config.deckId ?? null,
+      activeStudy: {
+        id: createId("session"),
+        deckId: config.deckId ?? null,
+        cardIds: selected.map((c: Card) => c.id),
+        currentIndex: 0,
+        revealed: false,
+        startedAt: now,
+        ratings: { again: 0, hard: 0, good: 0, easy: 0 },
+        completed: false,
+        previousCardState: null,
+        newCardsCount,
+        sessionXp: 0,
       },
     });
     playSessionStartSound();
