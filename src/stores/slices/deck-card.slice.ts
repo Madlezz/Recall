@@ -1,12 +1,13 @@
 import { createId, normalizeName } from "@/lib/utils";
 import { hasCloze } from "@/lib/cloze";
-import type { Card, Deck, DeckColor } from "@/types";
+import type { Card, Deck, DeckColor, RecallStateSnapshot, ReviewLog, StudySession } from "@/types";
 import {
   dataState,
   ensureCardInput,
   ensureDeckName,
   persistSnapshot,
   touchDeck,
+  type StoreSet,
 } from "../store-helpers";
 
 export interface DeckInput {
@@ -37,10 +38,14 @@ export interface DeckCardSlice {
 }
 
  
+/** State subset accessed by deck-card slice via get(). */
+interface SliceState extends RecallStateSnapshot {
+  updateCard: (cardId: string, updates: Partial<Card>) => Promise<void>;
+}
+
 export const deckCardSlice = (
-  set: (partial: any) => void,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  get: () => any,
+  set: StoreSet,
+  get: () => SliceState,
 ): DeckCardSlice => ({
   async createDeck(input: DeckInput) {
     const name = normalizeName(input.name);
@@ -77,8 +82,8 @@ export const deckCardSlice = (
       ...dataState(state),
       decks: state.decks.filter((d: Deck) => d.id !== deckId),
       cards: state.cards.filter((c: Card) => c.deckId !== deckId),
-      reviewLogs: state.reviewLogs.filter((r: any) => !deletedCardIds.has(r.cardId)),
-      studySessions: state.studySessions.filter((s: any) => s.deckId !== deckId),
+      reviewLogs: state.reviewLogs.filter((r: ReviewLog) => !deletedCardIds.has(r.cardId)),
+      studySessions: state.studySessions.filter((s: StudySession) => s.deckId !== deckId),
     }, { view: "dashboard", selectedDeckId: null, activeStudy: null });
   },
 
@@ -122,7 +127,7 @@ export const deckCardSlice = (
     await persistSnapshot(set, {
       ...dataState(state),
       cards: state.cards.filter((c: Card) => c.id !== cardId),
-      reviewLogs: state.reviewLogs.filter((r: any) => r.cardId !== cardId),
+      reviewLogs: state.reviewLogs.filter((r: ReviewLog) => r.cardId !== cardId),
     });
   },
 
@@ -143,8 +148,8 @@ export const deckCardSlice = (
       cards: state.cards.map((c: Card) =>
         c.deckId === deckId ? { ...c, state: "new" as const, lastReviewDate: null, nextReviewDate: now, stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0, reps: 0, lapses: 0, updatedAt: now } : c,
       ),
-      reviewLogs: state.reviewLogs.filter((r: any) => !deckCardIds.has(r.cardId)),
-      studySessions: state.studySessions.filter((s: any) => s.deckId !== deckId),
+      reviewLogs: state.reviewLogs.filter((r: ReviewLog) => !deckCardIds.has(r.cardId)),
+      studySessions: state.studySessions.filter((s: StudySession) => s.deckId !== deckId),
       decks: touchDeck(state.decks, deckId, now),
     });
   },

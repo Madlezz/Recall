@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { RecallStateSnapshot, Theme } from "@/types";
-import { dataState, getRepository } from "../store-helpers";
+import { dataState, getRepository, type StoreSet } from "../store-helpers";
 import { applyTheme } from "@/services/storage";
 import { setMasterVolume } from "@/services/audio";
 
@@ -12,8 +11,8 @@ export interface SettingsSlice {
 }
 
 export const settingsSlice = (
-  set: (partial: any) => void,
-  get: () => any,
+  set: StoreSet,
+  get: () => RecallStateSnapshot,
 ): SettingsSlice => ({
   async setTheme(theme: Theme) {
     const repo = await getRepository();

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { AppView } from "@/types";
 
 export interface NavigationSlice {
@@ -13,28 +12,33 @@ export interface NavigationSlice {
 }
 
 export const navigationSlice = (
-  _set: (partial: any) => void,
-  _get: () => any,
+  _set: (partial: Record<string, unknown>) => void,
+  _get: () => Record<string, unknown>,
 ): NavigationSlice => ({
   view: "dashboard",
   selectedDeckId: null,
 
   showDashboard() {
-    _set({ view: "dashboard", selectedDeckId: null, activeStudy: null });
+    _set({ view: "dashboard", selectedDeckId: null, error: null });
   },
+
   showSettings() {
-    _set({ view: "settings", selectedDeckId: null, activeStudy: null });
+    _set({ view: "settings", error: null });
   },
-  showStats() {
-    _set({ view: "stats", selectedDeckId: null, activeStudy: null });
-  },
-  showBrowser() {
-    _set({ view: "browser", selectedDeckId: null, activeStudy: null });
-  },
+
   showDeck(deckId: string) {
-    _set({ view: "deck", selectedDeckId: deckId, activeStudy: null });
+    _set({ view: "deck", selectedDeckId: deckId, error: null });
   },
+
+  showStats() {
+    _set({ view: "stats", error: null });
+  },
+
+  showBrowser() {
+    _set({ view: "browser", error: null });
+  },
+
   startMatch(deckId: string) {
-    _set({ view: "match", selectedDeckId: deckId, activeStudy: null });
+    _set({ view: "match", selectedDeckId: deckId });
   },
 });

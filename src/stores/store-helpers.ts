@@ -1,5 +1,4 @@
 import { applyTheme } from "@/services/storage";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getRecallRepository, type RecallRepository } from "@/services/repository";
 import { normalizeName } from "@/lib/utils";
 import type { Card, Deck, RecallStateSnapshot, ReviewLog, StudySession } from "@/types";
@@ -11,7 +10,10 @@ export async function getRepository(): Promise<RecallRepository> {
   return repositoryPromise;
 }
 
-export function dataState(state: any): RecallStateSnapshot {
+/** Zustand set function narrowed to the snapshot subset we persist. */
+export type StoreSet = (partial: RecallStateSnapshot & Record<string, unknown>) => void;
+
+export function dataState(state: RecallStateSnapshot): RecallStateSnapshot {
   return {
     decks: state.decks,
     cards: state.cards,
@@ -22,9 +24,9 @@ export function dataState(state: any): RecallStateSnapshot {
 }
 
 export async function persistSnapshot(
-  set: (partial: any) => void,
+  set: StoreSet,
   snapshot: RecallStateSnapshot,
-  extra: Record<string, any> = {},
+  extra: Record<string, unknown> = {},
 ): Promise<void> {
   const repository = await getRepository();
   await repository.saveSnapshot(snapshot);
@@ -38,12 +40,12 @@ export async function persistSnapshot(
  * Also updates Zustand state with the full snapshot for UI reactivity.
  */
 export async function persistReviewDelta(
-  set: (partial: any) => void,
+  set: StoreSet,
   snapshot: RecallStateSnapshot,
   updatedCard: Card,
   reviewLog: ReviewLog,
   session: StudySession | null,
-  extra: Record<string, any> = {},
+  extra: Record<string, unknown> = {},
 ): Promise<void> {
   const repository = await getRepository();
   await repository.recordReview(updatedCard, reviewLog, session);
@@ -52,9 +54,9 @@ export async function persistReviewDelta(
 }
 
 export async function persistReviewSnapshot(
-  set: (partial: any) => void,
+  set: StoreSet,
   snapshot: RecallStateSnapshot,
-  extra: Record<string, any> = {},
+  extra: Record<string, unknown> = {},
 ): Promise<void> {
   const repository = await getRepository();
   await repository.saveSnapshot(snapshot);
@@ -71,7 +73,7 @@ export function ensureDeckName(name: string, decks: Deck[]): void {
 
 export function ensureCardInput(input: { front: string; back: string }): void {
   if (!input.front.trim()) throw new Error("Front is required.");
-  const isCloze = /\{\{c\d+::[^}]+\}\}/.test(input.front);
+  const isCloze = /\{\{c\d::[^}]+\}\}/.test(input.front);
   if (!input.back.trim() && !isCloze) throw new Error("Back is required.");
 }
 
