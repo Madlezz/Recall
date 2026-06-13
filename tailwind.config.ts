@@ -45,24 +45,25 @@ const config = {
         sans: ["InterVariable", "Inter", "ui-sans-serif", "system-ui"],
       },
       keyframes: {
-              "fade-in": {
-                from: { opacity: "0", transform: "translateY(4px)" },
-                to: { opacity: "1", transform: "translateY(0)" },
-              },
-              shake: {
-                "0%, 100%": { transform: "translateX(0)" },
-                "20%": { transform: "translateX(-4px)" },
-                "40%": { transform: "translateX(4px)" },
-                "60%": { transform: "translateX(-3px)" },
-                "80%": { transform: "translateX(2px)" },
-              },
-            },
-            animation: {
-              "fade-in": "fade-in 160ms ease-out",
-              shake: "shake 400ms ease-in-out",
-            },
+        "fade-in": {
+          from: { opacity: "0", transform: "translateY(4px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        shake: {
+          "0%, 100%": { transform: "translateX(0)" },
+          "20%": { transform: "translateX(-4px)" },
+          "40%": { transform: "translateX(4px)" },
+          "60%": { transform: "translateX(-3px)" },
+          "80%": { transform: "translateX(2px)" },
+        },
+      },
+      animation: {
+        "fade-in": "fade-in 160ms ease-out",
+        shake: "shake 400ms ease-in-out",
+      },
     },
   },
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   plugins: [require("@tailwindcss/typography")],
 } satisfies Config;
 

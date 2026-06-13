@@ -50,7 +50,7 @@ export function ActivityHeatmap(): JSX.Element {
     const startDate = new Date(today);
     startDate.setDate(today.getDate() - 364); // 52 weeks * 7 days
 
-    let currentDate = new Date(startDate);
+    const currentDate = new Date(startDate);
     for (let week = 0; week < 52; week++) {
       const weekData: DayData[] = [];
       for (let day = 0; day < 7; day++) {

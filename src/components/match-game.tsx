@@ -37,15 +37,15 @@ function buildTiles(cards: Card[]): MatchTile[] {
 }
 
 export function MatchGame(): JSX.Element {
-  const cards = useRecallStore((state) => state.cards);
+  const allCards = useRecallStore((state) => state.cards);
   const settings = useRecallStore((state) => state.settings);
   const updateSettings = useRecallStore((state) => state.updateSettings);
   const showDashboard = useRecallStore((state) => state.showDashboard);
   const selectedDeckId = useRecallStore((state) => state.selectedDeckId);
   const decks = useRecallStore((state) => state.decks);
 
-  const deck = decks.find((d) => d.id === selectedDeckId);
-
+  useRecallStore((state) => state.cards); // ensure subscription
+  const cards = useRecallStore((state) => state.cards).filter((c) => c.deckId === selectedDeckId);
   const deckCards = useMemo(
     () => (selectedDeckId ? cards.filter((c) => c.deckId === selectedDeckId) : cards),
     [cards, selectedDeckId],

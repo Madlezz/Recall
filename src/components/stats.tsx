@@ -3,8 +3,8 @@ import { format, subDays } from "date-fns";
 import { BookOpen, Brain, Calendar, Clock, Flame, Lock, TrendingUp, Zap } from "lucide-react";
 import { useRecallStore } from "@/stores/recall-store";
 import { getStudyStreak } from "@/lib/streak";
-import { getLevel, getLevelTitle, levelProgress } from "@/lib/xp";
-import type { ReviewLog, ReviewRating } from "@/types";
+import { getLevel, getLevelTitle } from "@/lib/xp";
+import type { ReviewLog } from "@/types";
 import { ACHIEVEMENT_DEFS } from "@/types";
 
 // ── Helpers ──

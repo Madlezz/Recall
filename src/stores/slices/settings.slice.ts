@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { RecallStateSnapshot, Theme } from "@/types";
 import { dataState, getRepository } from "../store-helpers";
 import { applyTheme } from "@/services/storage";

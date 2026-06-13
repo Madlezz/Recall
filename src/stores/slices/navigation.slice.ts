@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { AppView } from "@/types";
 
 export interface NavigationSlice {

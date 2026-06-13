@@ -1,4 +1,4 @@
-import { FileSpreadsheet, Play, Upload } from "lucide-react";
+import { FileSpreadsheet, Upload } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";

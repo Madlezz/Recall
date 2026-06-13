@@ -36,8 +36,10 @@ export interface DeckCardSlice {
   resetDeckProgress: (deckId: string) => Promise<void>;
 }
 
+ 
 export const deckCardSlice = (
   set: (partial: any) => void,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   get: () => any,
 ): DeckCardSlice => ({
   async createDeck(input: DeckInput) {

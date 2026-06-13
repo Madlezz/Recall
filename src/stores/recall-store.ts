@@ -3,7 +3,7 @@ import { createSeedSnapshot } from "@/data/seed";
 import { getNewCardsReviewedToday, isCardDueToday } from "@/lib/stats";
 import { createId } from "@/lib/utils";
 import { buildExportPayload } from "@/services/import-export";
-import { getRecallRepository, type RecallRepository } from "@/services/repository";
+import { getRecallRepository } from "@/services/repository";
 import { applyTheme } from "@/services/storage";
 import { setMasterVolume } from "@/services/audio";
 import { applyReview } from "@/services/fsrs-engine";
@@ -21,10 +21,8 @@ import { getStudyStreak } from "@/lib/streak";
 import { sendDueReminder } from "@/services/notifications";
 import type {
   ActiveStudySession,
-  AppView,
   Card,
   Deck,
-  DeckColor,
   RecallExportPayload,
   RecallStateSnapshot,
   ReviewLog,
@@ -88,7 +86,8 @@ applyTheme(initialSnapshot.settings.theme);
 
 // ── Store ──
 
-export const useRecallStore = create<RecallStore>((set, get) => ({
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const useRecallStore = create<RecallStore>((set: any, get: any) => ({
   ...initialSnapshot,
   ...navigationSlice(set, get),
   ...deckCardSlice(set, get),

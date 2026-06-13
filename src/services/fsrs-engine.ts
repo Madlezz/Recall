@@ -76,8 +76,7 @@ export function calculateNextReview(
   card: Card,
   rating: ReviewRating
 ): Partial<Card> {
-  const updated = applyReview(card, rating, new Date());
-  const { id, deckId, front, back, hint, tags, createdAt, ...rest } = updated;
+  const { id: _id, deckId: _deckId, front: _front, back: _back, hint: _hint, tags: _tags, createdAt: _createdAt, ...rest } = applyReview(card, rating, new Date());
   return rest;
 }
 

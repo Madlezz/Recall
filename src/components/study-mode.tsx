@@ -1,12 +1,12 @@
 import confetti from "canvas-confetti";
-import { ArrowLeft, Check, Clock, EyeOff, RotateCcw, RotateCw, Timer, Volume2, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, Check, Clock, EyeOff, RotateCcw, RotateCw, Timer, Volume2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { RichCard } from "@/components/RichCard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useRecallStore } from "@/stores/recall-store";
-import { speakText, stopSpeaking, isSpeaking, isTTSSupported } from "@/services/tts";
+import { speakText, stopSpeaking, isTTSSupported } from "@/services/tts";
 import { playFlipSound, playCorrectSound, playAgainSound, playHardSound } from "@/services/audio";
 import { cn } from "@/lib/utils";
 import type { SessionSummary } from "@/types";

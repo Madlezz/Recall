@@ -62,34 +62,34 @@ export function DeckDetail(): JSX.Element {
     );
   }, [deckCards, search, selectedTag]);
 
-  if (!deck) {
-    return (
-      <div className="rounded-lg border border-dashed p-10 text-center">
-        <h1 className="font-semibold">Deck not found</h1>
-        <Button className="mt-4" onClick={showDashboard}>
-          Back to dashboard
-        </Button>
-      </div>
-    );
-  }
-
-  const stats = getDeckStats(deck, cards);
-  const progress = stats.total === 0 ? 0 : Math.round((stats.mastered / stats.total) * 100);
-    const currentDeckId = deck.id;
-
-    // Exam deadline
+  // Hooks — must be called unconditionally, above any early return
     const examDays = useMemo(() => {
-      if (!deck.examDeadline) return null;
+      if (!deck?.examDeadline) return null;
       const now = new Date();
       const d = new Date(deck.examDeadline);
       return Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    }, [deck.examDeadline]);
+    }, [deck?.examDeadline]);
 
-    const [examDateInput, setExamDateInput] = useState(deck.examDeadline?.split("T")[0] ?? "");
+    const [examDateInput, setExamDateInput] = useState(deck?.examDeadline?.split("T")[0] ?? "");
     const [showExamPicker, setShowExamPicker] = useState(false);
-      const [qualityWarnings, setQualityWarnings] = useState<CardQualityWarning[] | null>(null);
-      const [showCustomStudy, setShowCustomStudy] = useState(false);
-      const [showCsvImport, setShowCsvImport] = useState(false);
+    const [qualityWarnings, setQualityWarnings] = useState<CardQualityWarning[] | null>(null);
+    const [showCustomStudy, setShowCustomStudy] = useState(false);
+    const [showCsvImport, setShowCsvImport] = useState(false);
+
+    if (!deck) {
+      return (
+        <div className="rounded-lg border border-dashed p-10 text-center">
+          <h1 className="font-semibold">Deck not found</h1>
+          <Button className="mt-4" onClick={showDashboard}>
+            Back to dashboard
+          </Button>
+        </div>
+      );
+    }
+
+    const stats = getDeckStats(deck, cards);
+    const progress = stats.total === 0 ? 0 : Math.round((stats.mastered / stats.total) * 100);
+    const currentDeckId = deck.id;
 
       async function handleSetExamDeadline(): Promise<void> {
       if (!examDateInput) {

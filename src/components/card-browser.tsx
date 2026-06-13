@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ConfirmAction } from "@/components/confirm-action";
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
-import type { Card, CardState, Deck } from "@/types";
+import type { CardState, Deck } from "@/types";
 
 type SortField = "front" | "deck" | "state" | "nextReview" | "lapses" | "created";
 type SortDir = "asc" | "desc";
@@ -68,7 +68,7 @@ export function CardBrowser(): JSX.Element {
     return map;
   }, [decks]);
 
-  const allTags = useMemo(() => {
+  const _allTags = useMemo(() => {
     const set = new Set<string>();
     for (const c of cards) for (const t of c.tags) set.add(t);
     return [...set].sort();

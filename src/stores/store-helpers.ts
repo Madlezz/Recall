@@ -1,7 +1,8 @@
 import { applyTheme } from "@/services/storage";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getRecallRepository, type RecallRepository } from "@/services/repository";
 import { normalizeName } from "@/lib/utils";
-import type { Card, Deck, RecallStateSnapshot } from "@/types";
+import type { Deck, RecallStateSnapshot } from "@/types";
 
 let repositoryPromise: Promise<RecallRepository> | null = null;
 
