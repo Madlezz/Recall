@@ -10,7 +10,11 @@
 
 ## Screenshots
 
-> *Coming soon — in the meantime, clone and run `pnpm tauri dev` to see it live.*
+![Dashboard](docs/screenshots/dashboard.png)
+
+![Study Mode](docs/screenshots/study.png)
+
+![Stats](docs/screenshots/stats.png)
 
 ---
 
@@ -78,7 +82,7 @@ pnpm dev            # Browser-only preview
 - [ ] Exam deadline mode — set a date, cards prioritize
 - [ ] Source-linked cards — attach references to your knowledge
 - [ ] Card quality checker — flag cards that need improvement
-- [ ] Screenshots in README
+- [x] Screenshots in README
 - [ ] Desktop notifications for reviews
 
 ---
