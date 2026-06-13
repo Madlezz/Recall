@@ -183,7 +183,28 @@ export function StudyMode(): JSX.Element {
         </div>
       </header>
 
-      <section className="flex flex-1 items-center justify-center py-8">
+            {/* Exam deadline banner */}
+            {deck?.examDeadline ? (() => {
+              const now = new Date();
+              const deadline = new Date(deck.examDeadline);
+              const daysLeft = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+              if (daysLeft > 30) return null;
+              return (
+                <div className={cn(
+                  "rounded-md px-4 py-2 text-center text-sm font-medium",
+                  daysLeft <= 0 ? "bg-red-500/15 text-red-400" :
+                  daysLeft <= 3 ? "bg-amber-500/15 text-amber-400" :
+                  "bg-blue-500/15 text-blue-400",
+                )}>
+                  📅 {daysLeft <= 0 ? "Exam is today — give it your best!" :
+                      daysLeft === 1 ? "Exam tomorrow — final push!" :
+                      `Exam in ${daysLeft} days`}
+                  {daysLeft <= 3 ? " ⚡ Cram mode active" : ""}
+                </div>
+              );
+            })() : null}
+
+            <section className="flex flex-1 items-center justify-center py-8">
         <div className="w-full max-w-4xl" style={{ perspective: "1400px" }}>
           <div className="study-card relative min-h-[420px]" data-revealed={activeStudy.revealed}>
             <div className="study-card-face absolute inset-0 flex flex-col justify-center rounded-lg border bg-card p-8 shadow-2xl">

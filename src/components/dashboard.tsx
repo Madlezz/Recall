@@ -148,6 +148,14 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
   const stats = getDeckStats(deck, cards);
   const progress = stats.total === 0 ? 0 : Math.round((stats.mastered / stats.total) * 100);
 
+  // Exam countdown
+  const examDays = useMemo(() => {
+    if (!deck.examDeadline) return null;
+    const now = new Date();
+    const deadline = new Date(deck.examDeadline);
+    return Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  }, [deck.examDeadline]);
+
   return (
     <button
       className="group rounded-lg border bg-card p-5 text-left transition hover:border-primary/50 hover:bg-accent/40"
@@ -158,6 +166,16 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
           <div className="flex items-center gap-2">
             <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", getDeckColorClass(deck.color))} />
             <h3 className="truncate font-semibold">{deck.name}</h3>
+            {examDays !== null ? (
+              <span className={cn(
+                "ml-1 shrink-0 rounded-full px-2 py-0.5 text-xs font-medium",
+                examDays <= 0 ? "bg-red-500/20 text-red-400" :
+                examDays <= 3 ? "bg-amber-500/20 text-amber-400" :
+                "bg-blue-500/20 text-blue-400",
+              )}>
+                📅 {examDays <= 0 ? "Today!" : examDays === 1 ? "Tomorrow" : `${examDays}d`}
+              </span>
+            ) : null}
           </div>
           <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{deck.description || "No description"}</p>
         </div>

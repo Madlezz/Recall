@@ -218,6 +218,12 @@ fn migrations() -> Vec<Migration> {
             DROP TABLE recall_seed_guard;
         "#,
             kind: MigrationKind::Up,
-        },
-    ]
-}
+                    },
+                    Migration {
+                        version: 3,
+                        description: "add_exam_deadline_to_decks",
+                        sql: "ALTER TABLE decks ADD COLUMN exam_deadline TEXT;",
+                        kind: MigrationKind::Up,
+                    },
+                ]
+            }

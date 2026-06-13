@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS decks (
   name TEXT NOT NULL,
   description TEXT DEFAULT '',
   color TEXT DEFAULT 'blue',
+  exam_deadline TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );

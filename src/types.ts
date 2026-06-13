@@ -9,6 +9,7 @@ export interface Deck {
   name: string;
   description: string;
   color: DeckColor;
+  examDeadline?: string;
   createdAt: string;
   updatedAt: string;
 }

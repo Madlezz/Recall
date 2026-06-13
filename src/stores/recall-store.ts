@@ -63,6 +63,13 @@ type RecallStore = RecallStateSnapshot &
 
 export type { DeckInput, CardInput };
 
+function daysUntilExam(deck: Deck | undefined): number | null {
+  if (!deck?.examDeadline) return null;
+  const now = new Date();
+  const deadline = new Date(deck.examDeadline);
+  return Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+}
+
 // ── Initial state ──
 
 const initialSnapshot = createSeedSnapshot();
@@ -102,24 +109,28 @@ export const useRecallStore = create<RecallStore>((set, get) => ({
   // ── Study session ──
 
   startReview(deckId = null) {
-    const state = get();
-    const limit = state.settings.dailyNewCardLimit;
-    const dueCards = state.cards
-      .filter((card: Card) => (deckId ? card.deckId === deckId : true))
-      .filter((card: Card) => isCardDueToday(card))
-      .sort((a: Card, b: Card) => a.nextReviewDate.localeCompare(b.nextReviewDate));
-    if (dueCards.length === 0) return false;
+      const state = get();
+      const limit = state.settings.dailyNewCardLimit;
+      const examDeck = deckId ? state.decks.find((d: Deck) => d.id === deckId) : undefined;
+      const examDaysLeft = daysUntilExam(examDeck);
+      const isCramMode = examDaysLeft !== null && examDaysLeft <= 3;
+      const effectiveLimit = isCramMode ? Number.MAX_SAFE_INTEGER : limit;
+      const dueCards = state.cards
+        .filter((card: Card) => (deckId ? card.deckId === deckId : true))
+        .filter((card: Card) => isCardDueToday(card))
+        .sort((a: Card, b: Card) => a.nextReviewDate.localeCompare(b.nextReviewDate));
+      if (dueCards.length === 0) return false;
 
-    const newCardsReviewedToday = getNewCardsReviewedToday(state.reviewLogs);
-    let newCardsAllowed = Math.max(0, limit - newCardsReviewedToday);
-    const filteredDueCards = dueCards.filter((card: Card) => {
-      if (card.state === "new") {
-        if (newCardsAllowed > 0) { newCardsAllowed--; return true; }
-        return false;
-      }
-      return true;
-    });
-    if (filteredDueCards.length === 0) return false;
+      const newCardsReviewedToday = getNewCardsReviewedToday(state.reviewLogs);
+      let newCardsAllowed = Math.max(0, effectiveLimit - newCardsReviewedToday);
+      const filteredDueCards = dueCards.filter((card: Card) => {
+        if (card.state === "new") {
+          if (newCardsAllowed > 0) { newCardsAllowed--; return true; }
+          return false;
+        }
+        return true;
+      });
+      if (filteredDueCards.length === 0) return false;
 
     const newCardsCount = filteredDueCards.filter((c: Card) => c.state === "new").length;
     const now = new Date().toISOString();

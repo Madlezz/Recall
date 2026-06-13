@@ -27,6 +27,7 @@ export interface DeckCardSlice {
   createDeck: (input: DeckInput) => Promise<string>;
   updateDeck: (deckId: string, input: DeckInput) => Promise<void>;
   deleteDeck: (deckId: string) => Promise<void>;
+  setExamDeadline: (deckId: string, deadline: string | null) => Promise<void>;
   createCard: (input: CardInput) => Promise<string>;
   updateCard: (cardId: string, input: CardInput) => Promise<void>;
   deleteCard: (cardId: string) => Promise<void>;
@@ -141,6 +142,17 @@ export const deckCardSlice = (
       reviewLogs: state.reviewLogs.filter((r: any) => !deckCardIds.has(r.cardId)),
       studySessions: state.studySessions.filter((s: any) => s.deckId !== deckId),
       decks: touchDeck(state.decks, deckId, now),
+    });
+  },
+
+  async setExamDeadline(deckId: string, deadline: string | null) {
+    const state = get();
+    const now = new Date().toISOString();
+    await persistSnapshot(set, {
+      ...dataState(state),
+      decks: state.decks.map((d: Deck) =>
+        d.id === deckId ? { ...d, examDeadline: deadline ?? undefined, updatedAt: now } : d,
+      ),
     });
   },
 });

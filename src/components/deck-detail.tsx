@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpen, Brain, CheckSquare, Download, Edit3, Play, Plus, RefreshCw, Search, Square, Trash2, RotateCcw, X } from "lucide-react";
+import { ArrowLeft, BookOpen, Brain, Calendar, CheckSquare, Download, Edit3, Play, Plus, RefreshCw, Search, Square, Trash2, RotateCcw, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -28,10 +28,11 @@ export function DeckDetail(): JSX.Element {
   const cards = useRecallStore((state) => state.cards);
   const showDashboard = useRecallStore((state) => state.showDashboard);
     const deleteDeck = useRecallStore((state) => state.deleteDeck);
-    const deleteCard = useRecallStore((state) => state.deleteCard);
-    const startReview = useRecallStore((state) => state.startReview);
-        const resetDeckProgress = useRecallStore((state) => state.resetDeckProgress);
-        const startMatch = useRecallStore((state) => state.startMatch);
+        const deleteCard = useRecallStore((state) => state.deleteCard);
+        const startReview = useRecallStore((state) => state.startReview);
+            const resetDeckProgress = useRecallStore((state) => state.resetDeckProgress);
+            const startMatch = useRecallStore((state) => state.startMatch);
+      const setExamDeadline = useRecallStore((state) => state.setExamDeadline);
 
   const deckCards = useMemo(() => cards.filter((card) => card.deckId === selectedDeckId), [cards, selectedDeckId]);
 
@@ -71,9 +72,34 @@ export function DeckDetail(): JSX.Element {
 
   const stats = getDeckStats(deck, cards);
   const progress = stats.total === 0 ? 0 : Math.round((stats.mastered / stats.total) * 100);
-  const currentDeckId = deck.id;
+    const currentDeckId = deck.id;
 
-  function handleStudyNow(): void {
+    // Exam deadline
+    const examDays = useMemo(() => {
+      if (!deck.examDeadline) return null;
+      const now = new Date();
+      const d = new Date(deck.examDeadline);
+      return Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    }, [deck.examDeadline]);
+
+    const [examDateInput, setExamDateInput] = useState(deck.examDeadline?.split("T")[0] ?? "");
+    const [showExamPicker, setShowExamPicker] = useState(false);
+
+    async function handleSetExamDeadline(): Promise<void> {
+      if (!examDateInput) {
+        await setExamDeadline(deck.id, null);
+        toast.success("Exam deadline removed");
+        setShowExamPicker(false);
+        return;
+      }
+      // Set to end of day
+      const deadline = new Date(examDateInput + "T23:59:59").toISOString();
+      await setExamDeadline(deck.id, deadline);
+      toast.success(`Exam set for ${examDateInput}`);
+      setShowExamPicker(false);
+    }
+
+    function handleStudyNow(): void {
     if (!startReview(currentDeckId)) {
       toast.info("No cards due in this deck");
     }
@@ -175,12 +201,54 @@ export function DeckDetail(): JSX.Element {
                       Study Now
                     </Button>
                     <Button size="lg" variant="outline" onClick={() => startMatch(currentDeckId)}>
-                      <Brain className="h-4 w-4" />
-                      Match Game
-                    </Button>
-        </div>
+                                          <Brain className="h-4 w-4" />
+                                          Match Game
+                                        </Button>
+                            </div>
 
-        <div className="max-w-xl space-y-2">
+                            {/* Exam deadline */}
+                            <div className="flex items-center gap-3 mt-3">
+                              <button
+                                onClick={() => {
+                                  setExamDateInput(deck.examDeadline?.split("T")[0] ?? "");
+                                  setShowExamPicker(!showExamPicker);
+                                }}
+                                className={cn(
+                                  "inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm transition",
+                                  examDays !== null ? "border-primary/30 bg-primary/10 text-primary" : "border-dashed text-muted-foreground hover:border-primary/50 hover:text-foreground",
+                                )}
+                              >
+                                <Calendar className="h-4 w-4" />
+                                {examDays !== null ? (
+                                  examDays <= 0 ? "Exam today!" :
+                                  examDays === 1 ? "Exam tomorrow" :
+                                  `Exam in ${examDays} days`
+                                ) : "Set exam date"}
+                              </button>
+                              {examDays !== null && examDays <= 3 ? (
+                                <span className="text-xs font-medium text-amber-400">⚡ Cram mode — all new cards unlocked</span>
+                              ) : null}
+                            </div>
+
+                            {showExamPicker ? (
+                              <div className="flex items-center gap-2 mt-2">
+                                <input
+                                  type="date"
+                                  value={examDateInput}
+                                  onChange={(e) => setExamDateInput(e.target.value)}
+                                  className="rounded-md border bg-background px-3 py-1.5 text-sm"
+                                />
+                                <Button size="sm" onClick={() => void handleSetExamDeadline()}>Save</Button>
+                                {deck.examDeadline ? (
+                                  <Button size="sm" variant="ghost" onClick={() => {
+                                    setExamDateInput("");
+                                    void handleSetExamDeadline();
+                                  }}>Remove</Button>
+                                ) : null}
+                              </div>
+                            ) : null}
+
+                            <div className="max-w-xl space-y-2">
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>{stats.mastered}/{stats.total} mastered</span>
             <span>{progress}%</span>

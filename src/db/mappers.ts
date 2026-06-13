@@ -6,6 +6,7 @@ export interface DeckRow {
   name: string;
   description: string;
   color: string;
+  exam_deadline: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -61,13 +62,14 @@ export function deckFromRow(row: DeckRow): Deck {
   }
 
   return {
-    id: row.id,
-    name: row.name,
-    description: row.description,
-    color: row.color as DeckColor,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
+      id: row.id,
+      name: row.name,
+      description: row.description,
+      color: row.color as DeckColor,
+      examDeadline: row.exam_deadline ?? undefined,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    };
 }
 
 export function deckToRow(deck: Deck): DeckRow {
@@ -76,6 +78,7 @@ export function deckToRow(deck: Deck): DeckRow {
     name: deck.name,
     description: deck.description,
     color: deck.color,
+    exam_deadline: deck.examDeadline ?? null,
     created_at: deck.createdAt,
     updated_at: deck.updatedAt,
   };
