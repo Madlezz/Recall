@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Coffee, CloudRain, Headphones, Pause, Play, RotateCcw, Timer, VolumeX, Zap } from "lucide-react";
+import { Coffee, CloudRain, Headphones, Pause, Play, RotateCcw, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { startSoundscape, stopSoundscape } from "@/services/audio";
 import { getLevel, triggerLevelUpConfetti } from "@/lib/xp";

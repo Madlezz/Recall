@@ -20,7 +20,6 @@ import { getDeckStats } from "@/lib/stats";
 import { BulkAddDialog } from "@/components/bulk-add-dialog";
 import { MarkdownImportDialog } from "@/components/markdown-import-dialog";
 import { RecallImportDialog } from "@/components/recall-import-dialog";
-import { type BulkCardInput } from "@/lib/bulk-parser";
 import { useRecallStore } from "@/stores/recall-store";
 import type { Card } from "@/types";
 import { exportDeckToJson, exportDeckPackage, saveRecallPackage, downloadFile } from "@/services/import-export";
@@ -130,8 +129,8 @@ export function DeckDetail(): JSX.Element {
         const json = await exportDeckPackage(deck, deckCards);
         const saved = await saveRecallPackage(json, deck.name);
         if (saved) toast.success("Deck exported as .recall package");
-      } catch (err) {
-        toast.error("Could not export .recall package");
+      } catch {
+              toast.error("Could not export .recall package");
       }
     }
 

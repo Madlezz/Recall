@@ -1,4 +1,4 @@
-import { BookOpen, Database, Home, LayoutGrid, Settings, Shield, Star, TrendingUp, Zap } from "lucide-react";
+import { BookOpen, Home, LayoutGrid, Settings, Shield, Star, TrendingUp, Zap } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { getDueTodayCount } from "@/lib/stats";

@@ -46,7 +46,7 @@ export function MarkdownImportDialog({ deckId }: MarkdownImportDialogProps): JSX
       if (!targetDeckId && decks.length > 0) {
         setTargetDeckId(deckId ?? decks[0].id);
       }
-    } catch (err) {
+    } catch {
       toast.error("Could not read markdown file");
     } finally {
       setLoading(false);
