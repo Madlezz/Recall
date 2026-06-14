@@ -1,4 +1,4 @@
-import { ArrowLeft, Beaker, FileSpreadsheet, FileText, BookOpen, Brain, Calendar, CheckSquare, Download, Edit3, Play, Plus, RefreshCw, Search, ShieldCheck, Square, Trash2, X } from "lucide-react";
+import { ArrowLeft, Beaker, FileSpreadsheet, FileText, BookOpen, Brain, Calendar, CheckSquare, Download, Edit3, PackageOpen, Play, Plus, RefreshCw, Search, ShieldCheck, Square, Trash2, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -19,10 +19,11 @@ import { cn } from "@/lib/utils";
 import { getDeckStats } from "@/lib/stats";
 import { BulkAddDialog } from "@/components/bulk-add-dialog";
 import { MarkdownImportDialog } from "@/components/markdown-import-dialog";
+import { RecallImportDialog } from "@/components/recall-import-dialog";
 import { type BulkCardInput } from "@/lib/bulk-parser";
 import { useRecallStore } from "@/stores/recall-store";
 import type { Card } from "@/types";
-import { exportDeckToJson, downloadFile } from "@/services/import-export";
+import { exportDeckToJson, exportDeckPackage, saveRecallPackage, downloadFile } from "@/services/import-export";
 import { checkDeckQuality, type CardQualityWarning } from "@/lib/card-quality";
 
 export function DeckDetail(): JSX.Element {
@@ -117,11 +118,22 @@ export function DeckDetail(): JSX.Element {
   }
 
   function handleExport(): void {
+        if (!deck) return;
+        const json = exportDeckToJson(deck, deckCards);
+      downloadFile(`${deck.name.replace(/\s+/g, '_')}.json`, json);
+      toast.success("Deck exported");
+    }
+
+    async function handleExportRecall(): Promise<void> {
       if (!deck) return;
-      const json = exportDeckToJson(deck, deckCards);
-    downloadFile(`${deck.name.replace(/\s+/g, '_')}.json`, json);
-    toast.success("Deck exported");
-  }
+      try {
+        const json = await exportDeckPackage(deck, deckCards);
+        const saved = await saveRecallPackage(json, deck.name);
+        if (saved) toast.success("Deck exported as .recall package");
+      } catch (err) {
+        toast.error("Could not export .recall package");
+      }
+    }
 
   function toggleCardSelection(cardId: string): void {
     setSelectedCardIds((prev) => {
@@ -167,9 +179,13 @@ export function DeckDetail(): JSX.Element {
             }
           />
           <Button variant="outline" onClick={handleExport}>
-                      <Download className="h-4 w-4" />
-                      Export JSON
-                    </Button>
+                                <Download className="h-4 w-4" />
+                                Export JSON
+                              </Button>
+                              <Button variant="outline" onClick={handleExportRecall}>
+                                <PackageOpen className="h-4 w-4" />
+                                Export .recall
+                              </Button>
                     <Button
                       variant="outline"
                       onClick={() => {
@@ -188,6 +204,7 @@ export function DeckDetail(): JSX.Element {
                                                                                                                               CSV Import
                                                                                                                             </Button>
                                                                                                                             <MarkdownImportDialog deckId={currentDeckId} />
+                                                            <RecallImportDialog deckId={currentDeckId} />
                     <ConfirmAction
                       title="Reset progress?"
                       description="This resets all cards in this deck back to 'new' state. Card content is kept, but all review history and scheduling data is cleared."

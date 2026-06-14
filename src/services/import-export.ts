@@ -2,6 +2,8 @@ import type { Card, Deck, RecallExportPayload, RecallStateSnapshot, ReviewLog, S
 import { isCardState, isDeckColor, isReviewRating } from "@/lib/domain";
 import { createId, normalizeName } from "@/lib/utils";
 
+// --- Standard JSON export (existing) ---
+
 export function exportDeckToJson(deck: Deck, cards: Card[]): string {
   const payload: RecallExportPayload = {
     version: 2,
@@ -52,6 +54,212 @@ export function downloadFile(filename: string, content: string): void {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
+// --- .recall shareable package ---
+
+export interface RecallPackage {
+  /** Format version */
+  version: 3;
+  /** ISO export timestamp */
+  exportedAt: string;
+  /** Human-readable metadata */
+  metadata: {
+    deckName: string;
+    cardCount: number;
+    exportedFrom: string; // "Recall v0.1.0"
+  };
+  /** Card data (same as RecallExportPayload minus settings) */
+  payload: {
+    decks: Deck[];
+    cards: Card[];
+    studySessions: StudySession[];
+    reviewLogs: ReviewLog[];
+  };
+  /** filename -> base64 (data URL or raw base64) for embedded images */
+  images: Record<string, string>;
+}
+
+const RECALL_IMAGE_RE = /!\[([^\]]*)\]\(recall:\/\/([^)]+)\)/g;
+
+/** Collect all recall:// image filenames referenced in card content */
+function collectImageRefs(cards: Card[]): string[] {
+  const refs = new Set<string>();
+  for (const card of cards) {
+    for (const field of [card.front, card.back, card.hint]) {
+      let match: RegExpExecArray | null;
+      const re = new RegExp(RECALL_IMAGE_RE.source, "g");
+      while ((match = re.exec(field)) !== null) {
+        refs.add(match[2]);
+      }
+    }
+  }
+  return [...refs];
+}
+
+/** Export a deck as a shareable .recall package (JSON with embedded images). Returns JSON string. */
+export async function exportDeckPackage(deck: Deck, cards: Card[]): Promise<string> {
+  const imageRefs = collectImageRefs(cards);
+  const images: Record<string, string> = {};
+
+  // Read images from app data dir and convert to base64
+  if (imageRefs.length > 0) {
+    try {
+      const { appDataDir } = await import("@tauri-apps/api/path");
+      const { readFile } = await import("@tauri-apps/plugin-fs");
+      const dir = await appDataDir();
+
+      for (const filename of imageRefs) {
+        try {
+          const data = await readFile(`${dir}images/${filename}`);
+          // Convert Uint8Array to base64
+          const binary = Array.from(data)
+            .map((b) => String.fromCharCode(b))
+            .join("");
+          images[filename] = btoa(binary);
+        } catch {
+          // Image file missing — skip
+        }
+      }
+    } catch {
+      // Browser fallback: images will be empty
+    }
+  }
+
+  const pkg: RecallPackage = {
+    version: 3,
+    exportedAt: new Date().toISOString(),
+    metadata: {
+      deckName: deck.name,
+      cardCount: cards.length,
+      exportedFrom: "Recall",
+    },
+    payload: {
+      decks: [deck],
+      cards: cards.map((c) => ({
+        ...c,
+        state: "new" as const,
+        lastReviewDate: null,
+        nextReviewDate: new Date().toISOString(),
+        stability: 0,
+        difficulty: 0,
+        elapsedDays: 0,
+        scheduledDays: 0,
+        reps: 0,
+        lapses: 0,
+      })),
+      studySessions: [],
+      reviewLogs: [],
+    },
+    images,
+  };
+
+  return JSON.stringify(pkg, null, 2);
+}
+
+/** Save a .recall package to disk via Tauri save dialog. Returns true on success. */
+export async function saveRecallPackage(json: string, deckName: string): Promise<boolean> {
+  try {
+    const { save } = await import("@tauri-apps/plugin-dialog");
+    const { writeTextFile } = await import("@tauri-apps/plugin-fs");
+
+    const sanitized = deckName.replace(/[^a-zA-Z0-9 _-]/g, "").replace(/\s+/g, "_");
+    const path = await save({
+      defaultPath: `${sanitized}.recall`,
+      filters: [{ name: "Recall Package", extensions: ["recall"] }],
+    });
+    if (!path) return false;
+
+    await writeTextFile(path, json);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Parse and validate a .recall package JSON string */
+export function parseRecallPackage(raw: string): RecallPackage {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    throw new Error("Invalid .recall file — not valid JSON");
+  }
+
+  if (!isRecallPackage(parsed)) {
+    throw new Error("Invalid .recall file — wrong format");
+  }
+
+  return parsed;
+}
+
+function isRecallPackage(value: unknown): value is RecallPackage {
+  if (!isRecord(value)) return false;
+  return (
+    value.version === 3 &&
+    typeof value.exportedAt === "string" &&
+    isRecord(value.metadata) &&
+    typeof value.metadata.deckName === "string" &&
+    typeof value.metadata.cardCount === "number" &&
+    isRecord(value.payload) &&
+    Array.isArray(value.payload.decks) &&
+    Array.isArray(value.payload.cards) &&
+    isRecord(value.images)
+  );
+}
+
+/** Import a .recall file: open file picker, parse, restore images, return cards + deck */
+export async function openRecallPackage(): Promise<{ pkg: RecallPackage; raw: string } | null> {
+  try {
+    const { open } = await import("@tauri-apps/plugin-dialog");
+    const { readTextFile } = await import("@tauri-apps/plugin-fs");
+
+    const selected = await open({
+      filters: [{ name: "Recall Package", extensions: ["recall"] }],
+      multiple: false,
+    });
+    if (!selected) return null;
+
+    const path = typeof selected === "string" ? selected : (selected as { path: string }).path;
+    const raw = await readTextFile(path);
+    const pkg = parseRecallPackage(raw);
+    return { pkg, raw };
+  } catch (err) {
+    throw new Error(err instanceof Error ? err.message : "Could not open .recall file");
+  }
+}
+
+/** Restore embedded images from a .recall package to the app data dir */
+export async function restorePackageImages(images: Record<string, string>): Promise<void> {
+  const filenames = Object.keys(images);
+  if (filenames.length === 0) return;
+
+  try {
+    const { appDataDir } = await import("@tauri-apps/api/path");
+    const { writeFile, mkdir } = await import("@tauri-apps/plugin-fs");
+    const dir = await appDataDir();
+    const imagesDir = `${dir}images`;
+
+    // Ensure directory exists
+    try {
+      await mkdir(imagesDir, { recursive: true });
+    } catch {
+      // Already exists
+    }
+
+    for (const filename of filenames) {
+      try {
+        const binary = Uint8Array.from(atob(images[filename]), (c) => c.charCodeAt(0));
+        await writeFile(`${imagesDir}/${filename}`, binary);
+      } catch {
+        // Skip individual failures
+      }
+    }
+  } catch {
+    // Browser fallback
+  }
+}
+
+// --- Existing import logic ---
 
 export function buildExportPayload(snapshot: RecallStateSnapshot, exportedAt = new Date()): RecallExportPayload {
   return {
