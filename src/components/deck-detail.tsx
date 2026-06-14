@@ -18,6 +18,7 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { getDeckStats } from "@/lib/stats";
 import { BulkAddDialog } from "@/components/bulk-add-dialog";
+import { MarkdownImportDialog } from "@/components/markdown-import-dialog";
 import { type BulkCardInput } from "@/lib/bulk-parser";
 import { useRecallStore } from "@/stores/recall-store";
 import type { Card } from "@/types";
@@ -183,9 +184,10 @@ export function DeckDetail(): JSX.Element {
                                                                 Custom Study
                                                               </Button>
                                                               <Button variant="outline" onClick={() => setShowCsvImport(true)}>
-                                                                <FileSpreadsheet className="h-4 w-4" />
-                                                                CSV Import
-                                                              </Button>
+                                                                                                                              <FileSpreadsheet className="h-4 w-4" />
+                                                                                                                              CSV Import
+                                                                                                                            </Button>
+                                                                                                                            <MarkdownImportDialog deckId={currentDeckId} />
                     <ConfirmAction
                       title="Reset progress?"
                       description="This resets all cards in this deck back to 'new' state. Card content is kept, but all review history and scheduling data is cleared."

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, Beaker, FileSpreadsheet, Flame, Library, Plus, RotateCw } from "lucide-react";
+import { ArrowRight, Beaker, FileSpreadsheet, FileText, Flame, Library, Plus, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { AnkiImportDialog } from "@/components/anki-import-dialog";
 import { ReviewInbox } from "@/components/review-inbox";
@@ -10,6 +10,7 @@ import { ReviewCalendar } from "@/components/review-calendar";
 import { DeckDialog } from "@/components/deck-dialog";
 import { CustomStudyDialog } from "@/components/custom-study-dialog";
 import { CsvImportDialog } from "@/components/csv-import-dialog";
+import { MarkdownImportDialog } from "@/components/markdown-import-dialog";
 
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -75,9 +76,10 @@ export function Dashboard(): JSX.Element {
           />
           <AnkiImportDialog />
           <Button variant="outline" onClick={() => setShowCsvImport(true)}>
-            <FileSpreadsheet className="h-4 w-4" />
-            CSV Import
-          </Button>
+                      <FileSpreadsheet className="h-4 w-4" />
+                      CSV Import
+                    </Button>
+                    <MarkdownImportDialog />
           <Button variant="outline" onClick={() => setShowCustomStudy(true)}>
             <Beaker className="h-4 w-4" />
             Custom Study
