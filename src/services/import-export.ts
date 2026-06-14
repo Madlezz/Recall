@@ -247,9 +247,12 @@ export async function restorePackageImages(images: Record<string, string>): Prom
     }
 
     for (const filename of filenames) {
+      // Reject path traversal
+      const safe = filename.replace(/[/\\]|\.\./g, "").replace(/[^a-zA-Z0-9_.-]/g, "_");
+      if (!safe) continue;
       try {
         const binary = Uint8Array.from(atob(images[filename]), (c) => c.charCodeAt(0));
-        await writeFile(`${imagesDir}/${filename}`, binary);
+        await writeFile(`${imagesDir}/${safe}`, binary);
       } catch {
         // Skip individual failures
       }

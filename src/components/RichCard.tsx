@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
-import rehypeSanitize from "rehype-sanitize";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeHighlight from "rehype-highlight";
 import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
@@ -116,7 +116,13 @@ export function RichCard({ content, isBack = false, cardType = "basic", revealed
     <div className={`prose prose-invert max-w-none ${isBack ? 'border-t pt-4 mt-4' : ''}`}>
       <ReactMarkdown
         remarkPlugins={[remarkMath, remarkGfm]}
-        rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeHighlight, rehypeKatex]}
+        rehypePlugins={[rehypeRaw, [rehypeSanitize, {
+          // Restrict sanitizer: disallow form elements and interactive HTML in cards
+          ...defaultSchema,
+          tagNames: defaultSchema.tagNames?.filter(
+            (t: string) => !["form", "input", "textarea", "button", "select", "details", "summary"].includes(t),
+          ),
+        }], rehypeHighlight, rehypeKatex]}
         components={{
           img({ src, alt, ...props }: any) {
             if (src && src.startsWith("https://recall.local/")) {

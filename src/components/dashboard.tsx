@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, Beaker, FileSpreadsheet, FileText, Flame, Library, PackageOpen, Plus, RotateCw } from "lucide-react";
+import { ArrowRight, Beaker, FileSpreadsheet, Flame, Library, Plus, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { AnkiImportDialog } from "@/components/anki-import-dialog";
 import { ReviewInbox } from "@/components/review-inbox";

@@ -2,9 +2,8 @@ import { useMemo, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { useRecallStore } from "@/stores/recall-store";
 import { getDeckStats } from "@/lib/stats";
-import { checkDeckQuality, type CardQualityWarning } from "@/lib/card-quality";
+import { type CardQualityWarning } from "@/lib/card-quality";
 import { exportDeckToJson, downloadFile } from "@/services/import-export";
-import type { Card } from "@/types";
 
 export function useDeckDetail() {
   const selectedDeckId = useRecallStore((state) => state.selectedDeckId);

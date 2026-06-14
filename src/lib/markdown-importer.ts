@@ -14,8 +14,11 @@ export interface MarkdownCardInput {
  * Lines starting with "tags:" become comma-separated tags.
  */
 export function parseMarkdownCards(text: string): MarkdownCardInput[] {
-  // Auto-detect via string match (avoid regex literal escaping)
-  if (text.includes("\nQ:") || text.startsWith("Q:") || text.includes("\n**Q:") || text.startsWith("**Q:")) {
+  // Auto-detect: require BOTH Q: and A: markers for Q/A format
+    // Single Q: in heading content shouldn't trigger the Q/A parser
+    const hasQ = /\nQ:/.test(text) || /^\s*Q:/.test(text) || /\n\*\*Q:/.test(text) || /^\s*\*\*Q:/.test(text);
+    const hasA = /\nA:/.test(text) || /^\s*A:/.test(text) || /\n\*\*A:/.test(text) || /^\s*\*\*A:/.test(text);
+    if (hasQ && hasA) {
     return parseQAPairs(text);
   }
   return parseHeadingCards(text);

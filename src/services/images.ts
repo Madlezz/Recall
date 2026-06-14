@@ -1,5 +1,11 @@
 const imageUrlCache = new Map<string, string>();
 
+/** Reject path traversal and non-alphanumeric chars in image filenames */
+function sanitizeFilename(name: string): string {
+  // Strip directory traversal and dangerous chars
+  return name.replace(/[/\\]|\.\./g, "").replace(/[^a-zA-Z0-9_.-]/g, "_");
+}
+
 /** Open native file picker, copy selected image to app data dir, return filename. Browser-safe. */
 export async function insertImage(): Promise<string | null> {
   try {
@@ -13,7 +19,7 @@ export async function insertImage(): Promise<string | null> {
     const path = typeof selected === "string" ? selected : (selected as { path: string }).path;
     const { invoke } = await import("@tauri-apps/api/core");
     const filename: string = await invoke("copy_image_to_recall", { sourcePath: path });
-    return filename;
+    return sanitizeFilename(filename);
   } catch {
     return null;
   }
@@ -21,13 +27,15 @@ export async function insertImage(): Promise<string | null> {
 
 /** Resolve a recall image filename to a Tauri asset URL. Uses module-level cache. */
 export async function getImageUrl(filename: string): Promise<string> {
-  if (imageUrlCache.has(filename)) return imageUrlCache.get(filename)!;
+  const safe = sanitizeFilename(filename);
+  if (!safe) return "";
+  if (imageUrlCache.has(safe)) return imageUrlCache.get(safe)!;
   try {
     const { appDataDir } = await import("@tauri-apps/api/path");
     const { convertFileSrc } = await import("@tauri-apps/api/core");
     const dir = await appDataDir();
-    const src = convertFileSrc(`${dir}images/${filename}`);
-    imageUrlCache.set(filename, src);
+    const src = convertFileSrc(`${dir}images/${safe}`);
+    imageUrlCache.set(safe, src);
     return src;
   } catch {
     return "";

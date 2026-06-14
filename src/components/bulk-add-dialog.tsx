@@ -12,7 +12,7 @@ interface BulkAddDialogProps {
   onImport: (cards: BulkCardInput[]) => Promise<void>;
 }
 
-export function BulkAddDialog({ open, onClose, deckId, onImport }: BulkAddDialogProps): JSX.Element | null {
+export function BulkAddDialog({ open, onClose, deckId: _deckId, onImport }: BulkAddDialogProps): JSX.Element | null {
   const [text, setText] = useState("");
   const [importing, setImporting] = useState(false);
 
