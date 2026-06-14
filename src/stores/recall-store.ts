@@ -107,19 +107,42 @@ export const useRecallStore = create<RecallStore>((set: any, get: any) => ({
       set({ ...snapshot, view, isLoading: false, isInitialized: true, error: null });
 
             // Fire-and-forget: auto-backup if schedule says so
-            void runBackupIfDue(snapshot).then((backupAt) => {
-              if (backupAt) {
-                set({ settings: { ...snapshot.settings, lastBackupAt: backupAt } });
-              }
-            });
+                        void runBackupIfDue(snapshot).then((backupAt) => {
+                          if (backupAt) {
+                            set({ settings: { ...snapshot.settings, lastBackupAt: backupAt } });
+                          }
+                        });
 
-            // Fire-and-forget: send due reminder notification if enabled
-      if (snapshot.settings.notificationsEnabled) {
-        const dueCount = snapshot.cards.filter((c: Card) => isCardDueToday(c)).length;
-        if (dueCount > 0) {
-          void sendDueReminder(dueCount);
-        }
-      }
+                  // Compute due count once for tray + notifications
+                  const dueCount = snapshot.cards.filter((c: Card) => isCardDueToday(c)).length;
+
+                  // Update tray tooltip with due count (Tauri only)
+                  void (async () => {
+                    try {
+                      const { invoke } = await import("@tauri-apps/api/core");
+                      await invoke("update_tray_tooltip", { dueCount });
+                    } catch { /* not in Tauri runtime */ }
+                  })();
+
+                  // Check for app updates (Tauri only)
+                  void (async () => {
+                    try {
+                      const { check } = await import("@tauri-apps/plugin-updater");
+                      const update = await check();
+                      if (update?.available) {
+                        const { toast } = await import("sonner");
+                        toast.info(`Recall ${update.version} is available`, {
+                          action: { label: "Update", onClick: () => void update.downloadAndInstall() },
+                          duration: 15000,
+                        });
+                      }
+                    } catch { /* not in Tauri runtime */ }
+                  })();
+
+                  // Fire-and-forget: send due reminder notification if enabled
+                  if (snapshot.settings.notificationsEnabled && dueCount > 0) {
+                    void sendDueReminder(dueCount);
+                  }
     } catch (error) {
       set({
         isLoading: false, isInitialized: true,

@@ -1,9 +1,18 @@
 mod anki_import;
 
 use anki_import::parse_anki_apkg;
+use tauri::tray::{TrayIconBuilder, TrayIconEvent};
 use tauri_plugin_sql::{Migration, MigrationKind};
+use tauri::Manager;
 
 const RECALL_DB: &str = "sqlite:recall.db";
+
+#[tauri::command]
+fn update_tray_tooltip(app: tauri::AppHandle, due_count: u32) {
+    if let Some(tray) = app.tray_by_id("recall-tray") {
+        let _ = tray.set_tooltip(Some(&format!("Recall — {} card(s) due", due_count)));
+    }
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -11,12 +20,28 @@ pub fn run() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(
             tauri_plugin_sql::Builder::default()
                 .add_migrations(RECALL_DB, migrations())
                 .build(),
         )
-        .invoke_handler(tauri::generate_handler![parse_anki_apkg])
+        .setup(|app| {
+            let _tray = TrayIconBuilder::with_id("recall-tray")
+                .tooltip("Recall — your flashcards, local-first")
+                .icon(app.default_window_icon().unwrap().clone())
+                .on_tray_icon_event(|tray, event| {
+                    if let TrayIconEvent::Click { .. } = event {
+                        if let Some(window) = tray.app_handle().get_webview_window("main") {
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                        }
+                    }
+                })
+                .build(app)?;
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![parse_anki_apkg, update_tray_tooltip])
         .run(tauri::generate_context!())
         .expect("error while running Recall");
 }
