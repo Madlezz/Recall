@@ -1,6 +1,7 @@
 import { Brain, Calendar, Flame, Lock, TrendingUp, Zap } from "lucide-react";
 import { useStats } from "./use-stats";
 import { ACHIEVEMENT_DEFS } from "@/types";
+import { RetentionForecast } from "@/components/retention-forecast";
 
 // ── Sub-components ──
 
@@ -85,6 +86,7 @@ export function Stats(): JSX.Element {
     totalRated,
     accuracy,
     topDecks,
+    cards,
   } = useStats();
 
   return (
@@ -222,6 +224,9 @@ export function Stats(): JSX.Element {
           </div>
         )}
       </section>
+
+      {/* Due forecast */}
+      <RetentionForecast cards={cards} />
 
       {/* Top decks */}
       {topDecks.length > 0 && (

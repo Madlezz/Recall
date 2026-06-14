@@ -143,5 +143,34 @@ export function getDeckHealth(
   }
 
   const oldestAllowed = subDays(startOfDay(at), 365);
-  return differenceInCalendarDays(cursor, oldestAllowed) < 0 ? 365 : streak;
-}
+    return differenceInCalendarDays(cursor, oldestAllowed) < 0 ? 365 : streak;
+  }
+
+  export interface DueForecastDay {
+    date: string; // YYYY-MM-DD
+    count: number;
+  }
+
+  /** Project how many cards are due each day for the next N days */
+  export function getDueForecast(cards: Card[], days = 30): DueForecastDay[] {
+    const now = new Date();
+    const forecast: Map<string, number> = new Map();
+
+    for (const card of cards) {
+      if (card.state === "new") continue; // new cards aren't scheduled
+      const dueDate = parseISO(card.nextReviewDate);
+      if (isAfter(dueDate, now)) {
+        const key = startOfDay(dueDate).toISOString().slice(0, 10);
+        forecast.set(key, (forecast.get(key) || 0) + 1);
+      }
+    }
+
+    const result: DueForecastDay[] = [];
+    for (let i = 0; i < days; i++) {
+      const date = new Date(now);
+      date.setDate(date.getDate() + i);
+      const key = startOfDay(date).toISOString().slice(0, 10);
+      result.push({ date: key, count: forecast.get(key) || 0 });
+    }
+    return result;
+  }
