@@ -1,4 +1,4 @@
-import { Plus, Zap } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -39,7 +39,7 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
 
     try {
       await createCard({ deckId, front, back, hint: "", source: "", tags: [] });
-      toast.success("Card added!");
+      toast.success("Card added");
       setFront("");
       setBack("");
       frontRef.current?.focus();
@@ -57,26 +57,21 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
   if (!open) return <></>;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] bg-background/80 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] bg-black/40" onClick={onClose}>
       <div
-        className="mx-4 w-full max-w-lg rounded-lg border bg-card p-6 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-200"
+        className="mx-4 w-full max-w-lg border border-zinc-200 bg-white p-6 text-zinc-900 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
       >
-        <div className="flex items-center gap-2 mb-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10">
-            <Zap className="h-4 w-4 text-primary" />
-          </div>
-          <div>
-            <h2 className="font-semibold">Quick Add Card</h2>
-            <p className="text-xs text-muted-foreground">Ctrl+N · Press Escape to close</p>
-          </div>
+        <div className="mb-5">
+          <h2 className="text-base font-medium tracking-tight text-zinc-900 dark:text-zinc-100">Quick add</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Press Escape to close</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           {decks.length > 0 ? (
             <Select value={deckId} onValueChange={setDeckId}>
-              <SelectTrigger>
+              <SelectTrigger className="border-zinc-200 dark:border-zinc-800">
                 <SelectValue placeholder="Select deck" />
               </SelectTrigger>
               <SelectContent>
@@ -86,7 +81,7 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
               </SelectContent>
             </Select>
           ) : (
-            <p className="text-sm text-muted-foreground">Create a deck first to add cards.</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">Create a deck first to add cards.</p>
           )}
 
           <Textarea
@@ -94,14 +89,14 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
             value={front}
             onChange={(e) => setFront(e.target.value)}
             placeholder="Front (question)..."
-            className="min-h-[80px] font-mono text-sm"
+            className="min-h-[80px] border-zinc-200 font-mono text-sm dark:border-zinc-800"
             disabled={decks.length === 0}
           />
-
           <Input
             value={back}
             onChange={(e) => setBack(e.target.value)}
             placeholder="Back (answer)..."
+            className="border-zinc-200 dark:border-zinc-800"
             disabled={decks.length === 0}
             onKeyDown={(e) => {
               if (e.key === "Enter" && front.trim() && back.trim()) {
@@ -111,11 +106,11 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
             }}
           />
 
-          <div className="flex justify-end gap-2 pt-1">
-            <Button type="button" variant="ghost" size="sm" onClick={onClose}>
+          <div className="flex justify-end gap-2 border-t border-zinc-100 pt-4 dark:border-zinc-800">
+            <Button type="button" variant="ghost" size="sm" onClick={onClose} className="text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800">
               Cancel
             </Button>
-            <Button type="submit" size="sm" disabled={!deckId || !front.trim() || !back.trim()}>
+            <Button type="submit" size="sm" disabled={!deckId || !front.trim() || !back.trim()} className="bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200">
               <Plus className="h-4 w-4 mr-1" />
               Add Card
             </Button>

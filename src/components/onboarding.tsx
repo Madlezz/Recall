@@ -9,7 +9,7 @@ export function Onboarding(): JSX.Element {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 200);
+    const t = setTimeout(() => setVisible(true), 50);
     return () => clearTimeout(t);
   }, []);
 
@@ -22,58 +22,68 @@ export function Onboarding(): JSX.Element {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4 text-foreground">
+    <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
       <div
-        className={`w-full max-w-md space-y-10 text-center transition-all duration-700 ${
-          visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
+        className={`w-full max-w-md space-y-10 text-center transition-all duration-500 ${
+          visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
         }`}
       >
-        <div className="space-y-2">
-          <h1 className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-4xl font-bold tracking-tight text-transparent">
-            Recall
-          </h1>
-          <p className="text-sm text-muted-foreground">Beautiful flashcards, no cloud, no account.</p>
+        <div className="space-y-4">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+            <Brain className="h-7 w-7 text-zinc-800 dark:text-zinc-200" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+              Recall
+            </h1>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Beautiful flashcards, no cloud, no account.
+            </p>
+          </div>
         </div>
 
-        <div className="animate-in fade-in slide-in-from-right-4 duration-500 space-y-3">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-            <Brain className="h-8 w-8 text-primary" />
+        <div className="space-y-4 text-left">
+          <div className="space-y-2 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex items-center gap-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+              <Zap className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+              Smart Review, Zero Setup
+            </div>
+            <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+              Uses the best spaced repetition algorithm (FSRS). You just review — it handles the rest.
+            </p>
           </div>
 
-          <div className="space-y-6">
-            <div className="space-y-2 rounded-lg border bg-card/60 p-4 text-left">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <Zap className="h-4 w-4 text-primary" />
-                Smart Review, Zero Setup
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Uses the best spaced repetition algorithm (FSRS). You just review — it handles the rest.
-              </p>
+          <div className="space-y-2 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex items-center gap-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+              <BookCheck className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+              Rich Cards, Plain Text
             </div>
-
-            <div className="space-y-2 rounded-lg border bg-card/60 p-4 text-left">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <BookCheck className="h-4 w-4 text-primary" />
-                Rich Cards, Plain Text
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Markdown, LaTeX math, code highlighting. But it works great with plain text too.
-              </p>
-            </div>
+            <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+              Markdown, LaTeX math, code highlighting. But it works great with plain text too.
+            </p>
           </div>
         </div>
 
         <div className="space-y-3">
-          <Button size="lg" className="w-full" onClick={() => void handleTryDemo()}>
+          <Button
+            size="lg"
+            className="w-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+            onClick={() => void handleTryDemo()}
+          >
             <Sparkles className="mr-2 h-4 w-4" />
             Try with Demo Cards
           </Button>
 
-          <Button size="lg" variant="outline" className="w-full" onClick={() => void handleStartFresh()}>
+          <Button
+            size="lg"
+            variant="outline"
+            className="w-full border-zinc-200 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-900"
+            onClick={() => void handleStartFresh()}
+          >
             Start Fresh
           </Button>
 
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-zinc-400 dark:text-zinc-500">
             Your data lives on your computer. No account, no cloud, no telemetry.
           </p>
         </div>

@@ -117,28 +117,29 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
           <DialogHeader>
             <DialogTitle>{card ? "Edit card" : "New card"}</DialogTitle>
             <DialogDescription>
-              Supports Markdown, code blocks with syntax highlighting, and LaTeX math ($inline$ and $$block$$).
-              <br />
-              <span className="text-primary font-medium">Cloze deletion:</span> wrap hidden text like{" "}
-              <code className="bg-muted px-1 rounded text-xs">{"{{c1::hidden answer}}"}</code>{" "}
+              Supports Markdown, code blocks with syntax highlighting, and LaTeX math ($inline$ and $$block$$).{" "}
+              <span className="font-medium text-zinc-900 dark:text-zinc-100">Cloze deletion:</span> wrap hidden text like{" "}
+              <code className="bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded font-mono text-xs">{"{{c1::hidden answer}}"}</code>{" "}
               — it auto-detects and becomes a fill-in-the-blank card.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            <Label htmlFor="deck-select">Deck</Label>
-            <Select value={targetDeckId} onValueChange={setTargetDeckId}>
-              <SelectTrigger id="deck-select">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {decks.map((deck) => (
-                  <SelectItem key={deck.id} value={deck.id}>
-                    {deck.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <Label htmlFor="deck-select" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Deck</Label>
+              <Select value={targetDeckId} onValueChange={setTargetDeckId}>
+                <SelectTrigger id="deck-select" className="border-zinc-200 dark:border-zinc-800">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {decks.map((deck) => (
+                    <SelectItem key={deck.id} value={deck.id}>
+                      {deck.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             <Tabs defaultValue="front" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
@@ -147,16 +148,17 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
               </TabsList>
 
               <TabsContent value="front" className="space-y-4">
-                <div className="grid gap-2 md:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="front-input">Content (Markdown)</Label>
+                      <Label htmlFor="front-input" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Content (Markdown)</Label>
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => handleInsertImage(frontRef.current, front, setFront)}
                         title="Insert image"
+                        className="h-8 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800"
                       >
                         <ImageIcon className="h-4 w-4 mr-1" />
                         Image
@@ -167,17 +169,17 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
                       ref={frontRef}
                       value={front}
                       onChange={(event) => setFront(event.target.value)}
-                      placeholder="# Question&#10;&#10;```python&#10;print('hello')&#10;```"
-                      className="min-h-[200px] font-mono text-sm"
+                      placeholder="# Question\n\n```python\nprint('hello')\n```"
+                      className="min-h-[200px] border-zinc-200 font-mono text-sm dark:border-zinc-800"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Preview</Label>
-                    <div className="min-h-[200px] rounded-md border bg-muted/30 p-4">
+                    <Label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Preview</Label>
+                    <div className="min-h-[200px] rounded border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
                       {front ? (
                         <RichCard content={front} />
                       ) : (
-                        <p className="text-sm text-muted-foreground italic">Preview will appear here...</p>
+                        <p className="text-sm text-zinc-400 italic">Preview will appear here...</p>
                       )}
                     </div>
                   </div>
@@ -185,16 +187,17 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
               </TabsContent>
 
               <TabsContent value="back" className="space-y-4">
-                <div className="grid gap-2 md:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="back-input">Content (Markdown)</Label>
+                      <Label htmlFor="back-input" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Content (Markdown)</Label>
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => handleInsertImage(backRef.current, back, setBack)}
                         title="Insert image"
+                        className="h-8 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800"
                       >
                         <ImageIcon className="h-4 w-4 mr-1" />
                         Image
@@ -205,17 +208,17 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
                       ref={backRef}
                       value={back}
                       onChange={(event) => setBack(event.target.value)}
-                      placeholder="## Answer&#10;&#10;The solution is:&#10;&#10;$$E = mc^2$$"
-                      className="min-h-[200px] font-mono text-sm"
+                      placeholder="## Answer\n\nThe solution is:\n\n$$E = mc^2$$"
+                      className="min-h-[200px] border-zinc-200 font-mono text-sm dark:border-zinc-800"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Preview</Label>
-                    <div className="min-h-[200px] rounded-md border bg-muted/30 p-4">
+                    <Label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Preview</Label>
+                    <div className="min-h-[200px] rounded border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
                       {back ? (
                         <RichCard content={back} isBack />
                       ) : (
-                        <p className="text-sm text-muted-foreground italic">Preview will appear here...</p>
+                        <p className="text-sm text-zinc-400 italic">Preview will appear here...</p>
                       )}
                     </div>
                   </div>
@@ -225,42 +228,45 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="hint-input">Hint (optional)</Label>
+                <Label htmlFor="hint-input" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Hint (optional)</Label>
                 <Input
                   id="hint-input"
                   value={hint}
                   onChange={(event) => setHint(event.target.value)}
                   placeholder="A subtle clue"
+                  className="border-zinc-200 dark:border-zinc-800"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="source-input">Source URL (optional)</Label>
+                <Label htmlFor="source-input" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Source URL (optional)</Label>
                 <Input
                   id="source-input"
                   value={source}
                   onChange={(event) => setSource(event.target.value)}
                   placeholder="https://..."
+                  className="border-zinc-200 dark:border-zinc-800"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="tags-input">Tags (comma-separated)</Label>
+                <Label htmlFor="tags-input" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Tags (comma-separated)</Label>
                 <Input
                   id="tags-input"
                   value={tags}
                   onChange={(event) => setTags(event.target.value)}
                   placeholder="react, hooks, typescript"
+                  className="border-zinc-200 dark:border-zinc-800"
                 />
               </div>
             </div>
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} className="border-zinc-200 text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100">
               Cancel
             </Button>
-            <Button type="submit">{card ? "Save changes" : "Create card"}</Button>
+            <Button type="submit" className="bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200">{card ? "Save changes" : "Create card"}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

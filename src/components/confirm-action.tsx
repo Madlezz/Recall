@@ -45,7 +45,15 @@ export function ConfirmAction({
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant={destructive ? "destructive" : "outline"}>{triggerLabel}</Button>
+        <Button
+          variant={destructive ? "destructive" : "outline"}
+          className={destructive
+            ? "bg-red-600 text-white hover:bg-red-700"
+            : "border-zinc-200 text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+          }
+        >
+          {triggerLabel}
+        </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -57,6 +65,10 @@ export function ConfirmAction({
           <AlertDialogAction asChild>
             <Button
               variant={destructive ? "destructive" : "default"}
+              className={destructive
+                ? "bg-red-600 text-white hover:bg-red-700"
+                : "bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              }
               onClick={(event) => {
                 event.preventDefault();
                 void handleConfirm();
