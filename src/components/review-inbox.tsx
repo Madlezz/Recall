@@ -1,7 +1,6 @@
-import { AlertTriangle, BookOpen, Brain, Clock, RotateCw } from "lucide-react";
+import { AlertTriangle, BookOpen, Brain, RotateCw, Zap } from "lucide-react";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import {
   getDueTodayCount,
   getEstimatedReviewMinutes,
@@ -27,7 +26,10 @@ export function ReviewInbox(): JSX.Element {
   const learning = useMemo(() => getLearningCount(cards), [cards]);
   const leech = useMemo(() => getLeechCount(cards, settings.leechThreshold), [cards, settings.leechThreshold]);
   const newReviewedToday = useMemo(() => getNewCardsReviewedToday(reviewLogs), [reviewLogs]);
-  const estimatedMin = useMemo(() => getEstimatedReviewMinutes(cards, settings.dailyNewCardLimit), [cards, settings.dailyNewCardLimit]);
+  const estimatedMin = useMemo(
+    () => getEstimatedReviewMinutes(cards, settings.dailyNewCardLimit),
+    [cards, settings.dailyNewCardLimit],
+  );
 
   const newAvailable = Math.max(0, settings.dailyNewCardLimit - newReviewedToday);
   const totalDue = due + learning + Math.min(newCards, newAvailable);
@@ -40,98 +42,85 @@ export function ReviewInbox(): JSX.Element {
 
   if (totalDue === 0 && overdue === 0 && leech === 0) {
     return (
-      <div className="rounded-lg border bg-card p-5 text-center">
-        <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/10">
-          <RotateCw className="h-5 w-5 text-emerald-500" />
+      <div className="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-5 py-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+            <RotateCw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">All caught up</div>
+            <div className="text-xs text-zinc-500">No cards due. Add new cards or import a deck.</div>
+          </div>
         </div>
-        <h3 className="mt-3 font-semibold">All caught up!</h3>
-        <p className="mt-1 text-sm text-muted-foreground">
-          No cards due. Add new cards or import a deck.
-        </p>
-        <Progress className="mt-3 h-1.5" value={100} />
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg border bg-card p-5">
-      <div className="flex items-center justify-between mb-4">
+    <div className="rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="flex items-center justify-between px-5 py-4">
         <div>
-          <h3 className="font-semibold">Review Inbox</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {totalDue} cards ready · ~{estimatedMin} min estimated
+          <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Review Inbox</h3>
+          <p className="mt-0.5 text-xs text-zinc-500">
+            {totalDue} cards ready · ~{estimatedMin} min
           </p>
         </div>
-        <Button onClick={handleStartReview}>
+        <Button onClick={handleStartReview} className="gap-2">
           <RotateCw className="h-4 w-4" />
-          Start Review
+          Start
         </Button>
       </div>
 
-      <div className="grid gap-2 sm:grid-cols-2">
-        <InboxRow
-          icon={RotateCw}
-          label="Due"
-          count={due}
-          color="text-blue-500"
-          bg="bg-blue-500/10"
-          sub={`${overdue} overdue`}
-        />
-        <InboxRow
-          icon={Brain}
-          label="Learning"
-          count={learning}
-          color="text-amber-500"
-          bg="bg-amber-500/10"
-          sub="in progress"
-        />
-        <InboxRow
+      <div className="grid grid-cols-4 divide-x divide-zinc-100 border-t border-zinc-100 dark:divide-zinc-800 dark:border-zinc-800">
+        <InboxCell icon={RotateCw} label="Due" count={due} sub={`${overdue} overdue`} />
+        <InboxCell icon={Brain} label="Learning" count={learning} sub="in progress" />
+        <InboxCell
           icon={BookOpen}
           label="New"
           count={Math.min(newCards, newAvailable)}
-          color="text-emerald-500"
-          bg="bg-emerald-500/10"
-          sub={`${newReviewedToday}/${settings.dailyNewCardLimit} today`}
+          sub={`${newReviewedToday}/${settings.dailyNewCardLimit}`}
         />
-        <InboxRow
+        <InboxCell
           icon={AlertTriangle}
           label="Leeches"
           count={leech}
-          color={leech > 0 ? "text-red-500" : "text-muted-foreground"}
-          bg={leech > 0 ? "bg-red-500/10" : "bg-muted/30"}
-          sub={leech > 0 ? `≥${settings.leechThreshold} lapses` : "none flagged"}
+          sub={leech > 0 ? `≥${settings.leechThreshold} laps` : "none"}
+          accent={leech > 0}
         />
       </div>
 
       {overdue > 0 && (
-        <div className="mt-3 flex items-center gap-2 rounded-md bg-red-500/10 border border-red-500/20 px-3 py-2 text-sm">
-          <Clock className="h-4 w-4 text-red-500 shrink-0" />
-          <span className="text-red-500 font-medium">{overdue} overdue</span>
-          <span className="text-muted-foreground">— review these first to stay on track</span>
+        <div className="flex items-center gap-2 border-t border-zinc-100 px-5 py-3 text-sm dark:border-zinc-800">
+          <Zap className="h-4 w-4 text-red-500 shrink-0" />
+          <span className="font-semibold text-red-600 dark:text-red-400">{overdue} overdue</span>
+          <span className="text-zinc-500">— tackle these first</span>
         </div>
       )}
     </div>
   );
 }
 
-interface InboxRowProps {
+function InboxCell({
+  icon: Icon,
+  label,
+  count,
+  sub,
+  accent,
+}: {
   icon: typeof RotateCw;
   label: string;
   count: number;
-  color: string;
-  bg: string;
   sub: string;
-}
-
-function InboxRow({ icon: Icon, label, count, color, bg, sub }: InboxRowProps): JSX.Element {
+  accent?: boolean;
+}): JSX.Element {
   return (
-    <div className={cn("flex items-center gap-3 rounded-md p-3", bg)}>
-      <Icon className={cn("h-5 w-5 shrink-0", color)} />
-      <div className="min-w-0">
-        <div className={cn("text-lg font-bold", color)}>{count}</div>
-        <div className="text-xs font-medium">{label}</div>
-        <div className="text-xs text-muted-foreground">{sub}</div>
-      </div>
+    <div className="flex flex-col items-center justify-center px-2 py-4 text-center">
+      <Icon className={cn("h-4 w-4 mb-1.5", accent ? "text-red-500" : "text-zinc-400")} />
+      <span className={cn("text-xl font-bold tabular-nums", accent ? "text-red-600" : "text-zinc-800 dark:text-zinc-200")}>
+        {count}
+      </span>
+      <span className="text-[10px] font-medium text-zinc-500 mt-0.5">{label}</span>
+      <span className="text-[9px] text-zinc-400 mt-0.5">{sub}</span>
     </div>
   );
 }
