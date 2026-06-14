@@ -7,6 +7,11 @@ export default defineConfig({
   build: {
     target: "es2021",
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: "es2021",
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
