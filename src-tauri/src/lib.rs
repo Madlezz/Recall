@@ -275,7 +275,7 @@ fn migrations() -> Vec<Migration> {
                 FROM recall_seed_guard WHERE should_seed = 1;
 
             INSERT OR REPLACE INTO settings (key, value) VALUES ('schema_version', '2');
-            INSERT OR IGNORE INTO settings (key, value) VALUES ('theme', 'dark');
+            INSERT OR IGNORE INTO settings (key, value) VALUES ('theme', 'light');
             INSERT OR IGNORE INTO settings (key, value)
                 SELECT 'seeded_at', strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
                 FROM recall_seed_guard WHERE should_seed = 1;

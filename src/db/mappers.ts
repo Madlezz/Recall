@@ -189,7 +189,7 @@ export function reviewLogToRow(review: ReviewLog): ReviewLogRow {
 
 export function settingsFromRows(rows: SettingRow[]): RecallSettings {
   const values = new Map(rows.map((row) => [row.key, row.value]));
-  const theme = values.get("theme") === "light" ? "light" : "dark";
+  const theme = values.get("theme") === "dark" ? "dark" : "light";
   const dailyNewCardLimitRaw = values.get("daily_new_card_limit");
   const leechThresholdRaw = values.get("leech_threshold");
   const xpRaw = values.get("xp");

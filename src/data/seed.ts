@@ -73,7 +73,7 @@ export function createSeedSnapshot(now = new Date()): RecallStateSnapshot {
     studySessions,
     reviewLogs,
     settings: {
-          theme: "dark",
+          theme: "light",
           seededAt: ISO(today),
           dailyNewCardLimit: 20,
           leechThreshold: 5,

@@ -25,7 +25,7 @@ export function exportDeckToJson(deck: Deck, cards: Card[]): string {
     studySessions: [],
     reviewLogs: [],
     settings: {
-          theme: "dark" as const,
+          theme: "light" as const,
           seededAt: new Date().toISOString(),
           dailyNewCardLimit: 20,
           leechThreshold: 5,

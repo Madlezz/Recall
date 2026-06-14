@@ -25,6 +25,7 @@ import type { Deck } from "@/types";
 export function Dashboard(): JSX.Element {
   const decks = useRecallStore((state) => state.decks);
     const cards = useRecallStore((state) => state.cards);
+    const isLoading = useRecallStore((state) => state.isLoading);
     const showDeck = useRecallStore((state) => state.showDeck);
   const startReview = useRecallStore((state) => state.startReview);
   const [sortBy, setSortBy] = useState<"name" | "due" | "cards">("name");
@@ -111,38 +112,62 @@ export function Dashboard(): JSX.Element {
                   </section>
 
                   <section>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Decks</h2>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">{decks.length} total</span>
-                      <div className="flex rounded-md border border-input overflow-hidden">
-                        <button onClick={() => setSortBy("name")} className={cn("px-2 py-1 text-xs font-medium transition-colors", sortBy === "name" ? "bg-primary text-primary-foreground" : "hover:bg-muted")}>Name</button>
-                        <button onClick={() => setSortBy("due")} className={cn("px-2 py-1 text-xs font-medium transition-colors border-l border-input", sortBy === "due" ? "bg-primary text-primary-foreground" : "hover:bg-muted")}>Due</button>
-                        <button onClick={() => setSortBy("cards")} className={cn("px-2 py-1 text-xs font-medium transition-colors border-l border-input", sortBy === "cards" ? "bg-primary text-primary-foreground" : "hover:bg-muted")}>Cards</button>
-                      </div>
-                    </div>
-        </div>
-
-        {decks.length === 0 ? (
-                          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-muted-foreground/30 px-6 py-16 text-center">
-                            <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-muted/60">
-                              <Library className="h-8 w-8 text-muted-foreground/60" />
-                            </div>
-                            <h3 className="text-lg font-semibold">Nothing here yet!</h3>
-                            <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
-                              Time to learn something cool. Create your first deck and the magic begins. ✨
-                            </p>
-                            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-                              <Button onClick={() => setShowCreateDeck(true)}>
-                                <Plus className="mr-2 h-4 w-4" />
-                                Create Your First Deck
-                              </Button>
-                              <Button variant="outline" onClick={() => toast.info("Select a .apkg file to import")}>
-                                <ArrowRight className="mr-2 h-4 w-4" />
-                                Import from Anki
-                              </Button>
-                            </div>
+                          <div className="mb-4 flex items-center justify-between">
+                            <h2 className="text-lg font-semibold tracking-tight">Your Decks</h2>
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-xs text-muted-foreground">{decks.length} total</span>
+                                        <div className="flex rounded-lg border bg-muted/50 p-0.5">
+                                          {(["name", "due", "cards"] as const).map((s) => (
+                                            <button
+                                              key={s}
+                                              onClick={() => setSortBy(s)}
+                                              className={cn(
+                                                "px-2.5 py-1 text-xs font-medium rounded-md transition-all",
+                                                sortBy === s ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+                                              )}
+                                            >
+                                              {s === "name" ? "Name" : s === "due" ? "Due" : "Cards"}
+                                            </button>
+                                          ))}
+                                        </div>
+                                      </div>
                           </div>
+
+                          {isLoading ? (
+                            <div className="grid gap-3 lg:grid-cols-2">
+                              {[1, 2, 3, 4].map((i) => (
+                                <div key={i} className="rounded-xl border bg-card p-5 animate-pulse">
+                                  <div className="h-5 w-32 bg-muted rounded mb-3" />
+                                  <div className="h-3 w-48 bg-muted rounded mb-4" />
+                                  <div className="h-2 bg-muted rounded mb-3" />
+                                  <div className="grid grid-cols-3 gap-2">
+                                    <div className="h-10 bg-muted rounded" />
+                                    <div className="h-10 bg-muted rounded" />
+                                    <div className="h-10 bg-muted rounded" />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : decks.length === 0 ? (
+                                                    <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-muted-foreground/20 bg-muted/20 px-6 py-20 text-center">
+                                                      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 shadow-inner">
+                                                        <Library className="h-10 w-10 text-primary/60" />
+                                                      </div>
+                                                      <h3 className="text-xl font-semibold tracking-tight">Your library is empty</h3>
+                                                      <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
+                                                        Create your first deck and start building knowledge that sticks.
+                                                      </p>
+                                                      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                                                        <Button size="lg" onClick={() => setShowCreateDeck(true)} className="shadow-sm">
+                                                          <Plus className="mr-2 h-4 w-4" />
+                                                          Create Deck
+                                                        </Button>
+                                                        <Button size="lg" variant="outline" onClick={() => setShowCsvImport(true)}>
+                                                          <ArrowRight className="mr-2 h-4 w-4" />
+                                                          Import Cards
+                                                        </Button>
+                                                      </div>
+                                                    </div>
                 ) : (
           <div className="grid gap-3 lg:grid-cols-2">
             {sortedDecks.map((deck) => (
@@ -201,15 +226,17 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
   }
 
   return (
-    <button
-      className="group rounded-lg border bg-card p-5 text-left transition hover:border-primary/50 hover:bg-accent/40"
-      onClick={onOpen}
-    >
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", getDeckColorClass(deck.color))} />
-            <h3 className="truncate font-semibold">{deck.name}</h3>
+      <button
+        className="group relative overflow-hidden rounded-xl border bg-card p-5 text-left transition-all duration-200 hover:shadow-md hover:border-primary/30 hover:-translate-y-0.5"
+        onClick={onOpen}
+      >
+        {/* Color accent bar */}
+        <div className={cn("absolute left-0 top-0 bottom-0 w-1", getDeckColorClass(deck.color))} />
+
+        <div className="flex items-start justify-between gap-4 pl-1">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h3 className="truncate text-base font-semibold tracking-tight">{deck.name}</h3>
             {examDays !== null ? (
               <span className={cn(
                 "ml-1 shrink-0 rounded-full px-2 py-0.5 text-xs font-medium",
@@ -234,17 +261,17 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
         <Progress value={progress} />
       </div>
 
-      <div className="mt-3 grid grid-cols-3 gap-2 text-sm">
-        <Metric label="Due" value={stats.due} />
-        <Metric label="Accuracy" value={`${stats.accuracy}%`} />
-        <Metric label="Cards" value={stats.total} />
-      </div>
+      <div className="mt-3 grid grid-cols-3 gap-2">
+              <Metric label="Due" value={stats.due} highlight={stats.due > 0} />
+              <Metric label="Accuracy" value={`${stats.accuracy}%`} />
+              <Metric label="Total" value={stats.total} />
+            </div>
 
-      {/* Health row */}
-      <div className="mt-3 flex items-center gap-3 border-t pt-3 text-xs text-muted-foreground">
-        <span className={cn("flex items-center gap-1 font-medium", healthColor)}>
-          {health.retention}% retention
-        </span>
+            {/* Health row */}
+            <div className="mt-3 flex items-center gap-3 border-t pt-3 text-xs">
+              <span className={cn("flex items-center gap-1 font-semibold", healthColor)}>
+                {health.retention}% retention
+              </span>
         {health.leeches > 0 && (
           <span className="flex items-center gap-1 text-amber-500">
             ⚠️ {health.leeches} {health.leeches === 1 ? "leech" : "leeches"}
@@ -271,13 +298,17 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
 interface MetricProps {
   label: string;
   value: string | number;
+  highlight?: boolean;
 }
 
-function Metric({ label, value }: MetricProps): JSX.Element {
+function Metric({ label, value, highlight }: MetricProps): JSX.Element {
   return (
-    <div className="rounded-md bg-muted/60 p-2">
-      <div className="font-semibold">{value}</div>
-      <div className="text-xs text-muted-foreground">{label}</div>
+    <div className={cn(
+      "rounded-lg p-2.5 text-center transition-colors",
+      highlight ? "bg-primary/10 text-primary font-semibold" : "bg-muted/50",
+    )}>
+      <div className="text-sm font-semibold">{value}</div>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">{label}</div>
     </div>
   );
 }

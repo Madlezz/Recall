@@ -381,7 +381,7 @@ function exportPayloadToSnapshot(payload: RecallExportPayload): RecallStateSnaps
 
 function migrateSettings(settings: Partial<RecallStateSnapshot["settings"]> & { theme: string; seededAt: string }): RecallStateSnapshot["settings"] {
   return {
-    theme: (settings.theme === "dark" || settings.theme === "light") ? settings.theme : "dark",
+    theme: (settings.theme === "dark" || settings.theme === "light") ? settings.theme : "light",
     seededAt: settings.seededAt,
     dailyNewCardLimit: typeof settings.dailyNewCardLimit === "number" ? settings.dailyNewCardLimit : 20,
     leechThreshold: typeof settings.leechThreshold === "number" ? settings.leechThreshold : 5,

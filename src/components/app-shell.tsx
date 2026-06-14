@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { getDueTodayCount } from "@/lib/stats";
 import { cn } from "@/lib/utils";
-import { getLevel, getLevelTitle } from "@/lib/xp";
+import { getLevel, getLevelTitle, levelProgress } from "@/lib/xp";
 import { useRecallStore } from "@/stores/recall-store";
 
 interface AppShellProps {
@@ -21,48 +21,49 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <aside className="fixed inset-y-0 left-0 hidden w-64 border-r bg-card/80 p-4 backdrop-blur lg:block">
-        <button className="flex w-full items-center gap-3 text-left" onClick={showDashboard}>
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <BookOpen className="h-5 w-5" />
-          </span>
-          <span>
-            <span className="block text-sm font-semibold">Recall</span>
-            <span className="block text-xs text-muted-foreground">Focused flashcards</span>
-          </span>
-        </button>
+      <aside className="fixed inset-y-0 left-0 hidden w-60 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:flex lg:flex-col">
+              <div className="flex h-14 items-center gap-3 border-b px-4">
+                <button className="flex items-center gap-2.5" onClick={showDashboard}>
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+                    <BookOpen className="h-4 w-4" />
+                  </span>
+                  <span className="text-sm font-semibold tracking-tight">Recall</span>
+                </button>
+              </div>
 
-        <nav className="mt-8 space-y-1">
-                  <NavButton active={view === "dashboard"} icon={Home} label="Dashboard" onClick={showDashboard} />
-                  <NavButton active={view === "browser"} icon={LayoutGrid} label="Browser" onClick={showBrowser} />
-                  <NavButton active={view === "stats"} icon={TrendingUp} label="Stats" onClick={showStats} />
-                  <NavButton active={view === "settings"} icon={Settings} label="Settings" onClick={showSettings} />
-                </nav>
+              <nav className="flex-1 space-y-0.5 px-3 py-4">
+                        <NavButton active={view === "dashboard"} icon={Home} label="Dashboard" onClick={showDashboard} />
+                        <NavButton active={view === "browser"} icon={LayoutGrid} label="Browser" onClick={showBrowser} />
+                        <NavButton active={view === "stats"} icon={TrendingUp} label="Stats" onClick={showStats} />
+                        <NavButton active={view === "settings"} icon={Settings} label="Settings" onClick={showSettings} />
+                      </nav>
 
-        <div className="mt-8 rounded-lg border bg-background/60 p-3">
-          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            <Database className="h-3.5 w-3.5" />
-            Local data
-          </div>
-          <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-            <div>
-              <div className="font-semibold">{decks.length}</div>
-              <div className="text-xs text-muted-foreground">Decks</div>
-            </div>
-            <div>
-              <div className="font-semibold">{cards.length}</div>
-              <div className="text-xs text-muted-foreground">Cards</div>
-            </div>
-          </div>
-          <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
-                      <Zap className="h-3.5 w-3.5 text-primary" />
-                      {getDueTodayCount(cards)} due today
-                    </div>
+              <div className="border-t px-3 py-3">
+                <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">
+                  <Database className="h-3 w-3" />
+                  Library
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="rounded-md bg-muted/50 px-2 py-1.5 text-center">
+                    <div className="font-semibold text-sm">{decks.length}</div>
+                    <div className="text-[10px] text-muted-foreground">Decks</div>
                   </div>
+                  <div className="rounded-md bg-muted/50 px-2 py-1.5 text-center">
+                    <div className="font-semibold text-sm">{cards.length}</div>
+                    <div className="text-[10px] text-muted-foreground">Cards</div>
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                  <Zap className="h-3 w-3 text-amber-500" />
+                  <span className="font-medium text-foreground">{getDueTodayCount(cards)}</span> due today
+                </div>
+              </div>
 
-                  <LevelWidget />
+              <div className="border-t px-3 py-3">
+                <LevelWidget />
+              </div>
 
-                </aside>
+            </aside>
       <header className="sticky top-0 z-30 border-b bg-card/90 px-4 py-3 backdrop-blur lg:hidden">
         <div className="flex items-center justify-between">
           <button className="flex items-center gap-2 font-semibold" onClick={showDashboard}>
@@ -93,11 +94,15 @@ function NavButton({ active, icon: Icon, label, onClick }: NavButtonProps): JSX.
   return (
     <button
       className={cn(
-        "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition hover:bg-accent hover:text-foreground",
-        active && "bg-accent text-foreground",
+        "relative flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150",
+        active
+          ? "bg-primary/10 text-primary"
+          : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
       )}
       onClick={onClick}
     >
+      {/* Active indicator */}
+      {active && <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full bg-primary" />}
       <Icon className="h-4 w-4" />
       {label}
     </button>
@@ -109,20 +114,28 @@ function LevelWidget(): JSX.Element {
   const level = getLevel(settings.xp);
   const title = getLevelTitle(level);
   const unlocked = settings.achievements.filter((a) => a.unlockedAt).length;
-  const total = 14; // keep in sync with ACHIEVEMENT_DEFS
 
   return (
-    <div className="mt-4 rounded-lg border bg-background/60 p-3">
-      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        <Shield className="h-3.5 w-3.5" />
-        Level {level} · {title}
-      </div>
-      <div className="mt-2 space-y-1 text-xs text-muted-foreground">
-        <div>{settings.xp} XP earned</div>
-        <div className="flex items-center gap-1">
-          <Star className="h-3 w-3" />
-          {unlocked}/{total} achievements
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+          <Shield className="h-3 w-3" />
+          Level {level}
         </div>
+        <span className="text-[10px] text-muted-foreground">{title}</span>
+      </div>
+      <div className="h-1 w-full rounded-full bg-muted overflow-hidden">
+        <div
+          className="h-full rounded-full bg-primary transition-all duration-500"
+          style={{ width: `${Math.round(levelProgress(settings.xp) * 100)}%` }}
+        />
+      </div>
+      <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+        <span>{settings.xp} XP</span>
+        <span className="flex items-center gap-1">
+          <Star className="h-2.5 w-2.5" />
+          {unlocked}/14
+        </span>
       </div>
     </div>
   );
