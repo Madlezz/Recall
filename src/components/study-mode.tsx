@@ -76,7 +76,8 @@ export function StudyMode(): JSX.Element {
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, [activeStudy?.id, activeStudy?.completed]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-tick on activeStudy lifecycle
+    }, [activeStudy?.id, activeStudy?.completed]);
 
   function formatElapsed(ms: number): string {
     const sec = Math.floor(ms / 1000);
@@ -326,17 +327,18 @@ function SessionSummaryModal({ summary, onContinue }: { summary: SessionSummary;
   const total = summary.againCount + summary.hardCount + summary.goodCount + summary.easyCount;
 
   useEffect(() => {
-    const goodScore = summary.goodCount + summary.easyCount;
-    const accuracy = goodScore / (total || 1);
-    if (accuracy >= 0.6) {
-      confetti({
-        particleCount: accuracy >= 0.9 ? 100 : 50,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ["#a855f7", "#6366f1", "#8b5cf6", "#d946ef"],
-      });
-    }
-  }, []);
+      const goodScore = summary.goodCount + summary.easyCount;
+      const accuracy = goodScore / (total || 1);
+      if (accuracy >= 0.6) {
+        confetti({
+          particleCount: accuracy >= 0.9 ? 100 : 50,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ["#a855f7", "#6366f1", "#8b5cf6", "#d946ef"],
+        });
+      }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fire confetti once on mount
+        }, []);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/50 backdrop-blur-sm">

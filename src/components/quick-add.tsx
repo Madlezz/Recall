@@ -30,6 +30,7 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
       // Focus front input after open animation
       setTimeout(() => frontRef.current?.focus(), 100);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- deckId intentionally omitted
   }, [open, decks]);
 
   async function handleSubmit(e: React.FormEvent): Promise<void> {
