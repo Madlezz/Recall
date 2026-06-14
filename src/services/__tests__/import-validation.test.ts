@@ -84,7 +84,7 @@ describe("validateImportSnapshot", () => {
       ...baseSnapshot,
       cards: [{
         id: "c1", deckId: "d1", front: "Q", back: "A", hint: "", source: "", tags: [],
-        cardType: "basic" as const, state: "invalid" as any, lastReviewDate: null,
+        cardType: "basic" as const, state: "invalid" as RecallStateSnapshot["cards"][number]["state"], lastReviewDate: null,
         nextReviewDate: "2025-01-01T00:00:00.000Z", stability: 0, difficulty: 0,
         elapsedDays: 0, scheduledDays: 0, reps: 0, lapses: 0,
         createdAt: "2025-01-01T00:00:00.000Z", updatedAt: "2025-01-01T00:00:00.000Z",

@@ -1,5 +1,5 @@
 import confetti from "canvas-confetti";
-import { ArrowLeft, Check, Clock, EyeOff, RotateCcw, RotateCw, Timer, Volume2 } from "lucide-react";
+import { AlertCircle, ArrowLeft, BookOpen, Check, Clock, EyeOff, RotateCcw, RotateCw, Timer, Volume2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { RichCard } from "@/components/RichCard";
@@ -98,9 +98,13 @@ export function StudyMode(): JSX.Element {
   if (!activeStudy) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-xl font-bold text-zinc-800 dark:text-zinc-200">No active session</h1>
-          <Button className="mt-4" onClick={exitStudy}>Back</Button>
+        <div className="text-center space-y-3">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
+            <BookOpen className="h-7 w-7 text-zinc-400" />
+          </div>
+          <h1 className="text-xl font-semibold text-zinc-800 dark:text-zinc-200">No active session</h1>
+          <p className="text-sm text-zinc-500">Start a study session from the dashboard or a deck.</p>
+          <Button className="mt-2" onClick={exitStudy}>Back to dashboard</Button>
         </div>
       </div>
     );
@@ -146,7 +150,14 @@ export function StudyMode(): JSX.Element {
   if (!card) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center">
-        <Button onClick={exitStudy}>Return</Button>
+        <div className="text-center space-y-3">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
+            <AlertCircle className="h-7 w-7 text-zinc-400" />
+          </div>
+          <h1 className="text-xl font-semibold text-zinc-800 dark:text-zinc-200">Card not found</h1>
+          <p className="text-sm text-zinc-500">This card may have been deleted or moved.</p>
+          <Button onClick={exitStudy}>Back to dashboard</Button>
+        </div>
       </div>
     );
   }

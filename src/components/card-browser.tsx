@@ -1,4 +1,4 @@
-import { ArrowUpDown, ExternalLink, Filter, Search, Tag, X } from "lucide-react";
+import { ArrowUpDown, ExternalLink, Filter, PackageOpen, Search, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -294,10 +294,26 @@ export function CardBrowser(): JSX.Element {
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-3 py-12 text-center text-muted-foreground">
-                  {cards.length === 0
-                    ? "No cards yet. Create a deck and add some cards."
-                    : "No cards match your filters."}
+                <td colSpan={8} className="px-3 py-16 text-center">
+                  <div className="mx-auto max-w-sm space-y-2">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted/60">
+                      {cards.length === 0 ? (
+                        <PackageOpen className="h-6 w-6 text-muted-foreground/60" />
+                      ) : (
+                        <Search className="h-6 w-6 text-muted-foreground/60" />
+                      )}
+                    </div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {cards.length === 0
+                        ? "No cards yet — create a deck and add some cards to get started."
+                        : "No cards match your current filters."}
+                    </p>
+                    {(search || deckFilter !== "all" || stateFilter !== "all") && (
+                      <Button variant="outline" size="sm" onClick={clearFilters}>
+                        Clear filters
+                      </Button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ) : (

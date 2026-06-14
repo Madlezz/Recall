@@ -124,14 +124,14 @@ export function RichCard({ content, isBack = false, cardType = "basic", revealed
           ),
         }], rehypeHighlight, rehypeKatex]}
         components={{
-          img({ src, alt, ...props }: any) {
+          img({ src, alt }: React.ComponentPropsWithoutRef<"img">) {
             if (src && src.startsWith("https://recall.local/")) {
               const filename = src.replace("https://recall.local/", "");
-              return <RecallImage filename={filename} alt={alt} />;
+              return <RecallImage filename={filename} alt={alt ?? undefined} />;
             }
-            return <img src={src} alt={alt ?? ""} className="max-w-full rounded-lg" {...props} />;
+            return <img src={src} alt={alt ?? ""} className="max-w-full rounded-lg" />;
           },
-          code({ inline, className, children, ...props }: any) {
+          code({ children, className, inline, ...props }: React.ComponentPropsWithoutRef<"code"> & { inline?: boolean }) {
             const match = /language-(\w+)/.exec(className || "");
             return !inline && match ? (
               <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
