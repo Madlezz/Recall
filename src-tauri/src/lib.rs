@@ -14,6 +14,31 @@ fn update_tray_tooltip(app: tauri::AppHandle, due_count: u32) {
     }
 }
 
+#[tauri::command]
+fn copy_image_to_recall(app: tauri::AppHandle, source_path: String) -> Result<String, String> {
+    let data_dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
+    let images_dir = data_dir.join("images");
+    std::fs::create_dir_all(&images_dir).map_err(|e| e.to_string())?;
+
+    let path = std::path::Path::new(&source_path);
+    let ext = path
+        .extension()
+        .and_then(|e| e.to_str())
+        .unwrap_or("png");
+
+    use std::time::{SystemTime, UNIX_EPOCH};
+    let nanos = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+    let filename = format!("{}.{}", nanos, ext);
+    let dest = images_dir.join(&filename);
+
+    std::fs::copy(&source_path, &dest).map_err(|e| e.to_string())?;
+
+    Ok(filename)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -41,7 +66,7 @@ pub fn run() {
                 .build(app)?;
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![parse_anki_apkg, update_tray_tooltip])
+        .invoke_handler(tauri::generate_handler![parse_anki_apkg, update_tray_tooltip, copy_image_to_recall])
         .run(tauri::generate_context!())
         .expect("error while running Recall");
 }

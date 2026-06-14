@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
@@ -7,6 +8,7 @@ import remarkMath from "remark-math";
 import remarkGfm from "remark-gfm";
 import type { CardType } from "@/types";
 import { renderCloze } from "@/lib/cloze";
+import { getImageUrl } from "@/services/images";
 import "katex/dist/katex.min.css";
 import "highlight.js/styles/github-dark.css";
 
@@ -19,7 +21,7 @@ interface RichCardProps {
 
 function ClozeContent({ content, revealed }: { content: string; revealed: boolean }): JSX.Element {
   const { segments, isCloze } = renderCloze(content, revealed);
-  
+
   if (!isCloze) {
     return <>{content}</>;
   }
@@ -53,6 +55,40 @@ function ClozeContent({ content, revealed }: { content: string; revealed: boolea
   );
 }
 
+/** Resolves recall:// images asynchronously with loading placeholder */
+function RecallImage({ filename, alt }: { filename: string; alt?: string }): JSX.Element {
+  const [src, setSrc] = useState<string>("");
+
+  useEffect(() => {
+    let cancelled = false;
+    getImageUrl(filename).then((url) => {
+      if (!cancelled && url) setSrc(url);
+    });
+    return () => { cancelled = true; };
+  }, [filename]);
+
+  if (!src) {
+    return (
+      <span className="inline-flex items-center gap-2 rounded border border-dashed border-muted-foreground/30 bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
+        🖼️ {alt || "Loading image..."}
+      </span>
+    );
+  }
+
+  return <img src={src} alt={alt ?? ""} className="max-w-full rounded-lg" />;
+}
+
+/**
+ * Rewrite recall:// protocol to a sanitizer-friendly https://recall.local/
+ * so rehype-sanitize doesn't strip the img src.
+ */
+function preprocessContent(content: string): string {
+  return content.replace(
+    /!\[([^\]]*)\]\(recall:\/\/([^)]+)\)/g,
+    "![$1](https://recall.local/$2)",
+  );
+}
+
 export function RichCard({ content, isBack = false, cardType = "basic", revealed = true }: RichCardProps): JSX.Element {
   // For cloze cards that aren't revealed yet, render blanks inline
   if (cardType === "cloze" && !revealed && !isBack) {
@@ -72,6 +108,9 @@ export function RichCard({ content, isBack = false, cardType = "basic", revealed
     );
   }
 
+  // Pre-process recall:// images before markdown rendering
+  const processed = preprocessContent(content);
+
   // Regular markdown rendering for basic cards and back side
   return (
     <div className={`prose prose-invert max-w-none ${isBack ? 'border-t pt-4 mt-4' : ''}`}>
@@ -79,6 +118,13 @@ export function RichCard({ content, isBack = false, cardType = "basic", revealed
         remarkPlugins={[remarkMath, remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeHighlight, rehypeKatex]}
         components={{
+          img({ src, alt, ...props }: any) {
+            if (src && src.startsWith("https://recall.local/")) {
+              const filename = src.replace("https://recall.local/", "");
+              return <RecallImage filename={filename} alt={alt} />;
+            }
+            return <img src={src} alt={alt ?? ""} className="max-w-full rounded-lg" {...props} />;
+          },
           code({ inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || "");
             return !inline && match ? (
@@ -95,7 +141,7 @@ export function RichCard({ content, isBack = false, cardType = "basic", revealed
           }
         }}
       >
-        {content}
+        {processed}
       </ReactMarkdown>
     </div>
   );
