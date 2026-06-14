@@ -123,6 +123,9 @@ export function DeckDetail(): JSX.Element {
     );
   }
 
+  // TypeScript needs this to narrow `deck` in closures for `tsc -b`
+  const d = deck;
+
   const stats = getDeckStats(deck, cards);
   const progress = stats.total === 0 ? 0 : Math.round((stats.mastered / stats.total) * 100);
   const currentDeckId = deck.id;
@@ -148,15 +151,15 @@ export function DeckDetail(): JSX.Element {
   }
 
   function handleExport(): void {
-    const json = exportDeckToJson(deck, deckCards);
-    downloadFile(`${deck.name.replace(/\s+/g, "_")}.json`, json);
+    const json = exportDeckToJson(d, deckCards);
+    downloadFile(`${d.name.replace(/\s+/g, "_")}.json`, json);
     toast.success("Deck exported");
   }
 
   async function handleExportRecall(): Promise<void> {
     try {
-      const json = await exportDeckPackage(deck, deckCards);
-      const saved = await saveRecallPackage(json, deck.name);
+      const json = await exportDeckPackage(d, deckCards);
+      const saved = await saveRecallPackage(json, d.name);
       if (saved) toast.success("Deck exported as .recall package");
     } catch {
       toast.error("Could not export .recall package");
