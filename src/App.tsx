@@ -58,8 +58,24 @@ export function App(): JSX.Element {
     }
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [view, startReview]);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+      }, [view, startReview]);
+
+      // Listen for global shortcut (Ctrl+Shift+N) from Tauri — works even when app is in background
+      useEffect(() => {
+        let unlisten: (() => void) | undefined;
+        void (async () => {
+          try {
+            const { listen } = await import("@tauri-apps/api/event");
+            unlisten = await listen("quick-add-shortcut", () => {
+              setShowQuickAdd(true);
+            });
+          } catch {
+            // Browser / Tauri unavailable — fallback to keyboard shortcut only
+          }
+        })();
+        return () => { unlisten?.(); };
+      }, []);
 
   if (isLoading) {
     return (

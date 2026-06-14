@@ -24,3 +24,4 @@ rusqlite = { version = "0.31", features = ["bundled"] }
 zip = "2"
 tempfile = "3"
 tauri-plugin-notification = "2.3.3"
+tauri-plugin-global-shortcut = "2.3.2"

@@ -46,6 +46,19 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
+                .plugin(
+                    tauri_plugin_global_shortcut::Builder::new()
+                        .with_handler(|app, shortcut, _event| {
+                            if shortcut.matches(&tauri_plugin_global_shortcut::Shortcut::parse("Control+Shift+N").unwrap()) {
+                                if let Some(window) = app.get_webview_window("main") {
+                                    let _ = window.show();
+                                    let _ = window.set_focus();
+                                    let _ = window.emit("quick-add-shortcut", ());
+                                }
+                            }
+                        })
+                        .build(),
+                )
         .plugin(
             tauri_plugin_sql::Builder::default()
                 .add_migrations(RECALL_DB, migrations())
@@ -64,7 +77,14 @@ pub fn run() {
                     }
                 })
                 .build(app)?;
-            Ok(())
+
+                            // Register the global shortcut
+                            use tauri_plugin_global_shortcut::Shortcut;
+                            let _ = app.global_shortcut().register(
+                                Shortcut::parse("Control+Shift+N").unwrap(),
+                            );
+
+                            Ok(())
         })
         .invoke_handler(tauri::generate_handler![parse_anki_apkg, update_tray_tooltip, copy_image_to_recall])
         .run(tauri::generate_context!())
