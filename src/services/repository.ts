@@ -409,8 +409,10 @@ function loadLocalSnapshot(): RecallStateSnapshot | null {
 
   try {
     const snapshot = JSON.parse(raw) as RecallStateSnapshot;
-    validateImportSnapshot(snapshot);
-    return snapshot;
+        validateImportSnapshot(snapshot);
+        // Migrate settings to fill in fields added after the user's last save
+        snapshot.settings = migrateSettings(snapshot.settings);
+        return snapshot;
   } catch {
     localStorage.removeItem(STORAGE_KEY);
     return null;

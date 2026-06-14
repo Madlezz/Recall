@@ -113,7 +113,7 @@ function LevelWidget(): JSX.Element {
   const settings = useRecallStore((state) => state.settings);
   const level = getLevel(settings.xp);
   const title = getLevelTitle(level);
-  const unlocked = settings.achievements.filter((a) => a.unlockedAt).length;
+  const unlocked = settings?.achievements?.filter((a) => a.unlockedAt)?.length ?? 0;
 
   return (
     <div className="space-y-2">
