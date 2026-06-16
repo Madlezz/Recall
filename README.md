@@ -103,6 +103,18 @@ Or build from source — see [Quick Start](#quick-start).
 
 ---
 
+## Security
+
+Recall is a local-first application — your data never leaves your machine. We take security seriously:
+
+- **Automated auditing**: `cargo audit` (Rust) and Dependabot (JS/TS) run on every CI push
+- **CodeQL analysis**: GitHub CodeQL scans for vulnerabilities on every PR
+- **Responsible disclosure**: See [SECURITY.md](SECURITY.md) for reporting vulnerabilities
+
+For known transitive vulnerabilities in upstream dependencies, see [SECURITY.md](SECURITY.md).
+
+---
+
 ## Keyboard Shortcuts
 
 | Keys | Action |
@@ -112,7 +124,8 @@ Or build from source — see [Quick Start](#quick-start).
 | `R` | Start review |
 | `B` | Bury card |
 | `S` | Snooze card |
-| `Ctrl+N` | Quick-add card |
+| `Ctrl+N` | Quick-add card (in-app) |
+| `Ctrl+Shift+N` | Quick-add card (global, works when minimized) |
 | `Ctrl+Z` | Undo last review |
 | `?` | Show all shortcuts |
 

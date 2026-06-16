@@ -23,6 +23,25 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [1.0.1] — 2026-06-17
+
+### Fixed
+- Accessibility: added `role="dialog"` and `aria-modal` to custom modals (shortcut help, quick add, study summary)
+- Accessibility: added `aria-label` to icon-only buttons (TTS, external link, logo, CSV import, custom study)
+- Accessibility: added `aria-expanded`/`aria-controls` to exam date picker toggle
+- Accessibility: added `aria-label` and `id`/`htmlFor` to form fields (sound volume, daily new cards, leech threshold, daily goal)
+- Accessibility: added `aria-live="polite"` to sound volume percentage display
+- Accessibility: improved color contrast for `--muted-foreground` in both light and dark modes
+
+### Added
+- GitHub Actions: added `cargo audit` job to CI workflow for automated Rust dependency vulnerability scanning
+- Added `SECURITY.md` documenting security policy, responsible disclosure, and known upstream transitive vulnerabilities
+
+### Changed
+- Updated global shortcut documentation in README to clarify `Ctrl+Shift+N` works when app is minimized
+
+---
+
 ## [1.0.0] — 2026-06-13
 
 ### Added
