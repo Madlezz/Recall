@@ -7,8 +7,8 @@
   --foreground: 240 10% 8%;
   --card: 0 0% 100%;
   --card-foreground: 240 10% 8%;
-  --primary: 221 83% 53%;
-  --primary-foreground: 0 0% 100%;
+  --primary: 240 6% 10%;
+  --primary-foreground: 0 0% 98%;
   --secondary: 240 5% 92%;
   --secondary-foreground: 240 6% 10%;
   --muted: 240 6% 92%;
@@ -19,7 +19,7 @@
   --destructive-foreground: 0 0% 100%;
   --border: 240 6% 86%;
   --input: 240 6% 84%;
-  --ring: 221 83% 60%;
+  --ring: 240 6% 10%;
   --radius: 8px;
 }
 
@@ -28,8 +28,8 @@
   --foreground: 0 0% 94%;
   --card: 240 9% 7%;
   --card-foreground: 0 0% 94%;
-  --primary: 214 95% 59%;
-  --primary-foreground: 0 0% 100%;
+  --primary: 240 6% 96%;
+  --primary-foreground: 240 10% 4%;
   --secondary: 240 6% 12%;
   --secondary-foreground: 0 0% 94%;
   --muted: 240 6% 12%;
@@ -40,7 +40,7 @@
   --destructive-foreground: 0 0% 100%;
   --border: 240 6% 16%;
   --input: 240 6% 18%;
-  --ring: 214 95% 59%;
+  --ring: 240 6% 96%;
 }
 
 * {
@@ -87,4 +87,23 @@ select {
 
 .study-card-back {
   transform: rotateY(180deg);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.animate-shake {
+  animation: shake 0.3s ease-in-out;
 }

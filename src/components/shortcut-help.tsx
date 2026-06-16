@@ -24,14 +24,14 @@ export function ShortcutHelp({ open, onClose }: ShortcutHelpProps): JSX.Element 
   if (!open) return <></>;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
       <div
-        className="mx-4 w-full max-w-sm rounded-lg border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
+        className="mx-4 w-full max-w-sm rounded-lg border bg-white dark:bg-zinc-900 p-6 shadow-sm animate-fade-in"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold">Keyboard Shortcuts</h2>
-          <button onClick={onClose} className="rounded p-1 hover:bg-accent transition">
+          <button onClick={onClose} className="rounded p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -39,12 +39,12 @@ export function ShortcutHelp({ open, onClose }: ShortcutHelpProps): JSX.Element 
         <div className="space-y-2">
           {SHORTCUTS.map((s, i) => (
             <div key={i} className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">{s.description}</span>
+              <span className="text-zinc-500 dark:text-zinc-400">{s.description}</span>
               <span className="flex items-center gap-1">
                 {s.keys.map((k, j) => (
                   <kbd
                     key={j}
-                    className="rounded border bg-muted px-1.5 py-0.5 text-xs font-mono font-medium"
+                    className="rounded border bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 text-xs font-mono font-medium"
                   >
                     {k}
                   </kbd>
@@ -54,8 +54,8 @@ export function ShortcutHelp({ open, onClose }: ShortcutHelpProps): JSX.Element 
           ))}
         </div>
 
-        <p className="mt-4 text-xs text-muted-foreground text-center">
-          Press <kbd className="rounded border bg-muted px-1 py-0.5 text-[10px] font-mono">?</kbd> anywhere to show this
+        <p className="mt-4 text-xs text-zinc-500 dark:text-zinc-400 text-center">
+          Press <kbd className="rounded border bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 text-[10px] font-mono">?</kbd> anywhere to show this
         </p>
       </div>
     </div>

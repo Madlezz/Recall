@@ -31,8 +31,8 @@ export function ActivityHeatmap(): JSX.Element {
     const counts = new Map<string, number>();
     reviewLogs.forEach((log) => {
       const date = new Date(log.reviewDate);
-      date.setHours(0, 0, 0, 0);
-      counts.set(date.toISOString().split("T")[0], (counts.get(date.toISOString().split("T")[0]) ?? 0) + 1);
+      const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+      counts.set(dateStr, (counts.get(dateStr) ?? 0) + 1);
     });
 
     const weeks: DayData[][] = [];
@@ -43,7 +43,7 @@ export function ActivityHeatmap(): JSX.Element {
     for (let week = 0; week < 52; week++) {
       const weekData: DayData[] = [];
       for (let day = 0; day < 7; day++) {
-        const dateStr = currentDate.toISOString().split("T")[0];
+        const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}-${String(currentDate.getDate()).padStart(2, "0")}`;
         const count = counts.get(dateStr) ?? 0;
         weekData.push({ date: dateStr, count, level: getLevel(count) });
         currentDate.setDate(currentDate.getDate() + 1);

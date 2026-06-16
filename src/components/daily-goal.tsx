@@ -2,8 +2,12 @@ import confetti from "canvas-confetti";
 import { useEffect, useMemo, useState } from "react";
 import { useRecallStore } from "@/stores/recall-store";
 
+function localDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 function reviewsToday(reviewLogs: { reviewDate: string }[]): number {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateStr(new Date());
   return reviewLogs.filter((l) => l.reviewDate.slice(0, 10) === today).length;
 }
 

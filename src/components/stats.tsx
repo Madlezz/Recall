@@ -204,7 +204,7 @@ export function Stats(): JSX.Element {
           <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">When You Study</h3>
           <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
             <div className="space-y-1">
-              <div className="grid grid-cols-24 gap-[2px]">
+              <div className="grid gap-[2px]" style={{ gridTemplateColumns: "repeat(24, minmax(0, 1fr))" }}>
                 {byHour.map((count, h) => (
                   <div key={h} className="group relative">
                     <div

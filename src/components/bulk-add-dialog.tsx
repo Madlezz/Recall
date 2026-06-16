@@ -51,24 +51,24 @@ Tags: asia, capitals`;
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl border bg-card p-6 shadow-xl animate-fade-in">
-        <button onClick={onClose} className="absolute right-4 top-4 rounded p-1 hover:bg-muted">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg border bg-white dark:bg-zinc-900 p-6 shadow-sm animate-fade-in">
+        <button onClick={onClose} className="absolute right-4 top-4 rounded p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800">
           <X className="h-4 w-4" />
         </button>
 
         <div className="flex items-center gap-2 mb-2">
-          <FileText className="h-5 w-5 text-primary" />
+          <FileText className="h-5 w-5 text-zinc-900 dark:text-zinc-100" />
           <h2 className="text-xl font-semibold">Bulk Add Cards</h2>
         </div>
 
-        <p className="text-sm text-muted-foreground mb-4">
-          Paste cards below using <code className="bg-muted px-1 rounded">Q:</code> / <code className="bg-muted px-1 rounded">A:</code> syntax.
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+          Paste cards below using <code className="bg-zinc-100 dark:bg-zinc-800 px-1 rounded">Q:</code> / <code className="bg-zinc-100 dark:bg-zinc-800 px-1 rounded">A:</code> syntax.
           Blank lines separate cards. Cloze deletions are supported.
         </p>
 
         <textarea
-          className="w-full h-48 rounded-md border bg-background p-4 text-sm font-mono resize-y focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="w-full h-48 rounded-md border bg-background p-4 text-sm font-mono resize-y focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600"
           placeholder="Paste your cards here..."
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -76,8 +76,8 @@ Tags: asia, capitals`;
 
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-center gap-2">
-            <Eye className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">
+            <Eye className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
+            <span className="text-sm text-zinc-500 dark:text-zinc-400">
               {parsed.length} card{parsed.length !== 1 ? "s" : ""} detected
             </span>
           </div>
@@ -95,16 +95,16 @@ Tags: asia, capitals`;
         {/* Preview */}
         {parsed.length > 0 && (
           <div className="mt-4 space-y-2">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Preview</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Preview</h3>
             <div className="max-h-60 overflow-y-auto space-y-2">
               {parsed.map((card, i) => (
-                <div key={i} className="rounded-md border bg-muted/30 p-3 text-sm">
+                <div key={i} className="rounded-md border bg-zinc-50 dark:bg-zinc-800/50 p-3 text-sm">
                   <div className="flex items-start gap-2">
-                    <span className="text-xs font-mono text-muted-foreground mt-0.5">#{i + 1}</span>
+                    <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400 mt-0.5">#{i + 1}</span>
                     <div className="min-w-0 flex-1">
-                      <div className="font-medium truncate">{card.front || <span className="italic text-muted-foreground">(empty)</span>}</div>
-                      {card.back && <div className="text-muted-foreground truncate mt-1">{card.back}</div>}
-                      {card.hint && <div className="text-xs text-muted-foreground mt-1">Hint: {card.hint}</div>}
+                      <div className="font-medium truncate">{card.front || <span className="italic text-zinc-500 dark:text-zinc-400">(empty)</span>}</div>
+                      {card.back && <div className="text-zinc-500 dark:text-zinc-400 truncate mt-1">{card.back}</div>}
+                      {card.hint && <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Hint: {card.hint}</div>}
                       {card.nextDeckName && (
                         <Badge tone="warning" className="mt-1 text-xs">
                           → {card.nextDeckName}

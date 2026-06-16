@@ -90,7 +90,7 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Beaker className="h-5 w-5 text-primary" />
+            <Beaker className="h-5 w-5 text-zinc-900 dark:text-zinc-100" />
             Custom Study
           </DialogTitle>
           <DialogDescription>
@@ -132,10 +132,10 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
               onChange={(e) => setCardCount(e.target.value)}
               placeholder="All"
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
               Leave empty or set to 0 for all matching cards.
               {eligibleCount > 0 && (
-                <span className="ml-1 text-primary">{eligibleCount} available</span>
+                <span className="ml-1 text-zinc-900 dark:text-zinc-100">{eligibleCount} available</span>
               )}
             </p>
           </div>
@@ -144,7 +144,7 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
           <div className="space-y-1.5">
             <Label className="flex items-center gap-1.5 text-xs">
               <Tag className="h-3.5 w-3.5" />
-              Filter by tag <span className="text-muted-foreground">(optional)</span>
+              Filter by tag <span className="text-zinc-500 dark:text-zinc-400">(optional)</span>
             </Label>
             {availableTags.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
@@ -155,7 +155,7 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
                     onClick={() => setTagFilter(tag === tagFilter ? "" : tag)}
                     className={`rounded-full border px-2.5 py-0.5 text-xs transition ${
                       tagFilter === tag
-                        ? "border-primary bg-primary/10 text-primary"
+                        ? "border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
                         : "border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40 hover:text-foreground"
                     }`}
                   >
@@ -165,7 +165,7 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-muted-foreground">No tags in this deck</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">No tags in this deck</p>
             )}
           </div>
 
@@ -182,7 +182,7 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
         </div>
 
         <div className="flex items-center justify-between pt-2">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
             {eligibleCount > 0
               ? `${Math.min(clamped, eligibleCount)} card(s) will be picked randomly`
               : "No cards match"}

@@ -190,7 +190,7 @@ export function MatchGame(): JSX.Element {
       <div className="flex min-h-[70vh] items-center justify-center">
         <div className="text-center space-y-4">
           <h1 className="text-xl font-semibold">Not enough cards</h1>
-          <p className="text-sm text-muted-foreground">Add at least 2 cards to play Match Game</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Add at least 2 cards to play Match Game</p>
           <Button onClick={showDashboard}>Back</Button>
         </div>
       </div>
@@ -206,7 +206,7 @@ export function MatchGame(): JSX.Element {
           Exit
         </Button>
 
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        <div className="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-400">
           <span className="flex items-center gap-1">
             <Clock className="h-4 w-4" />
             {formatTime(elapsed)}
@@ -234,11 +234,11 @@ export function MatchGame(): JSX.Element {
             <Check className="h-6 w-6" />
           </div>
           <h2 className="mt-3 text-xl font-bold">All matched!</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             {totalPairs} pairs in {formatTime(elapsed)} · {moves} moves
           </p>
           {xpEarned > 0 && (
-            <p className="mt-2 text-sm font-semibold text-primary">
+            <p className="mt-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               +{xpEarned} XP
             </p>
           )}
@@ -264,19 +264,19 @@ export function MatchGame(): JSX.Element {
                 disabled={isMatched}
                 className={cn(
                   "min-h-[90px] rounded-lg border p-3 text-sm font-medium transition-all duration-200 text-left",
-                  "hover:shadow-md active:scale-[0.97]",
+                  "hover:shadow-sm active:scale-[0.97]",
                   isMatched
                     ? "opacity-20 scale-95 pointer-events-none"
                     : isShaking
                       ? "animate-shake border-red-400 bg-red-500/10"
                       : isSelected
-                        ? "border-primary bg-primary/10 shadow-lg ring-1 ring-primary"
+                        ? "border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 shadow-sm ring-1 ring-zinc-300 dark:ring-zinc-700"
                         : isFront
                           ? "border-blue-500/30 bg-blue-500/5 hover:border-blue-500/50 hover:bg-blue-500/10"
                           : "border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50 hover:bg-amber-500/10",
                 )}
               >
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 block">
+                <span className="text-[10px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1 block">
                   {isFront ? "Question" : "Answer"}
                 </span>
                 <p className="line-clamp-3 leading-snug">{tile.text}</p>

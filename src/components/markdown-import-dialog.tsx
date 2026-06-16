@@ -100,8 +100,8 @@ export function MarkdownImportDialog({ deckId }: MarkdownImportDialogProps): JSX
         <div className="space-y-4 py-4">
           {cards.length === 0 ? (
             <div className="flex flex-col items-center gap-4 py-8">
-              <FileText className="h-12 w-12 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">
+              <FileText className="h-12 w-12 text-zinc-500 dark:text-zinc-400" />
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
                 Select a Markdown file to parse flashcards from it.
               </p>
               <Button onClick={handleFilePick} disabled={loading}>
@@ -139,14 +139,14 @@ export function MarkdownImportDialog({ deckId }: MarkdownImportDialogProps): JSX
                 {cards.map((card, i) => (
                   <div key={i} className="border rounded-md p-3 text-sm">
                     <p className="font-medium truncate">{card.front}</p>
-                    <p className="text-muted-foreground truncate mt-1">{card.back}</p>
+                    <p className="text-zinc-500 dark:text-zinc-400 truncate mt-1">{card.back}</p>
                     {(card.hint || card.tags.length > 0) && (
                       <div className="flex gap-2 mt-1.5">
                         {card.hint && (
-                          <span className="text-xs bg-muted px-1.5 py-0.5 rounded">Hint: {card.hint}</span>
+                          <span className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">Hint: {card.hint}</span>
                         )}
                         {card.tags.map((t) => (
-                          <span key={t} className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
+                          <span key={t} className="text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 px-1.5 py-0.5 rounded">
                             {t}
                           </span>
                         ))}
