@@ -362,6 +362,7 @@ export function CardBrowser(): JSX.Element {
                     </td>
                     <td className="px-3 py-2">
                       <button
+                        aria-label={`Open deck for card ${card.id}`}
                         className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
                         onClick={() => showDeck?.(card.deckId)}
                         title="Open deck"

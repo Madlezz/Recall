@@ -82,12 +82,12 @@ export function Dashboard(): JSX.Element {
             }
           />
           <AnkiImportDialog />
-          <Button variant="outline" size="icon" onClick={() => setShowCsvImport(true)} title="CSV Import">
+          <Button variant="outline" size="icon" onClick={() => setShowCsvImport(true)} title="CSV Import" aria-label="Import cards from CSV">
             <FileSpreadsheet className="h-4 w-4" />
           </Button>
           <MarkdownImportDialog />
           <RecallImportDialog />
-          <Button variant="outline" size="icon" onClick={() => setShowCustomStudy(true)} title="Custom Study">
+          <Button variant="outline" size="icon" onClick={() => setShowCustomStudy(true)} title="Custom Study" aria-label="Custom study session">
             <Beaker className="h-4 w-4" />
           </Button>
         </div>

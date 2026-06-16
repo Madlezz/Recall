@@ -176,6 +176,7 @@ export function StudyMode(): JSX.Element {
         <div className="flex items-center gap-4">
           {isTTSSupported() && (
             <button
+              aria-label="Read card text aloud"
               onClick={() => { const text = activeStudy.revealed ? `${card.front} ${card.back}` : card.front; speakText(text); }}
               className="rounded-md p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 transition-colors dark:hover:text-zinc-300 dark:hover:bg-zinc-800"
             >
@@ -352,13 +353,13 @@ function SessionSummaryModal({ summary, onContinue }: { summary: SessionSummary;
         }, []);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/50 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="session-summary-title">
       <div className="mx-4 w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl dark:bg-zinc-900 max-h-[90vh] overflow-y-auto">
         <div className="text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
             <Check className="h-7 w-7 text-zinc-600 dark:text-zinc-400" />
           </div>
-          <h2 className="mt-5 text-xl font-bold text-zinc-800 dark:text-zinc-200">Session Complete</h2>
+          <h2 id="session-summary-title" className="mt-5 text-xl font-bold text-zinc-800 dark:text-zinc-200">Session Complete</h2>
           <p className="mt-1 text-sm text-zinc-500">{summary.cardsStudied} cards reviewed</p>
         </div>
 

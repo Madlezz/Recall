@@ -153,15 +153,16 @@ export function Settings(): JSX.Element {
 
         <SettingsCard title="Sound Volume">
           <div className="flex items-center gap-3">
-            <Volume2 className="h-4 w-4 text-zinc-400 shrink-0" />
+            <Volume2 className="h-4 w-4 text-zinc-400 shrink-0" aria-hidden="true" />
             <input
               type="range"
               min="0" max="100"
+              aria-label="Sound volume"
               value={settings.soundVolume}
               onChange={(e) => void updateSettings({ soundVolume: parseInt(e.target.value, 10) })}
               className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-zinc-200 accent-zinc-700 dark:bg-zinc-700 dark:accent-zinc-300"
             />
-            <span className="w-9 text-right text-sm tabular-nums text-zinc-400">{settings.soundVolume}%</span>
+            <span className="w-9 text-right text-sm tabular-nums text-zinc-400" aria-live="polite">{settings.soundVolume}%</span>
           </div>
         </SettingsCard>
       </section>
@@ -170,7 +171,9 @@ export function Settings(): JSX.Element {
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <SettingsCard title="Daily New Cards">
           <div className="flex items-center gap-2">
+            <label htmlFor="daily-new-cards" className="sr-only">Daily new cards</label>
             <input
+              id="daily-new-cards"
               type="number" min="0" max="100"
               value={settings.dailyNewCardLimit}
               onChange={(e) => void updateSettings({ dailyNewCardLimit: Math.max(0, Math.min(100, parseInt(e.target.value) || 0)) })}
@@ -182,7 +185,9 @@ export function Settings(): JSX.Element {
 
         <SettingsCard title="Leech Threshold">
           <div className="flex items-center gap-2">
+            <label htmlFor="leech-threshold" className="sr-only">Leech threshold</label>
             <input
+              id="leech-threshold"
               type="number" min="1" max="20"
               value={settings.leechThreshold}
               onChange={(e) => void updateSettings({ leechThreshold: Math.max(1, Math.min(20, parseInt(e.target.value) || 5)) })}
@@ -194,7 +199,9 @@ export function Settings(): JSX.Element {
 
         <SettingsCard title="Daily Goal">
           <div className="flex items-center gap-2">
+            <label htmlFor="daily-goal" className="sr-only">Daily goal</label>
             <input
+              id="daily-goal"
               type="number" min="1" max="500"
               value={settings.dailyGoal}
               onChange={(e) => void updateSettings({ dailyGoal: Math.max(1, Math.min(500, parseInt(e.target.value) || 20)) })}

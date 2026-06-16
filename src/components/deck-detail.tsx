@@ -292,6 +292,8 @@ export function DeckDetail(): JSX.Element {
         {/* Exam deadline */}
         <div className="flex items-center gap-3">
           <button
+            aria-expanded={showExamPicker}
+            aria-controls="exam-date-picker"
             onClick={() => {
               setExamDateInput(deck.examDeadline?.split("T")[0] ?? "");
               setShowExamPicker(!showExamPicker);
@@ -320,8 +322,10 @@ export function DeckDetail(): JSX.Element {
         </div>
 
         {showExamPicker && (
-          <div className="flex items-center gap-2">
+          <div id="exam-date-picker" className="flex items-center gap-2" role="group" aria-label="Exam date picker">
+            <label htmlFor="exam-date-input" className="sr-only">Exam date</label>
             <input
+              id="exam-date-input"
               type="date"
               value={examDateInput}
               onChange={(e) => setExamDateInput(e.target.value)}

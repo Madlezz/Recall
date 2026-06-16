@@ -27,6 +27,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-56 flex-col border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 lg:flex">
         {/* Logo */}
         <button
+          aria-label="Go to dashboard"
           onClick={showDashboard}
           className="flex items-center gap-2.5 px-5 h-14 shrink-0"
         >

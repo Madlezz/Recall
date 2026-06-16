@@ -24,14 +24,24 @@ export function ShortcutHelp({ open, onClose }: ShortcutHelpProps): JSX.Element 
   if (!open) return <></>;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="shortcut-help-title"
+    >
       <div
         className="mx-4 w-full max-w-sm rounded-lg border bg-white dark:bg-zinc-900 p-6 shadow-sm animate-fade-in"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold">Keyboard Shortcuts</h2>
-          <button onClick={onClose} className="rounded p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+          <h2 id="shortcut-help-title" className="font-semibold">Keyboard Shortcuts</h2>
+          <button
+            onClick={onClose}
+            aria-label="Close keyboard shortcuts"
+            className="rounded p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
+          >
             <X className="h-4 w-4" />
           </button>
         </div>

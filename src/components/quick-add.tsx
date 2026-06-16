@@ -57,21 +57,27 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
   if (!open) return <></>;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] bg-black/40" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] bg-black/40"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="quick-add-title"
+    >
       <div
         className="mx-4 w-full max-w-lg border border-zinc-200 bg-white p-6 text-zinc-900 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
       >
         <div className="mb-5">
-          <h2 className="text-base font-medium tracking-tight text-zinc-900 dark:text-zinc-100">Quick add</h2>
+          <h2 id="quick-add-title" className="text-base font-medium tracking-tight text-zinc-900 dark:text-zinc-100">Quick add</h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">Press Escape to close</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           {decks.length > 0 ? (
             <Select value={deckId} onValueChange={setDeckId}>
-              <SelectTrigger className="border-zinc-200 dark:border-zinc-800">
+              <SelectTrigger className="border-zinc-200 dark:border-zinc-800" aria-label="Select deck">
                 <SelectValue placeholder="Select deck" />
               </SelectTrigger>
               <SelectContent>
@@ -89,6 +95,7 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
             value={front}
             onChange={(e) => setFront(e.target.value)}
             placeholder="Front (question)..."
+            aria-label="Card front (question)"
             className="min-h-[80px] border-zinc-200 font-mono text-sm dark:border-zinc-800"
             disabled={decks.length === 0}
           />
@@ -96,6 +103,7 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
             value={back}
             onChange={(e) => setBack(e.target.value)}
             placeholder="Back (answer)..."
+            aria-label="Card back (answer)"
             className="border-zinc-200 dark:border-zinc-800"
             disabled={decks.length === 0}
             onKeyDown={(e) => {
