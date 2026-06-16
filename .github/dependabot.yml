@@ -5,14 +5,25 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      dev-dependencies:
+        dependency-type: development
+      production-dependencies:
+        dependency-type: production
 
   - package-ecosystem: cargo
     directory: /src-tauri
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      all-dependencies:
+        patterns: ["*"]
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    groups:
+      all-actions:
+        patterns: ["*"]
