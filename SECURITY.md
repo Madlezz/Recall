@@ -18,9 +18,14 @@ as soon as possible and you'll be credited in the changelog.
 ## Scope
 
 Recall is a local desktop application with no network access beyond optional desktop notifications.
-All user data stays on-device in SQLite. There is no server, no account, no telemetry.
 
-Security issues of interest:
-- Arbitrary file read/write via malicious `.apkg` or CSV imports
-- XSS in card content (Markdown/HTML rendering via `rehype-sanitize`)
-- Tauri IPC command injection
+## Automated Auditing
+
+- **JavaScript/TypeScript**: Dependabot + `pnpm audit`
+- **Rust**: `cargo audit` runs on every CI push/PR
+- **CodeQL**: GitHub CodeQL analyzes JS/TS on every push
+
+## Known Upstream Vulnerabilities
+
+The following vulnerabilities exist in transitive dependencies and are tracked for upstream resolution.
+See [GHSA](https://github.com/Madlezz/Recall/security/advisories) for detailed advisories.
