@@ -46,12 +46,12 @@ export function useDeckDetail() {
     return result;
   }, [deckCards, search, selectedTag]);
 
-  const examDays = useMemo(() => {
+  const examDays = (() => {
     if (!deck?.examDeadline) return null;
     const now = new Date();
     const d = new Date(deck.examDeadline);
     return Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  }, [deck?.examDeadline]);
+  })();
 
   const stats = deck ? getDeckStats(deck, cards) : null;
   const progress = stats ? (stats.total === 0 ? 0 : Math.round((stats.mastered / stats.total) * 100)) : 0;

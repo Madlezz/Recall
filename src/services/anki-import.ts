@@ -12,6 +12,6 @@ export async function parseAnkiApkg(filePath: string): Promise<AnkiCard[]> {
     return await invoke<AnkiCard[]>("parse_anki_apkg", { filePath });
   } catch (error) {
     console.error("Failed to parse Anki .apkg:", error);
-    throw new Error(`Failed to parse Anki file: ${error}`);
+    throw new Error(`Failed to parse Anki file: ${error}`, { cause: error });
   }
 }

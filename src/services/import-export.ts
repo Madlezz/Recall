@@ -224,7 +224,7 @@ export async function openRecallPackage(): Promise<{ pkg: RecallPackage; raw: st
     const pkg = parseRecallPackage(raw);
     return { pkg, raw };
   } catch (err) {
-    throw new Error(err instanceof Error ? err.message : "Could not open .recall file");
+    throw new Error(err instanceof Error ? err.message : "Could not open .recall file", { cause: err });
   }
 }
 
