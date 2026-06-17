@@ -19,9 +19,6 @@
                 "notification:allow-request-permission",
                 "notification:allow-notify",
                 "core:tray:default",
-                "updater:default",
-                "updater:allow-check",
-                "updater:allow-download-and-install",
                 "global-shortcut:default",
                 "global-shortcut:allow-register",
                 "global-shortcut:allow-is-registered"
