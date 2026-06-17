@@ -7,19 +7,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Fixed
-- Timezone bugs in activity heatmap and daily goal (UTC vs local date mismatch)
-- Focus timer stale closure causing XP corruption when settings change during timer
-- CSV parser failing on escaped quotes (`""` inside quoted strings)
-- Broken 24-column heatmap layout in stats (invalid `grid-cols-24` Tailwind class)
-- CSS `--primary` variable still set to blue instead of zinc monochrome
+---
 
-### Changed
-- Complete design system cleanup: all dialogs converted to zinc monochrome (removed shadcn blue defaults, backdrop-blur, opacity tricks)
-- Added code splitting via Vite manual chunks (main bundle reduced from 1.4MB to 410KB)
-- Defined missing `animate-fade-in` and `animate-shake` CSS keyframes
-- Updated CodeQL GitHub Action from v3 to v4
-- Configured Dependabot grouping to reduce PR spam
+## [1.0.2] — 2026-06-17
+
+### Fixed
+- **Critical: app startup crash** — removed unused `tauri-plugin-updater` that panicked when no updater config was present in `tauri.conf.json`
+- **Critical: "Could not load Recall" error** — added `plugins.sql.preload` to `tauri.conf.json` so database migrations run automatically on first launch
+- Added `windows_subsystem = "windows"` to hide console window in release builds
+- Improved error logging: initialization failures now log to console with full error details instead of generic "Failed to load app data" message
 
 ---
 

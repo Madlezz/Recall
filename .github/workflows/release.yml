@@ -62,7 +62,7 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Recall ${{ github.ref_name }}'
-          releaseBody: 'See CHANGELOG.md for details.'
-          releaseDraft: true
+          releaseBody: 'See [CHANGELOG.md](https://github.com/Madlezz/Recall/blob/${{ github.ref_name }}/CHANGELOG.md) for details.'
+          releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}

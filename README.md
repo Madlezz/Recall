@@ -94,10 +94,10 @@ Pre-built binaries are available on the [Releases page](https://github.com/Madle
 
 | Platform | File |
 |----------|------|
-| Windows | `Recall_1.0.0_x64-setup.exe` or `.msi` |
-| macOS (Apple Silicon) | `Recall_1.0.0_aarch64.dmg` |
-| macOS (Intel) | `Recall_1.0.0_x64.dmg` |
-| Linux | `Recall_1.0.0_amd64.AppImage` |
+| Windows | `.exe` or `.msi` installer |
+| macOS (Apple Silicon) | `.dmg` |
+| macOS (Intel) | `.dmg` |
+| Linux | `.AppImage` or `.deb` |
 
 Or build from source — see [Quick Start](#quick-start).
 
