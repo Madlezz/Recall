@@ -4,6 +4,8 @@ use anki_import::parse_anki_apkg;
 use tauri::tray::{TrayIconBuilder, TrayIconEvent};
 use tauri_plugin_sql::{Migration, MigrationKind};
 use tauri::Manager;
+use tauri::Emitter;
+use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut};
 
 const RECALL_DB: &str = "sqlite:recall.db";
 
@@ -49,7 +51,7 @@ pub fn run() {
                 .plugin(
                     tauri_plugin_global_shortcut::Builder::new()
                         .with_handler(|app, shortcut, _event| {
-                            if shortcut.matches(&tauri_plugin_global_shortcut::Shortcut::parse("Control+Shift+N").unwrap()) {
+                            if shortcut == &"Control+Shift+N".parse::<Shortcut>().unwrap() {
                                 if let Some(window) = app.get_webview_window("main") {
                                     let _ = window.show();
                                     let _ = window.set_focus();
@@ -79,9 +81,8 @@ pub fn run() {
                 .build(app)?;
 
                             // Register the global shortcut
-                            use tauri_plugin_global_shortcut::Shortcut;
                             let _ = app.global_shortcut().register(
-                                Shortcut::parse("Control+Shift+N").unwrap(),
+                                "Control+Shift+N".parse::<Shortcut>().unwrap(),
                             );
 
                             Ok(())
