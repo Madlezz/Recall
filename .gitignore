@@ -3,12 +3,14 @@ dist
 src-tauri/target
 .env
 .DS_Store
+Thumbs.db
 *.local
 *.log
 *.tsbuildinfo
+*.swp
+*.swo
 /test-results/
 .playwright/
 .hermes/
-docs/
-recall_prd.md
-CONTRIBUTING.md
+.vscode/
+.idea/
