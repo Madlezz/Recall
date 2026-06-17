@@ -144,9 +144,10 @@ export const useRecallStore = create<RecallStore>((set: any, get: any) => ({
                     void sendDueReminder(dueCount);
                   }
     } catch (error) {
+      console.error("Failed to initialize Recall:", error);
       set({
         isLoading: false, isInitialized: true,
-        error: error instanceof Error ? error.message : "Failed to load app data",
+        error: error instanceof Error ? error.message : `Failed to load app data: ${String(error)}`,
       });
     }
   },
