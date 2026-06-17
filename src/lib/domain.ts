@@ -1,6 +1,6 @@
 import type { CardState, DeckColor, ReviewRating } from "@/types";
 
-export const SCHEMA_VERSION = "2";
+export const SCHEMA_VERSION = "4";
 
 export const deckColors: DeckColor[] = ["blue", "green", "amber", "rose", "violet", "slate"];
 export const cardStates: CardState[] = ["new", "learning", "review", "relearning"];

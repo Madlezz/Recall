@@ -1,3 +1,4 @@
+const MAX_CACHE_SIZE = 100;
 const imageUrlCache = new Map<string, string>();
 
 /** Reject path traversal and non-alphanumeric chars in image filenames */
@@ -25,7 +26,7 @@ export async function insertImage(): Promise<string | null> {
   }
 }
 
-/** Resolve a recall image filename to a Tauri asset URL. Uses module-level cache. */
+/** Resolve a recall image filename to a Tauri asset URL. Uses module-level LRU cache. */
 export async function getImageUrl(filename: string): Promise<string> {
   const safe = sanitizeFilename(filename);
   if (!safe) return "";
@@ -35,6 +36,11 @@ export async function getImageUrl(filename: string): Promise<string> {
     const { convertFileSrc } = await import("@tauri-apps/api/core");
     const dir = await appDataDir();
     const src = convertFileSrc(`${dir}images/${safe}`);
+    // LRU eviction: remove oldest entry if cache is full
+    if (imageUrlCache.size >= MAX_CACHE_SIZE) {
+      const firstKey = imageUrlCache.keys().next().value;
+      if (firstKey) imageUrlCache.delete(firstKey);
+    }
     imageUrlCache.set(safe, src);
     return src;
   } catch {

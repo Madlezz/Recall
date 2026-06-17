@@ -1,4 +1,3 @@
-import { drizzle } from "drizzle-orm/sqlite-proxy";
 import { isTauri } from "@tauri-apps/api/core";
 
 export type SqlValue = string | number | null;
@@ -15,18 +14,6 @@ let cachedExecutor: Promise<SqlExecutor | null> | null = null;
 
 export function isTauriRuntime(): boolean {
   return typeof window !== "undefined" && (isTauri() || "__TAURI_INTERNALS__" in window);
-}
-
-export function createDrizzleDatabase(executor: SqlExecutor): ReturnType<typeof drizzle> {
-  return drizzle(async (sql, params, method) => {
-    if (method === "run") {
-      await executor.execute(sql, params as SqlValue[]);
-      return { rows: [] };
-    }
-
-    const rows = await executor.select(sql, params as SqlValue[]);
-    return { rows };
-  });
 }
 
 export async function getTauriSqlExecutor(): Promise<SqlExecutor | null> {
@@ -72,6 +59,5 @@ async function createTauriSqlExecutor(): Promise<SqlExecutor | null> {
   };
 
   await executor.execute("PRAGMA foreign_keys = ON");
-  createDrizzleDatabase(executor);
   return executor;
 }

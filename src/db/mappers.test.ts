@@ -90,7 +90,7 @@ describe("database mappers", () => {
     expect(studySessionFromRow(studySessionToRow(session) as StudySessionRow)).toEqual(session);
     expect(reviewLogFromRow(reviewLogToRow(reviewLog) as ReviewLogRow)).toEqual(reviewLog);
     expect(settingsFromRows(settingsToRows(settings))).toEqual(settings);
-    expect(settingsToRows(settings)).toContainEqual({ key: "schema_version", value: "2" });
+    expect(settingsToRows(settings)).toContainEqual({ key: "schema_version", value: "4" });
   });
 
   it("rejects invalid card state and review rating rows", () => {

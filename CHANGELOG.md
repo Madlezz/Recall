@@ -17,16 +17,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Critical: "Start Fresh" broken on next launch** — `loadAppData()` now respects empty state when settings exist, preventing seed data from silently overwriting user's "Start Fresh" choice
 
 ### Changed
-- Removed unused dependencies: `@tauri-apps/plugin-updater`, `jszip`, `drizzle-kit`
+- Removed unused dependencies: `@tauri-apps/plugin-updater`, `jszip`, `drizzle-kit`, `drizzle-orm`
 - Updated documentation to reflect React 19 (was incorrectly listed as React 18)
 - Added Code of Conduct (Contributor Covenant)
 - Standardized GitHub Actions to use `actions/checkout@v4` across all workflows
 - Bumped `Cargo.toml` version to match package.json (1.0.2)
-
-### Removed
-- Stale internal planning document `recall_prd.md` (not meant for public repo)
-- Unused `docs/screenshot.png` (replaced by `docs/screenshots/` directory)
-- Dead updater check code in `recall-store.ts`
+- Fixed `beforeBuildCommand` to use `pnpm build` instead of `npx vite build`
+- Updated `SCHEMA_VERSION` constant from "2" to "4" to match Rust migrations
+- Added LRU eviction to image URL cache (max 100 entries) to prevent memory leaks
+- Added React 19 JSX namespace declaration to fix TypeScript compilation errors
 
 ---
 

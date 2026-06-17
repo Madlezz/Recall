@@ -27,5 +27,12 @@ Recall is a local desktop application with no network access beyond optional des
 
 ## Known Upstream Vulnerabilities
 
-The following vulnerabilities exist in transitive dependencies and are tracked for upstream resolution.
-See [GHSA](https://github.com/Madlezz/Recall/security/advisories) for detailed advisories.
+As of the latest release, there are no known unpatched vulnerabilities in our direct dependencies.
+
+Some transitive dependencies may have advisories flagged by `cargo audit` or `pnpm audit`. These are tracked and updated as upstream fixes become available. See the [Security Advisories](https://github.com/Madlezz/Recall/security/advisories) page for detailed information.
+
+## Supply Chain Security
+
+- All dependencies are pinned to compatible semver ranges
+- `pnpm-lock.yaml` is committed to ensure reproducible builds
+- Dependabot is configured for automated security updates
