@@ -131,23 +131,6 @@ For known transitive vulnerabilities in upstream dependencies, see [SECURITY.md]
 
 ---
 
-## Roadmap
-
-- [x] Exam deadline mode — set a date, cards prioritize
-- [x] Source-linked cards — attach references to your knowledge
-- [x] Card quality checker — flag cards that need improvement
-- [x] Screenshots in README
-- [x] Desktop notifications for reviews
-- [x] Card browser — table view with search, filter, sort, bulk operations
-- [x] Custom study — configurable sessions: deck, card count, tag, new-only
-- [x] Deck health — retention %, leech count, overdue on dashboard cards
-- [x] CSV import — front,back,hint,tags with preview + deck selector
-- [x] Keyboard shortcuts — B (bury), S (snooze) + elapsed timer in study
-- [x] Sound volume slider — master gain for effects, chimes, soundscapes
-- [x] Bulk tag management — add, set, or remove tags on selected cards
-
----
-
 ## Contributing
 
 Recall is open to contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions,
