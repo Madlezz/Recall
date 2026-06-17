@@ -287,8 +287,7 @@ export function Settings(): JSX.Element {
             <span className="font-semibold tabular-nums text-zinc-800 dark:text-zinc-200">{studySessions.length} completed</span>
           </div>
           <div className="px-5 py-3 text-xs text-zinc-400">
-                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                      {typeof window !== "undefined" && (window as any).__TAURI__ ? "SQLite (recall.db)" : "Browser localStorage"} · Export JSON for portable backup
+                      {isTauriRuntime() ? "SQLite (recall.db)" : "Browser localStorage"} · Export JSON for portable backup
                     </div>
         </div>
       </section>

@@ -31,7 +31,7 @@ fn copy_image_to_recall(app: tauri::AppHandle, source_path: String) -> Result<St
     use std::time::{SystemTime, UNIX_EPOCH};
     let nanos = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .unwrap()
+        .unwrap_or_default()
         .as_nanos();
     let filename = format!("{}.{}", nanos, ext);
     let dest = images_dir.join(&filename);
@@ -50,11 +50,13 @@ pub fn run() {
                 .plugin(
                     tauri_plugin_global_shortcut::Builder::new()
                         .with_handler(|app, shortcut, _event| {
-                            if shortcut == &"Control+Shift+N".parse::<Shortcut>().unwrap() {
-                                if let Some(window) = app.get_webview_window("main") {
-                                    let _ = window.show();
-                                    let _ = window.set_focus();
-                                    let _ = window.emit("quick-add-shortcut", ());
+                            if let Ok(target) = "Control+Shift+N".parse::<Shortcut>() {
+                                if shortcut == &target {
+                                    if let Some(window) = app.get_webview_window("main") {
+                                        let _ = window.show();
+                                        let _ = window.set_focus();
+                                        let _ = window.emit("quick-add-shortcut", ());
+                                    }
                                 }
                             }
                         })
@@ -66,9 +68,12 @@ pub fn run() {
                 .build(),
         )
         .setup(|app| {
+            let icon = app.default_window_icon()
+                .cloned()
+                .ok_or_else(|| tauri::Error::AssetNotFound("icons/icon.ico".to_string()))?;
             let _tray = TrayIconBuilder::with_id("recall-tray")
                 .tooltip("Recall — your flashcards, local-first")
-                .icon(app.default_window_icon().unwrap().clone())
+                .icon(icon)
                 .on_tray_icon_event(|tray, event| {
                     if let TrayIconEvent::Click { .. } = event {
                         if let Some(window) = tray.app_handle().get_webview_window("main") {
@@ -80,9 +85,9 @@ pub fn run() {
                 .build(app)?;
 
                             // Register the global shortcut
-                            let _ = app.global_shortcut().register(
-                                "Control+Shift+N".parse::<Shortcut>().unwrap(),
-                            );
+                            if let Ok(shortcut) = "Control+Shift+N".parse::<Shortcut>() {
+                                let _ = app.global_shortcut().register(shortcut);
+                            }
 
                             Ok(())
         })
