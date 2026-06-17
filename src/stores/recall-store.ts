@@ -124,21 +124,6 @@ export const useRecallStore = create<RecallStore>((set: any, get: any) => ({
                     } catch { /* not in Tauri runtime */ }
                   })();
 
-                  // Check for app updates (Tauri only)
-                  void (async () => {
-                    try {
-                      const { check } = await import("@tauri-apps/plugin-updater");
-                      const update = await check();
-                      if (update?.available) {
-                        const { toast } = await import("sonner");
-                        toast.info(`Recall ${update.version} is available`, {
-                          action: { label: "Update", onClick: () => void update.downloadAndInstall() },
-                          duration: 15000,
-                        });
-                      }
-                    } catch { /* not in Tauri runtime */ }
-                  })();
-
                   // Fire-and-forget: send due reminder notification if enabled
                   if (snapshot.settings.notificationsEnabled && dueCount > 0) {
                     void sendDueReminder(dueCount);
@@ -353,7 +338,14 @@ export const useRecallStore = create<RecallStore>((set: any, get: any) => ({
 
       const snapshot: RecallStateSnapshot = {
         decks: state.decks, cards: state.cards.map((c: Card) => (c.id === cardId ? previousCard : c)),
-        studySessions: state.studySessions, reviewLogs: state.reviewLogs.filter((l: ReviewLog) => l.cardId !== previousCardId),
+        studySessions: state.studySessions,
+        reviewLogs: (() => {
+          // Remove only the LAST review log for this card, not all of them
+          const cardLogs = state.reviewLogs.filter((l: ReviewLog) => l.cardId === previousCardId);
+          if (cardLogs.length === 0) return state.reviewLogs;
+          const lastLog = cardLogs[cardLogs.length - 1];
+          return state.reviewLogs.filter((l: ReviewLog) => l.id !== lastLog.id);
+        })(),
         settings: state.settings,
       };
       await persistReviewSnapshot(set, snapshot, { activeStudy: nextActiveStudy });

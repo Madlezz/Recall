@@ -126,21 +126,32 @@ class SqliteRecallRepository implements RecallRepository {
   constructor(private readonly executor: SqlExecutor) {}
 
   async loadAppData(): Promise<RecallStateSnapshot> {
-      // Compute the 90-day window: load only recent review logs
-      const recentSince = new Date(Date.now() - REVIEW_LOG_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString();
+      // Load ALL review logs — pruning older logs causes silent data loss
+      // when saveSnapshot() re-inserts only what's in memory.
       const [deckRows, cardRows, sessionRows, reviewLogRows, settingRows] = await Promise.all([
         this.executor.select<DeckRow>("SELECT * FROM decks ORDER BY created_at ASC"),
         this.executor.select<CardRow>("SELECT * FROM cards ORDER BY created_at ASC"),
         this.executor.select<StudySessionRow>("SELECT * FROM study_sessions ORDER BY started_at ASC"),
         this.executor.select<ReviewLogRow>(
-          "SELECT * FROM review_logs WHERE review_date >= ? ORDER BY review_date ASC",
-          [recentSince],
+          "SELECT * FROM review_logs ORDER BY review_date ASC",
         ),
         this.executor.select<SettingRow>("SELECT * FROM settings ORDER BY key ASC"),
       ]);
 
       if (deckRows.length === 0) {
-        return this.resetToSeedData();
+        // Only restore seed data if there are NO settings either.
+        // If settings exist (e.g. user chose "Start Fresh"), respect empty state.
+        if (settingRows.length === 0) {
+          return this.resetToSeedData();
+        }
+        const snapshot: RecallStateSnapshot = {
+          decks: [],
+          cards: [],
+          studySessions: [],
+          reviewLogs: [],
+          settings: settingsFromRows(settingRows),
+        };
+        return snapshot;
       }
 
       const snapshot: RecallStateSnapshot = {

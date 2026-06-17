@@ -165,7 +165,7 @@ project structure, and code style guidelines.
 | What | With |
 |------|------|
 | Desktop | Tauri 2 |
-| UI | React 18 + TypeScript (strict) |
+| UI | React 19 + TypeScript (strict) |
 | Styling | Tailwind CSS + shadcn/ui |
 | Storage | SQLite (Drizzle ORM) |
 | State | Zustand |

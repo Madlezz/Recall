@@ -12,10 +12,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [1.0.2] — 2026-06-17
 
 ### Fixed
-- **Critical: app startup crash** — removed unused `tauri-plugin-updater` that panicked when no updater config was present in `tauri.conf.json`
-- **Critical: "Could not load Recall" error** — added `plugins.sql.preload` to `tauri.conf.json` so database migrations run automatically on first launch
-- Added `windows_subsystem = "windows"` to hide console window in release builds
-- Improved error logging: initialization failures now log to console with full error details instead of generic "Failed to load app data" message
+- **Critical: review history data loss** — removed 90-day window pruning from `loadAppData()`. Previously, `saveSnapshot()` would delete and re-insert only recent logs, permanently destroying older review history on first save after startup
+- **Critical: undo wipes entire card history** — `undoLastReview` now correctly removes only the most recent review log entry instead of filtering out all logs for that card
+- **Critical: "Start Fresh" broken on next launch** — `loadAppData()` now respects empty state when settings exist, preventing seed data from silently overwriting user's "Start Fresh" choice
+
+### Changed
+- Removed unused dependencies: `@tauri-apps/plugin-updater`, `jszip`, `drizzle-kit`
+- Updated documentation to reflect React 19 (was incorrectly listed as React 18)
+- Added Code of Conduct (Contributor Covenant)
+- Standardized GitHub Actions to use `actions/checkout@v4` across all workflows
+- Bumped `Cargo.toml` version to match package.json (1.0.2)
+
+### Removed
+- Stale internal planning document `recall_prd.md` (not meant for public repo)
+- Unused `docs/screenshot.png` (replaced by `docs/screenshots/` directory)
+- Dead updater check code in `recall-store.ts`
 
 ---
 
@@ -74,7 +85,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Technical
 - Tauri v2 with cross-platform builds: Windows (MSI), macOS (DMG), Linux (AppImage)
-- React 18 + TypeScript strict mode
+- React 19 + TypeScript strict mode
 - SQLite via `@tauri-apps/plugin-sql` + Drizzle ORM
 - FSRS via `ts-fsrs` v5
 - 80+ unit tests (Vitest) + E2E smoke tests (Playwright)
