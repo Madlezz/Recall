@@ -15,6 +15,7 @@ const SHORTCUTS = [
   { keys: ["B"], description: "Bury card (skip, see later)" },
   { keys: ["S"], description: "Snooze card for 2 hours" },
   { keys: ["R"], description: "Start review (from dashboard)" },
+  { keys: ["F"], description: "Start/pause focus timer" },
   { keys: ["Ctrl", "N"], description: "Quick-add card" },
   { keys: ["Ctrl", "Z"], description: "Undo last review" },
   { keys: ["?"], description: "Show this help" },

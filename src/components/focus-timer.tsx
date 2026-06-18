@@ -41,6 +41,26 @@ export function FocusTimer(): JSX.Element {
     };
   }, []);
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent): void {
+      // Don't capture shortcuts when typing in inputs
+      const target = event.target as HTMLElement;
+      if (target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) return;
+
+      if (event.key.toLowerCase() === "f" && !event.ctrlKey && !event.metaKey) {
+        event.preventDefault();
+        if (running) pause();
+        else if (remaining === 0 && completed) reset();
+        else start();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [running, remaining, completed]);
+
   function tick(): void {
     setRemaining((prev) => {
       if (prev <= 1) {
@@ -158,18 +178,22 @@ export function FocusTimer(): JSX.Element {
       {/* Controls */}
       <div className="flex justify-center gap-2 mt-3">
         {running ? (
-          <Button size="sm" variant="outline" onClick={pause} className="gap-1.5">
+          <Button size="sm" variant="outline" onClick={pause} className="gap-1.5" aria-label="Pause focus timer">
             <Pause className="h-3.5 w-3.5" /> Pause
           </Button>
         ) : (
-          <Button size="sm" onClick={start} disabled={remaining === 0 && completed} className="gap-1.5">
+          <Button size="sm" onClick={start} disabled={remaining === 0 && completed} className="gap-1.5" aria-label={remaining === duration ? "Start focus timer" : "Resume focus timer"}>
             <Play className="h-3.5 w-3.5" /> {remaining === duration ? "Start" : "Resume"}
           </Button>
         )}
-        <Button size="sm" variant="ghost" onClick={reset} disabled={running || (remaining === duration && !completed)}>
+        <Button size="sm" variant="ghost" onClick={reset} disabled={running || (remaining === duration && !completed)} aria-label="Reset focus timer">
           <RotateCcw className="h-3.5 w-3.5" />
         </Button>
       </div>
+
+      <p className="mt-2 text-center text-[10px] text-zinc-400">
+        Press <kbd className="rounded border bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 text-[10px] font-mono">F</kbd> to {running ? "pause" : "start"}
+      </p>
 
       {/* Soundscapes */}
       <div className="mt-4 flex justify-center gap-1">
