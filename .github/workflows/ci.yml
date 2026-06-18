@@ -43,4 +43,3 @@ jobs:
       - name: Audit Rust dependencies
         working-directory: src-tauri
         run: cargo audit
-        continue-on-error: true

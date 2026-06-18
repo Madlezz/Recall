@@ -150,10 +150,10 @@ export function DeckDetail(): JSX.Element {
     }
   }
 
-  function handleExport(): void {
+  async function handleExport(): Promise<void> {
     const json = exportDeckToJson(d, deckCards);
-    downloadFile(`${d.name.replace(/\s+/g, "_")}.json`, json);
-    toast.success("Deck exported");
+    const ok = await downloadFile(`${d.name.replace(/\s+/g, "_")}.json`, json);
+    if (ok) toast.success("Deck exported");
   }
 
   async function handleExportRecall(): Promise<void> {

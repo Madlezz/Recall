@@ -67,12 +67,12 @@ export interface RecallSettings {
   xp: number;
   achievements: Achievement[];
   dailyGoal: number;
-    notificationsEnabled: boolean;
-    soundVolume: number; // 0-100
-    backupFolder: string | null;
-    backupSchedule: BackupSchedule;
-    lastBackupAt: string | null;
-  }
+  notificationsEnabled: boolean;
+  soundVolume: number; // 0-100
+  backupFolder: string | null;
+  backupSchedule: BackupSchedule;
+  lastBackupAt: string | null;
+}
 
 export type BackupSchedule = "daily" | "weekly" | "never";
 

@@ -67,6 +67,17 @@ pnpm test:watch      # Watch mode
 pnpm test:e2e        # E2E tests (Playwright, requires `pnpm dev` running)
 ```
 
+## Rust Development
+
+The Rust backend lives in `src-tauri/`. To validate Rust changes:
+
+```bash
+cd src-tauri
+cargo check          # Quick type/compile check
+cargo test           # Run Rust unit tests
+cargo clippy -- -D warnings   # Lint
+```
+
 ## Good First Issues
 
 Look for issues tagged [`good first issue`](https://github.com/Madlezz/Recall/labels/good%20first%20issue).

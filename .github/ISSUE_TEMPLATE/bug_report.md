@@ -27,3 +27,8 @@ What actually happened.
 
 ## Screenshots / Logs
 If applicable, add screenshots or paste console output.
+
+Log files are stored at:
+- **Linux:** `~/.local/share/dev.madlezz.recall/logs/`
+- **macOS:** `~/Library/Logs/dev.madlezz.recall/`
+- **Windows:** `%APPDATA%\dev.madlezz.recall\logs\`

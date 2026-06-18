@@ -104,11 +104,11 @@ export function useDeckDetail() {
     }
   }
 
-  function handleExport() {
+  async function handleExport() {
     if (!deck) return;
     const json = exportDeckToJson(deck, deckCards);
-    downloadFile(`${deck.name.replace(/\s+/g, "_")}.json`, json);
-    toast.success("Deck exported");
+    const ok = await downloadFile(`${deck.name.replace(/\s+/g, "_")}.json`, json);
+    if (ok) toast.success("Deck exported");
   }
 
   return {

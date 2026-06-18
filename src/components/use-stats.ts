@@ -65,9 +65,9 @@ export function useStats() {
     void loadAllReviewLogs();
   }, [loadAllReviewLogs]);
 
-  const streak = getStudyStreak(reviewLogs);
-  const level = getLevel(settings.xp);
-  const title = getLevelTitle(level);
+  const streak = useMemo(() => getStudyStreak(reviewLogs), [reviewLogs]);
+  const level = useMemo(() => getLevel(settings.xp), [settings.xp]);
+  const title = useMemo(() => getLevelTitle(level), [level]);
 
   const days = useMemo(() => lastNDays(30), []);
   const byDay = useMemo(() => reviewsByDay(reviewLogs), [reviewLogs]);

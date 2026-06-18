@@ -79,12 +79,31 @@ contributor-friendly TypeScript stack.
 
 ## Quick Start
 
+### Prerequisites
+
+- **Node.js** 22+ and **pnpm** 10+
+- **Rust** stable toolchain (`rustup install stable`)
+- Platform-specific libraries (see [CONTRIBUTING.md](CONTRIBUTING.md#prerequisites) for full list)
+
+### Run
+
 ```bash
 pnpm install
 pnpm tauri dev       # Full desktop app
 # or
-pnpm dev             # Browser-only preview
+pnpm dev             # Browser-only preview (no Rust needed)
 ```
+
+### Testing
+
+```bash
+pnpm test            # Unit tests (103 tests)
+pnpm lint            # ESLint
+pnpm build           # Production build
+pnpm test:e2e        # Playwright E2E (requires `pnpm dev` running first)
+```
+
+For full development guide, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 

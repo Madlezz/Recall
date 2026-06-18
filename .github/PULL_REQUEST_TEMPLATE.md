@@ -1,20 +1,25 @@
-## What does this PR do?
-Brief description of the change.
-
 ## Type of change
+
 - [ ] Bug fix
 - [ ] New feature
-- [ ] Refactor / cleanup
-- [ ] Documentation
-- [ ] Tests
+- [ ] Performance improvement
+- [ ] Documentation update
+- [ ] Other (describe):
 
 ## Testing
-- [ ] `pnpm test` passes
-- [ ] `pnpm lint` passes
-- [ ] Tested manually on [OS: ...]
 
-## Screenshots (if UI changes)
-Before / after if applicable.
+- [ ] Unit tests pass (`pnpm test`)
+- [ ] Build succeeds (`pnpm build`)
+- [ ] Tested on:
+  - [ ] Windows
+  - [ ] macOS
+  - [ ] Linux
 
-## Related issues
-Closes #...
+## Breaking changes
+
+- [ ] This PR modifies database schema, types, or export format
+- [ ] This PR has security implications (touches `repository.ts`, `import-export.ts`, or Rust file operations)
+
+## Closes
+
+Closes #

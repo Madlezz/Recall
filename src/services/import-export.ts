@@ -43,9 +43,29 @@ export function exportDeckToJson(deck: Deck, cards: Card[]): string {
                 return JSON.stringify(payload, null, 2);
 }
 
-export function downloadFile(filename: string, content: string): void {
+export async function downloadFile(filename: string, content: string): Promise<boolean> {
   // Sanitize filename to prevent path traversal and invalid characters
   const sanitized = filename.replace(/[^a-zA-Z0-9_\-\.]/g, "_");
+
+  try {
+    const { isTauri } = await import("@tauri-apps/api/core");
+    if (isTauri()) {
+      const { save } = await import("@tauri-apps/plugin-dialog");
+      const { writeTextFile } = await import("@tauri-apps/plugin-fs");
+
+      const path = await save({
+        defaultPath: sanitized,
+        filters: [{ name: "JSON", extensions: ["json"] }],
+      });
+      if (!path) return false;
+
+      await writeTextFile(path, content);
+      return true;
+    }
+  } catch {
+    // Not in Tauri — fall through to browser download
+  }
+
   const blob = new Blob([content], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -55,6 +75,7 @@ export function downloadFile(filename: string, content: string): void {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+  return true;
 }
 
 // --- .recall shareable package ---
