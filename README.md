@@ -5,8 +5,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)](https://github.com/Madlezz/Recall/releases/latest)
 
-> *Beautiful flashcards that live on your computer. No cloud, no account, no nonsense.*
-
 **Recall** is a desktop flashcard app built for focused learning. It uses FSRS-based scheduling for modern spaced repetition — but you just open it and start reviewing. Your data stays on your machine, always.
 
 ---
