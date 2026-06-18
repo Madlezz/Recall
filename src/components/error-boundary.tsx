@@ -36,6 +36,21 @@ export class ErrorBoundary extends Component<Props, State> {
     }
   }
 
+  handleCopyError(): void {
+    if (!this.state.error) return;
+    const errorText = `${this.state.error.message}\n\n${this.state.error.stack ?? ""}`;
+    navigator.clipboard.writeText(errorText).then(() => {
+      // Visual feedback
+      const btn = document.querySelector('[data-copy-btn]');
+      if (btn) {
+        btn.textContent = "Copied!";
+        setTimeout(() => {
+          btn.textContent = "Copy Error";
+        }, 2000);
+      }
+    });
+  }
+
   render(): ReactNode {
     if (this.state.error) {
       if (this.props.fallback) return this.props.fallback;
@@ -83,6 +98,13 @@ export class ErrorBoundary extends Component<Props, State> {
                 {"\n\n"}
                 {this.state.error.stack ?? ""}
               </pre>
+              <button
+                data-copy-btn
+                onClick={() => this.handleCopyError()}
+                className="mt-2 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 underline"
+              >
+                Copy Error
+              </button>
             </details>
           </div>
         </div>

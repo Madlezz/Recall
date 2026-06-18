@@ -1,4 +1,5 @@
 import { X } from "lucide-react";
+import { useEffect } from "react";
 
 interface ShortcutHelpProps {
   open: boolean;
@@ -21,6 +22,18 @@ const SHORTCUTS = [
 ];
 
 export function ShortcutHelp({ open, onClose }: ShortcutHelpProps): JSX.Element {
+  useEffect(() => {
+    if (!open) return;
+    function handleKeyDown(event: KeyboardEvent): void {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
+
   if (!open) return <></>;
 
   return (

@@ -1,4 +1,4 @@
-import { ArrowUpDown, ExternalLink, Filter, PackageOpen, Search, Tag, X } from "lucide-react";
+import { ArrowUpDown, ChevronLeft, ChevronRight, ExternalLink, Filter, PackageOpen, Search, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -8,6 +8,9 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useCardBrowser, type SortField, type SortDir, STATE_LABELS, STATE_COLORS } from "./use-card-browser";
 import { useRecallStore } from "@/stores/recall-store";
+import { useState, useEffect } from "react";
+
+const PAGE_SIZE = 50;
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
@@ -81,6 +84,16 @@ export function CardBrowser(): JSX.Element {
     updateCard,
   } = useCardBrowser();
   const showDeck = useRecallStore((s) => s.showDeck);
+  const [page, setPage] = useState(0);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setPage(0);
+  }, [search, deckFilter, stateFilter, sortField, sortDir]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages - 1);
+  const paginatedCards = filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
   async function bulkDelete() {
     const ids = [...selected];
@@ -317,7 +330,7 @@ export function CardBrowser(): JSX.Element {
                 </td>
               </tr>
             ) : (
-              filtered.map((card) => {
+              paginatedCards.map((card) => {
                 const deck = deckMap.get(card.deckId);
                 const isSelected = selected.has(card.id);
                 return (
@@ -377,6 +390,40 @@ export function CardBrowser(): JSX.Element {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">
+            Showing {currentPage * PAGE_SIZE + 1} to {Math.min((currentPage + 1) * PAGE_SIZE, filtered.length)} of {filtered.length} cards
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={currentPage === 0}
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              className="gap-1"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+              Previous
+            </Button>
+            <span className="text-sm tabular-nums">
+              {currentPage + 1} / {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={currentPage >= totalPages - 1}
+              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+              className="gap-1"
+            >
+              Next
+              <ChevronRight className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
