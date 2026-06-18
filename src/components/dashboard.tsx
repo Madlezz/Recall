@@ -69,14 +69,14 @@ export function Dashboard(): JSX.Element {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button onClick={handleStartReview} className="gap-2">
-            <RotateCw className="h-4 w-4" />
+          <Button onClick={handleStartReview} className="gap-2" aria-label="Start reviewing due cards across all decks">
+            <RotateCw className="h-4 w-4" aria-hidden="true" />
             Start Review
           </Button>
           <DeckDialog
             trigger={
-              <Button variant="outline" className="gap-2">
-                <Plus className="h-4 w-4" />
+              <Button variant="outline" className="gap-2" aria-label="Create a new deck">
+                <Plus className="h-4 w-4" aria-hidden="true" />
                 New Deck
               </Button>
             }
