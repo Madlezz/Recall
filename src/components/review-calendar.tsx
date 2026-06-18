@@ -59,15 +59,17 @@ export function ReviewCalendar(): JSX.Element {
           <button
             className="rounded p-1 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800"
             onClick={() => setMonth((m) => subMonths(m, 1))}
+            aria-label="Previous month"
           >
             <ChevronLeft className="h-4 w-4 text-zinc-500" />
           </button>
-          <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 min-w-[120px] text-center">
+          <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 min-w-[120px] text-center" aria-live="polite">
             {format(month, "MMMM yyyy")}
           </span>
           <button
             className="rounded p-1 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800"
             onClick={() => setMonth((m) => addMonths(m, 1))}
+            aria-label="Next month"
           >
             <ChevronRight className="h-4 w-4 text-zinc-500" />
           </button>

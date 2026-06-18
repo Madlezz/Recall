@@ -49,7 +49,7 @@ export function DailyGoal(): JSX.Element {
         <span className="text-lg text-zinc-400 tabular-nums">{goal}</span>
       </div>
 
-      <div className="mt-3 h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+      <div className="mt-3 h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label={`Daily goal progress: ${done} of ${goal} reviews`}>
         <div
           className={achieved ? "h-full rounded-full bg-emerald-500 transition-[width] duration-700 ease-out" : "h-full rounded-full bg-zinc-700 transition-[width] duration-700 ease-out dark:bg-zinc-300"}
           style={{ width: `${Math.round(progress * 100)}%` }}

@@ -7,12 +7,12 @@ import { RetentionForecast } from "@/components/retention-forecast";
 
 function StatTile({ icon: Icon, label, value }: { icon: typeof Flame; label: string; value: string }): JSX.Element {
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="rounded-lg border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900" role="group" aria-label={label}>
       <div className="flex items-center gap-2 text-xs text-zinc-400 mb-2">
-        <Icon className="h-3.5 w-3.5" />
+        <Icon className="h-3.5 w-3.5" aria-hidden="true" />
         {label}
       </div>
-      <div className="text-2xl font-bold tabular-nums text-zinc-800 dark:text-zinc-200">{value}</div>
+      <div className="text-2xl font-bold tabular-nums text-zinc-800 dark:text-zinc-200" aria-label={`${label}: ${value}`}>{value}</div>
     </div>
   );
 }
@@ -22,9 +22,9 @@ function StatTile({ icon: Icon, label, value }: { icon: typeof Flame; label: str
 function RatingBar({ color, label, count, total }: { color: string; label: string; count: number; total: number }): JSX.Element {
   const pct = total > 0 ? Math.round((count / total) * 100) : 0;
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3" role="group" aria-label={`${label}: ${count} reviews (${pct}%)`}>
       <span className="text-xs font-medium w-12 text-zinc-500">{label}</span>
-      <div className="flex-1 h-2.5 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+      <div className="flex-1 h-2.5 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
         <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
       </div>
       <span className="text-xs tabular-nums w-16 text-right text-zinc-400">{count} ({pct}%)</span>
