@@ -34,17 +34,18 @@ Tags: asia, capitals`;
 
   async function handleImport(): Promise<void> {
     if (parsed.length === 0) {
-      toast.error("No valid cards found");
+      toast.error("No valid cards found. Use 'Q:' for questions and 'A:' for answers, separated by blank lines");
       return;
     }
     setImporting(true);
     try {
       await onImport(parsed);
-      toast.success(`Imported ${parsed.length} card(s)`);
+      toast.success(`Successfully imported ${parsed.length} card(s)`);
       setText("");
       onClose();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Import failed");
+      const message = error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Import failed: ${message}`);
     } finally {
       setImporting(false);
     }

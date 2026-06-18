@@ -48,18 +48,24 @@ export function DeckDialog({ deck, trigger, open: controlledOpen, onOpenChange }
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
 
+    if (!name.trim()) {
+      toast.error("Deck name cannot be empty");
+      return;
+    }
+
     try {
       if (deck) {
-        await updateDeck(deck.id, { name, description, color });
-        toast.success("Deck updated");
+        await updateDeck(deck.id, { name: name.trim(), description, color });
+        toast.success(`Deck "${name.trim()}" updated`);
       } else {
-        const deckId = await createDeck({ name, description, color });
+        const deckId = await createDeck({ name: name.trim(), description, color });
         showDeck(deckId);
-        toast.success("Deck created");
+        toast.success(`Deck "${name.trim()}" created`);
       }
       handleOpenChange(false);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not save deck");
+      const message = error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Could not save deck: ${message}`);
     }
   }
 

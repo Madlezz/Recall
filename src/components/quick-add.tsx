@@ -35,16 +35,29 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
 
   async function handleSubmit(e: React.FormEvent): Promise<void> {
     e.preventDefault();
-    if (!deckId || !front.trim() || !back.trim()) return;
+    
+    if (!deckId) {
+      toast.error("Please select a deck first");
+      return;
+    }
+    if (!front.trim()) {
+      toast.error("Card front (question) cannot be empty");
+      return;
+    }
+    if (!back.trim()) {
+      toast.error("Card back (answer) cannot be empty");
+      return;
+    }
 
     try {
       await createCard({ deckId, front, back, hint: "", source: "", tags: [] });
-      toast.success("Card added");
+      toast.success("Card added successfully");
       setFront("");
       setBack("");
       frontRef.current?.focus();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to add card");
+      const message = err instanceof Error ? err.message : "Unknown error";
+      toast.error(`Failed to add card: ${message}`);
     }
   }
 

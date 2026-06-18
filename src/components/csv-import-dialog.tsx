@@ -76,7 +76,7 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
       const text = reader.result as string;
       const lines = text.split(/\r?\n/).filter((l) => l.trim());
       if (lines.length === 0) {
-        toast.error("CSV file is empty");
+        toast.error("CSV file is empty. Add at least one row with front and back content");
         return;
       }
 
@@ -99,7 +99,10 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
         }));
 
       if (csvRows.length === 0) {
-        toast.error("No valid card rows found (need at least front + back)");
+        const skipped = dataRows.length - csvRows.length;
+        toast.error(
+          `No valid cards found. Each row needs at least 2 columns: front and back. ${skipped} row(s) were skipped.`,
+        );
         return;
       }
 
@@ -133,9 +136,8 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
       if (fileRef.current) fileRef.current.value = "";
       onClose();
     } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : "Import failed",
-      );
+      const message = err instanceof Error ? err.message : "Unknown error";
+      toast.error(`Import failed: ${message}. Check that the deck exists and try again.`);
     } finally {
       setPending(false);
     }

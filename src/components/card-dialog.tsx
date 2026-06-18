@@ -76,19 +76,30 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
+    
+    if (!front.trim()) {
+      toast.error("Card front (question) cannot be empty");
+      return;
+    }
+    if (!back.trim()) {
+      toast.error("Card back (answer) cannot be empty");
+      return;
+    }
+    
     const input = { deckId: targetDeckId, front, back, hint, source, tags: parseTags(tags) };
 
     try {
       if (card) {
         await updateCard(card.id, input);
-        toast.success("Card updated");
+        toast.success("Card updated successfully");
       } else {
         await createCard(input);
-        toast.success("Card created");
+        toast.success("Card created successfully");
       }
       setOpen(false);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not save card");
+      const message = error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Could not save card: ${message}`);
     }
   }
 

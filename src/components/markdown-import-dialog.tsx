@@ -42,12 +42,19 @@ export function MarkdownImportDialog({ deckId }: MarkdownImportDialogProps): JSX
       setLoading(true);
       const content = await readTextFile(path);
       const parsed = parseMarkdownCards(content);
+      
+      if (parsed.length === 0) {
+        toast.error("No cards found in the markdown file. Make sure cards are separated by '---' with front and back sections");
+        return;
+      }
+      
       setCards(parsed);
       if (!targetDeckId && decks.length > 0) {
         setTargetDeckId(deckId ?? decks[0].id);
       }
-    } catch {
-      toast.error("Could not read markdown file");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      toast.error(`Could not read markdown file: ${message}`);
     } finally {
       setLoading(false);
     }
@@ -56,6 +63,7 @@ export function MarkdownImportDialog({ deckId }: MarkdownImportDialogProps): JSX
   async function handleImport(): Promise<void> {
     if (!targetDeckId || cards.length === 0) return;
     let imported = 0;
+    let failed = 0;
     for (const card of cards) {
       try {
         await createCard({
@@ -67,11 +75,16 @@ export function MarkdownImportDialog({ deckId }: MarkdownImportDialogProps): JSX
           tags: card.tags,
         });
         imported++;
-      } catch {
-        // skip individual failures
+      } catch (err) {
+        failed++;
+        console.error("Failed to import card:", err);
       }
     }
-    toast.success(`Imported ${imported} of ${cards.length} cards`);
+    if (failed > 0) {
+      toast.warning(`Imported ${imported} of ${cards.length} cards. ${failed} card(s) failed`);
+    } else {
+      toast.success(`Successfully imported ${imported} card(s)`);
+    }
     setOpen(false);
     setCards([]);
   }

@@ -56,8 +56,16 @@ export function AnkiImportDialog(): JSX.Element {
   }
 
   async function handleImport() {
-    if (!selectedFile || !deckName.trim()) {
-      toast.error("Please select a file and enter a deck name");
+    if (!selectedFile && !deckName.trim()) {
+      toast.error("Please select an Anki file and enter a deck name");
+      return;
+    }
+    if (!selectedFile) {
+      toast.error("Please select an Anki .apkg file");
+      return;
+    }
+    if (!deckName.trim()) {
+      toast.error("Please enter a name for the deck");
       return;
     }
 
@@ -66,7 +74,7 @@ export function AnkiImportDialog(): JSX.Element {
       const ankiCards = await parseAnkiApkg(selectedFile);
 
       if (ankiCards.length === 0) {
-        toast.warning("No cards found in the selected .apkg file");
+        toast.error("No cards found. Make sure you selected a valid Anki .apkg file (not .colpkg)");
         setIsImporting(false);
         return;
       }
@@ -122,7 +130,16 @@ export function AnkiImportDialog(): JSX.Element {
       });
     } catch (error) {
       console.error("Anki import failed:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to import Anki file");
+      const message = error instanceof Error ? error.message : "Unknown error";
+      
+      // Provide specific guidance based on common error patterns
+      if (message.includes("sqlite") || message.includes("database")) {
+        toast.error("Could not read Anki file. The file may be corrupted or from an unsupported Anki version");
+      } else if (message.includes("not found") || message.includes("ENOENT")) {
+        toast.error("File not found. Please make sure the file still exists at the selected location");
+      } else {
+        toast.error(`Import failed: ${message}. Try re-exporting from Anki or check the console for details`);
+      }
     } finally {
       setIsImporting(false);
     }
