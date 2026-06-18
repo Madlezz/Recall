@@ -25,6 +25,14 @@ Recall is designed to be accessible to all users. This guide covers keyboard nav
 | `Ctrl+Z` | Undo last review |
 | `R` | Start review |
 
+### Dashboard & Focus Timer
+
+| Keys | Action |
+|------|--------|
+| `F` | Start/pause focus timer |
+| `Tab` | Navigate between elements |
+| `Enter` | Activate focused element |
+
 ### Card Browser
 
 | Keys | Action |
