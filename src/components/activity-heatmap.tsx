@@ -55,14 +55,38 @@ export function ActivityHeatmap(): JSX.Element {
   }, [reviewLogs]);
 
   const totalReviews = reviewLogs.length;
+  const longestStreak = useMemo(() => {
+    let current = 0;
+    let longest = 0;
+
+    for (let i = 0; i < 365; i++) {
+      const weekIdx = Math.floor(i / 7);
+      const dayIdx = i % 7;
+      const count = heatmapData[51 - weekIdx]?.[6 - dayIdx]?.count ?? 0;
+      if (count > 0) {
+        current++;
+        longest = Math.max(longest, current);
+      } else {
+        current = 0;
+      }
+    }
+    return longest;
+  }, [heatmapData]);
 
   return (
-    <div>
+    <div role="region" aria-label="Study activity heatmap">
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Study Activity</span>
-        <span className="text-xs tabular-nums text-zinc-400">
-          {totalReviews} review{totalReviews !== 1 ? "s" : ""}
-        </span>
+        <div className="flex items-center gap-3 text-xs tabular-nums text-zinc-400">
+          {longestStreak > 0 && (
+            <span className="text-zinc-500 dark:text-zinc-300">
+              {longestStreak} day streak
+            </span>
+          )}
+          <span>
+            {totalReviews} review{totalReviews !== 1 ? "s" : ""}
+          </span>
+        </div>
       </div>
 
       <div className="overflow-x-auto">
