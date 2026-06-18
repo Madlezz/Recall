@@ -20,7 +20,7 @@ interface RichCardProps {
 }
 
 function ClozeContent({ content, revealed }: { content: string; revealed: boolean }): JSX.Element {
-  const { segments, isCloze } = renderCloze(content, revealed);
+  const { segments, isCloze } = renderCloze(content);
 
   if (!isCloze) {
     return <>{content}</>;

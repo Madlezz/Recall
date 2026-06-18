@@ -44,11 +44,13 @@ export function exportDeckToJson(deck: Deck, cards: Card[]): string {
 }
 
 export function downloadFile(filename: string, content: string): void {
+  // Sanitize filename to prevent path traversal and invalid characters
+  const sanitized = filename.replace(/[^a-zA-Z0-9_\-\.]/g, "_");
   const blob = new Blob([content], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = filename;
+  a.download = sanitized;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -367,7 +369,16 @@ export function mergeImportPayload(current: RecallStateSnapshot, incoming: Recal
       }
     } else {
       // Include sessions even without review logs
-      const nextSession = ensureStudySessionId({ ...incomingSession }, nextStudySessions);
+      let deckId: string | null = null;
+      if (incomingSession.deckId !== null) {
+        const mappedDeckId = deckIdMap.get(incomingSession.deckId);
+        if (!mappedDeckId) {
+          continue;
+        }
+        deckId = mappedDeckId;
+      }
+
+      const nextSession = ensureStudySessionId({ ...incomingSession, deckId }, nextStudySessions);
       nextStudySessions.push(nextSession);
     }
   }

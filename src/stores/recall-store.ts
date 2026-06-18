@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create, type StateCreator } from "zustand";
 import { createSeedSnapshot } from "@/data/seed";
 import { getNewCardsReviewedToday, isCardDueToday } from "@/lib/stats";
 import { createId } from "@/lib/utils";
@@ -82,12 +82,18 @@ applyTheme(initialSnapshot.settings.theme);
 
 // ── Store ──
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useRecallStore = create<RecallStore>((set: any, get: any) => ({
+export const useRecallStore = create<RecallStore>()((set, get) => {
+  // Zustand v5 requires explicit typing for store creators with slices.
+  // The slice architecture creates a circular type dependency between SliceState and RecallStore.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const setFn = set as any;
+  const getFn = get as any;
+
+  return {
   ...initialSnapshot,
-  ...navigationSlice(set, get),
-  ...deckCardSlice(set, get),
-  ...settingsSlice(set, get),
+  ...navigationSlice(setFn, getFn),
+  ...deckCardSlice(setFn, getFn),
+  ...settingsSlice(setFn, getFn),
 
   activeStudy: null,
   lastSessionSummary: null,
@@ -410,4 +416,5 @@ export const useRecallStore = create<RecallStore>((set: any, get: any) => ({
   },
 
   exportData() { return buildExportPayload(dataState(get())); },
-}));
+};
+});

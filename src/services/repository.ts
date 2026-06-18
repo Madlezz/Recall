@@ -17,7 +17,7 @@ import {
 } from "@/db/mappers";
 import { getTauriSqlExecutor, type SqlExecutor } from "@/db/client";
 import { createSeedSnapshot } from "@/data/seed";
-import { isCardState, isDeckColor, isReviewRating } from "@/lib/domain";
+import { isCardState, isCardType, isDeckColor, isReviewRating } from "@/lib/domain";
 import { normalizeName } from "@/lib/utils";
 import { mergeImportPayload } from "@/services/import-export";
 import type { Card, RecallExportPayload, RecallStateSnapshot, ReviewLog, StudySession, Theme } from "@/types";
@@ -39,9 +39,6 @@ export interface RecallRepository {
   countReviewLogs(): Promise<number>;
 }
 
-/** Number of days of review logs to eagerly load at startup. */
-export const REVIEW_LOG_WINDOW_DAYS = 90;
-
 let cachedRepository: Promise<RecallRepository> | null = null;
 
 export async function getRecallRepository(): Promise<RecallRepository> {
@@ -53,7 +50,15 @@ export function createSqliteRepository(executor: SqlExecutor): RecallRepository 
   return new SqliteRecallRepository(executor);
 }
 
+/** Maximum allowed import payload size (10MB JSON stringified). */
+const MAX_IMPORT_SIZE_BYTES = 10 * 1024 * 1024;
+
 export function validateImportSnapshot(snapshot: RecallStateSnapshot): void {
+  const sizeCheck = JSON.stringify(snapshot).length;
+  if (sizeCheck > MAX_IMPORT_SIZE_BYTES) {
+    throw new Error(`Import too large (${(sizeCheck / 1024 / 1024).toFixed(1)}MB). Maximum is 10MB.`);
+  }
+
   const deckIds = new Set<string>();
   const deckNames = new Set<string>();
 
@@ -92,6 +97,9 @@ export function validateImportSnapshot(snapshot: RecallStateSnapshot): void {
     }
     if (!isCardState(card.state)) {
       throw new Error("Invalid card state");
+    }
+    if (!isCardType(card.cardType)) {
+      throw new Error("Invalid card type");
     }
     cardIds.add(card.id);
   }
@@ -199,14 +207,16 @@ class SqliteRecallRepository implements RecallRepository {
 
       for (const card of snapshot.cards.map(cardToRow)) {
         await tx.execute(
-          "INSERT INTO cards (id, deck_id, front, back, hint, tags, state, last_review_date, next_review_date, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          "INSERT INTO cards (id, deck_id, front, back, hint, source, tags, card_type, state, last_review_date, next_review_date, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
           [
             card.id,
             card.deck_id,
             card.front,
             card.back,
             card.hint,
+            card.source,
             card.tags,
+            card.card_type,
             card.state,
             card.last_review_date,
             card.next_review_date,

@@ -52,13 +52,13 @@ describe("cloze", () => {
 
   describe("renderCloze", () => {
     test("returns isCloze=true when markers present", () => {
-      const result = renderCloze("{{c1::test}}", false);
+      const result = renderCloze("{{c1::test}}");
       expect(result.isCloze).toBe(true);
       expect(result.segments).toHaveLength(1);
     });
 
     test("returns isCloze=false for plain text", () => {
-      const result = renderCloze("plain text", false);
+      const result = renderCloze("plain text");
       expect(result.isCloze).toBe(false);
     });
   });

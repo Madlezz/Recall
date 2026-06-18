@@ -20,7 +20,9 @@ export function App(): JSX.Element {
   const isLoading = useRecallStore((state) => state.isLoading);
   const error = useRecallStore((state) => state.error);
   const initialize = useRecallStore((state) => state.initialize);
+  const showDashboard = useRecallStore((state) => state.showDashboard);
   const startReview = useRecallStore((state) => state.startReview);
+  const recoverToDashboard = () => showDashboard();
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
 
@@ -103,17 +105,49 @@ export function App(): JSX.Element {
       <ErrorBoundary>
         {view === "study" || view === "match" ? (
                 <main className="min-h-screen bg-background px-4 py-5 text-foreground sm:px-6 lg:px-8">
-                  {view === "study" ? <StudyMode /> : null}
-                  {view === "match" ? <MatchGame /> : null}
+                  {view === "study" ? (
+                    <ErrorBoundary viewName="StudyMode" onRecover={recoverToDashboard}>
+                      <StudyMode />
+                    </ErrorBoundary>
+                  ) : null}
+                  {view === "match" ? (
+                    <ErrorBoundary viewName="MatchGame" onRecover={recoverToDashboard}>
+                      <MatchGame />
+                    </ErrorBoundary>
+                  ) : null}
                 </main>
         ) : (
           <AppShell>
-                    {view === "dashboard" ? <Dashboard /> : null}
-                                      {view === "deck" ? <DeckDetail /> : null}
-                                      {view === "settings" ? <Settings /> : null}
-                                      {view === "stats" ? <Stats /> : null}
-                                                                          {view === "browser" ? <CardBrowser /> : null}
-                                                                          {view === "onboarding" ? <Onboarding /> : null}
+                    {view === "dashboard" ? (
+                      <ErrorBoundary viewName="Dashboard" onRecover={recoverToDashboard}>
+                        <Dashboard />
+                      </ErrorBoundary>
+                    ) : null}
+                                      {view === "deck" ? (
+                                        <ErrorBoundary viewName="DeckDetail" onRecover={recoverToDashboard}>
+                                          <DeckDetail />
+                                        </ErrorBoundary>
+                                      ) : null}
+                                      {view === "settings" ? (
+                                        <ErrorBoundary viewName="Settings" onRecover={recoverToDashboard}>
+                                          <Settings />
+                                        </ErrorBoundary>
+                                      ) : null}
+                                      {view === "stats" ? (
+                                        <ErrorBoundary viewName="Stats" onRecover={recoverToDashboard}>
+                                          <Stats />
+                                        </ErrorBoundary>
+                                      ) : null}
+                                                                          {view === "browser" ? (
+                                                                            <ErrorBoundary viewName="CardBrowser" onRecover={recoverToDashboard}>
+                                                                              <CardBrowser />
+                                                                            </ErrorBoundary>
+                                                                          ) : null}
+                                                                          {view === "onboarding" ? (
+                                                                            <ErrorBoundary viewName="Onboarding" onRecover={recoverToDashboard}>
+                                                                              <Onboarding />
+                                                                            </ErrorBoundary>
+                                                                          ) : null}
                   </AppShell>
         )}
         <Toaster richColors closeButton position="top-right" />

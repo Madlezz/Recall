@@ -73,7 +73,7 @@
 - [ ] Exam deadline mode: deadline ≤ 3 days → unlimited new cards for that deck
 
 ## Gamification
-- [ ] XP earned per review (Again=1, Hard=2, Good=3, Easy=4)
+- [ ] XP earned per review (Again=1, Hard=2, Good=5, Easy=8)
 - [ ] 10 levels: Curious Mind → Legend
 - [ ] 14 achievements unlock with confetti
 - [ ] Daily goal progress bar with confetti on completion

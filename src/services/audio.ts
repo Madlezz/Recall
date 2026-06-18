@@ -103,7 +103,12 @@ export function playSessionStartSound(): void {
 
 export type Soundscape = "rain" | "cafe" | "lofi" | "none";
 
-let ambientNodes: AudioNode[] = [];
+/** Anything with a disconnect() method — AudioNode or a cleanup wrapper */
+interface Disconnectable {
+  disconnect(): void;
+}
+
+let ambientNodes: Disconnectable[] = [];
 let ambientPlaying: Soundscape = "none";
 
 function stopAmbient(): void {
@@ -185,7 +190,7 @@ export function startCafe(): void {
     osc.stop(c.currentTime + 0.3);
   }, 1500 + Math.random() * 3000);
   
-  ambientNodes.push({ disconnect: () => clearInterval(pingInterval) } as unknown as AudioNode);
+  ambientNodes.push({ disconnect: () => clearInterval(pingInterval) });
   ambientPlaying = "cafe";
 }
 

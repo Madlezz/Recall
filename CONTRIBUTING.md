@@ -45,7 +45,7 @@ src/
   components/     # React UI components
   services/       # Business logic (FSRS engine, import/export, audio)
   stores/         # Zustand state management (split into slices)
-  db/             # SQLite schema, Drizzle ORM, mappers
+  db/             # SQLite schema, TypeScript mappers, and query helpers
   lib/            # Pure utility functions (XP, cloze, deck health)
   types.ts        # Shared TypeScript types
 src-tauri/
