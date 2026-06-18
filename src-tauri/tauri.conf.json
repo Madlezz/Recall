@@ -28,7 +28,7 @@
   "bundle": {
     "active": true,
     "targets": ["msi", "app", "appimage", "dmg"],
-    "icon": ["icons/icon.ico"],
+    "icon": ["icons/icon.png", "icons/icon.ico", "icons/icon.icns"],
     "windows": {
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",

@@ -1,4 +1,4 @@
-import { create, type StateCreator } from "zustand";
+import { create } from "zustand";
 import { createSeedSnapshot } from "@/data/seed";
 import { getNewCardsReviewedToday, isCardDueToday } from "@/lib/stats";
 import { createId } from "@/lib/utils";

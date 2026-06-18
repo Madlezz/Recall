@@ -45,7 +45,7 @@ export function exportDeckToJson(deck: Deck, cards: Card[]): string {
 
 export async function downloadFile(filename: string, content: string): Promise<boolean> {
   // Sanitize filename to prevent path traversal and invalid characters
-  const sanitized = filename.replace(/[^a-zA-Z0-9_\-\.]/g, "_");
+  const sanitized = filename.replace(/[^a-zA-Z0-9_.-]/g, "_");
 
   try {
     const { isTauri } = await import("@tauri-apps/api/core");
