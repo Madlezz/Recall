@@ -71,7 +71,12 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
       newOnly,
     });
     if (!started) {
-      toast.info("No cards match your criteria");
+      const reason = eligibleCount === 0
+        ? "No cards match your selected filters"
+        : newOnly && eligibleCount === 0
+          ? "No new cards available in the selected deck(s)"
+          : "Could not start custom study session";
+      toast.info(reason);
       return;
     }
     onClose();

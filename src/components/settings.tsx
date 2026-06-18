@@ -43,7 +43,8 @@ export function Settings(): JSX.Element {
     try {
       await setTheme(theme);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not save theme");
+      const message = error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Could not change theme: ${message}`);
     }
   }
 
@@ -51,18 +52,20 @@ export function Settings(): JSX.Element {
     try {
       const payload = exportData();
       const saved = await saveExportPayload(payload);
-      if (saved) toast.success("Export ready");
+      if (saved) toast.success("Data exported successfully");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not export data");
+      const message = error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Could not export data: ${message}`);
     }
   }
 
   async function handleReset(): Promise<void> {
     try {
       await resetData();
-      toast.success("Seed data restored");
+      toast.success("Seed data restored. All your cards and review history have been reset");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not reset data");
+      const message = error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Could not reset data: ${message}`);
     }
   }
 
@@ -71,9 +74,10 @@ export function Settings(): JSX.Element {
     try {
       await replaceData(pendingReplace);
       setPendingReplace(null);
-      toast.success("Import replaced local data");
+      toast.success("Data replaced successfully");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not replace data");
+      const message = error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Could not replace data: ${message}`);
     }
   }
 
@@ -88,9 +92,10 @@ export function Settings(): JSX.Element {
         return;
       }
       await mergeData(payload);
-      toast.success("Import merged");
+      toast.success("Data imported and merged successfully");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Invalid import file");
+      const message = error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Invalid import file: ${message}. Make sure you're importing a valid Recall JSON export`);
     }
   }
 
@@ -107,9 +112,10 @@ export function Settings(): JSX.Element {
         return;
       }
       await mergeData(payload);
-      toast.success("Import merged");
+      toast.success("Data imported and merged successfully");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Invalid import file");
+      const message = error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Invalid import file: ${message}. Make sure you're importing a valid Recall JSON export`);
     }
   }
 
