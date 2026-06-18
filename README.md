@@ -155,7 +155,7 @@ project structure, and code style guidelines.
 
 **Looking for a place to start?**
 - Browse [`good first issue`](https://github.com/Madlezz/Recall/labels/good%20first%20issue) tags
-- Check the roadmap above for planned features
+- Check [ROADMAP.md](ROADMAP.md) for planned features
 - Open an issue to discuss before opening a large PR
 
 ---

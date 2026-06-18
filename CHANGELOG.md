@@ -1,91 +1,65 @@
 # Changelog
 
-All notable changes to Recall are documented here.
-Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+All notable changes to this project will be documented in this file.
 
----
+The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
-
----
-
-## [1.0.2] — 2026-06-17
+## [1.0.3] - 2026-06-18
 
 ### Fixed
-- **Critical: review history data loss** — removed 90-day window pruning from `loadAppData()`. Previously, `saveSnapshot()` would delete and re-insert only recent logs, permanently destroying older review history on first save after startup
-- **Critical: undo wipes entire card history** — `undoLastReview` now correctly removes only the most recent review log entry instead of filtering out all logs for that card
-- **Critical: "Start Fresh" broken on next launch** — `loadAppData()` now respects empty state when settings exist, preventing seed data from silently overwriting user's "Start Fresh" choice
+- CI workflow: ignore known unmaintained Tauri transitive dependencies in cargo audit
+- Release workflow: generate complete icon set (PNG/ICO/ICNS) for all platforms
+- ESLint: fix no-useless-escape in downloadFile regex
+- Remove unused StateCreator import from recall-store
 
 ### Changed
-- Removed unused dependencies: `@tauri-apps/plugin-updater`, `jszip`, `drizzle-kit`, `drizzle-orm`
-- Updated documentation to reflect React 19 (was incorrectly listed as React 18)
-- Added Code of Conduct (Contributor Covenant)
-- Standardized GitHub Actions to use `actions/checkout@v4` across all workflows
-- Bumped `Cargo.toml` version to match package.json (1.0.2)
-- Fixed `beforeBuildCommand` to use `pnpm build` instead of `npx vite build`
-- Updated `SCHEMA_VERSION` constant from "2" to "4" to match Rust migrations
-- Added LRU eviction to image URL cache (max 100 entries) to prevent memory leaks
-- Added React 19 JSX namespace declaration to fix TypeScript compilation errors
+- Download file routing: use Tauri dialog.save() in desktop mode, browser fallback in preview
+- Memoize stat computations (getStudyStreak, getLevel, getLevelTitle)
+- Add 3 Rust unit tests for anki_import.rs (deck map flattening, card extraction, missing deck fallback)
+- Update README with prerequisites, test commands, E2E documentation
+- Add CONTRIBUTING.md Rust development section
+- Add PR template with breaking changes and security checkboxes
+- Update bug report template with platform-specific log file locations
+- Fix RecallSettings indentation in types.ts
 
----
-
-## [1.0.1] — 2026-06-17
+## [1.0.2] - 2026-06-17
 
 ### Fixed
-- Accessibility: added `role="dialog"` and `aria-modal` to custom modals (shortcut help, quick add, study summary)
-- Accessibility: added `aria-label` to icon-only buttons (TTS, external link, logo, CSV import, custom study)
-- Accessibility: added `aria-expanded`/`aria-controls` to exam date picker toggle
-- Accessibility: added `aria-label` and `id`/`htmlFor` to form fields (sound volume, daily new cards, leech threshold, daily goal)
-- Accessibility: added `aria-live="polite"` to sound volume percentage display
-- Accessibility: improved color contrast for `--muted-foreground` in both light and dark modes
+- Complete audit findings resolution (audit-4 through audit-11)
+- Remaining audit findings (#11-#20): CI, download routing, README, memoization, Rust tests, repo hygiene
+
+## [1.0.1] - 2026-06-16
+
+### Fixed
+- Initial audit findings (audit-1 through audit-10)
+- Security improvements across codebase
+
+## [1.0.0] - 2026-06-01
 
 ### Added
-- GitHub Actions: added `cargo audit` job to CI workflow for automated Rust dependency vulnerability scanning
-- Added `SECURITY.md` documenting security policy, responsible disclosure, and known upstream transitive vulnerabilities
-
-### Changed
-- Updated global shortcut documentation in README to clarify `Ctrl+Shift+N` works when app is minimized
-
----
-
-## [1.0.0] — 2026-06-13
-
-### Added
-- **FSRS scheduling** — modern spaced repetition (Again / Hard / Good / Easy)
-- **Cloze deletion** — `{{c1::hidden}}` fill-in-the-blank cards
-- **Rich cards** — Markdown, LaTeX (KaTeX), syntax-highlighted code blocks
-- **Anki import** — `.apkg` deck import with report
-- **CSV import** — front/back/hint/tags with preview and deck selector
-- **Card browser** — table view with search, filter, sort, and bulk operations
-- **Bulk tag management** — add, set, or remove tags on selected cards
-- **Custom study sessions** — configurable by deck, count, tag, new-only
-- **Deck health dashboard** — retention %, leeches, overdue per deck
-- **Stats dashboard** — review volume, rating distribution, time-of-day patterns
-- **Activity heatmap** — GitHub-style contribution graph
-- **XP & levels** — Curious Mind → Legend progression
-- **Achievements** — 14 milestones across streaks, volume, accuracy, time
-- **Daily goal** — set a target, progress bar, confetti on completion
-- **Focus timer** — Pomodoro with 15/25/45m presets
-- **Ambient soundscapes** — Rain, Cafe, Lofi (synthesized locally, zero files)
-- **Match game** — tile-matching puzzle from card content
-- **Exam deadline mode** — countdown + cram prioritization
-- **Source-linked cards** — attach reference URLs
-- **Card quality checker** — flag vague/stale/long/duplicate cards
-- **Desktop notifications** — due card reminders via OS notification
-- **Sound effects** — card flip, correct/incorrect feedback, level-up fanfares
-- **Volume control** — master gain slider
-- **Undo last review** — `Ctrl+Z` to revert
-- **Keyboard shortcuts** — Space, 1–4, R, B, S, Ctrl+N, Ctrl+Z, ?
-- **Review calendar** — month grid heatmap of study activity
-- **JSON export/import** — portable, human-readable backup
-- **Dark/light theme** — system-aware
-- **Onboarding** — demo decks or start fresh
-- **Privacy-first** — 100% offline, SQLite local storage, zero telemetry
-
-### Technical
-- Tauri v2 with cross-platform builds: Windows (MSI), macOS (DMG), Linux (AppImage)
-- React 19 + TypeScript strict mode
-- SQLite via `@tauri-apps/plugin-sql` + Drizzle ORM
-- FSRS via `ts-fsrs` v5
-- 80+ unit tests (Vitest) + E2E smoke tests (Playwright)
-- GitHub Actions CI: lint → test → build on every push/PR
+- Initial release
+- FSRS-based spaced repetition scheduling
+- Local SQLite storage with JSON export/import
+- Anki .apkg import support
+- CSV import with column mapping
+- Cloze deletion cards (`{{c1::hidden text}}`)
+- Rich cards with Markdown, LaTeX, and syntax-highlighted code
+- Card browser with search, filter, sort, bulk operations
+- XP and leveling system (Curious Mind to Legend)
+- 14 achievement milestones
+- Daily goals with progress tracking
+- Session summaries with ratings breakdown
+- Focus timer with Pomodoro presets (15/25/45m)
+- Ambient soundscapes (Rain, Cafe, Lofi) synthesized locally
+- Match game for alternative study
+- Review calendar with activity heatmap
+- Stats dashboard (review volume, rating distribution, time-of-day patterns)
+- Deck health metrics (retention, leeches, overdue)
+- Keyboard-first navigation and shortcuts
+- Global hotkey for quick-add (Ctrl+Shift+N)
+- Undo last review (Ctrl+Z)
+- Custom study mode (deck, count, tag filter, new-only)
+- Privacy-first: no account, no cloud, no telemetry
+- Multi-platform support: Windows, macOS (Intel + Apple Silicon), Linux
+- Comprehensive test suite (103 tests)
+- CI/CD pipeline with automated testing, linting, and multi-platform release builds
