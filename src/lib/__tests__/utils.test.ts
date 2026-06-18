@@ -8,8 +8,10 @@ describe("cn", () => {
   });
 
   it("handles conditional classes", () => {
-    expect(cn("base", false && "hidden", "active")).toBe("base active");
-    expect(cn("base", true && "shown")).toBe("base shown");
+    const isHidden = false;
+    const isShown = true;
+    expect(cn("base", isHidden && "hidden", "active")).toBe("base active");
+    expect(cn("base", isShown && "shown")).toBe("base shown");
   });
 
   it("handles empty inputs", () => {

@@ -85,9 +85,10 @@ applyTheme(initialSnapshot.settings.theme);
 export const useRecallStore = create<RecallStore>()((set, get) => {
   // Zustand v5 requires explicit typing for store creators with slices.
   // The slice architecture creates a circular type dependency between SliceState and RecallStore.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const setFn = set as any;
   const getFn = get as any;
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 
   return {
   ...initialSnapshot,
