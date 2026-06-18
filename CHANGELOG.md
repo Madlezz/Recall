@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- Card browser pagination (50 cards/page) for large deck performance
+- Activity heatmap shows longest study streak
+- Focus timer keyboard shortcut (F key to start/pause)
+- Keyboard shortcut help: Escape key to close dialog
+- Error boundary: "Copy Error" button for bug reporting
+- 34 new unit tests (images, TTS, pagination) — total 165 tests
+
+### Changed
+- Error messages across all dialogs: specific, actionable guidance
+- Settings: improved import/export/reset feedback with context
+- Custom study: more specific messages when no cards match filters
+- Shortcut help: added focus timer shortcut
+- Accessibility: ARIA labels on heatmap, timer controls, dashboard buttons
+- Documentation: getting-started guide, card formatting reference, accessibility docs
+- ROADMAP updated with completed items
+
+### Fixed
+- Image filename sanitization handles edge cases correctly
+
 ## [1.0.3] - 2026-06-18
 
 ### Fixed
