@@ -31,6 +31,7 @@ export function FocusTimer(): JSX.Element {
   const [running, setRunning] = useState(false);
   const [sc, setSc] = useState<Soundscape>("none");
   const [completed, setCompleted] = useState(false);
+  const [showCompletionFlash, setShowCompletionFlash] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const xpAwardedRef = useRef(false);
 
@@ -40,6 +41,14 @@ export function FocusTimer(): JSX.Element {
       stopSoundscape();
     };
   }, []);
+
+  // Auto-dismiss completion flash after 2 seconds
+  useEffect(() => {
+    if (showCompletionFlash) {
+      const timer = setTimeout(() => setShowCompletionFlash(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [showCompletionFlash]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -68,6 +77,7 @@ export function FocusTimer(): JSX.Element {
         intervalRef.current = null;
         setRunning(false);
         setCompleted(true);
+        setShowCompletionFlash(true);
         stopSoundscape();
 
         if (!xpAwardedRef.current) {
@@ -105,6 +115,7 @@ export function FocusTimer(): JSX.Element {
     pause();
     setRemaining(duration);
     setCompleted(false);
+    setShowCompletionFlash(false);
   }
 
   function pickPreset(mins: number): void {
@@ -129,13 +140,24 @@ export function FocusTimer(): JSX.Element {
   const circumference = 2 * Math.PI * 72;
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white px-5 py-5 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className={`rounded-lg border bg-white px-5 py-5 dark:bg-zinc-900 transition-all duration-500 ${
+      showCompletionFlash
+        ? "border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.4)] dark:border-emerald-500 dark:shadow-[0_0_20px_rgba(52,211,153,0.3)]"
+        : "border-zinc-200 dark:border-zinc-800"
+    }`}>
       <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">Focus Timer</span>
+
+      {/* Screen reader announcement for timer completion */}
+      {showCompletionFlash && (
+        <div className="sr-only" role="alert" aria-live="assertive">
+          Focus timer complete! Great work.
+        </div>
+      )}
 
       {/* Timer ring */}
       <div className="flex justify-center mt-4">
         <div className="relative">
-          <svg width="160" height="160" className="-rotate-90">
+          <svg width="160" height="160" className="-rotate-90" role="img" aria-label={`Focus timer: ${formatTime(remaining)} remaining, ${Math.round(progress * 100)}% complete`}>
             <circle cx="80" cy="80" r="72" fill="none" stroke="currentColor" strokeWidth="5" className="text-zinc-100 dark:text-zinc-800" />
             <circle
               cx="80" cy="80" r="72"
@@ -143,14 +165,20 @@ export function FocusTimer(): JSX.Element {
               strokeDasharray={circumference}
               strokeDashoffset={circumference * (1 - progress)}
               strokeLinecap="round"
-              className="text-zinc-700 transition-[stroke-dashoffset] duration-1000 ease-linear dark:text-zinc-300"
+              className={`transition-[stroke-dashoffset] duration-1000 ease-linear ${
+                showCompletionFlash ? "text-emerald-500" : "text-zinc-700 dark:text-zinc-300"
+              }`}
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl font-bold tabular-nums tracking-tight text-zinc-800 dark:text-zinc-200">
+            <span className={`text-3xl font-bold tabular-nums tracking-tight transition-colors duration-500 ${
+              showCompletionFlash ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-800 dark:text-zinc-200"
+            }`}>
               {formatTime(remaining)}
             </span>
-            <span className="mt-0.5 text-[11px] text-zinc-400">
+            <span className={`mt-0.5 text-[11px] font-semibold transition-colors duration-500 ${
+              showCompletionFlash ? "text-emerald-500" : "text-zinc-400"
+            }`}>
               {running ? "focusing" : completed ? "done!" : "ready"}
             </span>
           </div>

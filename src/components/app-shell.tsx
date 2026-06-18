@@ -23,6 +23,14 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+      {/* ── Skip navigation ── */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-zinc-900 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:shadow-lg dark:focus:bg-white dark:focus:text-zinc-900"
+      >
+        Skip to main content
+      </a>
+
       {/* ── Sidebar ── */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-56 flex-col border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 lg:flex">
         {/* Logo */}
@@ -38,7 +46,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         </button>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-3 space-y-1">
+        <nav className="flex-1 px-3 py-3 space-y-1" aria-label="Main navigation">
           <NavButton active={view === "dashboard"} icon={Home} label="Dashboard" onClick={showDashboard} />
           <NavButton active={view === "browser"} icon={LayoutGrid} label="Browser" onClick={showBrowser} />
           <NavButton active={view === "stats"} icon={TrendingUp} label="Stats" onClick={showStats} />
@@ -84,7 +92,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
       </header>
 
       {/* ── Main content ── */}
-      <main className="lg:pl-56">
+      <main id="main-content" className="lg:pl-56" tabIndex={-1}>
         <div className="mx-auto w-full max-w-6xl px-6 py-8 lg:px-10">{children}</div>
       </main>
     </div>
@@ -104,6 +112,7 @@ function NavButton({ active, icon: Icon, label, onClick }: NavButtonProps): JSX.
   return (
     <button
       onClick={onClick}
+      aria-current={active ? "page" : undefined}
       className={cn(
         "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
         active
@@ -141,7 +150,7 @@ function LevelWidget(): JSX.Element {
       </div>
 
       {/* Progress bar */}
-      <div className="relative h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+      <div className="relative h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label={`Level ${level} progress: ${settings.xp} XP`}>
         <div
           className="absolute inset-y-0 left-0 rounded-full bg-zinc-700 transition-[width] duration-700 ease-out dark:bg-zinc-300"
           style={{ width: `${Math.round(progress * 100)}%` }}

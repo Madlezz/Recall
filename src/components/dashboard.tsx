@@ -233,6 +233,7 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
   return (
     <button
       onClick={onOpen}
+      aria-label={`Open deck: ${deck.name}. ${stats.due} cards due, ${stats.total} total, ${progress}% mastered.`}
       className="group relative flex flex-col rounded-lg border border-zinc-200 bg-white p-5 text-left transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
     >
       {/* Top row: name + arrow */}

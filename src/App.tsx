@@ -153,6 +153,18 @@ export function App(): JSX.Element {
         <Toaster richColors closeButton position="top-right" />
         <QuickAddDialog open={showQuickAdd} onClose={() => setShowQuickAdd(false)} />
         <ShortcutHelp open={showShortcuts} onClose={() => setShowShortcuts(false)} />
+
+        {/* Screen reader announcements for view changes */}
+        <div aria-live="polite" aria-atomic="true" className="sr-only">
+          {view === "dashboard" && "Dashboard view"}
+          {view === "deck" && "Deck detail view"}
+          {view === "study" && "Study mode"}
+          {view === "match" && "Match game"}
+          {view === "browser" && "Card browser"}
+          {view === "stats" && "Statistics"}
+          {view === "settings" && "Settings"}
+          {view === "onboarding" && "Welcome to Recall"}
+        </div>
       </ErrorBoundary>
     );
 }

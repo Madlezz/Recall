@@ -32,6 +32,15 @@ export function StudyMode(): JSX.Element {
     ? Object.values(activeStudy.ratings).reduce((a, b) => a + b, 0)
     : 0;
 
+  // Visual feedback for answer rating (for deaf users)
+  const [ratingFlash, setRatingFlash] = useState<"again" | "hard" | "good" | "easy" | null>(null);
+  useEffect(() => {
+    if (ratingFlash) {
+      const timer = setTimeout(() => setRatingFlash(null), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [ratingFlash]);
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent): void {
       if (!activeStudy || activeStudy.completed) return;
@@ -166,10 +175,29 @@ export function StudyMode(): JSX.Element {
 
   // ── Active study ──
   return (
-    <div className="flex min-h-[82vh] flex-col">
+    <div className="flex min-h-[82vh] flex-col relative">
+      {/* Rating flash overlay for deaf users */}
+      {ratingFlash && (
+        <div
+          className={`pointer-events-none fixed inset-0 z-50 transition-opacity duration-300 ${
+            ratingFlash === "again" ? "bg-red-500/10" :
+            ratingFlash === "hard" ? "bg-amber-500/10" :
+            ratingFlash === "good" ? "bg-emerald-500/10" :
+            "bg-blue-500/10"
+          }`}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Screen reader announcements */}
+      <div className="sr-only" role="status" aria-live="polite">
+        Card {activeStudy.currentIndex + 1} of {total}.
+        {activeStudy.revealed ? "Answer revealed. Choose your rating." : "Press Space to reveal answer."}
+      </div>
+
       {/* Top bar */}
       <header className="flex items-center justify-between py-2">
-        <Button variant="ghost" size="sm" onClick={exitStudy} className="gap-1.5">
+        <Button variant="ghost" size="sm" onClick={exitStudy} className="gap-1.5" aria-label="Exit study mode">
           <ArrowLeft className="h-4 w-4" /> Exit
         </Button>
 
@@ -192,7 +220,7 @@ export function StudyMode(): JSX.Element {
           <div className="text-sm font-medium tabular-nums text-zinc-600 dark:text-zinc-400">
             {activeStudy.currentIndex + 1} / {total}
           </div>
-          <div className="mt-1.5 h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+          <div className="mt-1.5 h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100} aria-label={`Study progress: ${activeStudy.currentIndex} of ${total} cards`}>
             <div
               className="h-full rounded-full bg-zinc-500 transition-[width] duration-300 dark:bg-zinc-400"
               style={{ width: `${progress}%` }}
@@ -265,10 +293,10 @@ export function StudyMode(): JSX.Element {
           </Button>
         ) : (
           <>
-            <AnswerButton label="Again" keyHint="1" variant="again" onClick={() => { playAgainSound(); void answerCurrentCard("again"); }} />
-            <AnswerButton label="Hard" keyHint="2" variant="hard" onClick={() => { playHardSound(); void answerCurrentCard("hard"); }} />
-            <AnswerButton label="Good" keyHint="3" variant="good" onClick={() => { playCorrectSound(); void answerCurrentCard("good"); }} />
-            <AnswerButton label="Easy" keyHint="4" variant="easy" onClick={() => { playCorrectSound(); void answerCurrentCard("easy"); }} />
+            <AnswerButton label="Again" keyHint="1" variant="again" onClick={() => { playAgainSound(); setRatingFlash("again"); void answerCurrentCard("again"); }} />
+            <AnswerButton label="Hard" keyHint="2" variant="hard" onClick={() => { playHardSound(); setRatingFlash("hard"); void answerCurrentCard("hard"); }} />
+            <AnswerButton label="Good" keyHint="3" variant="good" onClick={() => { playCorrectSound(); setRatingFlash("good"); void answerCurrentCard("good"); }} />
+            <AnswerButton label="Easy" keyHint="4" variant="easy" onClick={() => { playCorrectSound(); setRatingFlash("easy"); void answerCurrentCard("easy"); }} />
           </>
         )}
 
@@ -299,12 +327,20 @@ const answerStyles: Record<AnswerVariant, string> = {
 };
 
 function AnswerButton({ label, keyHint, variant, onClick }: { label: string; keyHint: string; variant: AnswerVariant; onClick: () => void }): JSX.Element {
+  const variantDescriptions: Record<AnswerVariant, string> = {
+    again: "Rate as Again - forgot completely",
+    hard: "Rate as Hard - remembered with difficulty",
+    good: "Rate as Good - remembered with moderate effort",
+    easy: "Rate as Easy - remembered easily",
+  };
+
   return (
     <button
       onClick={onClick}
+      aria-label={variantDescriptions[variant]}
       className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors ${answerStyles[variant]}`}
     >
-      <span className="text-[10px] font-medium opacity-60 w-4">{keyHint}</span>
+      <span className="text-[10px] font-medium opacity-60 w-4" aria-hidden="true">{keyHint}</span>
       {label}
     </button>
   );

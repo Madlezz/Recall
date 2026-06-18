@@ -21,6 +21,14 @@ const LEVEL_COLORS: Record<number, string> = {
   3: "bg-emerald-600 dark:bg-emerald-500",
 };
 
+// Opacity-based differentiation for colorblind users (works regardless of hue perception)
+const LEVEL_OPACITY: Record<number, string> = {
+  0: "opacity-30",
+  1: "opacity-50",
+  2: "opacity-75",
+  3: "opacity-100",
+};
+
 export function ActivityHeatmap(): JSX.Element {
   const reviewLogs = useRecallStore((state) => state.reviewLogs);
 
@@ -55,6 +63,11 @@ export function ActivityHeatmap(): JSX.Element {
   }, [reviewLogs]);
 
   const totalReviews = reviewLogs.length;
+
+  // Calculate stats for screen readers
+  const daysStudied = heatmapData.flat().filter((d) => d.count > 0).length;
+  const avgPerDay = daysStudied > 0 ? Math.round(totalReviews / daysStudied) : 0;
+
   const longestStreak = useMemo(() => {
     let current = 0;
     let longest = 0;
@@ -97,8 +110,9 @@ export function ActivityHeatmap(): JSX.Element {
                 {week.map((day) => (
                   <div
                     key={day.date}
-                    className={`h-[11px] w-[11px] rounded-sm ${LEVEL_COLORS[day.level]}`}
+                    className={`h-[11px] w-[11px] rounded-sm ${LEVEL_COLORS[day.level]} ${LEVEL_OPACITY[day.level]} ${day.level === 3 ? "ring-1 ring-emerald-600/30 dark:ring-emerald-400/30" : ""}`}
                     title={`${day.date}: ${day.count} review${day.count !== 1 ? "s" : ""}`}
+                    aria-label={`${day.date}: ${day.count} review${day.count !== 1 ? "s" : ""}`}
                   />
                 ))}
               </div>
@@ -113,6 +127,13 @@ export function ActivityHeatmap(): JSX.Element {
           <div key={lvl} className={`h-[11px] w-[11px] rounded-sm ${LEVEL_COLORS[lvl]}`} />
         ))}
         <span>More</span>
+      </div>
+
+      {/* Screen reader summary */}
+      <div className="sr-only" aria-live="polite">
+        Study activity: {totalReviews} total reviews over {daysStudied} days in the past year.
+        Average {avgPerDay} reviews per active day.
+        {longestStreak > 0 && ` Longest streak: ${longestStreak} days.`}
       </div>
     </div>
   );
