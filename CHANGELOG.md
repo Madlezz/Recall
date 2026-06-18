@@ -13,13 +13,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Keyboard shortcut help: Escape key to close dialog
 - Error boundary: "Copy Error" button for bug reporting
 - 34 new unit tests (images, TTS, pagination) — total 165 tests
+- Skip navigation link for screen readers to jump to main content
+- Visual feedback for deaf users: rating flash overlay in study mode, focus timer green glow on completion
+- Colorblind-safe heatmap: opacity differentiation alongside color, ring on highest activity
+- Comprehensive ARIA landmarks: nav labels, aria-current=page, aria-live announcements
+- Screen reader summaries: heatmap stats, study mode progress, view changes, timer completion
 
 ### Changed
 - Error messages across all dialogs: specific, actionable guidance
 - Settings: improved import/export/reset feedback with context
 - Custom study: more specific messages when no cards match filters
 - Shortcut help: added focus timer shortcut
-- Accessibility: ARIA labels on heatmap, timer controls, dashboard buttons
+- Accessibility: ARIA labels on heatmap, timer controls, dashboard buttons, answer buttons, deck cards, progress bars
 - Documentation: getting-started guide, card formatting reference, accessibility docs
 - ROADMAP updated with completed items
 
