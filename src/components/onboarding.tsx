@@ -18,8 +18,9 @@ export function Onboarding(): JSX.Element {
     try {
       await completeOnboarding();
     } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error("Failed to complete onboarding:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to load demo cards");
+      toast.error(`Failed to load demo cards: ${message}`);
     }
   }
 
@@ -27,8 +28,9 @@ export function Onboarding(): JSX.Element {
     try {
       await startFresh();
     } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error("Failed to start fresh:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to reset data");
+      toast.error(`Failed to reset data: ${message}`);
     }
   }
 
