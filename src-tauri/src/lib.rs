@@ -103,6 +103,8 @@ fn migrations() -> Vec<Migration> {
             description: "create_recall_schema",
             sql: r#"
             PRAGMA foreign_keys = ON;
+            PRAGMA busy_timeout = 5000;
+            PRAGMA journal_mode = WAL;
 
             CREATE TABLE IF NOT EXISTS decks (
                 id TEXT PRIMARY KEY NOT NULL,
