@@ -49,7 +49,9 @@ async function createTauriSqlExecutor(): Promise<SqlExecutor | null> {
       // Retry up to 3 times on SQLITE_BUSY to handle contention with Rust-side migrations
       for (let attempt = 0; attempt < 3; attempt++) {
         try {
-          await database.execute("BEGIN IMMEDIATE");
+          // Use DEFERRED instead of IMMEDIATE — DEFERRED only acquires write lock when needed,
+          // allowing better concurrency with Rust-side read operations
+          await database.execute("BEGIN DEFERRED");
           try {
             const result = await callback(executor);
             await database.execute("COMMIT");
@@ -75,7 +77,7 @@ async function createTauriSqlExecutor(): Promise<SqlExecutor | null> {
   };
 
   await executor.execute("PRAGMA foreign_keys = ON");
-  await executor.execute("PRAGMA busy_timeout = 5000");
+  await executor.execute("PRAGMA busy_timeout = 30000");
   await executor.execute("PRAGMA journal_mode = WAL");
   return executor;
 }
