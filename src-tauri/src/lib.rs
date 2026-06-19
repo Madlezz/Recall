@@ -1,6 +1,8 @@
 mod anki_import;
+mod db_atomic;
 
 use anki_import::parse_anki_apkg;
+use db_atomic::{save_snapshot_atomic, record_review_atomic, create_safety_backup};
 use tauri::tray::{TrayIconBuilder, TrayIconEvent};
 use tauri_plugin_sql::{Migration, MigrationKind};
 use tauri::Manager;
@@ -23,22 +25,85 @@ fn copy_image_to_recall(app: tauri::AppHandle, source_path: String) -> Result<St
     std::fs::create_dir_all(&images_dir).map_err(|e| e.to_string())?;
 
     let path = std::path::Path::new(&source_path);
+
+    // Reject symlinks and directories
+    let metadata = std::fs::symlink_metadata(path).map_err(|e| format!("Cannot read file: {}", e))?;
+    if metadata.file_type().is_symlink() {
+        return Err("Symlinks are not allowed for security".to_string());
+    }
+    if metadata.is_dir() {
+        return Err("Path is a directory, not a file".to_string());
+    }
+
+    // Reject files above 50MB
+    let file_size = metadata.len();
+    if file_size > 50 * 1024 * 1024 {
+        return Err(format!("File too large ({}MB). Maximum is 50MB.", file_size / 1024 / 1024));
+    }
+
+    // Validate extension
     let ext = path
         .extension()
         .and_then(|e| e.to_str())
-        .unwrap_or("png");
+        .map(|e| e.to_lowercase())
+        .unwrap_or_default();
 
+    let allowed_exts = ["png", "jpg", "jpeg", "gif", "webp"];
+    if !allowed_exts.contains(&ext.as_str()) {
+        return Err(format!("Unsupported image type: .{}. Allowed: png, jpg, jpeg, gif, webp", ext));
+    }
+
+    // Validate magic bytes match the claimed extension
+    let mut header = [0u8; 12];
+    let mut file = std::fs::File::open(path).map_err(|e| format!("Cannot open file: {}", e))?;
+    use std::io::Read;
+    let bytes_read = file.read(&mut header).map_err(|e| format!("Cannot read file: {}", e))?;
+    if bytes_read < 4 {
+        return Err("File too small to be a valid image".to_string());
+    }
+
+    let magic_valid = match ext.as_str() {
+        "png" => header[0..4] == [0x89, 0x50, 0x4E, 0x47], // ‰PNG
+        "jpg" | "jpeg" => header[0..2] == [0xFF, 0xD8], // JPEG SOI
+        "gif" => header[0..3] == [0x47, 0x49, 0x46], // GIF
+        "webp" => bytes_read >= 12
+            && header[0..4] == [0x52, 0x49, 0x46, 0x46] // RIFF
+            && header[8..12] == [0x57, 0x45, 0x42, 0x50], // WEBP
+        _ => false,
+    };
+
+    if !magic_valid {
+        return Err(format!(
+            "File claims to be .{} but magic bytes don't match. Possible file corruption or spoofing.",
+            ext
+        ));
+    }
+
+    // Generate filename with UUID for uniqueness (not just timestamp)
+    let uuid = generate_simple_uuid();
+    let filename = format!("{}.{}", uuid, ext);
+    let dest = images_dir.join(&filename);
+
+    std::fs::copy(path, &dest).map_err(|e| format!("Copy failed: {}", e))?;
+
+    Ok(filename)
+}
+
+/// Generate a simple UUID-like string without pulling in the uuid crate.
+/// Uses timestamp + random bytes for uniqueness.
+fn generate_simple_uuid() -> String {
     use std::time::{SystemTime, UNIX_EPOCH};
     let nanos = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap_or_default()
         .as_nanos();
-    let filename = format!("{}.{}", nanos, ext);
-    let dest = images_dir.join(&filename);
 
-    std::fs::copy(&source_path, &dest).map_err(|e| e.to_string())?;
+    // Mix in some entropy from the process ID and a counter
+    let pid = std::process::id();
+    static COUNTER: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    let count = COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
 
-    Ok(filename)
+    format!("{:x}-{:x}-{:x}-{:x}", nanos >> 64, nanos as u64, pid as u64, count)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -91,7 +156,7 @@ pub fn run() {
 
                             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![parse_anki_apkg, update_tray_tooltip, copy_image_to_recall])
+        .invoke_handler(tauri::generate_handler![parse_anki_apkg, update_tray_tooltip, copy_image_to_recall, save_snapshot_atomic, record_review_atomic, create_safety_backup])
         .run(tauri::generate_context!())
         .expect("error while running Recall");
 }

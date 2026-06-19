@@ -129,6 +129,15 @@ export function RichCard({ content, isBack = false, cardType = "basic", revealed
               const filename = src.replace("https://recall.local/", "");
               return <RecallImage filename={filename} alt={alt ?? undefined} />;
             }
+            // Block all remote/external images for privacy (offline-first app)
+            // Only allow local recall:// images via the RecallImage component
+            if (src && (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("//"))) {
+              return (
+                <span className="inline-flex items-center gap-2 rounded border border-dashed border-muted-foreground/30 bg-muted/50 px-3 py-2 text-sm text-muted-foreground" title={src}>
+                  🚫 Remote image blocked (privacy)
+                </span>
+              );
+            }
             return <img src={src} alt={alt ?? ""} className="max-w-full rounded-lg" />;
           },
           code({ children, className, inline, ...props }: React.ComponentPropsWithoutRef<"code"> & { inline?: boolean }) {

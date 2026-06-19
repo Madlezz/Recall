@@ -15,7 +15,7 @@ import {
   type SettingRow,
   type StudySessionRow,
 } from "@/db/mappers";
-import { getTauriSqlExecutor, type SqlExecutor } from "@/db/client";
+import { getTauriSqlExecutor, isTauriRuntime, type SqlExecutor } from "@/db/client";
 import { createSeedSnapshot } from "@/data/seed";
 import { isCardState, isCardType, isDeckColor, isReviewRating } from "@/lib/domain";
 import { normalizeName } from "@/lib/utils";
@@ -191,6 +191,28 @@ class SqliteRecallRepository implements RecallRepository {
 
   async saveSnapshot(snapshot: RecallStateSnapshot): Promise<void> {
     validateImportSnapshot(snapshot);
+
+    // Try Rust atomic command first (truly atomic with real transactions)
+    if (isTauriRuntime()) {
+      try {
+        const { invoke } = await import("@tauri-apps/api/core");
+        await invoke("save_snapshot_atomic", {
+          data: {
+            decks: snapshot.decks.map(deckToRow),
+            cards: snapshot.cards.map(cardToRow),
+            study_sessions: snapshot.studySessions.map(studySessionToRow),
+            review_logs: snapshot.reviewLogs.map(reviewLogToRow),
+            settings: settingsToRows(snapshot.settings),
+          },
+        });
+        return;
+      } catch (error) {
+        // Rust command failed — fall through to JS transaction
+        console.error("Rust atomic save failed, falling back to JS:", error);
+      }
+    }
+
+    // Fallback: JS transaction (non-atomic but functional)
     await this.executor.transaction(async (tx) => {
       await tx.execute("DELETE FROM review_logs");
       await tx.execute("DELETE FROM study_sessions");
@@ -200,8 +222,8 @@ class SqliteRecallRepository implements RecallRepository {
 
       for (const deck of snapshot.decks.map(deckToRow)) {
         await tx.execute(
-          "INSERT INTO decks (id, name, description, color, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
-          [deck.id, deck.name, deck.description, deck.color, deck.created_at, deck.updated_at],
+          "INSERT INTO decks (id, name, description, color, exam_deadline, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          [deck.id, deck.name, deck.description, deck.color, deck.exam_deadline, deck.created_at, deck.updated_at],
         );
       }
 
@@ -261,6 +283,43 @@ class SqliteRecallRepository implements RecallRepository {
   async recordReview(updatedCard: Card, reviewLog: ReviewLog, session: StudySession | null): Promise<void> {
     const cardRow = cardToRow(updatedCard);
     const logRow = reviewLogToRow(reviewLog);
+
+    // Try Rust atomic command first (truly atomic with real transactions)
+    if (isTauriRuntime()) {
+      try {
+        const { invoke } = await import("@tauri-apps/api/core");
+        const sessionRow = session ? studySessionToRow(session) : null;
+        await invoke("record_review_atomic", {
+          data: {
+            card_id: cardRow.id,
+            state: cardRow.state,
+            last_review_date: cardRow.last_review_date,
+            next_review_date: cardRow.next_review_date,
+            stability: cardRow.stability,
+            difficulty: cardRow.difficulty,
+            elapsed_days: cardRow.elapsed_days,
+            scheduled_days: cardRow.scheduled_days,
+            reps: cardRow.reps,
+            lapses: cardRow.lapses,
+            updated_at: cardRow.updated_at,
+            review_log_id: logRow.id,
+            review_card_id: logRow.card_id,
+            rating: logRow.rating,
+            review_date: logRow.review_date,
+            review_stability: logRow.stability,
+            review_difficulty: logRow.difficulty,
+            review_elapsed_days: logRow.elapsed_days,
+            review_scheduled_days: logRow.scheduled_days,
+            session: sessionRow,
+          },
+        });
+        return;
+      } catch (error) {
+        console.error("Rust atomic recordReview failed, falling back to JS:", error);
+      }
+    }
+
+    // Fallback: JS transaction (non-atomic but functional)
     await this.executor.transaction(async (tx) => {
       await tx.execute(
         `UPDATE cards SET state=?, last_review_date=?, next_review_date=?,
@@ -299,6 +358,18 @@ class SqliteRecallRepository implements RecallRepository {
   async replaceDataFromImport(payload: RecallExportPayload): Promise<RecallStateSnapshot> {
     const snapshot = exportPayloadToSnapshot(payload);
     validateImportSnapshot(snapshot);
+
+    // Create safety backup before destructive import
+    if (isTauriRuntime()) {
+      try {
+        const { invoke } = await import("@tauri-apps/api/core");
+        const backupPath = await invoke<string>("create_safety_backup");
+        console.info("Safety backup created:", backupPath);
+      } catch (error) {
+        console.warn("Safety backup failed (continuing with import):", error);
+      }
+    }
+
     await this.saveSnapshot(snapshot);
     return snapshot;
   }

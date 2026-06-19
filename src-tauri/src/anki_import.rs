@@ -12,8 +12,18 @@ pub struct AnkiCard {
     pub tags: Vec<String>,
 }
 
+#[derive(Serialize)]
+pub struct AnkiImportReport {
+    pub cards: Vec<AnkiCard>,
+    pub notes_detected: usize,
+    pub cards_detected: usize,
+    pub cards_imported: usize,
+    pub unsupported_models: usize,
+    pub warnings: Vec<String>,
+}
+
 /// Parse deck name mappings from the col table's decks JSON blob (Anki 2.1+ format).
-/// Returns a map of deck_id -> deck_name.
+/// Returns a map of deck_id -> deck_name. Preserves full deck paths (e.g. "Japanese::Vocabulary::N5").
 fn parse_deck_map(conn: &rusqlite::Connection) -> Result<HashMap<String, String>, String> {
     let mut deck_map = HashMap::new();
 
@@ -29,10 +39,8 @@ fn parse_deck_map(conn: &rusqlite::Connection) -> Result<HashMap<String, String>
         if let Ok(decks) = serde_json::from_str::<HashMap<String, serde_json::Value>>(&json_str) {
             for (id, deck_obj) in decks {
                 if let Some(name) = deck_obj.get("name").and_then(|v| v.as_str()) {
-                    // Anki uses "::" as separator for nested decks (e.g., "Japanese::Vocabulary::N5")
-                    // We flatten to the leaf name for simplicity
-                    let flat_name = name.split("::").last().unwrap_or(name);
-                    deck_map.insert(id, flat_name.to_string());
+                    // Preserve full deck path for accurate hierarchy
+                    deck_map.insert(id, name.to_string());
                 }
             }
         }
@@ -41,9 +49,14 @@ fn parse_deck_map(conn: &rusqlite::Connection) -> Result<HashMap<String, String>
     Ok(deck_map)
 }
 
-/// Try to parse cards using the modern Anki 2.1+ format (col table with deck JSON).
-fn parse_anki21(conn: &rusqlite::Connection) -> Result<Vec<AnkiCard>, String> {
+/// Parse with note count for reporting.
+fn parse_anki21_with_count(conn: &rusqlite::Connection) -> Result<(Vec<AnkiCard>, usize), String> {
     let deck_map = parse_deck_map(conn)?;
+
+    // Count total notes for reporting
+    let notes_count: usize = conn
+        .query_row("SELECT COUNT(*) FROM notes", [], |row| row.get(0))
+        .unwrap_or(0);
 
     let mut stmt = conn
         .prepare(
@@ -84,11 +97,15 @@ fn parse_anki21(conn: &rusqlite::Connection) -> Result<Vec<AnkiCard>, String> {
         result.push(card.map_err(|e| e.to_string())?);
     }
 
-    Ok(result)
+    Ok((result, notes_count))
 }
 
-/// Try to parse cards using the legacy Anki 2.0 format (separate decks table).
-fn parse_anki20(conn: &rusqlite::Connection) -> Result<Vec<AnkiCard>, String> {
+/// Parse with note count for reporting.
+fn parse_anki20_with_count(conn: &rusqlite::Connection) -> Result<(Vec<AnkiCard>, usize), String> {
+    let notes_count: usize = conn
+        .query_row("SELECT COUNT(*) FROM notes", [], |row| row.get(0))
+        .unwrap_or(0);
+
     let mut stmt = conn
         .prepare(
             "SELECT DISTINCT n.flds, n.tags, d.name
@@ -122,15 +139,34 @@ fn parse_anki20(conn: &rusqlite::Connection) -> Result<Vec<AnkiCard>, String> {
         result.push(card.map_err(|e| e.to_string())?);
     }
 
-    Ok(result)
+    Ok((result, notes_count))
 }
 
-#[tauri::command]
-pub async fn parse_anki_apkg(file_path: String) -> Result<Vec<AnkiCard>, String> {
-    let temp_dir = tempdir().map_err(|e| e.to_string())?;
+/// Maximum allowed .apkg file size (500MB compressed).
+const MAX_APKG_SIZE: u64 = 500 * 1024 * 1024;
 
-    let file = File::open(&file_path).map_err(|e| e.to_string())?;
-    let mut archive = ZipArchive::new(file).map_err(|e| e.to_string())?;
+/// Maximum allowed uncompressed SQLite DB size (2GB).
+const MAX_DB_SIZE: u64 = 2 * 1024 * 1024 * 1024;
+
+/// Maximum number of cards to import.
+const MAX_CARDS: usize = 100_000;
+
+#[tauri::command]
+pub async fn parse_anki_apkg(file_path: String) -> Result<AnkiImportReport, String> {
+    let file = File::open(&file_path).map_err(|e| format!("Cannot open file: {}", e))?;
+
+    // Zip-bomb guard: check compressed size
+    let metadata = file.metadata().map_err(|e| e.to_string())?;
+    if metadata.len() > MAX_APKG_SIZE {
+        return Err(format!(
+            "Anki file too large ({}MB). Maximum is {}MB.",
+            metadata.len() / 1024 / 1024,
+            MAX_APKG_SIZE / 1024 / 1024,
+        ));
+    }
+
+    let temp_dir = tempdir().map_err(|e| e.to_string())?;
+    let mut archive = ZipArchive::new(file).map_err(|e| format!("Invalid zip: {}", e))?;
 
     // Try collection.anki21 first (Anki 2.1+), fall back to collection.anki2 (legacy)
     let has_anki21 = archive.by_name("collection.anki21").is_ok();
@@ -144,17 +180,64 @@ pub async fn parse_anki_apkg(file_path: String) -> Result<Vec<AnkiCard>, String>
         .by_name(collection_name)
         .map_err(|_| "Invalid .apkg: missing collection.anki21 or collection.anki2".to_string())?;
 
+    // Check uncompressed size
+    let uncompressed_size = collection_entry.size();
+    if uncompressed_size > MAX_DB_SIZE {
+        return Err(format!(
+            "Anki database too large ({}MB uncompressed). Maximum is {}MB.",
+            uncompressed_size / 1024 / 1024,
+            MAX_DB_SIZE / 1024 / 1024,
+        ));
+    }
+
     let db_path = temp_dir.path().join(collection_name);
     let mut db_file = File::create(&db_path).map_err(|e| e.to_string())?;
     std::io::copy(&mut collection_entry, &mut db_file).map_err(|e| e.to_string())?;
 
     let conn = rusqlite::Connection::open(&db_path).map_err(|e| e.to_string())?;
 
+    let mut warnings = Vec::new();
+
     // Try Anki 2.1+ format first (col table with deck JSON), fall back to legacy (decks table)
-    match parse_anki21(&conn) {
-        Ok(cards) if !cards.is_empty() => Ok(cards),
-        _ => parse_anki20(&conn),
+    let (cards, notes_detected) = match parse_anki21_with_count(&conn) {
+        Ok((cards, count)) if !cards.is_empty() => (cards, count),
+        _ => match parse_anki20_with_count(&conn) {
+            Ok((cards, count)) => (cards, count),
+            Err(e) => return Err(e),
+        },
+    };
+
+    let cards_detected = cards.len();
+    let mut imported_cards = cards;
+
+    if imported_cards.len() > MAX_CARDS {
+        warnings.push(format!(
+            "Truncated: {} cards found but maximum is {}. Only first {} imported.",
+            imported_cards.len(),
+            MAX_CARDS,
+            MAX_CARDS,
+        ));
+        imported_cards.truncate(MAX_CARDS);
     }
+
+    let cards_imported = imported_cards.len();
+
+    // Check for multi-template notes (we only import first field / first card per note)
+    if notes_detected > 0 && cards_imported < notes_detected {
+        warnings.push(format!(
+            "{} notes detected but only {} cards imported. Multi-template cards are not yet supported.",
+            notes_detected, cards_imported,
+        ));
+    }
+
+    Ok(AnkiImportReport {
+        cards: imported_cards,
+        notes_detected,
+        cards_detected,
+        cards_imported,
+        unsupported_models: 0, // Would require parsing col.models
+        warnings,
+    })
 }
 
 #[cfg(test)]
@@ -204,20 +287,21 @@ mod tests {
     fn test_parse_deck_map_flattens_nested_names() {
         let conn = setup_anki21_conn();
         let map = parse_deck_map(&conn).unwrap();
-        assert_eq!(map.get("12345").unwrap(), "N5");
+        assert_eq!(map.get("12345").unwrap(), "Japanese::Vocabulary::N5");
         assert_eq!(map.get("67890").unwrap(), "Math");
     }
 
     #[test]
     fn test_parse_anki21_extracts_cards_with_deck_resolution() {
         let conn = setup_anki21_conn();
-        let cards = parse_anki21(&conn).unwrap();
+        let (cards, count) = parse_anki21_with_count(&conn).unwrap();
 
         assert_eq!(cards.len(), 2);
+        assert_eq!(count, 2); // 2 notes inserted
 
         // Card 1: Japanese deck, front/back split by \x1f, tags parsed
         let c1 = cards.iter().find(|c| c.front == "Hello").unwrap();
-        assert_eq!(c1.deck_name, "N5");
+        assert_eq!(c1.deck_name, "Japanese::Vocabulary::N5");
         assert_eq!(c1.back, "こんにちは");
         assert_eq!(c1.tags, vec!["vocab", "jlpt"]);
 

@@ -1,6 +1,7 @@
 import { open } from "@tauri-apps/plugin-dialog";
 import { toast } from "sonner";
 import { parseAnkiApkg } from "@/services/anki-import";
+import type { AnkiCard } from "@/services/anki-import";
 import { useRecallStore } from "@/stores/recall-store";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Check, FileWarning, Layers, Tag, Upload, X } from "lucide-react";
+import { AlertTriangle, Check, FileWarning, Layers, Tag, Upload, X } from "lucide-react";
 
 interface ImportReport {
   deckName: string;
@@ -24,6 +25,8 @@ interface ImportReport {
   failed: number;
   cardTypes: { basic: number; cloze: number };
   tags: string[];
+  warnings: string[];
+  decksCreated: string[];
 }
 
 export function AnkiImportDialog(): JSX.Element {
@@ -71,7 +74,8 @@ export function AnkiImportDialog(): JSX.Element {
 
     setIsImporting(true);
     try {
-      const ankiCards = await parseAnkiApkg(selectedFile);
+      const ankiReport = await parseAnkiApkg(selectedFile);
+      const ankiCards = ankiReport.cards;
 
       if (ankiCards.length === 0) {
         toast.error("No cards found. Make sure you selected a valid Anki .apkg file (not .colpkg)");
@@ -79,60 +83,76 @@ export function AnkiImportDialog(): JSX.Element {
         return;
       }
 
-      const newDeckId = await createDeck({
-        name: deckName.trim(),
-        description: `Imported from Anki on ${new Date().toLocaleDateString()}`,
-        color: "blue",
-      });
+      // Group cards by deck_name (preserves Anki hierarchy)
+      const cardsByDeck = new Map<string, AnkiCard[]>();
+      for (const card of ankiCards) {
+        const deck = card.deck_name || deckName.trim();
+        if (!cardsByDeck.has(deck)) cardsByDeck.set(deck, []);
+        cardsByDeck.get(deck)!.push(card);
+      }
 
       let imported = 0;
       let failed = 0;
       let basicCount = 0;
       let clozeCount = 0;
       const tagSet = new Set<string>();
+      const decksCreated: string[] = [];
 
-      for (const ankiCard of ankiCards) {
-        try {
-          await createCard({
-            deckId: newDeckId,
-            front: ankiCard.front.trim(),
-            back: ankiCard.back.trim(),
-            hint: "",
-            source: "",
-            tags: ankiCard.tags.filter((t) => t.trim() !== ""),
-          });
-          imported++;
+      // Create decks and import cards per deck
+      for (const [ankiDeckName, deckCards] of cardsByDeck) {
+        const resolvedName = cardsByDeck.size === 1
+          ? deckName.trim()
+          : `${deckName.trim()} :: ${ankiDeckName}`;
 
-          // Detect card type
-          if (/\{\{c\d+::[^}]+\}\}/.test(ankiCard.front)) {
-            clozeCount++;
-          } else {
-            basicCount++;
+        const newDeckId = await createDeck({
+          name: resolvedName,
+          description: `Imported from Anki on ${new Date().toLocaleDateString()}`,
+          color: "blue",
+        });
+        decksCreated.push(resolvedName);
+
+        for (const ankiCard of deckCards) {
+          try {
+            await createCard({
+              deckId: newDeckId,
+              front: ankiCard.front.trim(),
+              back: ankiCard.back.trim(),
+              hint: "",
+              source: "",
+              tags: ankiCard.tags.filter((t) => t.trim() !== ""),
+            });
+            imported++;
+
+            if (/\{\{c\d+::[^}]+\}\}/.test(ankiCard.front)) {
+              clozeCount++;
+            } else {
+              basicCount++;
+            }
+
+            for (const t of ankiCard.tags) {
+              if (t.trim()) tagSet.add(t.trim());
+            }
+          } catch (err) {
+            console.error("Failed to create card:", err);
+            failed++;
           }
-
-          // Collect tags
-          for (const t of ankiCard.tags) {
-            if (t.trim()) tagSet.add(t.trim());
-          }
-        } catch (err) {
-          console.error("Failed to create card:", err);
-          failed++;
         }
       }
 
       setReport({
         deckName: deckName.trim(),
-        totalFound: ankiCards.length,
+        totalFound: ankiReport.cards_detected,
         imported,
         failed,
         cardTypes: { basic: basicCount, cloze: clozeCount },
         tags: [...tagSet].sort(),
+        warnings: ankiReport.warnings,
+        decksCreated,
       });
     } catch (error) {
       console.error("Anki import failed:", error);
       const message = error instanceof Error ? error.message : "Unknown error";
       
-      // Provide specific guidance based on common error patterns
       if (message.includes("sqlite") || message.includes("database")) {
         toast.error("Could not read Anki file. The file may be corrupted or from an unsupported Anki version");
       } else if (message.includes("not found") || message.includes("ENOENT")) {
@@ -278,6 +298,43 @@ export function AnkiImportDialog(): JSX.Element {
                     </span>
                   )}
                 </div>
+              </div>
+            )}
+
+            {report.decksCreated.length > 1 && (
+              <div>
+                <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 mb-2">
+                  <Layers className="h-3 w-3" />
+                  Decks created ({report.decksCreated.length})
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {report.decksCreated.slice(0, 8).map((d) => (
+                    <span key={d} className="rounded bg-blue-50 dark:bg-blue-950/30 px-2 py-0.5 text-xs text-blue-700 dark:text-blue-400">
+                      {d}
+                    </span>
+                  ))}
+                  {report.decksCreated.length > 8 && (
+                    <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                      +{report.decksCreated.length - 8} more
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {report.warnings.length > 0 && (
+              <div className="rounded-md bg-amber-50 border border-amber-200 p-3 dark:bg-amber-950/20 dark:border-amber-900">
+                <div className="flex items-center gap-1 text-xs font-semibold text-amber-700 dark:text-amber-400 mb-2">
+                  <AlertTriangle className="h-3 w-3" />
+                  Warnings
+                </div>
+                <ul className="space-y-1">
+                  {report.warnings.map((w, i) => (
+                    <li key={i} className="text-xs text-amber-600 dark:text-amber-400/80">
+                      {w}
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
           </div>
