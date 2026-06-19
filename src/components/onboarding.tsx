@@ -2,6 +2,7 @@ import { BookCheck, Brain, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRecallStore } from "@/stores/recall-store";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export function Onboarding(): JSX.Element {
   const completeOnboarding = useRecallStore((state) => state.completeOnboarding);
@@ -14,11 +15,21 @@ export function Onboarding(): JSX.Element {
   }, []);
 
   async function handleTryDemo(): Promise<void> {
-    await completeOnboarding();
+    try {
+      await completeOnboarding();
+    } catch (error) {
+      console.error("Failed to complete onboarding:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to load demo cards");
+    }
   }
 
   async function handleStartFresh(): Promise<void> {
-    await startFresh();
+    try {
+      await startFresh();
+    } catch (error) {
+      console.error("Failed to start fresh:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to reset data");
+    }
   }
 
   return (
