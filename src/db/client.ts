@@ -46,33 +46,12 @@ async function createTauriSqlExecutor(): Promise<SqlExecutor | null> {
       await database.execute(sql, params);
     },
     async transaction<T>(callback: (tx: SqlExecutor) => Promise<T>) {
-      // Retry up to 3 times on SQLITE_BUSY to handle contention with Rust-side migrations
-      for (let attempt = 0; attempt < 3; attempt++) {
-        try {
-          // Use DEFERRED instead of IMMEDIATE — DEFERRED only acquires write lock when needed,
-          // allowing better concurrency with Rust-side read operations
-          await database.execute("BEGIN DEFERRED");
-          try {
-            const result = await callback(executor);
-            await database.execute("COMMIT");
-            return result;
-          } catch (error) {
-            await database.execute("ROLLBACK");
-            throw error;
-          }
-        } catch (error) {
-          const msg = error instanceof Error ? error.message : String(error);
-          // SQLITE_BUSY (code 5) or nested transaction (code 1) — wait and retry
-          if ((msg.includes("code: 5") || msg.includes("code: 1")) && attempt < 2) {
-            await new Promise((r) => setTimeout(r, 100 * (attempt + 1)));
-            // Try to reset any stuck transaction state
-            try { await database.execute("ROLLBACK"); } catch { /* ignore */ }
-            continue;
-          }
-          throw error;
-        }
-      }
-      throw new Error("Transaction failed after 3 retries (database busy)");
+      // Don't use explicit BEGIN/COMMIT/ROLLBACK — the tauri_plugin_sql plugin
+      // shares the database connection with Rust, and Rust's migrations leave
+      // transaction state on the connection. Just execute statements directly;
+      // SQLite runs each statement in its own implicit transaction.
+      // This is less atomic but avoids connection state conflicts.
+      return callback(executor);
     },
   };
 
