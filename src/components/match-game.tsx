@@ -36,6 +36,9 @@ function buildTiles(cards: Card[]): MatchTile[] {
   return tiles.sort(() => Math.random() - 0.5);
 }
 
+// Visual feedback types for match/mismatch (for deaf users)
+type FeedbackType = "match" | "mismatch" | null;
+
 export function MatchGame(): JSX.Element {
   const _allCards = useRecallStore((state) => state.cards);
   const settings = useRecallStore((state) => state.settings);
@@ -63,9 +66,20 @@ export function MatchGame(): JSX.Element {
   const [moves, setMoves] = useState(0);
   const [gameCards, setGameCards] = useState<Card[]>([]);
   const [xpEarned, setXpEarned] = useState(0);
+  // Visual feedback for deaf users (replaces audio-only match/mismatch sounds)
+  const [feedback, setFeedback] = useState<FeedbackType>(null);
+  const [announcement, setAnnouncement] = useState("");
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const xpAwarded = useRef(false);
+
+  // Auto-dismiss visual feedback
+  useEffect(() => {
+    if (feedback) {
+      const timer = setTimeout(() => setFeedback(null), 400);
+      return () => clearTimeout(timer);
+    }
+  }, [feedback]);
 
   const startGame = useCallback(() => {
     // Clean up any running state
@@ -125,6 +139,8 @@ export function MatchGame(): JSX.Element {
     // Match: same card, different sides
     if (first.cardId === second.cardId && first.side !== second.side) {
       playMatchSound();
+      setFeedback("match");
+      setAnnouncement(`Matched! ${matchedPairs + 1} of ${totalPairs} pairs found.`);
       setMatched((prev) => new Set([...prev, first.id, second.id]));
       setSelected(null);
 
@@ -135,6 +151,7 @@ export function MatchGame(): JSX.Element {
         if (intervalRef.current) clearInterval(intervalRef.current);
         setRunning(false);
         setFinished(true);
+        setAnnouncement(`All ${totalPairs} pairs matched in ${formatTime(elapsed)} with ${moves + 1} moves!`);
 
         // Big confetti
         confetti({
@@ -174,6 +191,8 @@ export function MatchGame(): JSX.Element {
     } else {
       // No match — shake
       playMismatchSound();
+      setFeedback("mismatch");
+      setAnnouncement("Not a match. Try again.");
       setShaking(new Set([first.id, second.id]));
       timeoutRef.current = setTimeout(() => {
         setShaking(new Set());
@@ -198,40 +217,55 @@ export function MatchGame(): JSX.Element {
   }
 
   return (
-    <div className="flex min-h-[88vh] flex-col">
+    <div className="flex min-h-[88vh] flex-col relative">
+      {/* Visual feedback overlay for deaf users */}
+      {feedback && (
+        <div
+          className={`pointer-events-none fixed inset-0 z-50 transition-opacity duration-300 ${
+            feedback === "match" ? "bg-emerald-500/10" : "bg-red-500/10"
+          }`}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Screen reader announcements */}
+      <div className="sr-only" role="status" aria-live="polite">
+        {announcement}
+      </div>
+
       {/* Header */}
       <header className="flex items-center justify-between pb-4">
-        <Button variant="ghost" onClick={showDashboard}>
-          <ArrowLeft className="h-4 w-4" />
+        <Button variant="ghost" onClick={showDashboard} aria-label="Exit match game">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           Exit
         </Button>
 
-        <div className="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-400">
-          <span className="flex items-center gap-1">
-            <Clock className="h-4 w-4" />
+        <div className="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-400" role="group" aria-label="Game stats">
+          <span className="flex items-center gap-1" aria-label={`Time elapsed: ${formatTime(elapsed)}`}>
+            <Clock className="h-4 w-4" aria-hidden="true" />
             {formatTime(elapsed)}
           </span>
-          <span className="flex items-center gap-1">
-            <Check className="h-4 w-4" />
+          <span className="flex items-center gap-1" aria-label={`${matchedPairs} of ${totalPairs} pairs matched`}>
+            <Check className="h-4 w-4" aria-hidden="true" />
             {matchedPairs}/{totalPairs}
           </span>
-          <span className="flex items-center gap-1">
-            <Zap className="h-4 w-4" />
+          <span className="flex items-center gap-1" aria-label={`${moves} moves made`}>
+            <Zap className="h-4 w-4" aria-hidden="true" />
             {moves} moves
           </span>
         </div>
 
-        <Button variant="outline" size="sm" onClick={startGame}>
-          <RotateCcw className="h-4 w-4 mr-1" />
+        <Button variant="outline" size="sm" onClick={startGame} aria-label="Restart game">
+          <RotateCcw className="h-4 w-4 mr-1" aria-hidden="true" />
           Restart
         </Button>
       </header>
 
       {/* Finished overlay */}
       {finished && (
-        <div className="mb-6 rounded-lg border bg-emerald-500/10 border-emerald-500/30 p-6 text-center">
+        <div className="mb-6 rounded-lg border bg-emerald-500/10 border-emerald-500/30 p-6 text-center" role="alert">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-500">
-            <Check className="h-6 w-6" />
+            <Check className="h-6 w-6" aria-hidden="true" />
           </div>
           <h2 className="mt-3 text-xl font-bold">All matched!</h2>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -250,7 +284,7 @@ export function MatchGame(): JSX.Element {
 
       {/* Tile grid */}
       <div className="flex-1 flex items-start justify-center pt-2">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 w-full max-w-4xl">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 w-full max-w-4xl" role="group" aria-label="Match game tiles">
           {tiles.map((tile) => {
             const isMatched = matched.has(tile.id);
             const isShaking = shaking.has(tile.id);
@@ -262,6 +296,11 @@ export function MatchGame(): JSX.Element {
                 key={tile.id}
                 onClick={() => handleTileClick(tile.id)}
                 disabled={isMatched}
+                aria-label={`${isFront ? "Question" : "Answer"}: ${tile.text}. ${
+                  isMatched ? "Already matched" : isSelected ? "Currently selected" : ""
+                }`}
+                aria-selected={isSelected}
+                aria-disabled={isMatched}
                 className={cn(
                   "min-h-[90px] rounded-lg border p-3 text-sm font-medium transition-all duration-200 text-left",
                   "hover:shadow-sm active:scale-[0.97]",

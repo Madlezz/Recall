@@ -197,8 +197,8 @@ export function DeckDetail(): JSX.Element {
     <div className="animate-fade-in space-y-7">
       {/* ── Top bar ── */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Button variant="ghost" onClick={showDashboard}>
-          <ArrowLeft className="h-4 w-4" />
+        <Button variant="ghost" onClick={showDashboard} aria-label="Back to dashboard">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           Dashboard
         </Button>
         <div className="flex flex-wrap gap-2">
@@ -206,32 +206,32 @@ export function DeckDetail(): JSX.Element {
             deck={deck}
             trigger={
               <Button variant="outline">
-                <Edit3 className="h-4 w-4" />
+                <Edit3 className="h-4 w-4" aria-hidden="true" />
                 Edit
               </Button>
             }
           />
           <Button variant="outline" onClick={handleExport}>
-            <Download className="h-4 w-4" />
+            <Download className="h-4 w-4" aria-hidden="true" />
             Export JSON
           </Button>
           <Button variant="outline" onClick={() => void handleExportRecall()}>
-            <PackageOpen className="h-4 w-4" />
+            <PackageOpen className="h-4 w-4" aria-hidden="true" />
             Export .recall
           </Button>
           <Button
             variant="outline"
             onClick={() => setQualityWarnings(checkDeckQuality(deckCards).warnings)}
           >
-            <ShieldCheck className="h-4 w-4" />
+            <ShieldCheck className="h-4 w-4" aria-hidden="true" />
             Check Quality
           </Button>
           <Button variant="outline" onClick={() => setShowCustomStudy(true)}>
-            <Beaker className="h-4 w-4" />
+            <Beaker className="h-4 w-4" aria-hidden="true" />
             Custom Study
           </Button>
           <Button variant="outline" onClick={() => setShowCsvImport(true)}>
-            <FileSpreadsheet className="h-4 w-4" />
+            <FileSpreadsheet className="h-4 w-4" aria-hidden="true" />
             CSV Import
           </Button>
           <MarkdownImportDialog deckId={currentDeckId} />
@@ -278,12 +278,12 @@ export function DeckDetail(): JSX.Element {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button size="lg" onClick={handleStudyNow}>
-              <Play className="h-4 w-4" />
+            <Button size="lg" onClick={handleStudyNow} aria-label="Start studying this deck">
+              <Play className="h-4 w-4" aria-hidden="true" />
               Study Now
             </Button>
-            <Button size="lg" variant="outline" onClick={() => startMatch(currentDeckId)}>
-              <Brain className="h-4 w-4" />
+            <Button size="lg" variant="outline" onClick={() => startMatch(currentDeckId)} aria-label="Play match game with this deck">
+              <Brain className="h-4 w-4" aria-hidden="true" />
               Match Game
             </Button>
           </div>

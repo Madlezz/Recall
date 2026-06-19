@@ -87,6 +87,7 @@ All audio feedback has a visual counterpart for users who are deaf or have heari
 
 - **Study mode**: When you rate a card, a brief color-coded flash appears (red for Again, amber for Hard, green for Good, blue for Easy)
 - **Focus timer completion**: Timer ring glows green and displays "done!" text when the session ends
+- **Match game**: Green flash for correct match, red flash for mismatch. Screen reader announces match progress.
 
 ### Reduced Motion
 

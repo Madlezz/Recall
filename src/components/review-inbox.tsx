@@ -42,10 +42,10 @@ export function ReviewInbox(): JSX.Element {
 
   if (totalDue === 0 && overdue === 0 && leech === 0) {
     return (
-      <div className="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-5 py-4 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-5 py-4 dark:border-zinc-800 dark:bg-zinc-900" role="status" aria-label="No cards due for review">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
-            <RotateCw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            <RotateCw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
           </div>
           <div>
             <div className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">All caught up</div>
@@ -57,7 +57,7 @@ export function ReviewInbox(): JSX.Element {
   }
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900" role="region" aria-label="Review inbox">
       <div className="flex items-center justify-between px-5 py-4">
         <div>
           <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Review Inbox</h3>
@@ -65,8 +65,8 @@ export function ReviewInbox(): JSX.Element {
             {totalDue} cards ready · ~{estimatedMin} min
           </p>
         </div>
-        <Button onClick={handleStartReview} className="gap-2">
-          <RotateCw className="h-4 w-4" />
+        <Button onClick={handleStartReview} className="gap-2" aria-label={`Start review: ${totalDue} cards due, about ${estimatedMin} minutes`}>
+          <RotateCw className="h-4 w-4" aria-hidden="true" />
           Start
         </Button>
       </div>
@@ -90,10 +90,10 @@ export function ReviewInbox(): JSX.Element {
       </div>
 
       {overdue > 0 && (
-        <div className="flex items-center gap-2 border-t border-zinc-100 px-5 py-3 text-sm dark:border-zinc-800">
-          <Zap className="h-4 w-4 text-red-500 shrink-0" />
+        <div className="flex items-center gap-2 border-t border-zinc-100 px-5 py-3 text-sm dark:border-zinc-800" role="alert">
+          <Zap className="h-4 w-4 text-red-500 shrink-0" aria-hidden="true" />
           <span className="font-semibold text-red-600 dark:text-red-400">{overdue} overdue</span>
-          <span className="text-zinc-500">— tackle these first</span>
+          <span className="text-zinc-500">, tackle these first</span>
         </div>
       )}
     </div>
@@ -114,8 +114,8 @@ function InboxCell({
   accent?: boolean;
 }): JSX.Element {
   return (
-    <div className="flex flex-col items-center justify-center px-2 py-4 text-center">
-      <Icon className={cn("h-4 w-4 mb-1.5", accent ? "text-red-500" : "text-zinc-400")} />
+    <div className="flex flex-col items-center justify-center px-2 py-4 text-center" aria-label={`${count} ${label} cards, ${sub}`}>
+      <Icon className={cn("h-4 w-4 mb-1.5", accent ? "text-red-500" : "text-zinc-400")} aria-hidden="true" />
       <span className={cn("text-xl font-bold tabular-nums", accent ? "text-red-600" : "text-zinc-800 dark:text-zinc-200")}>
         {count}
       </span>

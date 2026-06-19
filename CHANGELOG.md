@@ -18,6 +18,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Colorblind-safe heatmap: opacity differentiation alongside color, ring on highest activity
 - Comprehensive ARIA landmarks: nav labels, aria-current=page, aria-live announcements
 - Screen reader summaries: heatmap stats, study mode progress, view changes, timer completion
+- Match game accessibility: visual feedback for deaf users (match/mismatch flash), comprehensive tile ARIA labels, aria-live announcements
+- Deck detail: aria-hidden decorative icons, descriptive aria-labels on Study/Match buttons, back navigation label
+- Onboarding: aria-hidden decorative icons, role=region, descriptive button aria-labels
+- Review inbox: aria-hidden icons, descriptive aria-labels on inbox cells, role=alert for overdue section
 
 ### Changed
 - Error messages across all dialogs: specific, actionable guidance
