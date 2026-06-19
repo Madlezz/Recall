@@ -136,7 +136,9 @@ pub fn run() {
             let icon = app.default_window_icon()
                 .cloned()
                 .ok_or_else(|| tauri::Error::AssetNotFound("icons/icon.ico".to_string()))?;
-            let _tray = TrayIconBuilder::with_id("recall-tray")
+
+            // Tray icon: fail-soft (app works without it)
+            match TrayIconBuilder::with_id("recall-tray")
                 .tooltip("Recall — your flashcards, local-first")
                 .icon(icon)
                 .on_tray_icon_event(|tray, event| {
@@ -147,14 +149,22 @@ pub fn run() {
                         }
                     }
                 })
-                .build(app)?;
+                .build(app)
+            {
+                Ok(_) => {}
+                Err(e) => {
+                    eprintln!("Tray icon failed to build (non-fatal): {}", e);
+                }
+            }
 
-                            // Register the global shortcut
-                            if let Ok(shortcut) = "Control+Shift+N".parse::<Shortcut>() {
-                                let _ = app.global_shortcut().register(shortcut);
-                            }
+            // Register the global shortcut: fail-soft with logging
+            if let Ok(shortcut) = "Control+Shift+N".parse::<Shortcut>() {
+                if let Err(e) = app.global_shortcut().register(shortcut) {
+                    eprintln!("Global shortcut registration failed (non-fatal): {}", e);
+                }
+            }
 
-                            Ok(())
+            Ok(())
         })
         .invoke_handler(tauri::generate_handler![parse_anki_apkg, update_tray_tooltip, copy_image_to_recall, save_snapshot_atomic, record_review_atomic, create_safety_backup])
         .run(tauri::generate_context!())
@@ -370,6 +380,87 @@ fn migrations() -> Vec<Migration> {
                                 version: 4,
                                 description: "add_source_to_cards",
                                 sql: "ALTER TABLE cards ADD COLUMN source TEXT DEFAULT '';",
+                                kind: MigrationKind::Up,
+                            },
+                            Migration {
+                                version: 5,
+                                description: "add_check_constraints",
+                                sql: r#"
+                                -- SQLite doesn't support ALTER TABLE ADD CONSTRAINT.
+                                -- We rebuild tables with CHECK constraints using the standard
+                                -- rename-recreate-copy pattern. Data is preserved.
+
+                                -- Decks: constrain color enum
+                                ALTER TABLE decks RENAME TO decks_old;
+                                CREATE TABLE decks (
+                                    id TEXT PRIMARY KEY NOT NULL,
+                                    name TEXT NOT NULL CHECK(length(trim(name)) > 0),
+                                    description TEXT DEFAULT '',
+                                    color TEXT DEFAULT 'blue' CHECK(color IN ('rose','amber','green','blue','violet','cyan','orange','pink')),
+                                    exam_deadline TEXT,
+                                    created_at TEXT NOT NULL,
+                                    updated_at TEXT NOT NULL
+                                );
+                                INSERT INTO decks SELECT * FROM decks_old;
+                                DROP TABLE decks_old;
+
+                                -- Cards: constrain state, card_type, numeric ranges
+                                ALTER TABLE cards RENAME TO cards_old;
+                                CREATE TABLE cards (
+                                    id TEXT PRIMARY KEY NOT NULL,
+                                    deck_id TEXT NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+                                    front TEXT NOT NULL CHECK(length(trim(front)) > 0),
+                                    back TEXT NOT NULL,
+                                    hint TEXT DEFAULT '',
+                                    source TEXT DEFAULT '',
+                                    tags TEXT NOT NULL DEFAULT '[]',
+                                    card_type TEXT NOT NULL DEFAULT 'basic' CHECK(card_type IN ('basic','cloze')),
+                                    state TEXT NOT NULL DEFAULT 'new' CHECK(state IN ('new','learning','review','relearning')),
+                                    last_review_date TEXT,
+                                    next_review_date TEXT NOT NULL,
+                                    stability REAL NOT NULL DEFAULT 0 CHECK(stability >= 0),
+                                    difficulty REAL NOT NULL DEFAULT 0 CHECK(difficulty >= 0),
+                                    elapsed_days INTEGER NOT NULL DEFAULT 0 CHECK(elapsed_days >= 0),
+                                    scheduled_days INTEGER NOT NULL DEFAULT 0 CHECK(scheduled_days >= 0),
+                                    reps INTEGER NOT NULL DEFAULT 0 CHECK(reps >= 0),
+                                    lapses INTEGER NOT NULL DEFAULT 0 CHECK(lapses >= 0),
+                                    created_at TEXT NOT NULL,
+                                    updated_at TEXT NOT NULL
+                                );
+                                INSERT INTO cards SELECT * FROM cards_old;
+                                DROP TABLE cards_old;
+                                CREATE INDEX IF NOT EXISTS cards_deck_id_idx ON cards(deck_id);
+                                CREATE INDEX IF NOT EXISTS cards_next_review_date_idx ON cards(next_review_date);
+
+                                -- Review logs: constrain rating enum, numeric ranges
+                                ALTER TABLE review_logs RENAME TO review_logs_old;
+                                CREATE TABLE review_logs (
+                                    id TEXT PRIMARY KEY NOT NULL,
+                                    card_id TEXT NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+                                    rating TEXT NOT NULL CHECK(rating IN ('again','hard','good','easy')),
+                                    review_date TEXT NOT NULL,
+                                    stability REAL NOT NULL CHECK(stability >= 0),
+                                    difficulty REAL NOT NULL CHECK(difficulty >= 0),
+                                    elapsed_days INTEGER NOT NULL CHECK(elapsed_days >= 0),
+                                    scheduled_days INTEGER NOT NULL CHECK(scheduled_days >= 0)
+                                );
+                                INSERT INTO review_logs SELECT * FROM review_logs_old;
+                                DROP TABLE review_logs_old;
+                                CREATE INDEX IF NOT EXISTS review_logs_card_id_idx ON review_logs(card_id);
+
+                                -- Study sessions: constrain cards_studied
+                                ALTER TABLE study_sessions RENAME TO study_sessions_old;
+                                CREATE TABLE study_sessions (
+                                    id TEXT PRIMARY KEY NOT NULL,
+                                    deck_id TEXT REFERENCES decks(id),
+                                    started_at TEXT NOT NULL,
+                                    ended_at TEXT NOT NULL,
+                                    cards_studied INTEGER NOT NULL DEFAULT 0 CHECK(cards_studied >= 0)
+                                );
+                                INSERT INTO study_sessions SELECT * FROM study_sessions_old;
+                                DROP TABLE study_sessions_old;
+                                CREATE INDEX IF NOT EXISTS study_sessions_deck_id_idx ON study_sessions(deck_id);
+                            "#,
                                 kind: MigrationKind::Up,
                             },
                         ]
