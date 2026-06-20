@@ -1,6 +1,6 @@
 [package]
 name = "recall"
-version = "1.0.8"
+version = "1.0.9"
 description = "A minimal, local-first flashcard app for focused learning."
 authors = ["Madlezz"]
 edition = "2021"
@@ -24,3 +24,4 @@ zip = "4"
 tempfile = "3"
 tauri-plugin-notification = "2.3.3"
 tauri-plugin-global-shortcut = "2.3.2"
+tauri-plugin-updater = "2"
