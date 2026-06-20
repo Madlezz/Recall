@@ -383,8 +383,13 @@ pub async fn upsert_deck_atomic(app: tauri::AppHandle, deck: DeckRowData) -> Res
            name=excluded.name, description=excluded.description, color=excluded.color,
            exam_deadline=excluded.exam_deadline, updated_at=excluded.updated_at",
         rusqlite::params![
-            deck.id, deck.name, deck.description, deck.color,
-            deck.exam_deadline, deck.created_at, deck.updated_at,
+            deck.id,
+            deck.name,
+            deck.description,
+            deck.color,
+            deck.exam_deadline,
+            deck.created_at,
+            deck.updated_at,
         ],
     ) {
         let _ = conn.execute_batch("ROLLBACK");
@@ -443,13 +448,19 @@ pub async fn delete_deck_atomic(app: tauri::AppHandle, deck_id: String) -> Resul
         .map_err(|e| format!("BEGIN failed: {}", e))?;
 
     // Delete cards first (foreign key constraint)
-    if let Err(e) = conn.execute("DELETE FROM cards WHERE deck_id = ?1", rusqlite::params![deck_id]) {
+    if let Err(e) = conn.execute(
+        "DELETE FROM cards WHERE deck_id = ?1",
+        rusqlite::params![deck_id],
+    ) {
         let _ = conn.execute_batch("ROLLBACK");
         return Err(format!("DELETE cards for deck '{}' failed: {}", deck_id, e));
     }
 
     // Delete deck
-    if let Err(e) = conn.execute("DELETE FROM decks WHERE id = ?1", rusqlite::params![deck_id]) {
+    if let Err(e) = conn.execute(
+        "DELETE FROM decks WHERE id = ?1",
+        rusqlite::params![deck_id],
+    ) {
         let _ = conn.execute_batch("ROLLBACK");
         return Err(format!("DELETE deck '{}' failed: {}", deck_id, e));
     }
@@ -468,7 +479,10 @@ pub async fn delete_card_atomic(app: tauri::AppHandle, card_id: String) -> Resul
     conn.execute_batch("BEGIN IMMEDIATE")
         .map_err(|e| format!("BEGIN failed: {}", e))?;
 
-    if let Err(e) = conn.execute("DELETE FROM cards WHERE id = ?1", rusqlite::params![card_id]) {
+    if let Err(e) = conn.execute(
+        "DELETE FROM cards WHERE id = ?1",
+        rusqlite::params![card_id],
+    ) {
         let _ = conn.execute_batch("ROLLBACK");
         return Err(format!("DELETE card '{}' failed: {}", card_id, e));
     }
@@ -481,7 +495,10 @@ pub async fn delete_card_atomic(app: tauri::AppHandle, card_id: String) -> Resul
 
 /// Atomically upsert a single setting (insert or update).
 #[tauri::command]
-pub async fn upsert_setting_atomic(app: tauri::AppHandle, setting: SettingRowData) -> Result<(), String> {
+pub async fn upsert_setting_atomic(
+    app: tauri::AppHandle,
+    setting: SettingRowData,
+) -> Result<(), String> {
     let conn = open_db_connection(&app)?;
 
     conn.execute_batch("BEGIN IMMEDIATE")
@@ -560,7 +577,11 @@ pub async fn query_cards(
     // Get total count
     let count_sql = format!("SELECT COUNT(*) FROM cards {}", where_sql);
     let total: i64 = conn
-        .query_row(&count_sql, rusqlite::params_from_iter(params.iter()), |row| row.get(0))
+        .query_row(
+            &count_sql,
+            rusqlite::params_from_iter(params.iter()),
+            |row| row.get(0),
+        )
         .map_err(|e| format!("COUNT query failed: {}", e))?;
 
     // Get paginated results
@@ -572,7 +593,9 @@ pub async fn query_cards(
     params.push(Box::new(limit));
     params.push(Box::new(offset));
 
-    let mut stmt = conn.prepare(&query_sql).map_err(|e| format!("Prepare failed: {}", e))?;
+    let mut stmt = conn
+        .prepare(&query_sql)
+        .map_err(|e| format!("Prepare failed: {}", e))?;
     let cards: Vec<CardRowData> = stmt
         .query_map(rusqlite::params_from_iter(params.iter()), |row| {
             Ok(CardRowData {
