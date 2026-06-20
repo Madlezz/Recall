@@ -13,6 +13,7 @@ import type { SessionSummary } from "@/types";
 export function StudyMode(): JSX.Element {
   const activeStudy = useRecallStore((state) => state.activeStudy);
   const decks = useRecallStore((state) => state.decks);
+  const settings = useRecallStore((state) => state.settings);
   const revealAnswer = useRecallStore((state) => state.revealAnswer);
   const answerCurrentCard = useRecallStore((state) => state.answerCurrentCard);
   const exitStudy = useRecallStore((state) => state.exitStudy);
@@ -258,7 +259,7 @@ export function StudyMode(): JSX.Element {
             <div className="study-card-face absolute inset-0 flex flex-col justify-center rounded-xl border border-zinc-200 bg-white p-10 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
               <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{deck?.name ?? "Review"}</p>
               <div className="mt-5 text-balance text-xl font-semibold leading-relaxed text-zinc-800 dark:text-zinc-200 sm:text-2xl">
-                <RichCard content={card.front} cardType={card.cardType} revealed={activeStudy.revealed} />
+                <RichCard content={card.front} cardType={card.cardType} revealed={activeStudy.revealed} allowHtml={settings?.allowHtml} />
               </div>
               {card.hint && (
                 <p className="mt-6 text-sm text-zinc-400">Hint: {card.hint}</p>
@@ -268,7 +269,7 @@ export function StudyMode(): JSX.Element {
             <div className="study-card-face study-card-back absolute inset-0 flex flex-col justify-center rounded-xl border border-zinc-200 bg-white p-10 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
               <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Answer</p>
               <div className="mt-5 text-balance text-xl font-semibold leading-relaxed text-zinc-800 dark:text-zinc-200 sm:text-2xl">
-                <RichCard content={card.back} isBack />
+                <RichCard content={card.back} isBack allowHtml={settings?.allowHtml} />
               </div>
             </div>
           </div>

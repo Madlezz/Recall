@@ -55,7 +55,11 @@ export function RecallImportDialog({ deckId }: RecallImportDialogProps): JSX.Ele
 
       // Restore images in background
       if (Object.keys(pkg.images).length > 0) {
-        restorePackageImages(pkg.images).catch(() => {
+        restorePackageImages(pkg.images).then((report) => {
+          if (report.warnings.length > 0) {
+            toast.warning(report.warnings[0]);
+          }
+        }).catch(() => {
           // Image restore failures are non-fatal; cards still import
         });
       }

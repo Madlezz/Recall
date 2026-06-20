@@ -69,6 +69,7 @@ export interface RecallSettings {
   dailyGoal: number;
   notificationsEnabled: boolean;
   soundVolume: number; // 0-100
+  allowHtml: boolean; // Render raw HTML in cards (default: false)
   backupFolder: string | null;
   backupSchedule: BackupSchedule;
   lastBackupAt: string | null;

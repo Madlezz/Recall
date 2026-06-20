@@ -17,6 +17,7 @@ interface RichCardProps {
   isBack?: boolean;
   cardType?: CardType;
   revealed?: boolean;
+  allowHtml?: boolean;
 }
 
 function ClozeContent({ content, revealed }: { content: string; revealed: boolean }): JSX.Element {
@@ -46,8 +47,9 @@ function ClozeContent({ content, revealed }: { content: string; revealed: boolea
           <span
             key={i}
             className="inline-flex items-center gap-1 rounded bg-muted px-2 py-0.5 text-base font-bold text-muted-foreground border border-dashed border-muted-foreground/30 min-w-[2.5rem] justify-center"
+            title={seg.hint}
           >
-            [...]
+            [{seg.hint || "..."}]
           </span>
         );
       })}
@@ -89,7 +91,7 @@ function preprocessContent(content: string): string {
   );
 }
 
-export function RichCard({ content, isBack = false, cardType = "basic", revealed = true }: RichCardProps): JSX.Element {
+export function RichCard({ content, isBack = false, cardType = "basic", revealed = true, allowHtml = false }: RichCardProps): JSX.Element {
   // For cloze cards that aren't revealed yet, render blanks inline
   if (cardType === "cloze" && !revealed && !isBack) {
     return (
@@ -116,7 +118,9 @@ export function RichCard({ content, isBack = false, cardType = "basic", revealed
     <div className={`prose prose-invert max-w-none ${isBack ? 'border-t pt-4 mt-4' : ''}`}>
       <ReactMarkdown
         remarkPlugins={[remarkMath, remarkGfm]}
-        rehypePlugins={[rehypeRaw, [rehypeSanitize, {
+        rehypePlugins={[
+          ...(allowHtml ? [rehypeRaw] : []),
+          [rehypeSanitize, {
           // Restrict sanitizer: disallow form elements and interactive HTML in cards
           ...defaultSchema,
           tagNames: defaultSchema.tagNames?.filter(

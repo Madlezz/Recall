@@ -35,6 +35,7 @@ export function exportDeckToJson(deck: Deck, cards: Card[]): string {
           dailyGoal: 20,
           notificationsEnabled: false,
           soundVolume: 100,
+          allowHtml: false,
                     backupFolder: null,
                     backupSchedule: "never" as const,
                     lastBackupAt: null,
@@ -104,6 +105,12 @@ export interface RecallPackage {
 
 const RECALL_IMAGE_RE = /!\[([^\]]*)\]\(recall:\/\/([^)]+)\)/g;
 
+export interface ImageOperationReport {
+  processed: number;
+  failed: string[];
+  warnings: string[];
+}
+
 /** Collect all recall:// image filenames referenced in card content */
 function collectImageRefs(cards: Card[]): string[] {
   const refs = new Set<string>();
@@ -119,10 +126,11 @@ function collectImageRefs(cards: Card[]): string[] {
   return [...refs];
 }
 
-/** Export a deck as a shareable .recall package (JSON with embedded images). Returns JSON string. */
-export async function exportDeckPackage(deck: Deck, cards: Card[]): Promise<string> {
+/** Export a deck as a shareable .recall package (JSON with embedded images). Returns JSON string and image report. */
+export async function exportDeckPackage(deck: Deck, cards: Card[]): Promise<{ json: string; imageReport: ImageOperationReport }> {
   const imageRefs = collectImageRefs(cards);
   const images: Record<string, string> = {};
+  const failed: string[] = [];
 
   // Read images from app data dir and convert to base64
   if (imageRefs.length > 0) {
@@ -140,7 +148,7 @@ export async function exportDeckPackage(deck: Deck, cards: Card[]): Promise<stri
             .join("");
           images[filename] = btoa(binary);
         } catch {
-          // Image file missing — skip
+          failed.push(filename);
         }
       }
     } catch {
@@ -176,7 +184,15 @@ export async function exportDeckPackage(deck: Deck, cards: Card[]): Promise<stri
     images,
   };
 
-  return JSON.stringify(pkg, null, 2);
+  const warnings: string[] = [];
+  if (failed.length > 0) {
+    warnings.push(`${failed.length} image(s) could not be read and were excluded from the export`);
+  }
+
+  return {
+    json: JSON.stringify(pkg, null, 2),
+    imageReport: { processed: Object.keys(images).length, failed, warnings },
+  };
 }
 
 /** Save a .recall package to disk via Tauri save dialog. Returns true on success. */
@@ -251,10 +267,13 @@ export async function openRecallPackage(): Promise<{ pkg: RecallPackage; raw: st
   }
 }
 
-/** Restore embedded images from a .recall package to the app data dir */
-export async function restorePackageImages(images: Record<string, string>): Promise<void> {
+/** Restore embedded images from a .recall package to the app data dir. Returns structured report. */
+export async function restorePackageImages(images: Record<string, string>): Promise<ImageOperationReport> {
   const filenames = Object.keys(images);
-  if (filenames.length === 0) return;
+  if (filenames.length === 0) return { processed: 0, failed: [], warnings: [] };
+
+  const failed: string[] = [];
+  let processed = 0;
 
   try {
     const { appDataDir } = await import("@tauri-apps/api/path");
@@ -271,18 +290,29 @@ export async function restorePackageImages(images: Record<string, string>): Prom
 
     for (const filename of filenames) {
       // Reject path traversal
-      const safe = filename.replace(/[/\\]|\.\./g, "").replace(/[^a-zA-Z0-9_.-]/g, "_");
-      if (!safe) continue;
+      const safe = filename.replace(/[/\\]|\.\\./g, "").replace(/[^a-zA-Z0-9_.-]/g, "_");
+      if (!safe) {
+        failed.push(filename);
+        continue;
+      }
       try {
         const binary = Uint8Array.from(atob(images[filename]), (c) => c.charCodeAt(0));
         await writeFile(`${imagesDir}/${safe}`, binary);
+        processed++;
       } catch {
-        // Skip individual failures
+        failed.push(filename);
       }
     }
   } catch {
     // Browser fallback
   }
+
+  const warnings: string[] = [];
+  if (failed.length > 0) {
+    warnings.push(`${failed.length} image(s) could not be restored: ${failed.slice(0, 3).join(", ")}${failed.length > 3 ? "..." : ""}`);
+  }
+
+  return { processed, failed, warnings };
 }
 
 // --- Existing import logic ---

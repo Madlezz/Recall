@@ -68,6 +68,7 @@ const validSnapshot: RecallStateSnapshot = {
             dailyGoal: 20,
             notificationsEnabled: false,
             soundVolume: 100,
+            allowHtml: false,
                         backupFolder: null,
                         backupSchedule: "never" as const,
                         lastBackupAt: null,

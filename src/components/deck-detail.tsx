@@ -158,9 +158,15 @@ export function DeckDetail(): JSX.Element {
 
   async function handleExportRecall(): Promise<void> {
     try {
-      const json = await exportDeckPackage(d, deckCards);
+      const { json, imageReport } = await exportDeckPackage(d, deckCards);
       const saved = await saveRecallPackage(json, d.name);
-      if (saved) toast.success("Deck exported as .recall package");
+      if (saved) {
+        if (imageReport.warnings.length > 0) {
+          toast.warning(`Deck exported as .recall package (${imageReport.warnings[0]})`);
+        } else {
+          toast.success("Deck exported as .recall package");
+        }
+      }
     } catch {
       toast.error("Could not export .recall package");
     }

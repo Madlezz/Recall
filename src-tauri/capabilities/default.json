@@ -12,15 +12,18 @@
     "dialog:allow-open",
     "dialog:allow-save",
     "fs:default",
-        "fs:allow-read-text-file",
-        "fs:allow-write-text-file",
-        "notification:default",
-        "notification:allow-is-permission-granted",
-                "notification:allow-request-permission",
-                "notification:allow-notify",
-                "core:tray:default",
-                "global-shortcut:default",
-                "global-shortcut:allow-register",
-                "global-shortcut:allow-is-registered"
-          ]
+    "fs:allow-read-text-file",
+    "fs:allow-write-text-file",
+    "fs:allow-read-file",
+    "fs:allow-write-file",
+    "fs:allow-mkdir",
+    "notification:default",
+    "notification:allow-is-permission-granted",
+    "notification:allow-request-permission",
+    "notification:allow-notify",
+    "core:tray:default",
+    "global-shortcut:default",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-is-registered"
+  ]
 }

@@ -81,6 +81,7 @@ describe("database mappers", () => {
       dailyGoal: 20,
       notificationsEnabled: false,
       soundVolume: 100,
+      allowHtml: false,
       backupFolder: null,
       backupSchedule: "never",
       lastBackupAt: null,

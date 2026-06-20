@@ -101,6 +101,40 @@ export function validateImportSnapshot(snapshot: RecallStateSnapshot): void {
     if (!isCardType(card.cardType)) {
       throw new Error("Invalid card type");
     }
+    // Numeric field validation: reject NaN, Infinity, negative counters
+    for (const [field, value] of [
+      ["stability", card.stability],
+      ["difficulty", card.difficulty],
+      ["elapsedDays", card.elapsedDays],
+      ["scheduledDays", card.scheduledDays],
+      ["reps", card.reps],
+      ["lapses", card.lapses],
+    ] as const) {
+      if (typeof value !== "number" || !Number.isFinite(value)) {
+        throw new Error(`Card ${card.id}: ${field} must be a finite number`);
+      }
+      if (["reps", "lapses"].includes(field) && value < 0) {
+        throw new Error(`Card ${card.id}: ${field} cannot be negative`);
+      }
+    }
+    // Date validation: nextReviewDate must be valid ISO
+    if (card.nextReviewDate && isNaN(Date.parse(card.nextReviewDate))) {
+      throw new Error(`Card ${card.id}: invalid nextReviewDate`);
+    }
+    if (card.lastReviewDate && isNaN(Date.parse(card.lastReviewDate))) {
+      throw new Error(`Card ${card.id}: invalid lastReviewDate`);
+    }
+    // Tag count limit
+    if (card.tags.length > 50) {
+      throw new Error(`Card ${card.id}: too many tags (max 50)`);
+    }
+    // Field length limits
+    if (card.front.length > 10000) {
+      throw new Error(`Card ${card.id}: front content exceeds 10,000 characters`);
+    }
+    if (card.back.length > 10000) {
+      throw new Error(`Card ${card.id}: back content exceeds 10,000 characters`);
+    }
     cardIds.add(card.id);
   }
 
@@ -474,6 +508,7 @@ function migrateSettings(settings: Partial<RecallStateSnapshot["settings"]> & { 
     dailyGoal: typeof settings.dailyGoal === "number" ? settings.dailyGoal : 20,
     notificationsEnabled: typeof settings.notificationsEnabled === "boolean" ? settings.notificationsEnabled : false,
         soundVolume: typeof settings.soundVolume === "number" ? settings.soundVolume : 100,
+    allowHtml: typeof settings.allowHtml === "boolean" ? settings.allowHtml : false,
         backupFolder: typeof settings.backupFolder === "string" ? settings.backupFolder : null,
         backupSchedule: (settings.backupSchedule === "daily" || settings.backupSchedule === "weekly") ? settings.backupSchedule : "never",
         lastBackupAt: typeof settings.lastBackupAt === "string" ? settings.lastBackupAt : null,

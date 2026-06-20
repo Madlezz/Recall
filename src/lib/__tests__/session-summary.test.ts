@@ -14,6 +14,7 @@ const defaultSettings: RecallSettings = {
   dailyGoal: 50,
   notificationsEnabled: false,
   soundVolume: 80,
+  allowHtml: false,
   backupFolder: null,
   backupSchedule: "never" as const,
   lastBackupAt: null,
