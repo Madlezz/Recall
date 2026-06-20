@@ -8,11 +8,13 @@ export default defineConfig({
     target: "es2021",
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ["react", "react-dom"],
-          markdown: ["react-markdown", "remark-gfm", "remark-math", "rehype-katex", "rehype-highlight", "rehype-raw"],
-          math: ["katex"],
-          ui: ["@radix-ui/react-dialog", "@radix-ui/react-alert-dialog", "@radix-ui/react-select", "@radix-ui/react-label", "@radix-ui/react-tabs"],
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("react") || id.includes("react-dom")) return "vendor";
+            if (id.includes("react-markdown") || id.includes("remark") || id.includes("rehype") || id.includes("katex")) return "markdown";
+            if (id.includes("katex")) return "math";
+            if (id.includes("@radix-ui")) return "ui";
+          }
         },
       },
     },
