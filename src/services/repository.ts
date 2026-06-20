@@ -561,6 +561,7 @@ function migrateSettings(settings: Partial<RecallStateSnapshot["settings"]> & { 
     notificationsEnabled: typeof settings.notificationsEnabled === "boolean" ? settings.notificationsEnabled : false,
         soundVolume: typeof settings.soundVolume === "number" ? settings.soundVolume : 100,
     allowHtml: typeof settings.allowHtml === "boolean" ? settings.allowHtml : false,
+    desiredRetention: typeof settings.desiredRetention === "number" && settings.desiredRetention >= 0.7 && settings.desiredRetention <= 0.99 ? settings.desiredRetention : 0.9,
         backupFolder: typeof settings.backupFolder === "string" ? settings.backupFolder : null,
         backupSchedule: (settings.backupSchedule === "daily" || settings.backupSchedule === "weekly") ? settings.backupSchedule : "never",
         lastBackupAt: typeof settings.lastBackupAt === "string" ? settings.lastBackupAt : null,

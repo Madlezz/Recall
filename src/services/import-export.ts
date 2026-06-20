@@ -36,6 +36,7 @@ export function exportDeckToJson(deck: Deck, cards: Card[]): string {
           notificationsEnabled: false,
           soundVolume: 100,
           allowHtml: false,
+desiredRetention: 0.9,
                     backupFolder: null,
                     backupSchedule: "never" as const,
                     lastBackupAt: null,

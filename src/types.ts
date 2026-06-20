@@ -70,6 +70,7 @@ export interface RecallSettings {
   notificationsEnabled: boolean;
   soundVolume: number; // 0-100
   allowHtml: boolean; // Render raw HTML in cards (default: false)
+  desiredRetention: number; // 0.70-0.99, FSRS target retention (default: 0.90)
   backupFolder: string | null;
   backupSchedule: BackupSchedule;
   lastBackupAt: string | null;

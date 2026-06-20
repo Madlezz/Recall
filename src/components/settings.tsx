@@ -216,6 +216,20 @@ export function Settings(): JSX.Element {
             <span className="text-sm text-zinc-400">cards/day</span>
           </div>
         </SettingsCard>
+
+        <SettingsCard title="Desired Retention" description="FSRS target retention (0.70–0.99). Higher = more frequent reviews.">
+          <div className="flex items-center gap-3">
+            <input
+              type="range"
+              min="70" max="99"
+              aria-label="Desired retention"
+              value={Math.round(settings.desiredRetention * 100)}
+              onChange={(e) => void updateSettings({ desiredRetention: parseInt(e.target.value, 10) / 100 })}
+              className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-zinc-200 accent-zinc-700 dark:bg-zinc-700 dark:accent-zinc-300"
+            />
+            <span className="w-12 text-right text-sm tabular-nums text-zinc-400" aria-live="polite">{(settings.desiredRetention * 100).toFixed(0)}%</span>
+          </div>
+        </SettingsCard>
       </section>
 
       {/* Notifications */}
@@ -402,10 +416,11 @@ export function Settings(): JSX.Element {
 
 // ── SettingsCard ──
 
-function SettingsCard({ title, children }: { title: string; children: React.ReactNode }): JSX.Element {
+function SettingsCard({ title, description, children }: { title: string; description?: string; children: React.ReactNode }): JSX.Element {
   return (
     <div className="rounded-lg border border-zinc-200 bg-white px-5 py-4 dark:border-zinc-800 dark:bg-zinc-900">
-      <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 mb-3">{title}</h3>
+      <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 mb-1">{title}</h3>
+      {description && <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-3">{description}</p>}
       {children}
     </div>
   );

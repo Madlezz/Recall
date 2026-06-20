@@ -1,7 +1,7 @@
 import { fsrs, Rating, State, Card as FSRSCard } from "ts-fsrs";
 import type { Card, ReviewRating, CardState } from "@/types";
 
-const f = fsrs();
+const DEFAULT_RETENTION = 0.9;
 
 export function getDueCards(cards: Card[], now = new Date()): Card[] {
   return cards
@@ -13,7 +13,8 @@ export function getDueCards(cards: Card[], now = new Date()): Card[] {
     );
 }
 
-export function applyReview(card: Card, rating: ReviewRating, reviewedAt: Date): Card {
+export function applyReview(card: Card, rating: ReviewRating, reviewedAt: Date, desiredRetention = DEFAULT_RETENTION): Card {
+  const f = fsrs({ request_retention: desiredRetention });
   const fsrsRating =
     rating === "again"
       ? Rating.Again
@@ -74,9 +75,10 @@ export function applyReview(card: Card, rating: ReviewRating, reviewedAt: Date):
 
 export function calculateNextReview(
   card: Card,
-  rating: ReviewRating
+  rating: ReviewRating,
+  desiredRetention = DEFAULT_RETENTION
 ): Partial<Card> {
-  const { id: _id, deckId: _deckId, front: _front, back: _back, hint: _hint, tags: _tags, createdAt: _createdAt, ...rest } = applyReview(card, rating, new Date());
+  const { id: _id, deckId: _deckId, front: _front, back: _back, hint: _hint, tags: _tags, createdAt: _createdAt, ...rest } = applyReview(card, rating, new Date(), desiredRetention);
   return rest;
 }
 

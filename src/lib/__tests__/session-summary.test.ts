@@ -15,6 +15,7 @@ const defaultSettings: RecallSettings = {
   notificationsEnabled: false,
   soundVolume: 80,
   allowHtml: false,
+  desiredRetention: 0.9,
   backupFolder: null,
   backupSchedule: "never" as const,
   lastBackupAt: null,

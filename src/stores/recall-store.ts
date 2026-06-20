@@ -296,7 +296,7 @@ export const useRecallStore = create<RecallStore>()((set, get) => {
     if (!card) return;
 
     const reviewedAt = new Date();
-    const updatedCard = applyReview(card, result, reviewedAt);
+    const updatedCard = applyReview(card, result, reviewedAt, state.settings.desiredRetention);
     const reviewLog: ReviewLog = {
       id: createId("review"), cardId,
       rating: result, reviewDate: reviewedAt.toISOString(),

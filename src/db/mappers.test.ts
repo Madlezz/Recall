@@ -82,6 +82,7 @@ describe("database mappers", () => {
       notificationsEnabled: false,
       soundVolume: 100,
       allowHtml: false,
+desiredRetention: 0.9,
       backupFolder: null,
       backupSchedule: "never",
       lastBackupAt: null,
