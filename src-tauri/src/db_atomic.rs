@@ -522,6 +522,7 @@ pub async fn upsert_setting_atomic(
 /// Query cards with DB-side filtering, sorting, and pagination.
 /// Returns paginated results + total count for UI pagination.
 #[tauri::command]
+#[allow(clippy::too_many_arguments)]
 pub async fn query_cards(
     app: tauri::AppHandle,
     deck_id: Option<String>,
