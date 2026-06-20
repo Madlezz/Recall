@@ -34,7 +34,7 @@ This document outlines the planned features and improvements for Recall. Items a
 - [ ] Apple Pencil / stylus support for handwriting
 
 ### Performance & Scale
-- [ ] Database optimization for large decks (10,000+ cards)
+- [ ] Database optimization for large decks (10,000+ cards) *(partial: DB-side queries done in v1.0.8)*
 - [ ] Incremental search indexing
 - [ ] Lazy loading for card browser
 - [ ] Memory optimization for mobile devices
@@ -68,10 +68,18 @@ This document outlines the planned features and improvements for Recall. Items a
 - [x] Keyboard-first navigation
 - [x] Global hotkey for quick-add
 - [x] Multi-platform (Windows, macOS, Linux)
-- [x] Comprehensive test suite (155 tests)
+- [x] Comprehensive test suite (165 tests)
 - [x] CI/CD with automated releases
 - [x] Accessibility documentation and ARIA labels
 - [x] User-friendly error messages across all dialogs
+- [x] Image support in cards (paste or drag-drop)
+- [x] JSON export/import for backup and migration
+- [x] Raw HTML toggle in RichCard
+- [x] Anki cloze hint syntax (`{{c1::answer::hint}}`)
+- [x] Incremental persistence via atomic Rust commands (v1.0.6)
+- [x] Configurable FSRS desired retention slider (v1.0.7)
+- [x] DB-side card query with filtering/sorting/pagination (v1.0.8)
+- [x] Release signing: ed25519 updater keys + SHA256SUMS (v1.0.9)
 
 ## Contributing
 

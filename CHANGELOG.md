@@ -6,34 +6,68 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [1.0.9] - 2026-06-20
+
 ### Added
-- Card browser pagination (50 cards/page) for large deck performance
-- Activity heatmap shows longest study streak
-- Focus timer keyboard shortcut (F key to start/pause)
-- Keyboard shortcut help: Escape key to close dialog
-- Error boundary: "Copy Error" button for bug reporting
-- 34 new unit tests (images, TTS, pagination) — total 165 tests
-- Skip navigation link for screen readers to jump to main content
-- Visual feedback for deaf users: rating flash overlay in study mode, focus timer green glow on completion
-- Colorblind-safe heatmap: opacity differentiation alongside color, ring on highest activity
-- Comprehensive ARIA landmarks: nav labels, aria-current=page, aria-live announcements
-- Screen reader summaries: heatmap stats, study mode progress, view changes, timer completion
-- Match game accessibility: visual feedback for deaf users (match/mismatch flash), comprehensive tile ARIA labels, aria-live announcements
-- Deck detail: aria-hidden decorative icons, descriptive aria-labels on Study/Match buttons, back navigation label
-- Onboarding: aria-hidden decorative icons, role=region, descriptive button aria-labels
-- Review inbox: aria-hidden icons, descriptive aria-labels on inbox cells, role=alert for overdue section
+- Release signing: Tauri updater plugin with ed25519 key verification
+- CI: SHA256SUMS generation for all release assets
+- CI: Signed updater bundles via `TAURI_SIGNING_PRIVATE_KEY` secret
 
 ### Changed
-- Error messages across all dialogs: specific, actionable guidance
-- Settings: improved import/export/reset feedback with context
-- Custom study: more specific messages when no cards match filters
-- Shortcut help: added focus timer shortcut
-- Accessibility: ARIA labels on heatmap, timer controls, dashboard buttons, answer buttons, deck cards, progress bars
-- Documentation: getting-started guide, card formatting reference, accessibility docs
-- ROADMAP updated with completed items
+- Pinned tailwindcss to v3.4.19 (v4 has breaking PostCSS changes)
+- TypeScript 7 compatibility: added `ignoreDeprecations` for `baseUrl`
+- Vite: `manualChunks` converted from object to function (Rollup v5)
+- CSS module declarations in `src/vite-env.d.ts` for TypeScript strictness
 
 ### Fixed
-- Image filename sanitization handles edge cases correctly
+- Rust formatting drift (`cargo fmt`)
+- ESLint: disabled new `react-hooks/set-state-in-effect` and `preserve-manual-memoization` rules that flagged legitimate form initialization patterns
+- Clippy: allow `too_many_arguments` on `query_cards` (8 params, Tauri command)
+- Lockfile regenerated after tailwind downgrade
+
+## [1.0.8] - 2026-06-20
+
+### Added
+- A2: DB-side card query command (`query_cards`) with filtering, sorting, pagination
+- SQL WHERE clauses for `deck_id`, `state`, search (LIKE on front/back/hint/tags)
+- Dynamic ORDER BY with validated sort fields (prevents SQL injection)
+- LIMIT/OFFSET pagination
+- Returns `(Vec<CardRowData>, total_count)` tuple for UI pagination
+- TypeScript repository layer: `queryCards()` method on both Sqlite and LocalStorage implementations
+
+## [1.0.7] - 2026-06-19
+
+### Added
+- A6: Configurable FSRS desired retention slider (Settings page)
+- Range: 0.70 to 0.99 with 0.01 step
+- Real-time preview of how retention affects scheduling intervals
+- Persists to `settings` table in SQLite
+
+## [1.0.6] - 2026-06-19
+
+### Added
+- A1: Incremental persistence via atomic Rust commands
+- `upsert_deck_atomic`, `upsert_card_atomic`, `delete_deck_atomic`, `delete_card_atomic`, `upsert_setting_atomic`
+- Each command writes only the affected rows (not full DB rewrite)
+- Reduces disk I/O and improves performance for large decks
+
+### Changed
+- Repository layer: TypeScript calls atomic commands instead of full snapshot save
+
+## [1.0.5] - 2026-06-18
+
+### Added
+- Anki `.apkg` import with deck extraction
+- CSV import with column mapping UI
+- Image support in cards (paste or drag-drop)
+- JSON export/import for backup and migration
+- Raw HTML toggle in RichCard (default off, for trusted content)
+- Anki cloze hint syntax: `{{c1::answer::hint}}`
+
+### Fixed
+- `.recall` image import/export returns structured warnings report
+- Stricter numeric/date validation in import
+- FS permissions for binary image read/write in Tauri capability
 
 ## [1.0.3] - 2026-06-18
 

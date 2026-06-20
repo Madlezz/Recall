@@ -103,7 +103,7 @@ pnpm dev             # Browser-only preview (no Rust needed)
 ### Testing
 
 ```bash
-pnpm test            # Unit tests (103 tests)
+pnpm test            # Unit tests (165 tests)
 pnpm lint            # ESLint
 pnpm build           # Production build
 pnpm test:e2e        # Playwright E2E (requires `pnpm dev` running first)
