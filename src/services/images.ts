@@ -12,7 +12,7 @@ export async function insertImage(): Promise<string | null> {
   try {
     const { open } = await import("@tauri-apps/plugin-dialog");
     const selected = await open({
-      filters: [{ name: "Images", extensions: ["png", "jpg", "jpeg", "gif", "webp", "svg"] }],
+      filters: [{ name: "Images", extensions: ["png", "jpg", "jpeg", "gif", "webp"] }],
       multiple: false,
     });
     if (!selected) return null;

@@ -28,11 +28,8 @@ fn parse_deck_map(conn: &rusqlite::Connection) -> Result<HashMap<String, String>
     let mut deck_map = HashMap::new();
 
     // Try to read the col table (Anki 2.1+ stores deck metadata as JSON)
-    let decks_json: Result<String, _> = conn.query_row(
-        "SELECT decks FROM col LIMIT 1",
-        [],
-        |row| row.get(0),
-    );
+    let decks_json: Result<String, _> =
+        conn.query_row("SELECT decks FROM col LIMIT 1", [], |row| row.get(0));
 
     if let Ok(json_str) = decks_json {
         // Parse the JSON: it's a map of deck_id -> deck_object
@@ -325,7 +322,7 @@ mod tests {
         )
         .unwrap();
 
-        let cards = parse_anki21(&conn).unwrap();
+        let (cards, _notes_count) = parse_anki21_with_count(&conn).unwrap();
         assert_eq!(cards.len(), 1);
         assert_eq!(cards[0].deck_name, "Default"); // Falls back to Default
     }

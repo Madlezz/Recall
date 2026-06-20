@@ -2,12 +2,12 @@ mod anki_import;
 mod db_atomic;
 
 use anki_import::parse_anki_apkg;
-use db_atomic::{save_snapshot_atomic, record_review_atomic, create_safety_backup};
+use db_atomic::{create_safety_backup, record_review_atomic, save_snapshot_atomic};
 use tauri::tray::{TrayIconBuilder, TrayIconEvent};
-use tauri_plugin_sql::{Migration, MigrationKind};
-use tauri::Manager;
 use tauri::Emitter;
+use tauri::Manager;
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut};
+use tauri_plugin_sql::{Migration, MigrationKind};
 
 const RECALL_DB: &str = "sqlite:recall.db";
 
@@ -27,7 +27,8 @@ fn copy_image_to_recall(app: tauri::AppHandle, source_path: String) -> Result<St
     let path = std::path::Path::new(&source_path);
 
     // Reject symlinks and directories
-    let metadata = std::fs::symlink_metadata(path).map_err(|e| format!("Cannot read file: {}", e))?;
+    let metadata =
+        std::fs::symlink_metadata(path).map_err(|e| format!("Cannot read file: {}", e))?;
     if metadata.file_type().is_symlink() {
         return Err("Symlinks are not allowed for security".to_string());
     }
@@ -38,7 +39,10 @@ fn copy_image_to_recall(app: tauri::AppHandle, source_path: String) -> Result<St
     // Reject files above 50MB
     let file_size = metadata.len();
     if file_size > 50 * 1024 * 1024 {
-        return Err(format!("File too large ({}MB). Maximum is 50MB.", file_size / 1024 / 1024));
+        return Err(format!(
+            "File too large ({}MB). Maximum is 50MB.",
+            file_size / 1024 / 1024
+        ));
     }
 
     // Validate extension
@@ -50,25 +54,32 @@ fn copy_image_to_recall(app: tauri::AppHandle, source_path: String) -> Result<St
 
     let allowed_exts = ["png", "jpg", "jpeg", "gif", "webp"];
     if !allowed_exts.contains(&ext.as_str()) {
-        return Err(format!("Unsupported image type: .{}. Allowed: png, jpg, jpeg, gif, webp", ext));
+        return Err(format!(
+            "Unsupported image type: .{}. Allowed: png, jpg, jpeg, gif, webp",
+            ext
+        ));
     }
 
     // Validate magic bytes match the claimed extension
     let mut header = [0u8; 12];
     let mut file = std::fs::File::open(path).map_err(|e| format!("Cannot open file: {}", e))?;
     use std::io::Read;
-    let bytes_read = file.read(&mut header).map_err(|e| format!("Cannot read file: {}", e))?;
+    let bytes_read = file
+        .read(&mut header)
+        .map_err(|e| format!("Cannot read file: {}", e))?;
     if bytes_read < 4 {
         return Err("File too small to be a valid image".to_string());
     }
 
     let magic_valid = match ext.as_str() {
         "png" => header[0..4] == [0x89, 0x50, 0x4E, 0x47], // ‰PNG
-        "jpg" | "jpeg" => header[0..2] == [0xFF, 0xD8], // JPEG SOI
-        "gif" => header[0..3] == [0x47, 0x49, 0x46], // GIF
-        "webp" => bytes_read >= 12
+        "jpg" | "jpeg" => header[0..2] == [0xFF, 0xD8],    // JPEG SOI
+        "gif" => header[0..3] == [0x47, 0x49, 0x46],       // GIF
+        "webp" => {
+            bytes_read >= 12
             && header[0..4] == [0x52, 0x49, 0x46, 0x46] // RIFF
-            && header[8..12] == [0x57, 0x45, 0x42, 0x50], // WEBP
+            && header[8..12] == [0x57, 0x45, 0x42, 0x50]
+        } // WEBP
         _ => false,
     };
 
@@ -103,7 +114,13 @@ fn generate_simple_uuid() -> String {
     static COUNTER: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
     let count = COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
 
-    format!("{:x}-{:x}-{:x}-{:x}", nanos >> 64, nanos as u64, pid as u64, count)
+    format!(
+        "{:x}-{:x}-{:x}-{:x}",
+        nanos >> 64,
+        nanos as u64,
+        pid as u64,
+        count
+    )
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -112,28 +129,29 @@ pub fn run() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
-                .plugin(
-                    tauri_plugin_global_shortcut::Builder::new()
-                        .with_handler(|app, shortcut, _event| {
-                            if let Ok(target) = "Control+Shift+N".parse::<Shortcut>() {
-                                if shortcut == &target {
-                                    if let Some(window) = app.get_webview_window("main") {
-                                        let _ = window.show();
-                                        let _ = window.set_focus();
-                                        let _ = window.emit("quick-add-shortcut", ());
-                                    }
-                                }
+        .plugin(
+            tauri_plugin_global_shortcut::Builder::new()
+                .with_handler(|app, shortcut, _event| {
+                    if let Ok(target) = "Control+Shift+N".parse::<Shortcut>() {
+                        if shortcut == &target {
+                            if let Some(window) = app.get_webview_window("main") {
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                                let _ = window.emit("quick-add-shortcut", ());
                             }
-                        })
-                        .build(),
-                )
+                        }
+                    }
+                })
+                .build(),
+        )
         .plugin(
             tauri_plugin_sql::Builder::default()
                 .add_migrations(RECALL_DB, migrations())
                 .build(),
         )
         .setup(|app| {
-            let icon = app.default_window_icon()
+            let icon = app
+                .default_window_icon()
                 .cloned()
                 .ok_or_else(|| tauri::Error::AssetNotFound("icons/icon.ico".to_string()))?;
 
@@ -166,7 +184,14 @@ pub fn run() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![parse_anki_apkg, update_tray_tooltip, copy_image_to_recall, save_snapshot_atomic, record_review_atomic, create_safety_backup])
+        .invoke_handler(tauri::generate_handler![
+            parse_anki_apkg,
+            update_tray_tooltip,
+            copy_image_to_recall,
+            save_snapshot_atomic,
+            record_review_atomic,
+            create_safety_backup
+        ])
         .run(tauri::generate_context!())
         .expect("error while running Recall");
 }
@@ -369,23 +394,23 @@ fn migrations() -> Vec<Migration> {
             DROP TABLE recall_seed_guard;
         "#,
             kind: MigrationKind::Up,
-                    },
-                    Migration {
-                                version: 3,
-                                description: "add_exam_deadline_to_decks",
-                                sql: "ALTER TABLE decks ADD COLUMN exam_deadline TEXT;",
-                                kind: MigrationKind::Up,
-                            },
-                            Migration {
-                                version: 4,
-                                description: "add_source_to_cards",
-                                sql: "ALTER TABLE cards ADD COLUMN source TEXT DEFAULT '';",
-                                kind: MigrationKind::Up,
-                            },
-                            Migration {
-                                version: 5,
-                                description: "add_check_constraints",
-                                sql: r#"
+        },
+        Migration {
+            version: 3,
+            description: "add_exam_deadline_to_decks",
+            sql: "ALTER TABLE decks ADD COLUMN exam_deadline TEXT;",
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 4,
+            description: "add_source_to_cards",
+            sql: "ALTER TABLE cards ADD COLUMN source TEXT DEFAULT '';",
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 5,
+            description: "add_check_constraints",
+            sql: r#"
                                 -- SQLite doesn't support ALTER TABLE ADD CONSTRAINT.
                                 -- We rebuild tables with CHECK constraints using the standard
                                 -- rename-recreate-copy pattern. Data is preserved.
@@ -461,7 +486,7 @@ fn migrations() -> Vec<Migration> {
                                 DROP TABLE study_sessions_old;
                                 CREATE INDEX IF NOT EXISTS study_sessions_deck_id_idx ON study_sessions(deck_id);
                             "#,
-                                kind: MigrationKind::Up,
-                            },
-                        ]
-                    }
+            kind: MigrationKind::Up,
+        },
+    ]
+}

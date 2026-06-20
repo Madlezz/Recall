@@ -189,12 +189,11 @@ class SqliteRecallRepository implements RecallRepository {
       return rows[0]?.cnt ?? 0;
     }
 
-  async saveSnapshot(snapshot: RecallStateSnapshot): Promise<void> {
-    validateImportSnapshot(snapshot);
+    async saveSnapshot(snapshot: RecallStateSnapshot): Promise<void> {
+      validateImportSnapshot(snapshot);
 
-    // Try Rust atomic command first (truly atomic with real transactions)
-    if (isTauriRuntime()) {
-      try {
+      // Tauri runtime: Use Rust atomic command (no fallback - must be atomic for data integrity)
+      if (isTauriRuntime()) {
         const { invoke } = await import("@tauri-apps/api/core");
         await invoke("save_snapshot_atomic", {
           data: {
@@ -206,87 +205,82 @@ class SqliteRecallRepository implements RecallRepository {
           },
         });
         return;
-      } catch (error) {
-        // Rust command failed — fall through to JS transaction
-        console.error("Rust atomic save failed, falling back to JS:", error);
       }
+
+      // Browser/preview mode only: JS transaction (non-atomic, for localStorage/compat)
+      await this.executor.transaction(async (tx) => {
+        await tx.execute("DELETE FROM review_logs");
+        await tx.execute("DELETE FROM study_sessions");
+        await tx.execute("DELETE FROM cards");
+        await tx.execute("DELETE FROM decks");
+        await tx.execute("DELETE FROM settings");
+
+        for (const deck of snapshot.decks.map(deckToRow)) {
+          await tx.execute(
+            "INSERT INTO decks (id, name, description, color, exam_deadline, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [deck.id, deck.name, deck.description, deck.color, deck.exam_deadline, deck.created_at, deck.updated_at],
+          );
+        }
+
+        for (const card of snapshot.cards.map(cardToRow)) {
+          await tx.execute(
+            "INSERT INTO cards (id, deck_id, front, back, hint, source, tags, card_type, state, last_review_date, next_review_date, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [
+              card.id,
+              card.deck_id,
+              card.front,
+              card.back,
+              card.hint,
+              card.source,
+              card.tags,
+              card.card_type,
+              card.state,
+              card.last_review_date,
+              card.next_review_date,
+              card.stability,
+              card.difficulty,
+              card.elapsed_days,
+              card.scheduled_days,
+              card.reps,
+              card.lapses,
+              card.created_at,
+              card.updated_at,
+            ],
+          );
+        }
+
+        for (const session of snapshot.studySessions.map(studySessionToRow)) {
+          await tx.execute(
+            "INSERT INTO study_sessions (id, deck_id, started_at, ended_at, cards_studied) VALUES (?, ?, ?, ?, ?)",
+            [
+              session.id,
+              session.deck_id,
+              session.started_at,
+              session.ended_at,
+              session.cards_studied,
+            ],
+          );
+        }
+
+        for (const reviewLog of snapshot.reviewLogs.map(reviewLogToRow)) {
+          await tx.execute(
+            "INSERT INTO review_logs (id, card_id, rating, review_date, stability, difficulty, elapsed_days, scheduled_days) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [reviewLog.id, reviewLog.card_id, reviewLog.rating, reviewLog.review_date, reviewLog.stability, reviewLog.difficulty, reviewLog.elapsed_days, reviewLog.scheduled_days],
+          );
+        }
+
+        for (const setting of settingsToRows(snapshot.settings)) {
+          await tx.execute("INSERT INTO settings (key, value) VALUES (?, ?)", [setting.key, setting.value]);
+        }
+      });
     }
 
-    // Fallback: JS transaction (non-atomic but functional)
-    await this.executor.transaction(async (tx) => {
-      await tx.execute("DELETE FROM review_logs");
-      await tx.execute("DELETE FROM study_sessions");
-      await tx.execute("DELETE FROM cards");
-      await tx.execute("DELETE FROM decks");
-      await tx.execute("DELETE FROM settings");
+    async recordReview(updatedCard: Card, reviewLog: ReviewLog, session: StudySession | null): Promise<void> {
+      const cardRow = cardToRow(updatedCard);
+      const logRow = reviewLogToRow(reviewLog);
 
-      for (const deck of snapshot.decks.map(deckToRow)) {
-        await tx.execute(
-          "INSERT INTO decks (id, name, description, color, exam_deadline, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-          [deck.id, deck.name, deck.description, deck.color, deck.exam_deadline, deck.created_at, deck.updated_at],
-        );
-      }
-
-      for (const card of snapshot.cards.map(cardToRow)) {
-        await tx.execute(
-          "INSERT INTO cards (id, deck_id, front, back, hint, source, tags, card_type, state, last_review_date, next_review_date, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-          [
-            card.id,
-            card.deck_id,
-            card.front,
-            card.back,
-            card.hint,
-            card.source,
-            card.tags,
-            card.card_type,
-            card.state,
-            card.last_review_date,
-            card.next_review_date,
-            card.stability,
-            card.difficulty,
-            card.elapsed_days,
-            card.scheduled_days,
-            card.reps,
-            card.lapses,
-            card.created_at,
-            card.updated_at,
-          ],
-        );
-      }
-
-      for (const session of snapshot.studySessions.map(studySessionToRow)) {
-        await tx.execute(
-          "INSERT INTO study_sessions (id, deck_id, started_at, ended_at, cards_studied) VALUES (?, ?, ?, ?, ?)",
-          [
-            session.id,
-            session.deck_id,
-            session.started_at,
-            session.ended_at,
-            session.cards_studied,
-          ],
-        );
-      }
-
-      for (const reviewLog of snapshot.reviewLogs.map(reviewLogToRow)) {
-        await tx.execute(
-          "INSERT INTO review_logs (id, card_id, rating, review_date, stability, difficulty, elapsed_days, scheduled_days) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-          [reviewLog.id, reviewLog.card_id, reviewLog.rating, reviewLog.review_date, reviewLog.stability, reviewLog.difficulty, reviewLog.elapsed_days, reviewLog.scheduled_days],
-        );
-      }
-
-      for (const setting of settingsToRows(snapshot.settings)) {
-        await tx.execute("INSERT INTO settings (key, value) VALUES (?, ?)", [setting.key, setting.value]);
-      }
-    });
-  }
-
-  async recordReview(updatedCard: Card, reviewLog: ReviewLog, session: StudySession | null): Promise<void> {
-    const cardRow = cardToRow(updatedCard);
-    const logRow = reviewLogToRow(reviewLog);
-
-    // Try Rust atomic command first (truly atomic with real transactions)
-    if (isTauriRuntime()) {
-      try {
+      // Tauri runtime: Use Rust atomic command (no fallback - must be atomic for data integrity)
+      if (isTauriRuntime()) {
         const { invoke } = await import("@tauri-apps/api/core");
         const sessionRow = session ? studySessionToRow(session) : null;
         await invoke("record_review_atomic", {
@@ -314,86 +308,83 @@ class SqliteRecallRepository implements RecallRepository {
           },
         });
         return;
-      } catch (error) {
-        console.error("Rust atomic recordReview failed, falling back to JS:", error);
       }
-    }
 
-    // Fallback: JS transaction (non-atomic but functional)
-    await this.executor.transaction(async (tx) => {
-      await tx.execute(
-        `UPDATE cards SET state=?, last_review_date=?, next_review_date=?,
-         stability=?, difficulty=?, elapsed_days=?, scheduled_days=?,
-         reps=?, lapses=?, updated_at=? WHERE id=?`,
-        [cardRow.state, cardRow.last_review_date, cardRow.next_review_date,
-         cardRow.stability, cardRow.difficulty, cardRow.elapsed_days,
-         cardRow.scheduled_days, cardRow.reps, cardRow.lapses,
-         cardRow.updated_at, cardRow.id],
-      );
-      await tx.execute(
-        `INSERT INTO review_logs (id, card_id, rating, review_date,
-         stability, difficulty, elapsed_days, scheduled_days)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [logRow.id, logRow.card_id, logRow.rating, logRow.review_date,
-         logRow.stability, logRow.difficulty, logRow.elapsed_days, logRow.scheduled_days],
-      );
-      if (session) {
-        const sessionRow = studySessionToRow(session);
+      // Browser/preview mode only: JS transaction (non-atomic, for localStorage/compat)
+      await this.executor.transaction(async (tx) => {
         await tx.execute(
-          `INSERT INTO study_sessions (id, deck_id, started_at, ended_at, cards_studied)
-           VALUES (?, ?, ?, ?, ?)`,
-          [sessionRow.id, sessionRow.deck_id, sessionRow.started_at,
-           sessionRow.ended_at, sessionRow.cards_studied],
+          `UPDATE cards SET state=?, last_review_date=?, next_review_date=?,
+           stability=?, difficulty=?, elapsed_days=?, scheduled_days=?,
+           reps=?, lapses=?, updated_at=? WHERE id=?`,
+          [cardRow.state, cardRow.last_review_date, cardRow.next_review_date,
+           cardRow.stability, cardRow.difficulty, cardRow.elapsed_days,
+           cardRow.scheduled_days, cardRow.reps, cardRow.lapses,
+           cardRow.updated_at, cardRow.id],
         );
-      }
-    });
-  }
-
-  async resetToSeedData(): Promise<RecallStateSnapshot> {
-    const snapshot = createSeedSnapshot();
-    await this.saveSnapshot(snapshot);
-    return snapshot;
-  }
-
-  async replaceDataFromImport(payload: RecallExportPayload): Promise<RecallStateSnapshot> {
-    const snapshot = exportPayloadToSnapshot(payload);
-    validateImportSnapshot(snapshot);
-
-    // Create safety backup before destructive import
-    if (isTauriRuntime()) {
-      try {
-        const { invoke } = await import("@tauri-apps/api/core");
-        const backupPath = await invoke<string>("create_safety_backup");
-        console.info("Safety backup created:", backupPath);
-      } catch (error) {
-        console.warn("Safety backup failed (continuing with import):", error);
-      }
+        await tx.execute(
+          `INSERT INTO review_logs (id, card_id, rating, review_date,
+           stability, difficulty, elapsed_days, scheduled_days)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [logRow.id, logRow.card_id, logRow.rating, logRow.review_date,
+           logRow.stability, logRow.difficulty, logRow.elapsed_days, logRow.scheduled_days],
+        );
+        if (session) {
+          const sessionRow = studySessionToRow(session);
+          await tx.execute(
+            `INSERT INTO study_sessions (id, deck_id, started_at, ended_at, cards_studied)
+             VALUES (?, ?, ?, ?, ?)`,
+            [sessionRow.id, sessionRow.deck_id, sessionRow.started_at,
+             sessionRow.ended_at, sessionRow.cards_studied],
+          );
+        }
+      });
     }
 
-    await this.saveSnapshot(snapshot);
-    return snapshot;
-  }
+    async resetToSeedData(): Promise<RecallStateSnapshot> {
+      const snapshot = createSeedSnapshot();
+      await this.saveSnapshot(snapshot);
+      return snapshot;
+    }
 
-  async mergeDataFromImport(current: RecallStateSnapshot, payload: RecallExportPayload): Promise<RecallStateSnapshot> {
-    validateImportSnapshot(exportPayloadToSnapshot(payload));
-    const snapshot = mergeImportPayload(current, payload);
-    validateImportSnapshot(snapshot);
-    await this.saveSnapshot(snapshot);
-    return snapshot;
-  }
+    async replaceDataFromImport(payload: RecallExportPayload): Promise<RecallStateSnapshot> {
+      const snapshot = exportPayloadToSnapshot(payload);
+      validateImportSnapshot(snapshot);
 
-  async saveTheme(theme: Theme, current: RecallStateSnapshot): Promise<RecallStateSnapshot> {
-    const snapshot = { ...current, settings: { ...current.settings, theme } };
-    await this.saveSnapshot(snapshot);
-    return snapshot;
-  }
+      // Create safety backup before destructive import
+      if (isTauriRuntime()) {
+        try {
+          const { invoke } = await import("@tauri-apps/api/core");
+          const backupPath = await invoke<string>("create_safety_backup");
+          console.info("Safety backup created:", backupPath);
+        } catch (error) {
+          console.warn("Safety backup failed (continuing with import):", error);
+        }
+      }
 
-  async saveSettings(settings: RecallStateSnapshot["settings"], current: RecallStateSnapshot): Promise<RecallStateSnapshot> {
-    const snapshot = { ...current, settings };
-    await this.saveSnapshot(snapshot);
-    return snapshot;
+      await this.saveSnapshot(snapshot);
+      return snapshot;
+    }
+
+    async mergeDataFromImport(current: RecallStateSnapshot, payload: RecallExportPayload): Promise<RecallStateSnapshot> {
+      validateImportSnapshot(exportPayloadToSnapshot(payload));
+      const snapshot = mergeImportPayload(current, payload);
+      validateImportSnapshot(snapshot);
+      await this.saveSnapshot(snapshot);
+      return snapshot;
+    }
+
+    async saveTheme(theme: Theme, current: RecallStateSnapshot): Promise<RecallStateSnapshot> {
+      const snapshot = { ...current, settings: { ...current.settings, theme } };
+      await this.saveSnapshot(snapshot);
+      return snapshot;
+    }
+
+    async saveSettings(settings: RecallStateSnapshot["settings"], current: RecallStateSnapshot): Promise<RecallStateSnapshot> {
+      const snapshot = { ...current, settings };
+      await this.saveSnapshot(snapshot);
+      return snapshot;
+    }
   }
-}
 
 class LocalStorageRecallRepository implements RecallRepository {
   async recordReview(_updatedCard: Card, _reviewLog: ReviewLog, _session: StudySession | null): Promise<void> {

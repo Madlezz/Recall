@@ -137,10 +137,7 @@ fn open_db_connection(app: &tauri::AppHandle) -> Result<Connection, String> {
 /// Uses BEGIN IMMEDIATE for a real write-lock transaction.
 /// If any statement fails, the entire operation rolls back.
 #[tauri::command]
-pub async fn save_snapshot_atomic(
-    app: tauri::AppHandle,
-    data: SnapshotRows,
-) -> Result<(), String> {
+pub async fn save_snapshot_atomic(app: tauri::AppHandle, data: SnapshotRows) -> Result<(), String> {
     let conn = open_db_connection(&app)?;
 
     conn.execute_batch("BEGIN IMMEDIATE")
@@ -198,8 +195,11 @@ pub async fn save_snapshot_atomic(
             "INSERT INTO study_sessions (id, deck_id, started_at, ended_at, cards_studied)
              VALUES (?1, ?2, ?3, ?4, ?5)",
             rusqlite::params![
-                session.id, session.deck_id, session.started_at,
-                session.ended_at, session.cards_studied,
+                session.id,
+                session.deck_id,
+                session.started_at,
+                session.ended_at,
+                session.cards_studied,
             ],
         ) {
             let _ = conn.execute_batch("ROLLBACK");
@@ -257,10 +257,17 @@ pub async fn record_review_atomic(
          stability=?4, difficulty=?5, elapsed_days=?6, scheduled_days=?7,
          reps=?8, lapses=?9, updated_at=?10 WHERE id=?11",
         rusqlite::params![
-            data.state, data.last_review_date, data.next_review_date,
-            data.stability, data.difficulty, data.elapsed_days,
-            data.scheduled_days, data.reps, data.lapses,
-            data.updated_at, data.card_id,
+            data.state,
+            data.last_review_date,
+            data.next_review_date,
+            data.stability,
+            data.difficulty,
+            data.elapsed_days,
+            data.scheduled_days,
+            data.reps,
+            data.lapses,
+            data.updated_at,
+            data.card_id,
         ],
     ) {
         let _ = conn.execute_batch("ROLLBACK");
@@ -271,7 +278,10 @@ pub async fn record_review_atomic(
     let changes = conn.changes();
     if changes == 0 {
         let _ = conn.execute_batch("ROLLBACK");
-        return Err(format!("Card '{}' not found for review update", data.card_id));
+        return Err(format!(
+            "Card '{}' not found for review update",
+            data.card_id
+        ));
     }
 
     // Insert review log
@@ -297,8 +307,11 @@ pub async fn record_review_atomic(
             "INSERT INTO study_sessions (id, deck_id, started_at, ended_at, cards_studied)
              VALUES (?1, ?2, ?3, ?4, ?5)",
             rusqlite::params![
-                session.id, session.deck_id, session.started_at,
-                session.ended_at, session.cards_studied,
+                session.id,
+                session.deck_id,
+                session.started_at,
+                session.ended_at,
+                session.cards_studied,
             ],
         ) {
             let _ = conn.execute_batch("ROLLBACK");
@@ -313,6 +326,7 @@ pub async fn record_review_atomic(
 }
 
 /// Create a pre-restore safety backup of the current database.
+/// Checkpoints WAL first to ensure backup contains all committed changes.
 /// Returns the backup file path on success.
 #[tauri::command]
 pub async fn create_safety_backup(app: tauri::AppHandle) -> Result<String, String> {
@@ -323,12 +337,20 @@ pub async fn create_safety_backup(app: tauri::AppHandle) -> Result<String, Strin
         return Err("Database file not found".to_string());
     }
 
+    // Checkpoint WAL to flush all pending changes into the main DB file.
+    // Without this, the copy could be stale if changes are still in the -wal file.
+    let db_path_str = db_path.to_string_lossy().to_string();
+    let conn = rusqlite::Connection::open(&db_path_str)
+        .map_err(|e| format!("Failed to open DB for checkpoint: {}", e))?;
+    conn.pragma_update(None, "wal_checkpoint", "FULL")
+        .map_err(|e| format!("WAL checkpoint failed: {}", e))?;
+    drop(conn);
+
     let timestamp = chrono_lite_timestamp();
     let backup_name = format!("recall-pre-restore-{}.db", timestamp);
     let backup_path = data_dir.join(&backup_name);
 
-    std::fs::copy(&db_path, &backup_path)
-        .map_err(|e| format!("Backup copy failed: {}", e))?;
+    std::fs::copy(&db_path, &backup_path).map_err(|e| format!("Backup copy failed: {}", e))?;
 
     // Keep only the last 5 safety backups
     cleanup_old_backups(&data_dir, 5);
