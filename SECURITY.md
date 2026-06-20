@@ -17,7 +17,9 @@ as soon as possible and you'll be credited in the changelog.
 
 ## Scope
 
-Recall is a local desktop application with no network access beyond optional desktop notifications.
+Recall is a local desktop application. Network access is limited to:
+- Auto-update checks via GitHub Releases (signed ed25519, optional)
+- Optional desktop notifications
 
 ## Automated Auditing
 
@@ -36,3 +38,9 @@ Some transitive dependencies may have advisories flagged by `cargo audit` or `pn
 - All dependencies are pinned to compatible semver ranges
 - `pnpm-lock.yaml` is committed to ensure reproducible builds
 - Dependabot is configured for automated security updates
+
+## Release Verification
+
+Every release includes:
+- **SHA256SUMS** — verify download integrity with `sha256sum -c SHA256SUMS`
+- **Signed updater bundles** — Tauri updater verifies ed25519 signatures before installing
