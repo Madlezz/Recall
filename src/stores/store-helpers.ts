@@ -60,6 +60,67 @@ export async function persistReviewDelta(
   set({ ...snapshot, ...extra, error: null });
 }
 
+/**
+ * Persist a single deck upsert using targeted INSERT/UPDATE.
+ * Falls back to saveSnapshot if targeted ops aren't available.
+ */
+export async function persistDeckDelta(
+  set: StoreSet,
+  snapshot: RecallStateSnapshot,
+  deck: Deck,
+  extra: Record<string, unknown> = {},
+): Promise<void> {
+  const repository = await getRepository();
+  await repository.upsertDeck(deck);
+  applyTheme(snapshot.settings.theme);
+  set({ ...snapshot, ...extra, error: null });
+}
+
+/**
+ * Persist a single card upsert using targeted INSERT/UPDATE.
+ */
+export async function persistCardDelta(
+  set: StoreSet,
+  snapshot: RecallStateSnapshot,
+  card: Card,
+  extra: Record<string, unknown> = {},
+): Promise<void> {
+  const repository = await getRepository();
+  await repository.upsertCard(card);
+  applyTheme(snapshot.settings.theme);
+  set({ ...snapshot, ...extra, error: null });
+}
+
+/**
+ * Persist a deck deletion using targeted DELETE.
+ */
+export async function persistDeckDelete(
+  set: StoreSet,
+  snapshot: RecallStateSnapshot,
+  deckId: string,
+  extra: Record<string, unknown> = {},
+): Promise<void> {
+  const repository = await getRepository();
+  await repository.deleteDeck(deckId);
+  applyTheme(snapshot.settings.theme);
+  set({ ...snapshot, ...extra, error: null });
+}
+
+/**
+ * Persist a card deletion using targeted DELETE.
+ */
+export async function persistCardDelete(
+  set: StoreSet,
+  snapshot: RecallStateSnapshot,
+  cardId: string,
+  extra: Record<string, unknown> = {},
+): Promise<void> {
+  const repository = await getRepository();
+  await repository.deleteCard(cardId);
+  applyTheme(snapshot.settings.theme);
+  set({ ...snapshot, ...extra, error: null });
+}
+
 export async function persistReviewSnapshot(
   set: StoreSet,
   snapshot: RecallStateSnapshot,

@@ -368,6 +368,140 @@ fn chrono_lite_timestamp() -> String {
     format!("{}", secs)
 }
 
+/// Atomically upsert a single deck (insert or update).
+#[tauri::command]
+pub async fn upsert_deck_atomic(app: tauri::AppHandle, deck: DeckRowData) -> Result<(), String> {
+    let conn = open_db_connection(&app)?;
+
+    conn.execute_batch("BEGIN IMMEDIATE")
+        .map_err(|e| format!("BEGIN failed: {}", e))?;
+
+    if let Err(e) = conn.execute(
+        "INSERT INTO decks (id, name, description, color, exam_deadline, created_at, updated_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
+         ON CONFLICT(id) DO UPDATE SET
+           name=excluded.name, description=excluded.description, color=excluded.color,
+           exam_deadline=excluded.exam_deadline, updated_at=excluded.updated_at",
+        rusqlite::params![
+            deck.id, deck.name, deck.description, deck.color,
+            deck.exam_deadline, deck.created_at, deck.updated_at,
+        ],
+    ) {
+        let _ = conn.execute_batch("ROLLBACK");
+        return Err(format!("UPSERT deck '{}' failed: {}", deck.id, e));
+    }
+
+    conn.execute_batch("COMMIT")
+        .map_err(|e| format!("COMMIT failed: {}", e))?;
+
+    Ok(())
+}
+
+/// Atomically upsert a single card (insert or update).
+#[tauri::command]
+pub async fn upsert_card_atomic(app: tauri::AppHandle, card: CardRowData) -> Result<(), String> {
+    let conn = open_db_connection(&app)?;
+
+    conn.execute_batch("BEGIN IMMEDIATE")
+        .map_err(|e| format!("BEGIN failed: {}", e))?;
+
+    if let Err(e) = conn.execute(
+        "INSERT INTO cards (id, deck_id, front, back, hint, source, tags, card_type, state,
+         last_review_date, next_review_date, stability, difficulty, elapsed_days,
+         scheduled_days, reps, lapses, created_at, updated_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19)
+         ON CONFLICT(id) DO UPDATE SET
+           deck_id=excluded.deck_id, front=excluded.front, back=excluded.back, hint=excluded.hint,
+           source=excluded.source, tags=excluded.tags, card_type=excluded.card_type, state=excluded.state,
+           last_review_date=excluded.last_review_date, next_review_date=excluded.next_review_date,
+           stability=excluded.stability, difficulty=excluded.difficulty, elapsed_days=excluded.elapsed_days,
+           scheduled_days=excluded.scheduled_days, reps=excluded.reps, lapses=excluded.lapses,
+           updated_at=excluded.updated_at",
+        rusqlite::params![
+            card.id, card.deck_id, card.front, card.back, card.hint, card.source,
+            card.tags, card.card_type, card.state, card.last_review_date,
+            card.next_review_date, card.stability, card.difficulty, card.elapsed_days,
+            card.scheduled_days, card.reps, card.lapses, card.created_at, card.updated_at,
+        ],
+    ) {
+        let _ = conn.execute_batch("ROLLBACK");
+        return Err(format!("UPSERT card '{}' failed: {}", card.id, e));
+    }
+
+    conn.execute_batch("COMMIT")
+        .map_err(|e| format!("COMMIT failed: {}", e))?;
+
+    Ok(())
+}
+
+/// Atomically delete a deck and all its cards (cascades).
+#[tauri::command]
+pub async fn delete_deck_atomic(app: tauri::AppHandle, deck_id: String) -> Result<(), String> {
+    let conn = open_db_connection(&app)?;
+
+    conn.execute_batch("BEGIN IMMEDIATE")
+        .map_err(|e| format!("BEGIN failed: {}", e))?;
+
+    // Delete cards first (foreign key constraint)
+    if let Err(e) = conn.execute("DELETE FROM cards WHERE deck_id = ?1", rusqlite::params![deck_id]) {
+        let _ = conn.execute_batch("ROLLBACK");
+        return Err(format!("DELETE cards for deck '{}' failed: {}", deck_id, e));
+    }
+
+    // Delete deck
+    if let Err(e) = conn.execute("DELETE FROM decks WHERE id = ?1", rusqlite::params![deck_id]) {
+        let _ = conn.execute_batch("ROLLBACK");
+        return Err(format!("DELETE deck '{}' failed: {}", deck_id, e));
+    }
+
+    conn.execute_batch("COMMIT")
+        .map_err(|e| format!("COMMIT failed: {}", e))?;
+
+    Ok(())
+}
+
+/// Atomically delete a single card.
+#[tauri::command]
+pub async fn delete_card_atomic(app: tauri::AppHandle, card_id: String) -> Result<(), String> {
+    let conn = open_db_connection(&app)?;
+
+    conn.execute_batch("BEGIN IMMEDIATE")
+        .map_err(|e| format!("BEGIN failed: {}", e))?;
+
+    if let Err(e) = conn.execute("DELETE FROM cards WHERE id = ?1", rusqlite::params![card_id]) {
+        let _ = conn.execute_batch("ROLLBACK");
+        return Err(format!("DELETE card '{}' failed: {}", card_id, e));
+    }
+
+    conn.execute_batch("COMMIT")
+        .map_err(|e| format!("COMMIT failed: {}", e))?;
+
+    Ok(())
+}
+
+/// Atomically upsert a single setting (insert or update).
+#[tauri::command]
+pub async fn upsert_setting_atomic(app: tauri::AppHandle, setting: SettingRowData) -> Result<(), String> {
+    let conn = open_db_connection(&app)?;
+
+    conn.execute_batch("BEGIN IMMEDIATE")
+        .map_err(|e| format!("BEGIN failed: {}", e))?;
+
+    if let Err(e) = conn.execute(
+        "INSERT INTO settings (key, value) VALUES (?1, ?2)
+         ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+        rusqlite::params![setting.key, setting.value],
+    ) {
+        let _ = conn.execute_batch("ROLLBACK");
+        return Err(format!("UPSERT setting '{}' failed: {}", setting.key, e));
+    }
+
+    conn.execute_batch("COMMIT")
+        .map_err(|e| format!("COMMIT failed: {}", e))?;
+
+    Ok(())
+}
+
 /// Remove old safety backups, keeping only the newest `keep` files.
 fn cleanup_old_backups(data_dir: &std::path::Path, keep: usize) {
     let mut backups: Vec<_> = std::fs::read_dir(data_dir)

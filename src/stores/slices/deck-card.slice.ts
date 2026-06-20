@@ -5,6 +5,10 @@ import {
   dataState,
   ensureCardInput,
   ensureDeckName,
+  persistDeckDelta,
+  persistDeckDelete,
+  persistCardDelta,
+  persistCardDelete,
   persistSnapshot,
   touchDeck,
   type StoreSet,
@@ -56,7 +60,8 @@ export const deckCardSlice = (
       id: createId("deck"), name, description: input.description.trim(),
       color: input.color, createdAt: now, updatedAt: now,
     };
-    await persistSnapshot(set, { ...dataState(state), decks: [...state.decks, deck] });
+    const snapshot = { ...dataState(state), decks: [...state.decks, deck] };
+    await persistDeckDelta(set, snapshot, deck);
     return deck.id;
   },
 
@@ -65,12 +70,12 @@ export const deckCardSlice = (
     const state = get();
     ensureDeckName(name, state.decks.filter((d: Deck) => d.id !== deckId));
     const now = new Date().toISOString();
-    await persistSnapshot(set, {
+    const updatedDeck: Deck = { ...state.decks.find((d: Deck) => d.id === deckId)!, name, description: input.description.trim(), color: input.color, updatedAt: now };
+    const snapshot = {
       ...dataState(state),
-      decks: state.decks.map((d: Deck) =>
-        d.id === deckId ? { ...d, name, description: input.description.trim(), color: input.color, updatedAt: now } : d,
-      ),
-    });
+      decks: state.decks.map((d: Deck) => d.id === deckId ? updatedDeck : d),
+    };
+    await persistDeckDelta(set, snapshot, updatedDeck);
   },
 
   async deleteDeck(deckId: string) {
@@ -78,13 +83,15 @@ export const deckCardSlice = (
     const deletedCardIds = new Set(
       state.cards.filter((c: Card) => c.deckId === deckId).map((c: Card) => c.id),
     );
-    await persistSnapshot(set, {
+    const snapshot = {
       ...dataState(state),
       decks: state.decks.filter((d: Deck) => d.id !== deckId),
       cards: state.cards.filter((c: Card) => c.deckId !== deckId),
       reviewLogs: state.reviewLogs.filter((r: ReviewLog) => !deletedCardIds.has(r.cardId)),
       studySessions: state.studySessions.filter((s: StudySession) => s.deckId !== deckId),
-    }, { view: "dashboard", selectedDeckId: null, activeStudy: null });
+    };
+    // Rust handles cascade (cards + review_logs), but we still pass full state to update UI
+    await persistDeckDelete(set, snapshot, deckId, { view: "dashboard", selectedDeckId: null, activeStudy: null });
   },
 
   async createCard(input: CardInput) {
@@ -101,11 +108,12 @@ export const deckCardSlice = (
       stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0,
       reps: 0, lapses: 0, createdAt: now, updatedAt: now,
     };
-    await persistSnapshot(set, {
+    const snapshot = {
       ...dataState(state),
       cards: [...state.cards, card],
       decks: touchDeck(state.decks, input.deckId, now),
-    });
+    };
+    await persistCardDelta(set, snapshot, card);
     return card.id;
   },
 
@@ -113,22 +121,23 @@ export const deckCardSlice = (
     ensureCardInput(input);
     const state = get();
     const now = new Date().toISOString();
-    await persistSnapshot(set, {
+    const updatedCard = { ...state.cards.find((c: Card) => c.id === cardId)!, deckId: input.deckId, front: input.front.trim(), back: input.back.trim(), hint: input.hint.trim(), source: input.source.trim(), tags: input.tags, updatedAt: now };
+    const snapshot = {
       ...dataState(state),
-      cards: state.cards.map((c: Card) =>
-        c.id === cardId ? { ...c, deckId: input.deckId, front: input.front.trim(), back: input.back.trim(), hint: input.hint.trim(), source: input.source.trim(), tags: input.tags, updatedAt: now } : c,
-      ),
+      cards: state.cards.map((c: Card) => c.id === cardId ? updatedCard : c),
       decks: touchDeck(state.decks, input.deckId, now),
-    });
+    };
+    await persistCardDelta(set, snapshot, updatedCard);
   },
 
   async deleteCard(cardId: string) {
     const state = get();
-    await persistSnapshot(set, {
+    const snapshot = {
       ...dataState(state),
       cards: state.cards.filter((c: Card) => c.id !== cardId),
       reviewLogs: state.reviewLogs.filter((r: ReviewLog) => r.cardId !== cardId),
-    });
+    };
+    await persistCardDelete(set, snapshot, cardId);
   },
 
   async moveCard(cardId: string, deckId: string) {
@@ -157,11 +166,11 @@ export const deckCardSlice = (
   async setExamDeadline(deckId: string, deadline: string | null) {
     const state = get();
     const now = new Date().toISOString();
-    await persistSnapshot(set, {
+    const updatedDeck = { ...state.decks.find((d: Deck) => d.id === deckId)!, examDeadline: deadline ?? undefined, updatedAt: now };
+    const snapshot = {
       ...dataState(state),
-      decks: state.decks.map((d: Deck) =>
-        d.id === deckId ? { ...d, examDeadline: deadline ?? undefined, updatedAt: now } : d,
-      ),
-    });
+      decks: state.decks.map((d: Deck) => d.id === deckId ? updatedDeck : d),
+    };
+    await persistDeckDelta(set, snapshot, updatedDeck);
   },
 });

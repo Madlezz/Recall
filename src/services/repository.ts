@@ -20,7 +20,7 @@ import { createSeedSnapshot } from "@/data/seed";
 import { isCardState, isCardType, isDeckColor, isReviewRating } from "@/lib/domain";
 import { normalizeName } from "@/lib/utils";
 import { mergeImportPayload } from "@/services/import-export";
-import type { Card, RecallExportPayload, RecallStateSnapshot, ReviewLog, StudySession, Theme } from "@/types";
+import type { Card, Deck, RecallExportPayload, RecallStateSnapshot, ReviewLog, StudySession, Theme } from "@/types";
 
 const STORAGE_KEY = "recall.snapshot.v1";
 
@@ -37,6 +37,11 @@ export interface RecallRepository {
   loadReviewLogs(since?: string): Promise<ReviewLog[]>;
   /** Count total review logs (for data-health indicators). */
   countReviewLogs(): Promise<number>;
+  // Targeted entity operations (incremental persistence)
+  upsertDeck(deck: Deck): Promise<void>;
+  upsertCard(card: Card): Promise<void>;
+  deleteDeck(deckId: string): Promise<void>;
+  deleteCard(cardId: string): Promise<void>;
 }
 
 let cachedRepository: Promise<RecallRepository> | null = null;
@@ -409,14 +414,55 @@ class SqliteRecallRepository implements RecallRepository {
 
     async saveTheme(theme: Theme, current: RecallStateSnapshot): Promise<RecallStateSnapshot> {
       const snapshot = { ...current, settings: { ...current.settings, theme } };
-      await this.saveSnapshot(snapshot);
+      if (isTauriRuntime()) {
+        const { invoke } = await import("@tauri-apps/api/core");
+        await invoke("upsert_setting_atomic", { setting: { key: "theme", value: theme } });
+      } else {
+        await this.saveSnapshot(snapshot);
+      }
       return snapshot;
     }
 
     async saveSettings(settings: RecallStateSnapshot["settings"], current: RecallStateSnapshot): Promise<RecallStateSnapshot> {
       const snapshot = { ...current, settings };
-      await this.saveSnapshot(snapshot);
+      if (isTauriRuntime()) {
+        const { invoke } = await import("@tauri-apps/api/core");
+        const settingRows = settingsToRows(settings);
+        for (const row of settingRows) {
+          await invoke("upsert_setting_atomic", { setting: row });
+        }
+      } else {
+        await this.saveSnapshot(snapshot);
+      }
       return snapshot;
+    }
+
+    async upsertDeck(deck: Deck): Promise<void> {
+      if (isTauriRuntime()) {
+        const { invoke } = await import("@tauri-apps/api/core");
+        await invoke("upsert_deck_atomic", { deck: deckToRow(deck) });
+      }
+    }
+
+    async upsertCard(card: Card): Promise<void> {
+      if (isTauriRuntime()) {
+        const { invoke } = await import("@tauri-apps/api/core");
+        await invoke("upsert_card_atomic", { card: cardToRow(card) });
+      }
+    }
+
+    async deleteDeck(deckId: string): Promise<void> {
+      if (isTauriRuntime()) {
+        const { invoke } = await import("@tauri-apps/api/core");
+        await invoke("delete_deck_atomic", { deckId });
+      }
+    }
+
+    async deleteCard(cardId: string): Promise<void> {
+      if (isTauriRuntime()) {
+        const { invoke } = await import("@tauri-apps/api/core");
+        await invoke("delete_card_atomic", { cardId });
+      }
     }
   }
 
@@ -484,6 +530,12 @@ class LocalStorageRecallRepository implements RecallRepository {
     await this.saveSnapshot(snapshot);
     return snapshot;
   }
+
+  // LocalStorage doesn't support targeted updates; these are no-ops (tests only)
+  async upsertDeck(_deck: Deck): Promise<void> {}
+  async upsertCard(_card: Card): Promise<void> {}
+  async deleteDeck(_deckId: string): Promise<void> {}
+  async deleteCard(_cardId: string): Promise<void> {}
 }
 
 function exportPayloadToSnapshot(payload: RecallExportPayload): RecallStateSnapshot {

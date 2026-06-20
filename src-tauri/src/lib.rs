@@ -2,7 +2,7 @@ mod anki_import;
 mod db_atomic;
 
 use anki_import::parse_anki_apkg;
-use db_atomic::{create_safety_backup, record_review_atomic, save_snapshot_atomic};
+use db_atomic::{create_safety_backup, delete_card_atomic, delete_deck_atomic, record_review_atomic, save_snapshot_atomic, upsert_card_atomic, upsert_deck_atomic, upsert_setting_atomic};
 use tauri::tray::{TrayIconBuilder, TrayIconEvent};
 use tauri::Emitter;
 use tauri::Manager;
@@ -190,7 +190,12 @@ pub fn run() {
             copy_image_to_recall,
             save_snapshot_atomic,
             record_review_atomic,
-            create_safety_backup
+            create_safety_backup,
+            upsert_deck_atomic,
+            upsert_card_atomic,
+            delete_deck_atomic,
+            delete_card_atomic,
+            upsert_setting_atomic,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Recall");
