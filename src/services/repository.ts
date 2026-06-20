@@ -42,6 +42,7 @@ export interface RecallRepository {
   upsertCard(card: Card): Promise<void>;
   deleteDeck(deckId: string): Promise<void>;
   deleteCard(cardId: string): Promise<void>;
+  queryCards(filters: { deckId?: string; state?: string; search?: string; sortField: string; sortDir: string; limit: number; offset: number }): Promise<{ cards: Card[]; total: number }>;
 }
 
 let cachedRepository: Promise<RecallRepository> | null = null;
@@ -464,6 +465,25 @@ class SqliteRecallRepository implements RecallRepository {
         await invoke("delete_card_atomic", { cardId });
       }
     }
+
+    async queryCards(filters: { deckId?: string; state?: string; search?: string; sortField: string; sortDir: string; limit: number; offset: number }): Promise<{ cards: Card[]; total: number }> {
+      if (!isTauriRuntime()) {
+        return { cards: [], total: 0 };
+      }
+      const { invoke } = await import("@tauri-apps/api/core");
+      const result = await invoke<[Array<Record<string, unknown>>, number]>("query_cards", {
+        deckId: filters.deckId ?? null,
+        state: filters.state ?? null,
+        search: filters.search ?? null,
+        sortField: filters.sortField,
+        sortDir: filters.sortDir,
+        limit: filters.limit,
+        offset: filters.offset,
+      });
+      const [rows, total] = result;
+      const cards = rows.map((row) => cardFromRow(row as unknown as import("@/db/mappers").CardRow));
+      return { cards, total };
+    }
   }
 
 class LocalStorageRecallRepository implements RecallRepository {
@@ -536,6 +556,11 @@ class LocalStorageRecallRepository implements RecallRepository {
   async upsertCard(_card: Card): Promise<void> {}
   async deleteDeck(_deckId: string): Promise<void> {}
   async deleteCard(_cardId: string): Promise<void> {}
+  async queryCards(_filters: { deckId?: string; state?: string; search?: string; sortField: string; sortDir: string; limit: number; offset: number }): Promise<{ cards: Card[]; total: number }> {
+    // LocalStorage can't do DB-side queries; fallback to client-side
+    const all = await this.loadAppData();
+    return { cards: all.cards, total: all.cards.length };
+  }
 }
 
 function exportPayloadToSnapshot(payload: RecallExportPayload): RecallStateSnapshot {

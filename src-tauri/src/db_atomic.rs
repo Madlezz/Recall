@@ -30,7 +30,7 @@ pub struct DeckRowData {
     pub updated_at: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, serde::Serialize)]
 pub struct CardRowData {
     pub id: String,
     pub deck_id: String,
@@ -500,6 +500,108 @@ pub async fn upsert_setting_atomic(app: tauri::AppHandle, setting: SettingRowDat
         .map_err(|e| format!("COMMIT failed: {}", e))?;
 
     Ok(())
+}
+
+/// Query cards with DB-side filtering, sorting, and pagination.
+/// Returns paginated results + total count for UI pagination.
+#[tauri::command]
+pub async fn query_cards(
+    app: tauri::AppHandle,
+    deck_id: Option<String>,
+    state: Option<String>,
+    search: Option<String>,
+    sort_field: String,
+    sort_dir: String,
+    limit: i64,
+    offset: i64,
+) -> Result<(Vec<CardRowData>, i64), String> {
+    let conn = open_db_connection(&app)?;
+
+    // Build WHERE clause
+    let mut where_clauses = Vec::new();
+    let mut params: Vec<Box<dyn rusqlite::types::ToSql>> = Vec::new();
+
+    if let Some(ref did) = deck_id {
+        where_clauses.push("deck_id = ?");
+        params.push(Box::new(did.clone()));
+    }
+    if let Some(ref st) = state {
+        where_clauses.push("state = ?");
+        params.push(Box::new(st.clone()));
+    }
+    if let Some(ref s) = search {
+        where_clauses.push("(front LIKE ? OR back LIKE ? OR hint LIKE ? OR tags LIKE ?)");
+        let pattern = format!("%{}%", s);
+        params.push(Box::new(pattern.clone()));
+        params.push(Box::new(pattern.clone()));
+        params.push(Box::new(pattern.clone()));
+        params.push(Box::new(pattern));
+    }
+
+    let where_sql = if where_clauses.is_empty() {
+        String::new()
+    } else {
+        format!("WHERE {}", where_clauses.join(" AND "))
+    };
+
+    // Validate sort_field to prevent SQL injection
+    let sort_col = match sort_field.as_str() {
+        "front" => "front",
+        "deck" => "deck_id",
+        "state" => "state",
+        "nextReview" => "next_review_date",
+        "lapses" => "lapses",
+        "created" => "created_at",
+        _ => "next_review_date",
+    };
+
+    let dir = if sort_dir == "desc" { "DESC" } else { "ASC" };
+
+    // Get total count
+    let count_sql = format!("SELECT COUNT(*) FROM cards {}", where_sql);
+    let total: i64 = conn
+        .query_row(&count_sql, rusqlite::params_from_iter(params.iter()), |row| row.get(0))
+        .map_err(|e| format!("COUNT query failed: {}", e))?;
+
+    // Get paginated results
+    let query_sql = format!(
+        "SELECT id, deck_id, front, back, hint, source, tags, card_type, state, last_review_date, next_review_date, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at FROM cards {} ORDER BY {} {} LIMIT ? OFFSET ?",
+        where_sql, sort_col, dir
+    );
+
+    params.push(Box::new(limit));
+    params.push(Box::new(offset));
+
+    let mut stmt = conn.prepare(&query_sql).map_err(|e| format!("Prepare failed: {}", e))?;
+    let cards: Vec<CardRowData> = stmt
+        .query_map(rusqlite::params_from_iter(params.iter()), |row| {
+            Ok(CardRowData {
+                id: row.get(0)?,
+                deck_id: row.get(1)?,
+                front: row.get(2)?,
+                back: row.get(3)?,
+                hint: row.get(4)?,
+                source: row.get(5)?,
+                tags: row.get(6)?,
+                card_type: row.get(7)?,
+                state: row.get(8)?,
+                last_review_date: row.get(9)?,
+                next_review_date: row.get(10)?,
+                stability: row.get(11)?,
+                difficulty: row.get(12)?,
+                elapsed_days: row.get(13)?,
+                scheduled_days: row.get(14)?,
+                reps: row.get(15)?,
+                lapses: row.get(16)?,
+                created_at: row.get(17)?,
+                updated_at: row.get(18)?,
+            })
+        })
+        .map_err(|e| format!("Query failed: {}", e))?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|e| format!("Collect failed: {}", e))?;
+
+    Ok((cards, total))
 }
 
 /// Remove old safety backups, keeping only the newest `keep` files.

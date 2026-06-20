@@ -1,7 +1,7 @@
 {
   "name": "recall",
   "private": true,
-  "version": "1.0.7",
+  "version": "1.0.8",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -47,6 +47,7 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",
     "ts-fsrs": "^5.4.1",
+    "virtua": "^0.49.1",
     "zustand": "^5.0.2"
   },
   "devDependencies": {
