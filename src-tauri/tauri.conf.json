@@ -27,6 +27,7 @@
   },
   "bundle": {
     "active": true,
+    "createUpdaterArtifacts": true,
     "targets": ["msi", "app", "appimage", "dmg"],
     "icon": ["icons/icon.png", "icons/icon.ico", "icons/icon.icns"],
     "windows": {

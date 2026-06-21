@@ -119,10 +119,10 @@ Pre-built binaries are available on the [Releases page](https://github.com/Madle
 
 | Platform | File |
 |----------|------|
-| Windows | `.exe` or `.msi` installer |
+| Windows | `.msi` installer |
 | macOS (Apple Silicon) | `.dmg` |
 | macOS (Intel) | `.dmg` |
-| Linux | `.AppImage` or `.deb` |
+| Linux | `.AppImage` |
 
 Or build from source — see [Quick Start](#quick-start).
 
