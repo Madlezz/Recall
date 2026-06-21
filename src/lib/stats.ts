@@ -174,3 +174,58 @@ export function getDeckHealth(
     }
     return result;
   }
+
+  export interface ForecastDueDay {
+    date: string;     // YYYY-MM-DD
+    due: number;      // review cards due this day
+    newCount: number; // brand-new cards (state === "new")
+  }
+
+  /**
+   * Bucket cards by their next review date for the next N days.
+   * Overdue cards are bucketed into day 0.
+   * New cards (state === "new") are counted separately.
+   */
+  export function forecastDueByDay(cards: Card[], days = 30, now = new Date()): ForecastDueDay[] {
+    const today = startOfDay(now);
+    const buckets = new Map<string, { due: number; newCount: number }>();
+
+    // Initialize buckets
+    for (let i = 0; i < days; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() + i);
+      const key = d.toISOString().slice(0, 10);
+      buckets.set(key, { due: 0, newCount: 0 });
+    }
+
+    const dayKeys = Array.from(buckets.keys());
+    const lastDay = dayKeys[dayKeys.length - 1];
+
+    for (const card of cards) {
+      if (card.state === "new") {
+        // Brand-new cards don't have a scheduled date — count in day 0
+        const first = dayKeys[0];
+        const bucket = buckets.get(first);
+        if (bucket) bucket.newCount += 1;
+        continue;
+      }
+
+      const dueDate = startOfDay(parseISO(card.nextReviewDate));
+      const key = dueDate.toISOString().slice(0, 10);
+
+      // Overdue cards go into day 0
+      if (isAfter(today, dueDate) || dueDate.getTime() === today.getTime()) {
+        const first = dayKeys[0];
+        const bucket = buckets.get(first);
+        if (bucket) bucket.due += 1;
+      } else if (key <= lastDay) {
+        const bucket = buckets.get(key);
+        if (bucket) bucket.due += 1;
+      }
+    }
+
+    return dayKeys.map((key) => {
+      const b = buckets.get(key);
+      return { date: key, due: b?.due ?? 0, newCount: b?.newCount ?? 0 };
+    });
+  }

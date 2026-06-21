@@ -1,7 +1,7 @@
 import { Brain, Calendar, Flame, Lock, TrendingUp, Zap } from "lucide-react";
 import { useStats } from "./use-stats";
 import { ACHIEVEMENT_DEFS } from "@/types";
-import { RetentionForecast } from "@/components/retention-forecast";
+import { WorkloadForecast } from "@/components/workload-forecast";
 
 // ── Stat tile ──
 
@@ -230,8 +230,8 @@ export function Stats(): JSX.Element {
         </section>
       )}
 
-      {/* Due forecast */}
-      <RetentionForecast cards={cards} />
+      {/* Workload forecast */}
+      <WorkloadForecast cards={cards} />
 
       {/* Top decks */}
       {topDecks.length > 0 && (
