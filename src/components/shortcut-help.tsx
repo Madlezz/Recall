@@ -7,6 +7,7 @@ interface ShortcutHelpProps {
 }
 
 const SHORTCUTS = [
+  { keys: ["Ctrl", "K"], description: "Command palette" },
   { keys: ["Space"], description: "Reveal answer (in study mode)" },
   { keys: ["1"], description: "Rate — Again" },
   { keys: ["2"], description: "Rate — Hard" },

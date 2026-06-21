@@ -1,5 +1,6 @@
 import { BookOpen, Home, LayoutGrid, Settings, Shield, Star, TrendingUp, Zap } from "lucide-react";
 import type { ReactNode } from "react";
+import { CommandPalette } from "@/components/command-palette";
 import { Button } from "@/components/ui/button";
 import { getDueTodayCount } from "@/lib/stats";
 import { cn } from "@/lib/utils";
@@ -95,6 +96,9 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
       <main id="main-content" className="lg:pl-56" tabIndex={-1}>
         <div className="mx-auto w-full max-w-6xl px-6 py-8 lg:px-10">{children}</div>
       </main>
+
+      {/* ── Command Palette ── */}
+      <CommandPalette />
     </div>
   );
 }
