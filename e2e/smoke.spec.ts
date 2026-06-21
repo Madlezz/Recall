@@ -74,8 +74,8 @@ test.describe("Recall Smoke Tests", () => {
     // Click "Start Review"
     await page.getByRole("button", { name: /Start Review/i }).first().click();
 
-    // Should be in study mode — progress counter visible (e.g., "1/5")
-    await expect(page.getByText(/\d+\/\d+/)).toBeVisible({ timeout: 10000 });
+    // Should be in study mode — progress counter visible (e.g., "1 / 5")
+    await expect(page.getByText(/\d+\s*\/\s*\d+/)).toBeVisible({ timeout: 10000 });
 
     // Press Space to reveal answer
     await page.keyboard.press("Space");
@@ -104,6 +104,6 @@ test.describe("Recall Smoke Tests", () => {
     await page.keyboard.press("r");
 
     // Should enter study mode
-    await expect(page.getByText(/\d+\/\d+/)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/\d+\s*\/\s*\d+/)).toBeVisible({ timeout: 10000 });
   });
 });
