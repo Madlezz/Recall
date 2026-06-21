@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useRecallStore } from "@/stores/recall-store";
 import { speakText, stopSpeaking, isTTSSupported } from "@/services/tts";
 import { playFlipSound, playCorrectSound, playAgainSound, playHardSound } from "@/services/audio";
+import { previewIntervals } from "@/services/fsrs-engine";
 import { cn } from "@/lib/utils";
 import type { SessionSummary } from "@/types";
 
@@ -174,6 +175,11 @@ export function StudyMode(): JSX.Element {
 
   const progress = ((activeStudy.currentIndex) / total) * 100;
 
+  // Compute interval preview when answer is revealed
+  const intervals = activeStudy.revealed && card
+    ? previewIntervals(card, settings?.desiredRetention)
+    : null;
+
   // ── Active study ──
   return (
     <div className="flex min-h-[82vh] flex-col relative">
@@ -294,10 +300,10 @@ export function StudyMode(): JSX.Element {
           </Button>
         ) : (
           <>
-            <AnswerButton label="Again" keyHint="1" variant="again" onClick={() => { playAgainSound(); setRatingFlash("again"); void answerCurrentCard("again"); }} />
-            <AnswerButton label="Hard" keyHint="2" variant="hard" onClick={() => { playHardSound(); setRatingFlash("hard"); void answerCurrentCard("hard"); }} />
-            <AnswerButton label="Good" keyHint="3" variant="good" onClick={() => { playCorrectSound(); setRatingFlash("good"); void answerCurrentCard("good"); }} />
-            <AnswerButton label="Easy" keyHint="4" variant="easy" onClick={() => { playCorrectSound(); setRatingFlash("easy"); void answerCurrentCard("easy"); }} />
+            <AnswerButton label="Again" keyHint="1" variant="again" interval={intervals?.again} onClick={() => { playAgainSound(); setRatingFlash("again"); void answerCurrentCard("again"); }} />
+            <AnswerButton label="Hard" keyHint="2" variant="hard" interval={intervals?.hard} onClick={() => { playHardSound(); setRatingFlash("hard"); void answerCurrentCard("hard"); }} />
+            <AnswerButton label="Good" keyHint="3" variant="good" interval={intervals?.good} onClick={() => { playCorrectSound(); setRatingFlash("good"); void answerCurrentCard("good"); }} />
+            <AnswerButton label="Easy" keyHint="4" variant="easy" interval={intervals?.easy} onClick={() => { playCorrectSound(); setRatingFlash("easy"); void answerCurrentCard("easy"); }} />
           </>
         )}
 
@@ -327,7 +333,7 @@ const answerStyles: Record<AnswerVariant, string> = {
   easy: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900",
 };
 
-function AnswerButton({ label, keyHint, variant, onClick }: { label: string; keyHint: string; variant: AnswerVariant; onClick: () => void }): JSX.Element {
+function AnswerButton({ label, keyHint, variant, interval, onClick }: { label: string; keyHint: string; variant: AnswerVariant; interval?: string; onClick: () => void }): JSX.Element {
   const variantDescriptions: Record<AnswerVariant, string> = {
     again: "Rate as Again - forgot completely",
     hard: "Rate as Hard - remembered with difficulty",
@@ -339,10 +345,15 @@ function AnswerButton({ label, keyHint, variant, onClick }: { label: string; key
     <button
       onClick={onClick}
       aria-label={variantDescriptions[variant]}
-      className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors ${answerStyles[variant]}`}
+      className={`flex flex-col items-center gap-0.5 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${answerStyles[variant]}`}
     >
-      <span className="text-[10px] font-medium opacity-60 w-4" aria-hidden="true">{keyHint}</span>
-      {label}
+      <span className="flex items-center gap-2">
+        <span className="text-[10px] font-medium opacity-60 w-4" aria-hidden="true">{keyHint}</span>
+        {label}
+      </span>
+      {interval && (
+        <span className="text-[10px] font-normal opacity-60" aria-label={`Next interval: ${interval}`}>{interval}</span>
+      )}
     </button>
   );
 }
