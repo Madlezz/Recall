@@ -50,7 +50,7 @@
       }
     },
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEFBOTRBM0ZFNEE0M0U2N0QKUldSOTVrTksvcU9VcXJZWjlUcVY5QzN0TFBnY2tMYkYxc1pLZ3Yrc3lmcWVrT21oalZHdzJpenMK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQ1MjExOUFEQjhFOEVFMjQKUldRazd1aTRyUmtoUlkwYUl0TkVuRTRiSWtmWTZDeTkwZklZdDYvdVZ2UU85L2YrTU01QmlsYkEK",
       "endpoints": [
         "https://github.com/Madlezz/Recall/releases/latest/download/latest.json"
       ],
