@@ -30,7 +30,12 @@ export async function insertImage(): Promise<string | null> {
 export async function getImageUrl(filename: string): Promise<string> {
   const safe = sanitizeFilename(filename);
   if (!safe) return "";
-  if (imageUrlCache.has(safe)) return imageUrlCache.get(safe)!;
+  if (imageUrlCache.has(safe)) {
+    const cached = imageUrlCache.get(safe)!;
+    imageUrlCache.delete(safe);
+    imageUrlCache.set(safe, cached);
+    return cached;
+  }
   try {
     const { appDataDir } = await import("@tauri-apps/api/path");
     const { convertFileSrc } = await import("@tauri-apps/api/core");
