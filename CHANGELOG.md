@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Changed
+- A3/A4: Clarified DB architecture in `src/db/client.ts` — all writes go through Rust atomic commands, executor is read-only in production
+- A8: Added explicit fs scope to Tauri capabilities — restricted to `$APPDATA/**` and dialog-selected paths
+- A12: Added coverage threshold (70% lines/functions/branches/statements) and benchmark test stub
+
+### Fixed
+- A9: Verified LRU cache implementation is correct (already uses delete+set for reordering)
+- R2: Documented OS code signing status in SECURITY.md (binaries not OS-signed, only updater-signed)
+
 ## [1.0.11] - 2026-06-21
 
 ### Added
