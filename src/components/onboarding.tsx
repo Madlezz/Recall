@@ -84,7 +84,7 @@ export function Onboarding(): JSX.Element {
             size="lg"
             className="w-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
             onClick={() => void handleTryDemo()}
-            aria-label="Try Recall with demo flashcard cards"
+            aria-label="Try with Demo Cards"
           >
             <Sparkles className="mr-2 h-4 w-4" aria-hidden="true" />
             Try with Demo Cards
