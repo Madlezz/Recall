@@ -44,3 +44,27 @@ Some transitive dependencies may have advisories flagged by `cargo audit` or `pn
 Every release includes:
 - **SHA256SUMS** — verify download integrity with `sha256sum -c SHA256SUMS`
 - **Signed updater bundles** — Tauri updater verifies ed25519 signatures before installing
+
+## Code Signing Status
+
+**Binaries are not OS-signed.** This means:
+
+### Windows
+SmartScreen may warn "Windows protected your PC" on first run. To proceed:
+1. Click **"More info"**
+2. Click **"Run anyway"**
+
+To verify authenticity, check the SHA256SUMS file against your download.
+
+### macOS
+Gatekeeper may block the app with "Recall cannot be opened because the developer cannot be verified." To proceed:
+1. Right-click the app → **Open** (instead of double-click)
+2. Click **Open** in the dialog
+
+Alternatively, remove the quarantine attribute:
+```bash
+xattr -cr /Applications/Recall.app
+```
+
+### Future: OS-level signing
+Authenticode (Windows) and notarization (macOS) require paid certificates. This is tracked for future releases but not currently implemented.
