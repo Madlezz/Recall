@@ -24,8 +24,8 @@ Recall is a local desktop application. Network access is limited to:
 ## Automated Auditing
 
 - **JavaScript/TypeScript**: Dependabot + `pnpm audit`
-- **Rust**: `cargo audit` runs on every CI push/PR
-- **CodeQL**: GitHub CodeQL analyzes JS/TS on every push
+- **Rust**: `cargo audit` runs on every CI push/PR (ignore justifications in `src-tauri/.cargo/audit.toml`)
+- **CodeQL**: GitHub CodeQL analyzes both JS/TS and Rust on every push
 
 ## Known Upstream Vulnerabilities
 

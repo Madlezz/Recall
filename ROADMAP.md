@@ -34,7 +34,7 @@ This document outlines the planned features and improvements for Recall. Items a
 - [ ] Apple Pencil / stylus support for handwriting
 
 ### Performance & Scale
-- [ ] Database optimization for large decks (10,000+ cards) *(partial: DB-side queries done in v1.0.8)*
+- [ ] Database optimization for large decks (10,000+ cards) *(done: DB-side queries + pagination in v1.0.8, UI wired in v1.0.11)*
 - [ ] Incremental search indexing
 - [ ] Lazy loading for card browser
 - [ ] Memory optimization for mobile devices
@@ -80,6 +80,11 @@ This document outlines the planned features and improvements for Recall. Items a
 - [x] Configurable FSRS desired retention slider (v1.0.7)
 - [x] DB-side card query with filtering/sorting/pagination (v1.0.8)
 - [x] Release signing: ed25519 updater keys + SHA256SUMS (v1.0.9)
+- [x] Auto-updater artifacts: `latest.json` + `.sig` generation (v1.0.11)
+- [x] CodeQL Rust analysis (v1.0.11)
+- [x] Cargo-audit ignore justification file (v1.0.11)
+- [x] Anki media import warning (v1.0.11)
+- [x] Card browser UI wired to DB queries (v1.0.11)
 
 ## Contributing
 

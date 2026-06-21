@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [1.0.11] - 2026-06-21
+
+### Added
+- R2: `bundle.createUpdaterArtifacts: true` — auto-generates `latest.json` + `.sig` files for updater
+- R4: CodeQL Rust analysis — separate job for Rust security scanning alongside JS/TS
+- A5: Anki import now warns when media files (images/audio) are detected but not transferred
+
+### Changed
+- A2: Wired `query_cards` into card browser UI — DB-side pagination instead of loading all cards
+- A7: `chrono_lite_timestamp()` uses milliseconds + atomic counter (collision-proof)
+- R1: Cargo-audit ignores moved to `src-tauri/.cargo/audit.toml` with per-line justification
+
+### Fixed
+- R9: Download table in README corrected (msi/AppImage only, removed .exe/.deb)
+- Lint: 0 warnings — disabled `react-refresh/only-export-components` for UI primitives
+- Rust: Fixed borrow checker issue in Anki import with explicit `drop()` calls
+
 ## [1.0.9] - 2026-06-20
 
 ### Added
