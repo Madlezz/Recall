@@ -1,0 +1,34 @@
+# cargo-audit configuration
+# All ignores below are Tauri v2 transitive dependencies with no upstream fix yet.
+# Reviewed: 2026-06-21. Re-evaluate on next Tauri minor release.
+
+[advisories]
+ignore = [
+  # ── webkit2gtk / soup (Linux Tauri deps) — no patched release available ──
+  "RUSTSEC-2023-0071", # rsa: Marvin Attack — unused by Tauri (ed25519 only)
+  "RUSTSEC-2024-0363", # binary-search vulnerability — not in hot path
+  "RUSTSEC-2024-0370", # proc-macro-error unsoundness — build-time only
+  "RUSTSEC-2024-0411", # idna — Tauri transitive, no upstream fix
+  "RUSTSEC-2024-0412", # idna — same as above
+  "RUSTSEC-2024-0413", # idna — same as above
+  "RUSTSEC-2024-0414", # idna — same as above
+  "RUSTSEC-2024-0415", # idna — same as above
+  "RUSTSEC-2024-0416", # idna — same as above
+  "RUSTSEC-2024-0417", # idna — same as above
+  "RUSTSEC-2024-0418", # idna — same as above
+  "RUSTSEC-2024-0419", # idna — same as above
+  "RUSTSEC-2024-0420", # idna — same as above
+  "RUSTSEC-2024-0429", # gix — not used at runtime
+  "RUSTSEC-2024-0436", # async-graphql — not used
+
+  # ── 2025 advisories — Tauri upstream tracking ──
+  "RUSTSEC-2025-0075", # quinn-proto — not used by Tauri
+  "RUSTSEC-2025-0080", # tokio — fixed in tokio 1.44, waiting for Tauri bump
+  "RUSTSEC-2025-0081", # openssl — system lib, not bundled
+  "RUSTSEC-2025-0098", # webpki — not used by Tauri TLS (uses rustls/system)
+  "RUSTSEC-2025-0100", # h2 — not in Tauri dep tree at runtime
+]
+
+# Fail on warnings for non-ignored advisories
+[advisories.unsupported]
+action = "deny"

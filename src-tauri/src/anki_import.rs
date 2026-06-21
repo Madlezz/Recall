@@ -190,6 +190,8 @@ pub async fn parse_anki_apkg(file_path: String) -> Result<AnkiImportReport, Stri
     let db_path = temp_dir.path().join(collection_name);
     let mut db_file = File::create(&db_path).map_err(|e| e.to_string())?;
     std::io::copy(&mut collection_entry, &mut db_file).map_err(|e| e.to_string())?;
+    drop(collection_entry);
+    drop(db_file);
 
     let conn = rusqlite::Connection::open(&db_path).map_err(|e| e.to_string())?;
 
@@ -224,6 +226,24 @@ pub async fn parse_anki_apkg(file_path: String) -> Result<AnkiImportReport, Stri
         warnings.push(format!(
             "{} notes detected but only {} cards imported. Multi-template cards are not yet supported.",
             notes_detected, cards_imported,
+        ));
+    }
+
+    // Check for media files in the archive (images/audio/video)
+    let media_count = (0..archive.len())
+        .filter(|i| {
+            if let Ok(entry) = archive.by_index(*i) {
+                let name = entry.name();
+                !name.starts_with("collection.anki2") && name != "media" && !name.ends_with('/')
+            } else {
+                false
+            }
+        })
+        .count();
+    if media_count > 0 {
+        warnings.push(format!(
+            "{} media file(s) detected in .apkg but not imported. Anki images/audio are not transferred during import.",
+            media_count,
         ));
     }
 

@@ -359,13 +359,16 @@ pub async fn create_safety_backup(app: tauri::AppHandle) -> Result<String, Strin
 }
 
 /// Generate a simple timestamp string without pulling in the chrono crate.
+/// Includes milliseconds and an atomic counter to prevent same-second collisions.
 fn chrono_lite_timestamp() -> String {
     use std::time::{SystemTime, UNIX_EPOCH};
-    let secs = SystemTime::now()
+    let dur = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_secs();
-    format!("{}", secs)
+        .unwrap_or_default();
+    let millis = dur.as_millis();
+    static COUNTER: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
+    let count = COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    format!("{:x}-{:x}", millis, count)
 }
 
 /// Atomically upsert a single deck (insert or update).
