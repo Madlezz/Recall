@@ -45,12 +45,17 @@ async function createTauriSqlExecutor(): Promise<SqlExecutor | null> {
     async execute(sql: string, params: SqlValue[] = []) {
       await database.execute(sql, params);
     },
-    async transaction<T>(callback: (tx: SqlExecutor) => Promise<T>) {
-      // Don't use explicit BEGIN/COMMIT/ROLLBACK — the tauri_plugin_sql plugin
-      // shares the database connection with Rust, and Rust's migrations leave
-      // transaction state on the connection. Just execute statements directly;
-      // SQLite runs each statement in its own implicit transaction.
-      // This is less atomic but avoids connection state conflicts.
+    async transaction<T>(callback: (tx: SqlExecutor) => Promise<T>): Promise<T> {
+      // ARCHITECTURE NOTE (A3/A4):
+      // On Tauri runtime, this executor is READ-ONLY. All write operations go through
+      // Rust atomic commands via invoke() (see db_atomic.rs). This separation ensures:
+      // - True atomic transactions with BEGIN IMMEDIATE / COMMIT / ROLLBACK
+      // - No shared connection state conflicts between JS and Rust
+      // - Data integrity for multi-statement operations
+      //
+      // This transaction() method is only used by the browser/preview fallback
+      // (LocalStorageRecallRepository) where atomicity is not critical.
+      // SQLite implicit transactions are fine for individual SELECT/INSERT statements.
       return callback(executor);
     },
   };
