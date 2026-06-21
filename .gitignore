@@ -10,10 +10,11 @@ Thumbs.db
 *.swp
 *.swo
 /test-results/
-.playwright/
+/playwright/
 .hermes/
 .vscode/
 .idea/
+coverage/
 
 # Temporary files
 gen-key.py
