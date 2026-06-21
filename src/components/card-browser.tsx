@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useCardBrowser, type SortField, type SortDir, STATE_LABELS, STATE_COLORS } from "./use-card-browser";
 import { useRecallStore } from "@/stores/recall-store";
-import { useState, useEffect } from "react";
 
 const PAGE_SIZE = 50;
 
@@ -58,7 +57,11 @@ export function CardBrowser(): JSX.Element {
     cards,
     decks,
     deckMap,
-    filtered,
+    filtered: paginatedCards,
+    totalCount,
+    totalPages,
+    currentPage,
+    loading,
     search,
     deckFilter,
     stateFilter,
@@ -76,6 +79,7 @@ export function CardBrowser(): JSX.Element {
     clearSelection,
     handleSort,
     clearFilters,
+    setPage,
     setBulkTagInput,
     setBulkTagMode,
     setShowBulkTag,
@@ -84,16 +88,6 @@ export function CardBrowser(): JSX.Element {
     updateCard,
   } = useCardBrowser();
   const showDeck = useRecallStore((s) => s.showDeck);
-  const [page, setPage] = useState(0);
-
-  // Reset to first page when filters change
-  useEffect(() => {
-    setPage(0);
-  }, [search, deckFilter, stateFilter, sortField, sortDir]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages - 1);
-  const paginatedCards = filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
   async function bulkDelete() {
     const ids = [...selected];
@@ -169,7 +163,7 @@ export function CardBrowser(): JSX.Element {
         <div>
           <h1 className="text-2xl font-semibold tracking-normal">Card Browser</h1>
           <p className="text-sm text-muted-foreground">
-            {filtered.length} of {cards.length} cards
+            {totalCount} cards{loading && " · loading..."}
             {selected.size > 0 && <> · {selected.size} selected</>}
           </p>
         </div>
@@ -290,7 +284,7 @@ export function CardBrowser(): JSX.Element {
               <th className="w-10 px-3 py-2">
                 <input
                   type="checkbox"
-                  checked={selected.size === filtered.length && filtered.length > 0}
+                  checked={selected.size === paginatedCards.length && paginatedCards.length > 0}
                   onChange={selectAll}
                   className="h-4 w-4 rounded border-muted-foreground/30"
                 />
@@ -305,7 +299,7 @@ export function CardBrowser(): JSX.Element {
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {paginatedCards.length === 0 ? (
               <tr>
                 <td colSpan={8} className="px-3 py-16 text-center">
                   <div className="mx-auto max-w-sm space-y-2">
@@ -395,7 +389,7 @@ export function CardBrowser(): JSX.Element {
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-xs text-muted-foreground">
-            Showing {currentPage * PAGE_SIZE + 1} to {Math.min((currentPage + 1) * PAGE_SIZE, filtered.length)} of {filtered.length} cards
+            Showing {currentPage * PAGE_SIZE + 1} to {Math.min((currentPage + 1) * PAGE_SIZE, totalCount)} of {totalCount} cards
           </p>
           <div className="flex items-center gap-2">
             <Button

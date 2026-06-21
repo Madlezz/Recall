@@ -1,6 +1,8 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { useRecallStore } from "@/stores/recall-store";
 import type { Card, Deck, CardState } from "@/types";
+import { isTauriRuntime } from "@/db/client";
+import { getRecallRepository } from "@/services/repository";
 
 export type SortField = "front" | "deck" | "state" | "nextReview" | "lapses" | "created";
 export type SortDir = "asc" | "desc";
@@ -19,6 +21,18 @@ export const STATE_COLORS: Record<CardState, string> = {
   relearning: "bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300",
 };
 
+const PAGE_SIZE = 50;
+
+// Map UI sort fields to DB column names
+const SORT_FIELD_MAP: Record<SortField, string> = {
+  front: "front",
+  deck: "deck_id",
+  state: "state",
+  nextReview: "next_review_date",
+  lapses: "lapses",
+  created: "created_at",
+};
+
 export function useCardBrowser() {
   const cards = useRecallStore((s) => s.cards);
   const decks = useRecallStore((s) => s.decks);
@@ -32,6 +46,12 @@ export function useCardBrowser() {
   const [stateFilter, setStateFilter] = useState<string>("all");
   const [sortField, setSortField] = useState<SortField>("nextReview");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [page, setPage] = useState(0);
+
+  // ── DB-side query state (Tauri mode) ──
+  const [dbCards, setDbCards] = useState<Card[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   // ── Selection ──
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -48,7 +68,54 @@ export function useCardBrowser() {
     return map;
   }, [decks]);
 
+  // Reset to first page when filters change
+  useEffect(() => {
+    setPage(0);
+  }, [search, deckFilter, stateFilter, sortField, sortDir]);
+
+  // DB-side query (Tauri mode)
+  useEffect(() => {
+    if (!isTauriRuntime()) return;
+
+    let cancelled = false;
+    setLoading(true);
+
+    const fetchCards = async () => {
+      try {
+        const repo = await getRecallRepository();
+        const result = await repo.queryCards({
+          deckId: deckFilter !== "all" ? deckFilter : undefined,
+          state: stateFilter !== "all" ? stateFilter : undefined,
+          search: search.trim() || undefined,
+          sortField: SORT_FIELD_MAP[sortField],
+          sortDir,
+          limit: PAGE_SIZE,
+          offset: page * PAGE_SIZE,
+        });
+
+        if (!cancelled) {
+          setDbCards(result.cards);
+          setTotalCount(result.total);
+        }
+      } catch (error) {
+        console.error("Failed to query cards:", error);
+        if (!cancelled) {
+          setDbCards([]);
+          setTotalCount(0);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    fetchCards();
+    return () => { cancelled = true; };
+  }, [search, deckFilter, stateFilter, sortField, sortDir, page]);
+
+  // JS-side filtering (LocalStorage fallback)
   const filtered = useMemo(() => {
+    if (isTauriRuntime()) return dbCards;
+
     let result: Card[] = [...cards];
 
     const q = search.toLowerCase().trim();
@@ -99,14 +166,22 @@ export function useCardBrowser() {
     });
 
     return result;
-  }, [cards, search, deckFilter, stateFilter, sortField, sortDir, deckMap]);
+  }, [cards, dbCards, search, deckFilter, stateFilter, sortField, sortDir, deckMap]);
+
+  const total = isTauriRuntime() ? totalCount : filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages - 1);
+
+  // For Tauri mode, cards are already paginated from DB
+  // For LocalStorage mode, paginate in JS
+  const paginatedCards = isTauriRuntime() ? filtered : filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
   const toggleSelect = useCallback(
     (cardId: string, shiftKey: boolean) => {
       setSelected((prev) => {
         const next = new Set(prev);
         if (shiftKey && lastClicked) {
-          const visible = filtered.map((c) => c.id);
+          const visible = paginatedCards.map((c) => c.id);
           const start = visible.indexOf(lastClicked);
           const end = visible.indexOf(cardId);
           if (start !== -1 && end !== -1) {
@@ -122,14 +197,14 @@ export function useCardBrowser() {
       });
       setLastClicked(cardId);
     },
-    [filtered, lastClicked],
+    [paginatedCards, lastClicked],
   );
 
   const selectAll = useCallback(() => {
     setSelected((prev) =>
-      prev.size === filtered.length ? new Set() : new Set(filtered.map((c) => c.id)),
+      prev.size === paginatedCards.length ? new Set() : new Set(paginatedCards.map((c) => c.id)),
     );
-  }, [filtered]);
+  }, [paginatedCards]);
 
   const clearSelection = useCallback(() => {
     setSelected(new Set());
@@ -158,7 +233,11 @@ export function useCardBrowser() {
     cards,
     decks,
     deckMap,
-    filtered,
+    filtered: paginatedCards,
+    totalCount: total,
+    totalPages,
+    currentPage,
+    loading,
     search,
     deckFilter,
     stateFilter,
@@ -174,6 +253,7 @@ export function useCardBrowser() {
     setStateFilter,
     setSortField,
     setSortDir,
+    setPage,
     toggleSelect,
     selectAll,
     clearSelection,
