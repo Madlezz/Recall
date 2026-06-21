@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+- FSRS interval preview: rating buttons show predicted next interval (e.g. `<1m | 8m | 3d | 12d`)
+
 ## [1.0.11] - 2026-06-21
 
 ### Added
