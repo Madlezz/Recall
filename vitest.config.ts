@@ -11,25 +11,6 @@ export default defineConfig({
     exclude: ["e2e/**", "node_modules/**"],
     coverage: {
       provider: "v8",
-      reporter: ["text", "json", "html"],
-      exclude: [
-        "node_modules/**",
-        "e2e/**",
-        "**/*.test.ts",
-        "**/*.test.tsx",
-        "vitest.config.ts",
-        "vite.config.ts",
-        "playwright.config.ts",
-      ],
-      thresholds: {
-        lines: 70,
-        functions: 70,
-        branches: 70,
-        statements: 70,
-      },
-    },
-  },
-});
       reporter: ["text", "lcov"],
       include: ["src/**/*.ts", "src/**/*.tsx"],
       exclude: [
@@ -39,6 +20,11 @@ export default defineConfig({
         "src/vite-env.d.ts",
         "src/types.ts",
         "src/**/*.d.ts",
+        "node_modules/**",
+        "e2e/**",
+        "vitest.config.ts",
+        "vite.config.ts",
+        "playwright.config.ts",
       ],
       thresholds: {
         lines: 14,
