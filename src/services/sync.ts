@@ -55,7 +55,7 @@ export async function importFromSyncFolder(
     }
 
     return data;
-  } catch (error) {
+  } catch {
     // File doesn't exist or can't be read — not an error
     return null;
   }
