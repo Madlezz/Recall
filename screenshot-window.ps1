@@ -1,53 +1,60 @@
-param([string]$OutputPath, [string]$WindowTitle)
-
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
-
-# Find the window by title (partial match)
-$procs = Get-Process | Where-Object { $_.MainWindowTitle -like "*$WindowTitle*" }
-if (-not $procs) {
-    Write-Host "ERROR: No window found matching '$WindowTitle'"
-    exit 1
-}
-
-$proc = $procs[0]
-$hwnd = $proc.MainWindowHandle
-$rect = New-Object System.Drawing.Rectangle
-
-# Get window bounds
 Add-Type @"
 using System;
 using System.Runtime.InteropServices;
 public class WinAPI {
-    [DllImport("user32.dll")]
-    public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
-    [DllImport("user32.dll")]
-    public static extern bool SetForegroundWindow(IntPtr hWnd);
-    [StructLayout(LayoutKind.Sequential)]
-    public struct RECT {
-        public int Left; public int Top; public int Right; public int Bottom;
-    }
+    [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hWnd);
+    [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+    [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
 }
 "@
 
-[WinAPI]::SetForegroundWindow($hwnd) | Out-Null
+# Find the Recall process window
+$proc = Get-Process -Name "recall" -ErrorAction SilentlyContinue | Select-Object -First 1
+if (-not $proc) {
+    Write-Error "Recall process not found"
+    exit 1
+}
+
+$hwnd = $proc.MainWindowHandle
+if ($hwnd -eq [IntPtr]::Zero) {
+    Write-Error "Recall has no main window"
+    exit 1
+}
+
+# Bring to foreground
+[WinAPI]::ShowWindow($hwnd, 9)  # SW_RESTORE
+[WinAPI]::SetForegroundWindow($hwnd)
 Start-Sleep -Milliseconds 500
 
-$winRect = New-Object WinAPI+RECT
-[WinAPI]::GetWindowRect($hwnd, [ref]$winRect) | Out-Null
+# Get updated window rect
+$proc.Refresh()
+$rect = $proc.MainWindowHandle
+Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+public struct RECT { public int Left; public int Top; public int Right; public int Bottom; }
+public class WinRect {
+    [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+}
+"@
 
-$left = $winRect.Left
-$top = $winRect.Top
-$width = $winRect.Right - $winRect.Left
-$height = $winRect.Bottom - $winRect.Top
+$r = New-Object RECT
+[WinRect]::GetWindowRect($hwnd, [ref]$r)
+
+$width = $r.Right - $r.Left
+$height = $r.Bottom - $r.Top
 
 Write-Host "Capturing window: $($proc.MainWindowTitle) ($width x $height)"
 
 $bitmap = New-Object System.Drawing.Bitmap($width, $height)
 $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
-$graphics.CopyFromScreen($left, $top, 0, 0, (New-Object System.Drawing.Size($width, $height)))
-$bitmap.Save($OutputPath)
+$graphics.CopyFromScreen($r.Left, $r.Top, 0, 0, (New-Object System.Drawing.Size($width, $height)))
+
+$outputPath = $args[0]
+$bitmap.Save($outputPath)
 $graphics.Dispose()
 $bitmap.Dispose()
 
-Write-Host "Saved: $OutputPath"
+Write-Host "Saved: $outputPath"
