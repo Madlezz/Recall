@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [1.0.12] - 2026-06-22
+
 ### Added
 - High-contrast theme: pure black/white with stronger borders for accessibility
 - Retention curve: rolling 7-day retention rate visualization on stats dashboard
