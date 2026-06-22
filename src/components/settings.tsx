@@ -1,4 +1,4 @@
-import { Download, FolderOpen, HardDrive, Layers, Moon, RotateCcw, Save, Sun, Upload, Bell, BellOff, Volume2, Mic, TrendingUp, Eye } from "lucide-react";
+import { Download, FolderOpen, HardDrive, Layers, Moon, RotateCcw, Save, Sun, Upload, Bell, BellOff, Volume2, Mic, TrendingUp, Eye, RefreshCw } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -36,6 +36,7 @@ export function Settings(): JSX.Element {
   const setTheme = useRecallStore((state) => state.setTheme);
   const setAccentColor = useRecallStore((state) => state.setAccentColor);
   const setDyslexiaFont = useRecallStore((state) => state.setDyslexiaFont);
+  const performSync = useRecallStore((state) => state.performSync);
   const updateSettings = useRecallStore((state) => state.updateSettings);
   const resetData = useRecallStore((state) => state.resetData);
   const exportData = useRecallStore((state) => state.exportData);
@@ -484,6 +485,70 @@ export function Settings(): JSX.Element {
             </p>
           ) : (
             <p className="mt-3 text-xs text-zinc-400">No backups yet. Set a schedule and pick a folder.</p>
+          )}
+        </div>
+      </section>
+
+      {/* Cloud Sync */}
+      <section>
+        <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">Cloud Sync</h3>
+        <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+          <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+            Sync your data to a cloud folder (Dropbox, Google Drive, OneDrive, etc.) for backup and multi-device access.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={settings.syncEnabled}
+                onChange={(e) => void updateSettings({ syncEnabled: e.target.checked })}
+                className="rounded"
+              />
+              <span className="text-sm text-zinc-700 dark:text-zinc-300">Enable sync</span>
+            </label>
+            <button
+              onClick={async () => {
+                try {
+                  const { open } = await import("@tauri-apps/plugin-dialog");
+                  const folder = await open({ directory: true, title: "Choose sync folder" });
+                  if (folder) {
+                    await updateSettings({ syncFolder: folder as string });
+                    toast.success("Sync folder set");
+                  }
+                } catch {
+                  toast.error("Folder picker only works in the Tauri desktop app");
+                }
+              }}
+              className="flex items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800/50"
+            >
+              <FolderOpen className="h-3.5 w-3.5" />
+              {settings.syncFolder ? "Change Folder" : "Pick Folder"}
+            </button>
+            {settings.syncFolder && (
+              <span className="text-xs text-zinc-400 truncate max-w-[200px]">{settings.syncFolder}</span>
+            )}
+            {settings.syncFolder && (
+              <button
+                onClick={async () => {
+                  try {
+                    toast.loading("Syncing...", { id: "sync" });
+                    await performSync();
+                    toast.success("Sync complete", { id: "sync" });
+                  } catch (error) {
+                    toast.error(error instanceof Error ? error.message : "Sync failed", { id: "sync" });
+                  }
+                }}
+                className="flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                Sync Now
+              </button>
+            )}
+          </div>
+          {settings.syncFolder && (
+            <p className="mt-3 text-xs text-zinc-400">
+              Data will be synced to: <code className="text-xs">{settings.syncFolder}</code>
+            </p>
           )}
         </div>
       </section>

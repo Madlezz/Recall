@@ -3,11 +3,13 @@ import { dataState, getRepository, type StoreSet } from "../store-helpers";
 import { applyTheme, applyAccentColor, applyDyslexiaFont } from "@/services/storage";
 import { setMasterVolume } from "@/services/audio";
 import { setCustomWeights } from "@/services/fsrs-engine";
+import { performSync } from "@/services/sync";
 
 export interface SettingsSlice {
   setTheme: (theme: Theme) => Promise<void>;
   setAccentColor: (color: AccentColor) => Promise<void>;
   setDyslexiaFont: (enabled: boolean) => Promise<void>;
+  performSync: () => Promise<void>;
   updateSettings: (partial: Partial<RecallStateSnapshot["settings"]>) => Promise<void>;
   completeOnboarding: () => Promise<void>;
   startFresh: () => Promise<void>;
@@ -51,6 +53,23 @@ export const settingsSlice = (
     setMasterVolume(snapshot.settings.soundVolume / 100);
     setCustomWeights(snapshot.settings.fsrsWeights);
     set({ ...snapshot, error: null });
+  },
+
+  async performSync() {
+    const { settings } = dataState(get());
+    if (!settings.syncFolder) {
+      throw new Error("No sync folder configured");
+    }
+    const result = await performSync(dataState(get()), settings.syncFolder);
+    if (!result.success) {
+      throw new Error(result.error || "Sync failed");
+    }
+    if (result.imported) {
+      // Reload state from repository since mergeImportPayload returns a new snapshot
+      const repo = await getRepository();
+      const snapshot = await repo.loadAppData();
+      set({ ...snapshot, error: null });
+    }
   },
 
   async updateSettings(partial: Partial<RecallStateSnapshot["settings"]>) {
