@@ -2,7 +2,21 @@ export type CardState = "new" | "learning" | "review" | "relearning";
 export type ReviewRating = "again" | "hard" | "good" | "easy";
 export type Theme = "dark" | "light" | "high-contrast";
 export type DeckColor = "blue" | "green" | "amber" | "rose" | "violet" | "slate";
-export type CardType = "basic" | "cloze";
+export type CardType = "basic" | "cloze" | "image-occlusion";
+
+export interface OcclusionShape {
+  id: string;
+  x: number; // percentage 0-100
+  y: number;
+  width: number;
+  height: number;
+  label: string; // the answer
+}
+
+export interface ImageOcclusionData {
+  imageUrl: string; // filename (resolved via getImageUrl)
+  occlusions: OcclusionShape[];
+}
 
 export interface Deck {
   id: string;

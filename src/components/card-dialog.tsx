@@ -18,9 +18,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { TagInput } from "@/components/tag-input";
+import { ImageOcclusionEditor } from "@/components/image-occlusion-editor";
 import { useRecallStore } from "@/stores/recall-store";
 import { insertImage } from "@/services/images";
-import type { Card } from "@/types";
+import type { Card, CardType, ImageOcclusionData } from "@/types";
 
 interface CardDialogProps {
   card?: Card;
@@ -52,11 +53,13 @@ function insertAtCursor(
 export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Element {
   const [open, setOpen] = useState(false);
   const [targetDeckId, setTargetDeckId] = useState(card?.deckId ?? deckId);
+  const [cardType, setCardType] = useState<CardType>(card?.cardType ?? "basic");
   const [front, setFront] = useState(card?.front ?? "");
   const [back, setBack] = useState(card?.back ?? "");
   const [hint, setHint] = useState(card?.hint ?? "");
   const [source, setSource] = useState(card?.source ?? "");
   const [tags, setTags] = useState<string[]>(card?.tags ?? []);
+  const [occlusionData, setOcclusionData] = useState<ImageOcclusionData | null>(null);
   const decks = useRecallStore((state) => state.decks);
   const createCard = useRecallStore((state) => state.createCard);
   const updateCard = useRecallStore((state) => state.updateCard);
@@ -66,27 +69,57 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
   useEffect(() => {
     if (open) {
       setTargetDeckId(card?.deckId ?? deckId);
+      setCardType(card?.cardType ?? "basic");
       setFront(card?.front ?? "");
       setBack(card?.back ?? "");
       setHint(card?.hint ?? "");
       setSource(card?.source ?? "");
       setTags(card?.tags ?? []);
+      
+      // Parse occlusion data if this is an image-occlusion card
+      if (card?.cardType === "image-occlusion" && card?.front) {
+        try {
+          setOcclusionData(JSON.parse(card.front) as ImageOcclusionData);
+        } catch {
+          setOcclusionData(null);
+        }
+      } else {
+        setOcclusionData(null);
+      }
     }
   }, [card, deckId, open]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     
-    if (!front.trim()) {
-      toast.error("Card front (question) cannot be empty");
-      return;
-    }
-    if (!back.trim()) {
-      toast.error("Card back (answer) cannot be empty");
-      return;
+    let finalFront = front;
+    let finalBack = back;
+    
+    // For image-occlusion cards, serialize the occlusion data to the front field
+    if (cardType === "image-occlusion") {
+      if (!occlusionData?.imageUrl) {
+        toast.error("Please upload an image for the occlusion card");
+        return;
+      }
+      if (!occlusionData.occlusions.length) {
+        toast.error("Please create at least one occlusion");
+        return;
+      }
+      finalFront = JSON.stringify(occlusionData);
+      finalBack = ""; // Image occlusion doesn't use back field
+    } else {
+      // Regular validation for basic/cloze cards
+      if (!finalFront.trim()) {
+        toast.error("Card front (question) cannot be empty");
+        return;
+      }
+      if (!finalBack.trim()) {
+        toast.error("Card back (answer) cannot be empty");
+        return;
+      }
     }
     
-    const input = { deckId: targetDeckId, front, back, hint, source, tags };
+    const input = { deckId: targetDeckId, front: finalFront, back: finalBack, hint, source, tags, cardType };
 
     try {
       if (card) {
@@ -152,7 +185,27 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
               </Select>
             </div>
 
-            <Tabs defaultValue="front" className="w-full">
+            <div className="space-y-2">
+              <Label htmlFor="card-type" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Card Type</Label>
+              <Select value={cardType} onValueChange={(v) => setCardType(v as CardType)}>
+                <SelectTrigger id="card-type" className="border-zinc-200 dark:border-zinc-800">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="basic">Basic</SelectItem>
+                  <SelectItem value="cloze">Cloze Deletion</SelectItem>
+                  <SelectItem value="image-occlusion">Image Occlusion</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {cardType === "image-occlusion" ? (
+              <div className="space-y-4">
+                <Label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Image Occlusion</Label>
+                <ImageOcclusionEditor value={occlusionData} onChange={setOcclusionData} />
+              </div>
+            ) : (
+              <Tabs defaultValue="front" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="front">Front</TabsTrigger>
                 <TabsTrigger value="back">Back</TabsTrigger>
@@ -236,6 +289,7 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
                 </div>
               </TabsContent>
             </Tabs>
+            )}
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">

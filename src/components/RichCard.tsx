@@ -6,9 +6,10 @@ import rehypeHighlight from "rehype-highlight";
 import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import remarkGfm from "remark-gfm";
-import type { CardType } from "@/types";
+import type { CardType, ImageOcclusionData } from "@/types";
 import { renderCloze } from "@/lib/cloze";
 import { getImageUrl } from "@/services/images";
+import { ImageOcclusionStudy } from "@/components/image-occlusion-study";
 import "katex/dist/katex.min.css";
 import "highlight.js/styles/github-dark.css";
 
@@ -92,6 +93,20 @@ function preprocessContent(content: string): string {
 }
 
 export function RichCard({ content, isBack = false, cardType = "basic", revealed = true, allowHtml = false }: RichCardProps): JSX.Element {
+  // Image occlusion cards
+  if (cardType === "image-occlusion") {
+    try {
+      const occlusionData = JSON.parse(content) as ImageOcclusionData;
+      return (
+        <div className="w-full">
+          <ImageOcclusionStudy data={occlusionData} revealed={revealed} />
+        </div>
+      );
+    } catch {
+      return <div className="text-red-500">Invalid image occlusion data</div>;
+    }
+  }
+
   // For cloze cards that aren't revealed yet, render blanks inline
   if (cardType === "cloze" && !revealed && !isBack) {
     return (
