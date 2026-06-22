@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::File;
+use std::io::Read;
+use std::path::Path;
+use tauri::Manager;
 use tempfile::tempdir;
 use zip::ZipArchive;
 
@@ -20,6 +23,7 @@ pub struct AnkiImportReport {
     pub cards_imported: usize,
     pub unsupported_models: usize,
     pub warnings: Vec<String>,
+    pub media_imported: usize,
 }
 
 /// Parse deck name mappings from the col table's decks JSON blob (Anki 2.1+ format).
@@ -148,8 +152,109 @@ const MAX_DB_SIZE: u64 = 2 * 1024 * 1024 * 1024;
 /// Maximum number of cards to import.
 const MAX_CARDS: usize = 100_000;
 
+/// Extract media files from .apkg and copy them to Recall's image storage.
+/// Returns a map from Anki media filename to Recall filename.
+fn extract_media_files(
+    archive: &mut ZipArchive<File>,
+    app_data_dir: &Path,
+) -> Result<HashMap<String, String>, String> {
+    let mut media_map: HashMap<String, String> = HashMap::new();
+
+    // Parse the media map file (maps numeric IDs to original filenames)
+    let media_map_content = if let Ok(mut media_entry) = archive.by_name("media") {
+        let mut content = String::new();
+        media_entry.read_to_string(&mut content).ok();
+        Some(content)
+    } else {
+        None
+    };
+
+    let media_map_json: HashMap<String, String> = if let Some(content) = media_map_content {
+        serde_json::from_str(&content).unwrap_or_default()
+    } else {
+        HashMap::new()
+    };
+
+    // Create images directory if it doesn't exist
+    let images_dir = app_data_dir.join("images");
+    std::fs::create_dir_all(&images_dir).map_err(|e| e.to_string())?;
+
+    // Extract each media file
+    for i in 0..archive.len() {
+        let mut entry = match archive.by_index(i) {
+            Ok(e) => e,
+            Err(_) => continue,
+        };
+
+        let entry_name = entry.name().to_string();
+
+        // Skip database files and the media map
+        if entry_name.starts_with("collection.anki2")
+            || entry_name == "media"
+            || entry_name.ends_with('/')
+        {
+            continue;
+        }
+
+        // Get the original filename from the media map
+        let original_filename = media_map_json
+            .get(&entry_name)
+            .cloned()
+            .unwrap_or_else(|| entry_name.clone());
+
+        // Sanitize filename (remove path separators, etc.)
+        let safe_filename = original_filename
+            .replace(['/', '\\'], "_")
+            .replace("..", "_");
+
+        // Skip if not an image
+        let lower = safe_filename.to_lowercase();
+        if !lower.ends_with(".png")
+            && !lower.ends_with(".jpg")
+            && !lower.ends_with(".jpeg")
+            && !lower.ends_with(".gif")
+            && !lower.ends_with(".webp")
+            && !lower.ends_with(".svg")
+        {
+            continue;
+        }
+
+        // Extract the file
+        let dest_path = images_dir.join(&safe_filename);
+        let mut dest_file = File::create(&dest_path).map_err(|e| e.to_string())?;
+        std::io::copy(&mut entry, &mut dest_file).map_err(|e| e.to_string())?;
+
+        // Map original filename to Recall filename
+        media_map.insert(original_filename.clone(), safe_filename);
+    }
+
+    Ok(media_map)
+}
+
+/// Replace Anki image references in HTML with recall:// URLs.
+fn replace_media_references(content: &str, media_map: &HashMap<String, String>) -> String {
+    let mut result = content.to_string();
+
+    // Replace <img src="filename"> with <img src="recall://filename">
+    for (anki_name, recall_name) in media_map {
+        // Match various HTML patterns for images
+        let patterns = [
+            format!(r#"src="{}"#, anki_name),
+            format!(r#"src='{}'"#, anki_name),
+            format!(r#"src={}"#, anki_name),
+        ];
+
+        for pattern in &patterns {
+            let replacement = format!(r#"src="recall://{}""#, recall_name);
+            result = result.replace(pattern, &replacement);
+        }
+    }
+
+    result
+}
+
 #[tauri::command]
-pub async fn parse_anki_apkg(file_path: String) -> Result<AnkiImportReport, String> {
+pub async fn parse_anki_apkg(app: tauri::AppHandle, file_path: String) -> Result<AnkiImportReport, String> {
     let file = File::open(&file_path).map_err(|e| format!("Cannot open file: {}", e))?;
 
     // Zip-bomb guard: check compressed size
@@ -164,6 +269,11 @@ pub async fn parse_anki_apkg(file_path: String) -> Result<AnkiImportReport, Stri
 
     let temp_dir = tempdir().map_err(|e| e.to_string())?;
     let mut archive = ZipArchive::new(file).map_err(|e| format!("Invalid zip: {}", e))?;
+
+    // Extract media files first (before we consume the archive)
+    let app_data_dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
+    let media_map = extract_media_files(&mut archive, &app_data_dir).unwrap_or_default();
+    let media_imported = media_map.len();
 
     // Try collection.anki21 first (Anki 2.1+), fall back to collection.anki2 (legacy)
     let has_anki21 = archive.by_name("collection.anki21").is_ok();
@@ -209,6 +319,14 @@ pub async fn parse_anki_apkg(file_path: String) -> Result<AnkiImportReport, Stri
     let cards_detected = cards.len();
     let mut imported_cards = cards;
 
+    // Apply media reference replacement to card content
+    if !media_map.is_empty() {
+        for card in &mut imported_cards {
+            card.front = replace_media_references(&card.front, &media_map);
+            card.back = replace_media_references(&card.back, &media_map);
+        }
+    }
+
     if imported_cards.len() > MAX_CARDS {
         warnings.push(format!(
             "Truncated: {} cards found but maximum is {}. Only first {} imported.",
@@ -229,24 +347,6 @@ pub async fn parse_anki_apkg(file_path: String) -> Result<AnkiImportReport, Stri
         ));
     }
 
-    // Check for media files in the archive (images/audio/video)
-    let media_count = (0..archive.len())
-        .filter(|i| {
-            if let Ok(entry) = archive.by_index(*i) {
-                let name = entry.name();
-                !name.starts_with("collection.anki2") && name != "media" && !name.ends_with('/')
-            } else {
-                false
-            }
-        })
-        .count();
-    if media_count > 0 {
-        warnings.push(format!(
-            "{} media file(s) detected in .apkg but not imported. Anki images/audio are not transferred during import.",
-            media_count,
-        ));
-    }
-
     Ok(AnkiImportReport {
         cards: imported_cards,
         notes_detected,
@@ -254,6 +354,7 @@ pub async fn parse_anki_apkg(file_path: String) -> Result<AnkiImportReport, Stri
         cards_imported,
         unsupported_models: 0, // Would require parsing col.models
         warnings,
+        media_imported,
     })
 }
 

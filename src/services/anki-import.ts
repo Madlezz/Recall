@@ -14,6 +14,7 @@ export interface AnkiImportReport {
   cards_imported: number;
   unsupported_models: number;
   warnings: string[];
+  media_imported: number;
 }
 
 export async function parseAnkiApkg(filePath: string): Promise<AnkiImportReport> {

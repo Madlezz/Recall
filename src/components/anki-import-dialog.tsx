@@ -27,6 +27,7 @@ interface ImportReport {
   tags: string[];
   warnings: string[];
   decksCreated: string[];
+  mediaImported: number;
 }
 
 export function AnkiImportDialog(): JSX.Element {
@@ -148,6 +149,7 @@ export function AnkiImportDialog(): JSX.Element {
         tags: [...tagSet].sort(),
         warnings: ankiReport.warnings,
         decksCreated,
+        mediaImported: ankiReport.media_imported,
       });
     } catch (error) {
       console.error("Anki import failed:", error);
@@ -278,6 +280,12 @@ export function AnkiImportDialog(): JSX.Element {
                 <span className="text-zinc-500 dark:text-zinc-400">Cloze cards</span>
                 <span className="font-medium">{report.cardTypes.cloze}</span>
               </div>
+              {report.mediaImported > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-zinc-500 dark:text-zinc-400">Media files</span>
+                  <span className="font-medium">{report.mediaImported}</span>
+                </div>
+              )}
             </div>
 
             {report.tags.length > 0 && (
