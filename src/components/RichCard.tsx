@@ -95,16 +95,17 @@ function preprocessContent(content: string): string {
 export function RichCard({ content, isBack = false, cardType = "basic", revealed = true, allowHtml = false }: RichCardProps): JSX.Element {
   // Image occlusion cards
   if (cardType === "image-occlusion") {
+    let occlusionData: ImageOcclusionData;
     try {
-      const occlusionData = JSON.parse(content) as ImageOcclusionData;
-      return (
-        <div className="w-full">
-          <ImageOcclusionStudy data={occlusionData} revealed={revealed} />
-        </div>
-      );
+      occlusionData = JSON.parse(content) as ImageOcclusionData;
     } catch {
       return <div className="text-red-500">Invalid image occlusion data</div>;
     }
+    return (
+      <div className="w-full">
+        <ImageOcclusionStudy data={occlusionData} revealed={revealed} />
+      </div>
+    );
   }
 
   // For cloze cards that aren't revealed yet, render blanks inline

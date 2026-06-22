@@ -254,7 +254,10 @@ fn replace_media_references(content: &str, media_map: &HashMap<String, String>) 
 }
 
 #[tauri::command]
-pub async fn parse_anki_apkg(app: tauri::AppHandle, file_path: String) -> Result<AnkiImportReport, String> {
+pub async fn parse_anki_apkg(
+    app: tauri::AppHandle,
+    file_path: String,
+) -> Result<AnkiImportReport, String> {
     let file = File::open(&file_path).map_err(|e| format!("Cannot open file: {}", e))?;
 
     // Zip-bomb guard: check compressed size

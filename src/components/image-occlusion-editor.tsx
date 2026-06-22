@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { X, Plus } from "lucide-react";
 import type { ImageOcclusionData, OcclusionShape } from "@/types";
 import { insertImage, getImageUrl } from "@/services/images";
@@ -9,39 +9,38 @@ interface Props {
 }
 
 export function ImageOcclusionEditor({ value, onChange }: Props) {
-  const [imageSrc, setImageSrc] = useState<string>("");
   const [drawing, setDrawing] = useState(false);
   const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(null);
   const [currentShape, setCurrentShape] = useState<OcclusionShape | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
 
-  // Load image when imageUrl changes
-  useEffect(() => {
-    if (!value?.imageUrl) {
-      setImageSrc("");
-      imageRef.current = null;
-      return;
+  const drawShape = useCallback((ctx: CanvasRenderingContext2D, shape: OcclusionShape, img: HTMLImageElement) => {
+    const x = (shape.x / 100) * img.width;
+    const y = (shape.y / 100) * img.height;
+    const w = (shape.width / 100) * img.width;
+    const h = (shape.height / 100) * img.height;
+
+    // Semi-transparent overlay
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.fillRect(x, y, w, h);
+
+    // Border
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, w, h);
+
+    // Label
+    if (shape.label) {
+      ctx.fillStyle = "#fff";
+      ctx.font = "16px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(shape.label, x + w / 2, y + h / 2);
     }
+  }, []);
 
-    getImageUrl(value.imageUrl).then((url) => {
-      if (!url) return;
-      setImageSrc(url);
-      const img = new Image();
-      img.onload = () => {
-        imageRef.current = img;
-        drawCanvas();
-      };
-      img.src = url;
-    });
-  }, [value?.imageUrl]);
-
-  // Redraw canvas when shapes change
-  useEffect(() => {
-    drawCanvas();
-  }, [value?.occlusions]);
-
-  const drawCanvas = () => {
+  const drawCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     const img = imageRef.current;
     if (!canvas || !img) return;
@@ -65,32 +64,30 @@ export function ImageOcclusionEditor({ value, onChange }: Props) {
     if (currentShape) {
       drawShape(ctx, currentShape, img);
     }
-  };
+  }, [value?.occlusions, currentShape, drawShape]);
 
-  const drawShape = (ctx: CanvasRenderingContext2D, shape: OcclusionShape, img: HTMLImageElement) => {
-    const x = (shape.x / 100) * img.width;
-    const y = (shape.y / 100) * img.height;
-    const w = (shape.width / 100) * img.width;
-    const h = (shape.height / 100) * img.height;
-
-    // Semi-transparent overlay
-    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-    ctx.fillRect(x, y, w, h);
-
-    // Border
-    ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(x, y, w, h);
-
-    // Label
-    if (shape.label) {
-      ctx.fillStyle = "#fff";
-      ctx.font = "16px sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(shape.label, x + w / 2, y + h / 2);
+  // Load image when imageUrl changes
+  useEffect(() => {
+    if (!value?.imageUrl) {
+      imageRef.current = null;
+      return;
     }
-  };
+
+    getImageUrl(value.imageUrl).then((url) => {
+      if (!url) return;
+      const img = new Image();
+      img.onload = () => {
+        imageRef.current = img;
+        drawCanvas();
+      };
+      img.src = url;
+    });
+  }, [value?.imageUrl, drawCanvas]);
+
+  // Redraw canvas when shapes change
+  useEffect(() => {
+    drawCanvas();
+  }, [drawCanvas]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!imageRef.current) return;

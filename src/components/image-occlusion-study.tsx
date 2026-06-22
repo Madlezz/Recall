@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import type { ImageOcclusionData, OcclusionShape } from "@/types";
 import { getImageUrl } from "@/services/images";
 
@@ -8,55 +8,11 @@ interface Props {
 }
 
 export function ImageOcclusionStudy({ data, revealed }: Props) {
-  const [imageSrc, setImageSrc] = useState<string>("");
   const [revealedIndex, setRevealedIndex] = useState<number | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
 
-  // Load image
-  useEffect(() => {
-    if (!data.imageUrl) return;
-
-    getImageUrl(data.imageUrl).then((url) => {
-      if (!url) return;
-      setImageSrc(url);
-      const img = new Image();
-      img.onload = () => {
-        imageRef.current = img;
-        drawCanvas();
-      };
-      img.src = url;
-    });
-  }, [data.imageUrl]);
-
-  // Redraw when revealed state changes
-  useEffect(() => {
-    drawCanvas();
-  }, [revealed, revealedIndex]);
-
-  const drawCanvas = () => {
-    const canvas = canvasRef.current;
-    const img = imageRef.current;
-    if (!canvas || !img) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    // Set canvas size
-    canvas.width = img.width;
-    canvas.height = img.height;
-
-    // Draw image
-    ctx.drawImage(img, 0, 0);
-
-    // Draw occlusions
-    data.occlusions.forEach((shape, i) => {
-      const isRevealed = revealed || revealedIndex === i;
-      drawShape(ctx, shape, img, isRevealed, i);
-    });
-  };
-
-  const drawShape = (
+  const drawShape = useCallback((
     ctx: CanvasRenderingContext2D,
     shape: OcclusionShape,
     img: HTMLImageElement,
@@ -99,7 +55,49 @@ export function ImageOcclusionStudy({ data, revealed }: Props) {
       ctx.textBaseline = "middle";
       ctx.fillText(`${index + 1}`, x + w / 2, y + h / 2);
     }
-  };
+  }, []);
+
+  const drawCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    const img = imageRef.current;
+    if (!canvas || !img) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Set canvas size
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    // Draw image
+    ctx.drawImage(img, 0, 0);
+
+    // Draw occlusions
+    data.occlusions.forEach((shape, i) => {
+      const isRevealed = revealed || revealedIndex === i;
+      drawShape(ctx, shape, img, isRevealed, i);
+    });
+  }, [data.occlusions, revealed, revealedIndex, drawShape]);
+
+  // Load image
+  useEffect(() => {
+    if (!data.imageUrl) return;
+
+    getImageUrl(data.imageUrl).then((url) => {
+      if (!url) return;
+      const img = new Image();
+      img.onload = () => {
+        imageRef.current = img;
+        drawCanvas();
+      };
+      img.src = url;
+    });
+  }, [data.imageUrl, drawCanvas]);
+
+  // Redraw when revealed state changes
+  useEffect(() => {
+    drawCanvas();
+  }, [drawCanvas]);
 
   const handleRevealNext = () => {
     if (revealedIndex === null) {
