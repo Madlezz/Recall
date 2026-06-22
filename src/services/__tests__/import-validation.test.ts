@@ -23,9 +23,10 @@ const baseSnapshot: RecallStateSnapshot = {
     backupFolder: null,
     backupSchedule: "never" as const,
     lastBackupAt: null,
-    ttsEnabled: false,
-    ttsAutoRead: false,
-    ttsSpeed: 1,
+        ttsEnabled: false,
+        ttsAutoRead: false,
+        ttsSpeed: 1,
+        fsrsWeights: null,
   },
 };
 

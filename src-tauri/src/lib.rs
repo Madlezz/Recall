@@ -509,5 +509,13 @@ fn migrations() -> Vec<Migration> {
             "#,
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 7,
+            description: "add_fsrs_weights",
+            sql: r#"
+                INSERT OR IGNORE INTO settings (key, value) VALUES ('fsrs_weights', '');
+            "#,
+            kind: MigrationKind::Up,
+        },
     ]
 }

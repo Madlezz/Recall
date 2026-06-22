@@ -38,7 +38,7 @@ const snapshot: RecallStateSnapshot = {
   ],
   studySessions: [],
   reviewLogs: [],
-  settings: { theme: "dark", seededAt: "2026-06-01T00:00:00.000Z", dailyNewCardLimit: 20, leechThreshold: 5, onboardingComplete: false, xp: 0, achievements: [], dailyGoal: 20, notificationsEnabled: false, soundVolume: 100, allowHtml: false, desiredRetention: 0.9, backupFolder: null, backupSchedule: "never", lastBackupAt: null, ttsEnabled: false, ttsAutoRead: false, ttsSpeed: 1 },
+  settings: { theme: "dark", seededAt: "2026-06-01T00:00:00.000Z", dailyNewCardLimit: 20, leechThreshold: 5, onboardingComplete: false, xp: 0, achievements: [], dailyGoal: 20, notificationsEnabled: false, soundVolume: 100, allowHtml: false, desiredRetention: 0.9, backupFolder: null, backupSchedule: "never", lastBackupAt: null, ttsEnabled: false, ttsAutoRead: false, ttsSpeed: 1, fsrsWeights: null },
 };
 
 describe("import/export", () => {

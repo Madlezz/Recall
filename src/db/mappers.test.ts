@@ -86,9 +86,10 @@ desiredRetention: 0.9,
       backupFolder: null,
       backupSchedule: "never",
       lastBackupAt: null,
-    ttsEnabled: false,
-    ttsAutoRead: false,
-    ttsSpeed: 1,
+          ttsEnabled: false,
+          ttsAutoRead: false,
+          ttsSpeed: 1,
+          fsrsWeights: null,
     };
 
     expect(deckFromRow(deckToRow(deck) as DeckRow)).toEqual(deck);

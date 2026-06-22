@@ -1,4 +1,4 @@
-import { Download, FolderOpen, HardDrive, Layers, Moon, RotateCcw, Save, Sun, Upload, Bell, BellOff, Volume2, Mic } from "lucide-react";
+import { Download, FolderOpen, HardDrive, Layers, Moon, RotateCcw, Save, Sun, Upload, Bell, BellOff, Volume2, Mic, TrendingUp } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -19,6 +19,7 @@ import { parseImportPayload } from "@/services/import-export";
 import { openImportPayload, saveExportPayload } from "@/services/native-files";
 import { useRecallStore } from "@/stores/recall-store";
 import { sendTestNotification } from "@/services/notifications";
+import { optimizeFromHistory, formatOptimizationResult } from "@/services/fsrs-optimizer";
 import type { RecallExportPayload, Theme } from "@/types";
 
 type ImportMode = "merge" | "replace";
@@ -207,6 +208,51 @@ export function Settings(): JSX.Element {
               />
               <span className="w-9 text-right text-sm tabular-nums text-zinc-400" aria-live="polite">{settings.ttsSpeed}x</span>
             </div>
+          </div>
+        </SettingsCard>
+      </section>
+
+      {/* FSRS Optimizer */}
+      <section className="grid gap-4 sm:grid-cols-1">
+        <SettingsCard title="FSRS Spaced Repetition Optimizer">
+          <div className="space-y-3">
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Analyze your review history to optimize spacing intervals for better retention.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                const result = optimizeFromHistory(reviewLogs, cards, settings.desiredRetention);
+                if (result.success) {
+                  void updateSettings({
+                    desiredRetention: result.suggestedRetention,
+                    fsrsWeights: result.weights,
+                  });
+                  toast.success(formatOptimizationResult(result));
+                } else {
+                  toast.error(formatOptimizationResult(result));
+                }
+              }}
+              disabled={reviewLogs.length < 100}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <TrendingUp className="h-4 w-4" />
+              Optimize from History ({reviewLogs.length} reviews)
+            </button>
+            {settings.fsrsWeights && (
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Custom weights active • Retention: {Math.round(settings.desiredRetention * 100)}%
+                </span>
+                <button
+                  type="button"
+                  onClick={() => void updateSettings({ fsrsWeights: null })}
+                  className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  Reset to defaults
+                </button>
+              </div>
+            )}
           </div>
         </SettingsCard>
       </section>

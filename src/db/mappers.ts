@@ -219,6 +219,7 @@ export function settingsFromRows(rows: SettingRow[]): RecallSettings {
             ttsEnabled: values.get("tts_enabled") === "true",
             ttsAutoRead: values.get("tts_auto_read") === "true",
             ttsSpeed: Number(values.get("tts_speed")) || 1.0,
+            fsrsWeights: values.get("fsrs_weights") ? JSON.parse(values.get("fsrs_weights")!) : null,
           };
 }
 
@@ -243,6 +244,7 @@ export function settingsToRows(settings: RecallSettings): SettingRow[] {
     { key: "tts_enabled", value: String(settings.ttsEnabled) },
     { key: "tts_auto_read", value: String(settings.ttsAutoRead) },
     { key: "tts_speed", value: String(settings.ttsSpeed) },
+    { key: "fsrs_weights", value: settings.fsrsWeights ? JSON.stringify(settings.fsrsWeights) : "" },
       ];
 }
 

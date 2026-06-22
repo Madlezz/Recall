@@ -2,6 +2,7 @@ import type { RecallStateSnapshot, Theme } from "@/types";
 import { dataState, getRepository, type StoreSet } from "../store-helpers";
 import { applyTheme } from "@/services/storage";
 import { setMasterVolume } from "@/services/audio";
+import { setCustomWeights } from "@/services/fsrs-engine";
 
 export interface SettingsSlice {
   setTheme: (theme: Theme) => Promise<void>;
@@ -19,6 +20,7 @@ export const settingsSlice = (
     const snapshot = await repo.saveTheme(theme, dataState(get()));
     applyTheme(snapshot.settings.theme);
     setMasterVolume(snapshot.settings.soundVolume / 100);
+    setCustomWeights(snapshot.settings.fsrsWeights);
     set({ ...snapshot, error: null });
   },
 
@@ -28,6 +30,7 @@ export const settingsSlice = (
     const snapshot = await repo.saveSettings({ ...current, ...partial }, dataState(get()));
     applyTheme(snapshot.settings.theme);
     setMasterVolume(snapshot.settings.soundVolume / 100);
+    setCustomWeights(snapshot.settings.fsrsWeights);
     set({ ...snapshot, error: null });
   },
 
@@ -39,6 +42,7 @@ export const settingsSlice = (
     );
     applyTheme(snapshot.settings.theme);
     setMasterVolume(snapshot.settings.soundVolume / 100);
+    setCustomWeights(snapshot.settings.fsrsWeights);
     set({ ...snapshot, view: "dashboard", error: null });
   },
 
@@ -54,6 +58,7 @@ export const settingsSlice = (
     });
     applyTheme(snapshot.settings.theme);
     setMasterVolume(snapshot.settings.soundVolume / 100);
+    setCustomWeights(snapshot.settings.fsrsWeights);
     set({ ...snapshot, view: "dashboard", error: null });
   },
 });
