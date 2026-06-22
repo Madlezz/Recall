@@ -12,6 +12,7 @@ import { Settings } from "@/components/settings";
 import { ShortcutHelp } from "@/components/shortcut-help";
 import { Stats } from "@/components/stats";
 import { StudyMode } from "@/components/study-mode";
+import { TagManager } from "@/components/tag-manager";
 import { useRecallStore } from "@/stores/recall-store";
 import { toast } from "sonner";
 
@@ -143,6 +144,11 @@ export function App(): JSX.Element {
                                                                               <CardBrowser />
                                                                             </ErrorBoundary>
                                                                           ) : null}
+                                                                          {view === "tags" ? (
+                                                                            <ErrorBoundary viewName="TagManager" onRecover={recoverToDashboard}>
+                                                                              <TagManager />
+                                                                            </ErrorBoundary>
+                                                                          ) : null}
                                                                           {view === "onboarding" ? (
                                                                             <ErrorBoundary viewName="Onboarding" onRecover={recoverToDashboard}>
                                                                               <Onboarding />
@@ -161,6 +167,7 @@ export function App(): JSX.Element {
           {view === "study" && "Study mode"}
           {view === "match" && "Match game"}
           {view === "browser" && "Card browser"}
+          {view === "tags" && "Tags"}
           {view === "stats" && "Statistics"}
           {view === "settings" && "Settings"}
           {view === "onboarding" && "Welcome to Recall"}

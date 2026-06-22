@@ -7,6 +7,7 @@ This document outlines the planned features and improvements for Recall. Items a
 - [ ] Mobile app (iOS and Android) using Tauri's cross-platform capabilities
 - [ ] Sync protocol for optional cloud backup (privacy-preserving, end-to-end encrypted)
 - [ ] Spaced repetition algorithm options (switch between FSRS variants)
+- [ ] First-class tags: hierarchical tag tree, saved searches, filtered decks (Phase 1 complete: tag manager UI)
 
 ## Planned
 

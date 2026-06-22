@@ -1,4 +1,4 @@
-import { Home, LayoutGrid, Moon, Search, Settings, Sun, TrendingUp, Zap } from "lucide-react";
+import { Home, LayoutGrid, Moon, Search, Settings, Sun, Tag, TrendingUp, Zap } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,7 @@ export function CommandPalette(): JSX.Element {
   const showBrowser = useRecallStore((s) => s.showBrowser);
   const showStats = useRecallStore((s) => s.showStats);
   const showSettings = useRecallStore((s) => s.showSettings);
+  const showTags = useRecallStore((s) => s.showTags);
   const startReview = useRecallStore((s) => s.startReview);
   const setTheme = useRecallStore((s) => s.setTheme);
   const settings = useRecallStore((s) => s.settings);
@@ -33,6 +34,7 @@ export function CommandPalette(): JSX.Element {
   const commands: Command[] = useMemo(() => [
     { id: "dashboard", label: "Go to Dashboard", icon: Home, action: showDashboard },
     { id: "browser", label: "Open Card Browser", icon: LayoutGrid, action: showBrowser },
+    { id: "tags", label: "Manage Tags", icon: Tag, action: showTags },
     { id: "stats", label: "Go to Stats", icon: TrendingUp, action: showStats },
     { id: "settings", label: "Go to Settings", icon: Settings, action: showSettings },
     {
@@ -55,7 +57,7 @@ export function CommandPalette(): JSX.Element {
       shortcut: "Ctrl+K",
       action: () => { showBrowser(); },
     },
-  ], [showDashboard, showBrowser, showStats, showSettings, startReview, setTheme, settings.theme]);
+  ], [showDashboard, showBrowser, showTags, showStats, showSettings, startReview, setTheme, settings.theme]);
 
   // Filter commands based on query
   const filtered = useMemo(() => {

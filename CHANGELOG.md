@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+- Tag management: hierarchical tag tree view with card counts, rename/delete operations, search, and tag preview panel
+
 ## [1.0.12] - 2026-06-22
 
 ### Added
