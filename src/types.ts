@@ -1,6 +1,6 @@
 export type CardState = "new" | "learning" | "review" | "relearning";
 export type ReviewRating = "again" | "hard" | "good" | "easy";
-export type Theme = "dark" | "light";
+export type Theme = "dark" | "light" | "high-contrast";
 export type DeckColor = "blue" | "green" | "amber" | "rose" | "violet" | "slate";
 export type CardType = "basic" | "cloze";
 

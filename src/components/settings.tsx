@@ -1,4 +1,4 @@
-import { Download, FolderOpen, HardDrive, Layers, Moon, RotateCcw, Save, Sun, Upload, Bell, BellOff, Volume2, Mic, TrendingUp } from "lucide-react";
+import { Download, FolderOpen, HardDrive, Layers, Moon, RotateCcw, Save, Sun, Upload, Bell, BellOff, Volume2, Mic, TrendingUp, Eye } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -154,6 +154,16 @@ export function Settings(): JSX.Element {
               }`}
             >
               <Sun className="h-4 w-4" /> Light
+            </button>
+            <button
+              onClick={() => void handleTheme("high-contrast")}
+              className={`flex items-center gap-2 rounded-md px-3.5 py-2 text-sm font-medium transition-colors ${
+                settings.theme === "high-contrast"
+                  ? "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200"
+                  : "text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+              }`}
+            >
+              <Eye className="h-4 w-4" /> High Contrast
             </button>
           </div>
         </SettingsCard>
