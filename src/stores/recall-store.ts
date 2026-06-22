@@ -4,7 +4,7 @@ import { getNewCardsReviewedToday, isCardDueToday } from "@/lib/stats";
 import { createId } from "@/lib/utils";
 import { buildExportPayload } from "@/services/import-export";
 import { getRecallRepository } from "@/services/repository";
-import { applyTheme } from "@/services/storage";
+import { applyTheme, applyAccentColor, applyDyslexiaFont } from "@/services/storage";
 import { setMasterVolume } from "@/services/audio";
 import { applyReview, setCustomWeights } from "@/services/fsrs-engine";
 import { playSessionStartSound } from "@/services/audio";
@@ -83,6 +83,8 @@ function daysUntilExam(deck: Deck | undefined): number | null {
 
 const initialSnapshot = createSeedSnapshot();
 applyTheme(initialSnapshot.settings.theme);
+applyAccentColor(initialSnapshot.settings.accentColor);
+applyDyslexiaFont(initialSnapshot.settings.dyslexiaFont);
 
 // ── Store ──
 
@@ -114,6 +116,8 @@ export const useRecallStore = create<RecallStore>()((set, get) => {
       const repository = await getRecallRepository();
       const snapshot = await repository.loadAppData();
       applyTheme(snapshot.settings.theme);
+      applyAccentColor(snapshot.settings.accentColor);
+      applyDyslexiaFont(snapshot.settings.dyslexiaFont);
             setMasterVolume(snapshot.settings.soundVolume / 100);
             setCustomWeights(snapshot.settings.fsrsWeights);
             const view = snapshot.settings.onboardingComplete ? "dashboard" : "onboarding";

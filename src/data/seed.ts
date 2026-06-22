@@ -74,6 +74,8 @@ export function createSeedSnapshot(now = new Date()): RecallStateSnapshot {
     reviewLogs,
     settings: {
           theme: "light",
+          accentColor: "zinc",
+          dyslexiaFont: false,
           seededAt: ISO(today),
           dailyNewCardLimit: 20,
           leechThreshold: 5,

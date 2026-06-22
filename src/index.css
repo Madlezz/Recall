@@ -140,3 +140,40 @@ select {
 .high-contrast .rounded-md {
   border-width: 2px;
 }
+
+/* Accent colors */
+:root {
+  --accent-zinc: #18181b;
+  --accent-blue: #1d4ed8;
+  --accent-green: #15803d;
+  --accent-rose: #be123c;
+  --accent-amber: #b45309;
+  --accent-violet: #7c3aed;
+}
+
+.dark {
+  --accent-zinc: #f4f4f5;
+  --accent-blue: #60a5fa;
+  --accent-green: #4ade80;
+  --accent-rose: #fb7185;
+  --accent-amber: #fbbf24;
+  --accent-violet: #a78bfa;
+}
+
+.accent-zinc { --accent-current: var(--accent-zinc); }
+.accent-blue { --accent-current: var(--accent-blue); }
+.accent-green { --accent-current: var(--accent-green); }
+.accent-rose { --accent-current: var(--accent-rose); }
+.accent-amber { --accent-current: var(--accent-amber); }
+.accent-violet { --accent-current: var(--accent-violet); }
+
+/* Dyslexia-friendly font */
+.dyslexia-font {
+  font-family: "Comic Sans MS", "OpenDyslexic", "Verdana", sans-serif !important;
+  letter-spacing: 0.05em;
+  word-spacing: 0.1em;
+}
+
+.dyslexia-font * {
+  font-family: inherit;
+}

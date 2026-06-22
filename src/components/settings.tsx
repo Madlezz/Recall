@@ -34,6 +34,8 @@ export function Settings(): JSX.Element {
   const reviewLogs = useRecallStore((state) => state.reviewLogs);
   const studySessions = useRecallStore((state) => state.studySessions);
   const setTheme = useRecallStore((state) => state.setTheme);
+  const setAccentColor = useRecallStore((state) => state.setAccentColor);
+  const setDyslexiaFont = useRecallStore((state) => state.setDyslexiaFont);
   const updateSettings = useRecallStore((state) => state.updateSettings);
   const resetData = useRecallStore((state) => state.resetData);
   const exportData = useRecallStore((state) => state.exportData);
@@ -165,6 +167,35 @@ export function Settings(): JSX.Element {
             >
               <Eye className="h-4 w-4" /> High Contrast
             </button>
+          </div>
+
+          <div className="mt-4 space-y-2">
+            <label className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Accent Color</label>
+            <div className="flex gap-2">
+              {(["zinc", "blue", "green", "rose", "amber", "violet"] as const).map((color) => (
+                <button
+                  key={color}
+                  onClick={() => void setAccentColor(color)}
+                  className={`h-8 w-8 rounded-full border-2 transition-all ${
+                    settings.accentColor === color ? "border-zinc-900 scale-110" : "border-zinc-300 dark:border-zinc-700"
+                  }`}
+                  style={{ backgroundColor: `var(--accent-${color})` }}
+                  aria-label={`${color} accent color`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              <input
+                type="checkbox"
+                checked={settings.dyslexiaFont}
+                onChange={(e) => void setDyslexiaFont(e.target.checked)}
+                className="rounded"
+              />
+              Dyslexia-friendly font
+            </label>
           </div>
         </SettingsCard>
 

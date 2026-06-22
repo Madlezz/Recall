@@ -1,11 +1,13 @@
-import type { RecallStateSnapshot, Theme, Deck, Card } from "@/types";
+import type { RecallStateSnapshot, Theme, Deck, Card, AccentColor } from "@/types";
 import { dataState, getRepository, type StoreSet } from "../store-helpers";
-import { applyTheme } from "@/services/storage";
+import { applyTheme, applyAccentColor, applyDyslexiaFont } from "@/services/storage";
 import { setMasterVolume } from "@/services/audio";
 import { setCustomWeights } from "@/services/fsrs-engine";
 
 export interface SettingsSlice {
   setTheme: (theme: Theme) => Promise<void>;
+  setAccentColor: (color: AccentColor) => Promise<void>;
+  setDyslexiaFont: (enabled: boolean) => Promise<void>;
   updateSettings: (partial: Partial<RecallStateSnapshot["settings"]>) => Promise<void>;
   completeOnboarding: () => Promise<void>;
   startFresh: () => Promise<void>;
@@ -20,6 +22,32 @@ export const settingsSlice = (
     const repo = await getRepository();
     const snapshot = await repo.saveTheme(theme, dataState(get()));
     applyTheme(snapshot.settings.theme);
+    applyAccentColor(snapshot.settings.accentColor);
+    applyDyslexiaFont(snapshot.settings.dyslexiaFont);
+    setMasterVolume(snapshot.settings.soundVolume / 100);
+    setCustomWeights(snapshot.settings.fsrsWeights);
+    set({ ...snapshot, error: null });
+  },
+
+  async setAccentColor(color: AccentColor) {
+    const repo = await getRepository();
+    const current = dataState(get()).settings;
+    const snapshot = await repo.saveSettings({ ...current, accentColor: color }, dataState(get()));
+    applyTheme(snapshot.settings.theme);
+    applyAccentColor(snapshot.settings.accentColor);
+    applyDyslexiaFont(snapshot.settings.dyslexiaFont);
+    setMasterVolume(snapshot.settings.soundVolume / 100);
+    setCustomWeights(snapshot.settings.fsrsWeights);
+    set({ ...snapshot, error: null });
+  },
+
+  async setDyslexiaFont(enabled: boolean) {
+    const repo = await getRepository();
+    const current = dataState(get()).settings;
+    const snapshot = await repo.saveSettings({ ...current, dyslexiaFont: enabled }, dataState(get()));
+    applyTheme(snapshot.settings.theme);
+    applyAccentColor(snapshot.settings.accentColor);
+    applyDyslexiaFont(snapshot.settings.dyslexiaFont);
     setMasterVolume(snapshot.settings.soundVolume / 100);
     setCustomWeights(snapshot.settings.fsrsWeights);
     set({ ...snapshot, error: null });
@@ -30,6 +58,8 @@ export const settingsSlice = (
     const current = dataState(get()).settings;
     const snapshot = await repo.saveSettings({ ...current, ...partial }, dataState(get()));
     applyTheme(snapshot.settings.theme);
+    applyAccentColor(snapshot.settings.accentColor);
+    applyDyslexiaFont(snapshot.settings.dyslexiaFont);
     setMasterVolume(snapshot.settings.soundVolume / 100);
     setCustomWeights(snapshot.settings.fsrsWeights);
     set({ ...snapshot, error: null });
@@ -42,6 +72,8 @@ export const settingsSlice = (
       dataState(get()),
     );
     applyTheme(snapshot.settings.theme);
+    applyAccentColor(snapshot.settings.accentColor);
+    applyDyslexiaFont(snapshot.settings.dyslexiaFont);
     setMasterVolume(snapshot.settings.soundVolume / 100);
     setCustomWeights(snapshot.settings.fsrsWeights);
     set({ ...snapshot, view: "dashboard", error: null });
@@ -58,6 +90,8 @@ export const settingsSlice = (
       settings,
     });
     applyTheme(snapshot.settings.theme);
+    applyAccentColor(snapshot.settings.accentColor);
+    applyDyslexiaFont(snapshot.settings.dyslexiaFont);
     setMasterVolume(snapshot.settings.soundVolume / 100);
     setCustomWeights(snapshot.settings.fsrsWeights);
     set({ ...snapshot, view: "dashboard", error: null });
@@ -74,6 +108,8 @@ export const settingsSlice = (
       settings,
     });
     applyTheme(snapshot.settings.theme);
+    applyAccentColor(snapshot.settings.accentColor);
+    applyDyslexiaFont(snapshot.settings.dyslexiaFont);
     setMasterVolume(snapshot.settings.soundVolume / 100);
     setCustomWeights(snapshot.settings.fsrsWeights);
     set({ ...snapshot, view: "dashboard", error: null });
