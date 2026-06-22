@@ -95,6 +95,8 @@ This document outlines the planned features and improvements for Recall. Items a
 - [x] Onboarding template deck gallery: 4 starter decks (Languages, Coding, GRE, Med) (v1.0.13)
 - [x] Theming depth: 6 accent colors + dyslexia-friendly font (v1.0.13)
 - [x] Folder-based cloud sync: merge-on-import to Dropbox/Google Drive/etc. (v1.0.13)
+- [x] Image Occlusion cards: draw rectangles on images, reveal during study (Unreleased)
+- [x] Richer Anki import: media extraction (images from .apkg) with recall:// URLs (Unreleased)
 
 ## Contributing
 
