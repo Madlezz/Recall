@@ -1,4 +1,4 @@
-import type { RecallStateSnapshot, Theme } from "@/types";
+import type { RecallStateSnapshot, Theme, Deck, Card } from "@/types";
 import { dataState, getRepository, type StoreSet } from "../store-helpers";
 import { applyTheme } from "@/services/storage";
 import { setMasterVolume } from "@/services/audio";
@@ -9,6 +9,7 @@ export interface SettingsSlice {
   updateSettings: (partial: Partial<RecallStateSnapshot["settings"]>) => Promise<void>;
   completeOnboarding: () => Promise<void>;
   startFresh: () => Promise<void>;
+  importTemplateDecks: (decks: Deck[], cards: Card[]) => Promise<void>;
 }
 
 export const settingsSlice = (
@@ -52,6 +53,22 @@ export const settingsSlice = (
     const snapshot = await repo.saveSettings(settings, {
       decks: [],
       cards: [],
+      studySessions: [],
+      reviewLogs: [],
+      settings,
+    });
+    applyTheme(snapshot.settings.theme);
+    setMasterVolume(snapshot.settings.soundVolume / 100);
+    setCustomWeights(snapshot.settings.fsrsWeights);
+    set({ ...snapshot, view: "dashboard", error: null });
+  },
+
+  async importTemplateDecks(decks: Deck[], cards: Card[]) {
+    const repo = await getRepository();
+    const settings = { ...dataState(get()).settings, onboardingComplete: true };
+    const snapshot = await repo.saveSettings(settings, {
+      decks,
+      cards,
       studySessions: [],
       reviewLogs: [],
       settings,
