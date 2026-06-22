@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+- Tag management: hierarchical tag tree view with card counts, rename/delete operations, search, and tag preview panel
+- Saved searches: save tag combinations as virtual decks, study them via custom study with "all" or "any" match modes
+- Tag autocomplete: chip-based tag input with real-time suggestions from existing tags, sorted by usage frequency
+
 ## [1.0.12] - 2026-06-22
 
 ### Added

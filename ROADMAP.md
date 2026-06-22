@@ -91,6 +91,7 @@ This document outlines the planned features and improvements for Recall. Items a
 - [x] Command palette: Ctrl+K quick navigation (Unreleased)
 - [x] FSRS interval preview: rating buttons show predicted intervals (Unreleased)
 - [x] Retention curve: rolling 7-day retention visualization on stats dashboard (Unreleased)
+- [x] Tags as first-class citizens: hierarchical tag tree, saved searches, tag autocomplete (Unreleased)
 
 ## Contributing
 

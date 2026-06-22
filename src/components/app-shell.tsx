@@ -1,4 +1,4 @@
-import { BookOpen, Home, LayoutGrid, Settings, Shield, Star, TrendingUp, Zap } from "lucide-react";
+import { BookOpen, Home, LayoutGrid, Settings, Shield, Star, Tag, TrendingUp, Zap } from "lucide-react";
 import type { ReactNode } from "react";
 import { CommandPalette } from "@/components/command-palette";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
   const showSettings = useRecallStore((state) => state.showSettings);
   const showStats = useRecallStore((state) => state.showStats);
   const showBrowser = useRecallStore((state) => state.showBrowser);
+  const showTags = useRecallStore((state) => state.showTags);
 
   const dueCount = getDueTodayCount(cards);
 
@@ -50,6 +51,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         <nav className="flex-1 px-3 py-3 space-y-1" aria-label="Main navigation">
           <NavButton active={view === "dashboard"} icon={Home} label="Dashboard" onClick={showDashboard} />
           <NavButton active={view === "browser"} icon={LayoutGrid} label="Browser" onClick={showBrowser} />
+          <NavButton active={view === "tags"} icon={Tag} label="Tags" onClick={showTags} />
           <NavButton active={view === "stats"} icon={TrendingUp} label="Stats" onClick={showStats} />
           <NavButton active={view === "settings"} icon={Settings} label="Settings" onClick={showSettings} />
         </nav>

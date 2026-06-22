@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { parseTags } from "@/lib/utils";
+import { TagInput } from "@/components/tag-input";
 import { useRecallStore } from "@/stores/recall-store";
 import { insertImage } from "@/services/images";
 import type { Card } from "@/types";
@@ -56,7 +56,7 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
   const [back, setBack] = useState(card?.back ?? "");
   const [hint, setHint] = useState(card?.hint ?? "");
   const [source, setSource] = useState(card?.source ?? "");
-  const [tags, setTags] = useState(card?.tags.join(", ") ?? "");
+  const [tags, setTags] = useState<string[]>(card?.tags ?? []);
   const decks = useRecallStore((state) => state.decks);
   const createCard = useRecallStore((state) => state.createCard);
   const updateCard = useRecallStore((state) => state.updateCard);
@@ -70,7 +70,7 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
       setBack(card?.back ?? "");
       setHint(card?.hint ?? "");
       setSource(card?.source ?? "");
-      setTags(card?.tags.join(", ") ?? "");
+      setTags(card?.tags ?? []);
     }
   }, [card, deckId, open]);
 
@@ -86,7 +86,7 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
       return;
     }
     
-    const input = { deckId: targetDeckId, front, back, hint, source, tags: parseTags(tags) };
+    const input = { deckId: targetDeckId, front, back, hint, source, tags };
 
     try {
       if (card) {
@@ -261,14 +261,15 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="tags-input" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Tags (comma-separated)</Label>
-                <Input
-                  id="tags-input"
+                <Label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Tags</Label>
+                <TagInput
                   value={tags}
-                  onChange={(event) => setTags(event.target.value)}
-                  placeholder="react, hooks, typescript"
-                  className="border-zinc-200 dark:border-zinc-800"
+                  onChange={setTags}
+                  placeholder="Add tags..."
                 />
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Press Enter or comma to add. Type to see suggestions.
+                </p>
               </div>
             </div>
           </div>
