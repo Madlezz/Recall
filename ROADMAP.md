@@ -90,6 +90,7 @@ This document outlines the planned features and improvements for Recall. Items a
 - [x] Workload forecast: 30-day due card chart with new vs review breakdown (Unreleased)
 - [x] Command palette: Ctrl+K quick navigation (Unreleased)
 - [x] FSRS interval preview: rating buttons show predicted intervals (Unreleased)
+- [x] Retention curve: rolling 7-day retention visualization on stats dashboard (Unreleased)
 
 ## Contributing
 
