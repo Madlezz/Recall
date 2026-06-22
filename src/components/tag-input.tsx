@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
 import { buildTagCounts } from "@/lib/tags";

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Tag, ChevronRight, ChevronDown, Search, Trash2, Edit3, X, Check, Bookmark, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -238,12 +238,13 @@ export function TagManager(): JSX.Element {
     if (selectedTag === tag) setSelectedTag(null);
   }
 
-  // Expand all top-level by default
-  useMemo(() => {
-    if (expanded.size === 0) {
+  // Expand all top-level by default (only once on mount)
+  useEffect(() => {
+    if (expanded.size === 0 && tagTree.length > 0) {
       setExpanded(new Set(tagTree.map((n) => n.fullPath)));
     }
-  }, [tagTree, expanded.size]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally only on initial load
+  }, [tagTree]);
 
   function handleSaveSearch(): void {
     if (!selectedTag || !newSearchName.trim()) {
