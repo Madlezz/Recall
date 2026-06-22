@@ -56,6 +56,7 @@ contributor-friendly TypeScript stack.
 - **CSV import** — upload a spreadsheet, map columns
 - **Custom study** — deck, count, tag filter, new-only
 - **Card browser** — search, filter, sort, bulk tag/delete/move
+- **Tags** — hierarchical tag tree, saved searches, tag autocomplete
 - Keyboard-first: `Space` reveal, `1`–`4` rate, `R` to start review, `Ctrl+N` quick-add
 
 ### 🎮 Stay Motivated
@@ -63,6 +64,7 @@ contributor-friendly TypeScript stack.
 - **Achievements** — 14 milestones (streaks, volume, accuracy, time-based)
 - **Daily goal** — set a target, watch the progress bar, confetti on completion
 - **Session summaries** — ratings breakdown, XP earned, achievement unlocks
+- **Onboarding gallery** — choose from 4 starter decks (Languages, Coding, GRE, Medical)
 
 ### 🧘 Study Tools
 - **Focus timer** — Pomodoro with 15/25/45m presets
@@ -80,6 +82,12 @@ contributor-friendly TypeScript stack.
 - No account, no cloud, no telemetry
 - 100% offline — SQLite database on your machine
 - JSON export/import — portable and human-readable
+- Optional cloud sync — point to any folder (Dropbox, Google Drive, etc.)
+
+### 🎨 Customization
+- **6 accent colors** — zinc, blue, green, rose, amber, violet
+- **Dyslexia-friendly font** — optional OpenDyslexic/Comic Sans fallback
+- **Dark/Light/High-contrast themes** — three themes to match your preference
 
 ---
 
