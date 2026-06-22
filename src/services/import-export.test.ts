@@ -56,6 +56,8 @@ const snapshot: RecallStateSnapshot = {
     backupFolder: null,
     backupSchedule: "never",
     lastBackupAt: null,
+      syncFolder: null,
+      syncEnabled: false,
     ttsEnabled: false,
     ttsAutoRead: false,
     ttsSpeed: 1,
