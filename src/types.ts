@@ -1,6 +1,6 @@
 export type CardState = "new" | "learning" | "review" | "relearning";
 export type ReviewRating = "again" | "hard" | "good" | "easy";
-export type Theme = "dark" | "light";
+export type Theme = "dark" | "light" | "high-contrast";
 export type DeckColor = "blue" | "green" | "amber" | "rose" | "violet" | "slate";
 export type CardType = "basic" | "cloze";
 
@@ -74,6 +74,10 @@ export interface RecallSettings {
   backupFolder: string | null;
   backupSchedule: BackupSchedule;
   lastBackupAt: string | null;
+  ttsEnabled: boolean; // Enable text-to-speech in study mode
+  ttsAutoRead: boolean; // Auto-read cards when shown/revealed
+  ttsSpeed: number; // 0.5-2.0, speech rate multiplier
+  fsrsWeights: number[] | null; // Custom FSRS weights (null = use defaults)
 }
 
 export type BackupSchedule = "daily" | "weekly" | "never";

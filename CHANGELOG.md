@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ## [Unreleased]
 
 ### Added
+- High-contrast theme: pure black/white with stronger borders for accessibility
+- Retention curve: rolling 7-day retention rate visualization on stats dashboard
+- FSRS optimizer: analyze review history to auto-tune spacing weights and suggest optimal retention target
+- Text-to-Speech: enable TTS in settings for auto-read cards, adjustable speed (0.5x–2x), press T to toggle read aloud
 - Workload forecast: see cards due each day for the next 30 days, with new vs review breakdown, 7-day average, and heaviest day highlight
 - Command palette: press `Ctrl+K` (or `Cmd+K` on Mac) to quickly access navigation and actions
 - FSRS interval preview: rating buttons show predicted next interval (e.g. `<1m | 8m | 3d | 12d`)

@@ -6,7 +6,7 @@ import { buildExportPayload } from "@/services/import-export";
 import { getRecallRepository } from "@/services/repository";
 import { applyTheme } from "@/services/storage";
 import { setMasterVolume } from "@/services/audio";
-import { applyReview } from "@/services/fsrs-engine";
+import { applyReview, setCustomWeights } from "@/services/fsrs-engine";
 import { playSessionStartSound } from "@/services/audio";
 import {
   REVIEW_XP,
@@ -110,6 +110,7 @@ export const useRecallStore = create<RecallStore>()((set, get) => {
       const snapshot = await repository.loadAppData();
       applyTheme(snapshot.settings.theme);
             setMasterVolume(snapshot.settings.soundVolume / 100);
+            setCustomWeights(snapshot.settings.fsrsWeights);
             const view = snapshot.settings.onboardingComplete ? "dashboard" : "onboarding";
       set({ ...snapshot, view, isLoading: false, isInitialized: true, error: null });
 

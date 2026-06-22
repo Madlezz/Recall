@@ -5,6 +5,8 @@ export function applyTheme(theme: Theme): void {
     return;
   }
 
-  document.documentElement.classList.toggle("dark", theme === "dark");
-  document.documentElement.style.colorScheme = theme;
+  const root = document.documentElement;
+  root.classList.toggle("dark", theme === "dark" || theme === "high-contrast");
+  root.classList.toggle("high-contrast", theme === "high-contrast");
+  root.style.colorScheme = theme === "high-contrast" ? "dark" : theme;
 }

@@ -3,6 +3,18 @@ import type { Card, ReviewRating, CardState } from "@/types";
 
 const DEFAULT_RETENTION = 0.9;
 
+let _customWeights: number[] | null = null;
+
+/** Set custom FSRS weights (null = use defaults). */
+export function setCustomWeights(weights: number[] | null): void {
+  _customWeights = weights;
+}
+
+/** Get current custom weights (null = using defaults). */
+export function getCustomWeights(): number[] | null {
+  return _customWeights;
+}
+
 /** Format a millisecond duration into a human-readable interval string. */
 export function formatInterval(ms: number): string {
   if (ms <= 0) return "<1m";
@@ -25,7 +37,7 @@ export function previewIntervals(
   desiredRetention = DEFAULT_RETENTION,
   now = new Date()
 ): { again: string; hard: string; good: string; easy: string } {
-  const f = fsrs({ request_retention: desiredRetention });
+  const f = fsrs({ request_retention: desiredRetention, w: _customWeights ?? undefined });
 
   const fsrsState =
     card.state === "new"
@@ -75,7 +87,7 @@ export function getDueCards(cards: Card[], now = new Date()): Card[] {
 }
 
 export function applyReview(card: Card, rating: ReviewRating, reviewedAt: Date, desiredRetention = DEFAULT_RETENTION): Card {
-  const f = fsrs({ request_retention: desiredRetention });
+  const f = fsrs({ request_retention: desiredRetention, w: _customWeights ?? undefined });
   const fsrsRating =
     rating === "again"
       ? Rating.Again
