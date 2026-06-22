@@ -437,7 +437,8 @@ fn migrations() -> Vec<Migration> {
                                     created_at TEXT NOT NULL,
                                     updated_at TEXT NOT NULL
                                 );
-                                INSERT INTO decks SELECT * FROM decks_old;
+                                INSERT INTO decks (id, name, description, color, exam_deadline, created_at, updated_at)
+                                    SELECT id, name, description, color, exam_deadline, created_at, updated_at FROM decks_old;
                                 DROP TABLE decks_old;
 
                                 -- Cards: constrain state, card_type, numeric ranges
@@ -450,7 +451,7 @@ fn migrations() -> Vec<Migration> {
                                     hint TEXT DEFAULT '',
                                     source TEXT DEFAULT '',
                                     tags TEXT NOT NULL DEFAULT '[]',
-                                    card_type TEXT NOT NULL DEFAULT 'basic' CHECK(card_type IN ('basic','cloze')),
+                                    card_type TEXT NOT NULL DEFAULT 'basic' CHECK(card_type IN ('basic','cloze','image-occlusion')),
                                     state TEXT NOT NULL DEFAULT 'new' CHECK(state IN ('new','learning','review','relearning')),
                                     last_review_date TEXT,
                                     next_review_date TEXT NOT NULL,
@@ -463,7 +464,8 @@ fn migrations() -> Vec<Migration> {
                                     created_at TEXT NOT NULL,
                                     updated_at TEXT NOT NULL
                                 );
-                                INSERT INTO cards SELECT * FROM cards_old;
+                                INSERT INTO cards (id, deck_id, front, back, hint, source, tags, card_type, state, last_review_date, next_review_date, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at)
+                                    SELECT id, deck_id, front, back, hint, source, tags, card_type, state, last_review_date, next_review_date, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at FROM cards_old;
                                 DROP TABLE cards_old;
                                 CREATE INDEX IF NOT EXISTS cards_deck_id_idx ON cards(deck_id);
                                 CREATE INDEX IF NOT EXISTS cards_next_review_date_idx ON cards(next_review_date);
@@ -480,7 +482,8 @@ fn migrations() -> Vec<Migration> {
                                     elapsed_days INTEGER NOT NULL CHECK(elapsed_days >= 0),
                                     scheduled_days INTEGER NOT NULL CHECK(scheduled_days >= 0)
                                 );
-                                INSERT INTO review_logs SELECT * FROM review_logs_old;
+                                INSERT INTO review_logs (id, card_id, rating, review_date, stability, difficulty, elapsed_days, scheduled_days)
+                                    SELECT id, card_id, rating, review_date, stability, difficulty, elapsed_days, scheduled_days FROM review_logs_old;
                                 DROP TABLE review_logs_old;
                                 CREATE INDEX IF NOT EXISTS review_logs_card_id_idx ON review_logs(card_id);
 
@@ -493,7 +496,8 @@ fn migrations() -> Vec<Migration> {
                                     ended_at TEXT NOT NULL,
                                     cards_studied INTEGER NOT NULL DEFAULT 0 CHECK(cards_studied >= 0)
                                 );
-                                INSERT INTO study_sessions SELECT * FROM study_sessions_old;
+                                INSERT INTO study_sessions (id, deck_id, started_at, ended_at, cards_studied)
+                                    SELECT id, deck_id, started_at, ended_at, cards_studied FROM study_sessions_old;
                                 DROP TABLE study_sessions_old;
                                 CREATE INDEX IF NOT EXISTS study_sessions_deck_id_idx ON study_sessions(deck_id);
                             "#,
