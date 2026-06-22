@@ -39,10 +39,10 @@ This document outlines the planned features and improvements for Recall. Items a
 - [ ] Memory optimization for mobile devices
 
 ### Accessibility
-- [x] High contrast themes (Unreleased)
+- [x] High contrast themes (v1.0.13)
 - [ ] Screen reader support (ARIA labels, focus management)
 - [ ] Customizable keyboard shortcuts
-- [ ] Dyslexia-friendly font option
+- [x] Dyslexia-friendly font option (v1.0.13)
 - [ ] Color-blind friendly UI
 
 ## Completed (v1.0.x)
@@ -91,7 +91,10 @@ This document outlines the planned features and improvements for Recall. Items a
 - [x] Command palette: Ctrl+K quick navigation (Unreleased)
 - [x] FSRS interval preview: rating buttons show predicted intervals (Unreleased)
 - [x] Retention curve: rolling 7-day retention visualization on stats dashboard (Unreleased)
-- [x] Tags as first-class citizens: hierarchical tag tree, saved searches, tag autocomplete (Unreleased)
+- [x] Tags as first-class citizens: hierarchical tag tree, saved searches, tag autocomplete (v1.0.13)
+- [x] Onboarding template deck gallery: 4 starter decks (Languages, Coding, GRE, Med) (v1.0.13)
+- [x] Theming depth: 6 accent colors + dyslexia-friendly font (v1.0.13)
+- [x] Folder-based cloud sync: merge-on-import to Dropbox/Google Drive/etc. (v1.0.13)
 
 ## Contributing
 
