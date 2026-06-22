@@ -202,6 +202,8 @@ export function settingsFromRows(rows: SettingRow[]): RecallSettings {
 
   return {
       theme,
+      accentColor: (values.get("accent_color") ?? "zinc") as RecallSettings["accentColor"],
+      dyslexiaFont: values.get("dyslexia_font") === "true",
       seededAt: values.get("seeded_at") ?? new Date(0).toISOString(),
       dailyNewCardLimit: dailyNewCardLimitRaw ? parseInt(dailyNewCardLimitRaw, 10) : 20,
       leechThreshold: leechThresholdRaw ? parseInt(leechThresholdRaw, 10) : 5,
@@ -226,6 +228,8 @@ export function settingsFromRows(rows: SettingRow[]): RecallSettings {
 export function settingsToRows(settings: RecallSettings): SettingRow[] {
   return [
     { key: "theme", value: settings.theme },
+    { key: "accent_color", value: settings.accentColor },
+    { key: "dyslexia_font", value: String(settings.dyslexiaFont) },
     { key: "seeded_at", value: settings.seededAt },
     { key: "schema_version", value: SCHEMA_VERSION },
     { key: "daily_new_card_limit", value: String(settings.dailyNewCardLimit) },

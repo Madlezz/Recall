@@ -9,6 +9,8 @@ const baseSnapshot: RecallStateSnapshot = {
   reviewLogs: [],
   settings: {
     theme: "dark",
+    accentColor: "zinc",
+    dyslexiaFont: false,
     seededAt: "2025-01-01T00:00:00.000Z",
     dailyNewCardLimit: 20,
     leechThreshold: 5,

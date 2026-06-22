@@ -58,8 +58,12 @@ export interface StudySession {
   cardsStudied: number;
 }
 
+export type AccentColor = "zinc" | "blue" | "green" | "rose" | "amber" | "violet";
+
 export interface RecallSettings {
   theme: Theme;
+  accentColor: AccentColor;
+  dyslexiaFont: boolean;
   seededAt: string;
   dailyNewCardLimit: number;
   leechThreshold: number;

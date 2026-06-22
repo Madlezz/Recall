@@ -72,6 +72,8 @@ describe("database mappers", () => {
     };
     const settings: RecallSettings = {
       theme: "dark",
+      accentColor: "zinc",
+      dyslexiaFont: false,
       seededAt: "2026-06-01T00:00:00.000Z",
       dailyNewCardLimit: 20,
       leechThreshold: 5,
