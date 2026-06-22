@@ -6,7 +6,6 @@ This document outlines the planned features and improvements for Recall. Items a
 
 - [ ] Mobile app (iOS and Android) using Tauri's cross-platform capabilities
 - [ ] Sync protocol for optional cloud backup (privacy-preserving, end-to-end encrypted)
-- [ ] Card editor improvements (WYSIWYG, drag-and-drop media)
 - [ ] Spaced repetition algorithm options (switch between FSRS variants)
 
 ## Planned
@@ -85,6 +84,12 @@ This document outlines the planned features and improvements for Recall. Items a
 - [x] Cargo-audit ignore justification file (v1.0.11)
 - [x] Anki media import warning (v1.0.11)
 - [x] Card browser UI wired to DB queries (v1.0.11)
+- [x] Card editor: paste (Ctrl+V) and drag-drop image support (Unreleased)
+- [x] Text-to-Speech: auto-read cards in study mode with configurable speed (Unreleased)
+- [x] FSRS optimizer: analyze review history to auto-tune spacing weights (Unreleased)
+- [x] Workload forecast: 30-day due card chart with new vs review breakdown (Unreleased)
+- [x] Command palette: Ctrl+K quick navigation (Unreleased)
+- [x] FSRS interval preview: rating buttons show predicted intervals (Unreleased)
 
 ## Contributing
 

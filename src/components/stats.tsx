@@ -72,6 +72,67 @@ function StackedBarChart({ data }: { data: { again: number; hard: number; good: 
   );
 }
 
+// ── RetentionCurve ──
+
+function RetentionCurve({ data }: { data: number[] }): JSX.Element {
+  // Filter out days with no data (-1)
+  const validData = data.filter((v) => v >= 0);
+  const height = 80;
+  const width = 100; // percentage
+
+  if (validData.length === 0) {
+    return <p className="text-sm text-zinc-400">Not enough data yet</p>;
+  }
+
+  const maxVal = 100;
+  const minVal = 50; // Start y-axis at 50% for better visibility
+  const range = maxVal - minVal;
+
+  return (
+    <div className="relative" style={{ height }}>
+      <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+        {/* Grid lines */}
+        {[50, 70, 90].map((y) => {
+          const yPos = height - ((y - minVal) / range) * height;
+          return (
+            <line
+              key={y}
+              x1="0"
+              y1={yPos}
+              x2={width}
+              y2={yPos}
+              stroke="rgb(113 113 122 / 0.2)"
+              strokeWidth="0.5"
+            />
+          );
+        })}
+
+        {/* Retention curve */}
+        {validData.length > 1 && (
+          <path
+            d={validData
+              .map((val, i) => {
+                const x = (i / (validData.length - 1)) * width;
+                const clampedVal = Math.max(minVal, Math.min(maxVal, val));
+                const y = height - ((clampedVal - minVal) / range) * height;
+                return `${i === 0 ? "M" : "L"} ${x} ${y}`;
+              })
+              .join(" ")}
+            fill="none"
+            stroke="rgb(16 185 129)"
+            strokeWidth="2"
+            vectorEffect="non-scaling-stroke"
+          />
+        )}
+      </svg>
+
+      {/* Y-axis labels */}
+      <div className="absolute left-0 top-0 text-[10px] text-zinc-400">100%</div>
+      <div className="absolute left-0 bottom-0 text-[10px] text-zinc-400">50%</div>
+    </div>
+  );
+}
+
 // ── Component ──
 
 export function Stats(): JSX.Element {
@@ -82,6 +143,7 @@ export function Stats(): JSX.Element {
     title,
     dayData,
     dayRatingData,
+    retentionData,
     byHour,
     maxHour,
     totalReviews,
@@ -194,6 +256,22 @@ export function Stats(): JSX.Element {
               <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-emerald-500/70" /> Good</span>
               <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-blue-500/70" /> Easy</span>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Retention curve */}
+      {totalReviews > 0 && (
+        <section>
+          <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">
+            Retention Over Time
+            <span className="ml-2 text-xs font-normal text-zinc-400">(7-day rolling)</span>
+          </h3>
+          <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+            <RetentionCurve data={retentionData} />
+            <p className="mt-3 text-xs text-zinc-400">
+              Shows the percentage of Good/Easy ratings over a rolling 7-day window. Higher = better retention.
+            </p>
           </div>
         </section>
       )}
