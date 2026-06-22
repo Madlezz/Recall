@@ -7,7 +7,6 @@ This document outlines the planned features and improvements for Recall. Items a
 - [ ] Mobile app (iOS and Android) using Tauri's cross-platform capabilities
 - [ ] Sync protocol for optional cloud backup (privacy-preserving, end-to-end encrypted)
 - [ ] Spaced repetition algorithm options (switch between FSRS variants)
-- [ ] First-class tags: hierarchical tag tree, saved searches, filtered decks (Phase 2 complete: saved searches + custom study integration)
 
 ## Planned
 
@@ -92,6 +91,7 @@ This document outlines the planned features and improvements for Recall. Items a
 - [x] Command palette: Ctrl+K quick navigation (Unreleased)
 - [x] FSRS interval preview: rating buttons show predicted intervals (Unreleased)
 - [x] Retention curve: rolling 7-day retention visualization on stats dashboard (Unreleased)
+- [x] Tags as first-class citizens: hierarchical tag tree, saved searches, tag autocomplete (Unreleased)
 
 ## Contributing
 
