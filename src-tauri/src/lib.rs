@@ -499,5 +499,15 @@ fn migrations() -> Vec<Migration> {
                             "#,
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 6,
+            description: "add_tts_settings",
+            sql: r#"
+                INSERT OR IGNORE INTO settings (key, value) VALUES ('tts_enabled', 'false');
+                INSERT OR IGNORE INTO settings (key, value) VALUES ('tts_auto_read', 'false');
+                INSERT OR IGNORE INTO settings (key, value) VALUES ('tts_speed', '1');
+            "#,
+            kind: MigrationKind::Up,
+        },
     ]
 }

@@ -216,6 +216,9 @@ export function settingsFromRows(rows: SettingRow[]): RecallSettings {
             backupFolder: values.get("backup_folder") || null,
                         backupSchedule: (values.get("backup_schedule") ?? "never") as "daily" | "weekly" | "never",
                         lastBackupAt: values.get("last_backup_at") || null,
+            ttsEnabled: values.get("tts_enabled") === "true",
+            ttsAutoRead: values.get("tts_auto_read") === "true",
+            ttsSpeed: Number(values.get("tts_speed")) || 1.0,
           };
 }
 
@@ -237,6 +240,9 @@ export function settingsToRows(settings: RecallSettings): SettingRow[] {
         { key: "backup_folder", value: settings.backupFolder ?? "" },
         { key: "backup_schedule", value: settings.backupSchedule },
         { key: "last_backup_at", value: settings.lastBackupAt ?? "" },
+    { key: "tts_enabled", value: String(settings.ttsEnabled) },
+    { key: "tts_auto_read", value: String(settings.ttsAutoRead) },
+    { key: "tts_speed", value: String(settings.ttsSpeed) },
       ];
 }
 

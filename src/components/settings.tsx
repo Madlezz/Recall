@@ -1,4 +1,4 @@
-import { Download, FolderOpen, HardDrive, Layers, Moon, RotateCcw, Save, Sun, Upload, Bell, BellOff, Volume2 } from "lucide-react";
+import { Download, FolderOpen, HardDrive, Layers, Moon, RotateCcw, Save, Sun, Upload, Bell, BellOff, Volume2, Mic } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -169,6 +169,44 @@ export function Settings(): JSX.Element {
               className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-zinc-200 accent-zinc-700 dark:bg-zinc-700 dark:accent-zinc-300"
             />
             <span className="w-9 text-right text-sm tabular-nums text-zinc-400" aria-live="polite">{settings.soundVolume}%</span>
+          </div>
+        </SettingsCard>
+
+        <SettingsCard title="Text-to-Speech">
+          <div className="space-y-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={settings.ttsEnabled}
+                onChange={(e) => void updateSettings({ ttsEnabled: e.target.checked })}
+                className="h-4 w-4 rounded border-zinc-300 text-zinc-700 focus:ring-zinc-400 dark:border-zinc-600"
+              />
+              <Mic className="h-4 w-4 text-zinc-400" aria-hidden="true" />
+              <span className="text-sm text-zinc-700 dark:text-zinc-300">Enable TTS in study mode</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={settings.ttsAutoRead}
+                onChange={(e) => void updateSettings({ ttsAutoRead: e.target.checked })}
+                disabled={!settings.ttsEnabled}
+                className="h-4 w-4 rounded border-zinc-300 text-zinc-700 focus:ring-zinc-400 disabled:opacity-50 dark:border-zinc-600"
+              />
+              <span className="text-sm text-zinc-700 dark:text-zinc-300">Auto-read cards</span>
+            </label>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-zinc-400 w-12">Speed</span>
+              <input
+                type="range"
+                min="0.5" max="2.0" step="0.1"
+                aria-label="TTS speed"
+                value={settings.ttsSpeed}
+                onChange={(e) => void updateSettings({ ttsSpeed: parseFloat(e.target.value) })}
+                disabled={!settings.ttsEnabled}
+                className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-zinc-200 accent-zinc-700 disabled:opacity-50 dark:bg-zinc-700 dark:accent-zinc-300"
+              />
+              <span className="w-9 text-right text-sm tabular-nums text-zinc-400" aria-live="polite">{settings.ttsSpeed}x</span>
+            </div>
           </div>
         </SettingsCard>
       </section>

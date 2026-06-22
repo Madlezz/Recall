@@ -4,8 +4,13 @@
  */
 
 let _currentUtterance: SpeechSynthesisUtterance | null = null;
+let _speakingCallback: ((speaking: boolean) => void) | null = null;
 
-export function speakText(text: string, lang = "en-US"): void {
+export function setSpeakingCallback(cb: (speaking: boolean) => void): void {
+  _speakingCallback = cb;
+}
+
+export function speakText(text: string, lang = "en-US", rate = 1.0): void {
   if (typeof window === "undefined" || !window.speechSynthesis) {
     return;
   }
@@ -27,7 +32,7 @@ export function speakText(text: string, lang = "en-US"): void {
 
   const utterance = new SpeechSynthesisUtterance(cleanText);
   utterance.lang = lang;
-  utterance.rate = 0.9;
+  utterance.rate = rate;
   utterance.pitch = 1;
 
   // Try to find a voice matching the language
@@ -37,6 +42,10 @@ export function speakText(text: string, lang = "en-US"): void {
     utterance.voice = matchingVoice;
   }
 
+  utterance.onstart = () => _speakingCallback?.(true);
+  utterance.onend = () => _speakingCallback?.(false);
+  utterance.onerror = () => _speakingCallback?.(false);
+
   _currentUtterance = utterance;
   window.speechSynthesis.speak(utterance);
 }
@@ -45,6 +54,7 @@ export function stopSpeaking(): void {
   if (typeof window !== "undefined" && window.speechSynthesis) {
     window.speechSynthesis.cancel();
     _currentUtterance = null;
+    _speakingCallback?.(false);
   }
 }
 

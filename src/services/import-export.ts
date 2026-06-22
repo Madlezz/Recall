@@ -40,6 +40,9 @@ desiredRetention: 0.9,
                     backupFolder: null,
                     backupSchedule: "never" as const,
                     lastBackupAt: null,
+    ttsEnabled: false,
+    ttsAutoRead: false,
+    ttsSpeed: 1,
                   },
                 };
                 return JSON.stringify(payload, null, 2);

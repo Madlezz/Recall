@@ -74,6 +74,9 @@ export interface RecallSettings {
   backupFolder: string | null;
   backupSchedule: BackupSchedule;
   lastBackupAt: string | null;
+  ttsEnabled: boolean; // Enable text-to-speech in study mode
+  ttsAutoRead: boolean; // Auto-read cards when shown/revealed
+  ttsSpeed: number; // 0.5-2.0, speech rate multiplier
 }
 
 export type BackupSchedule = "daily" | "weekly" | "never";

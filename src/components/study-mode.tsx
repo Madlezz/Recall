@@ -1,11 +1,11 @@
 import confetti from "canvas-confetti";
-import { AlertCircle, ArrowLeft, BookOpen, Check, Clock, EyeOff, RotateCcw, RotateCw, Timer, Volume2 } from "lucide-react";
+import { AlertCircle, ArrowLeft, BookOpen, Check, Clock, EyeOff, RotateCcw, RotateCw, Timer, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { RichCard } from "@/components/RichCard";
 import { Button } from "@/components/ui/button";
 import { useRecallStore } from "@/stores/recall-store";
-import { speakText, stopSpeaking, isTTSSupported } from "@/services/tts";
+import { speakText, stopSpeaking, isTTSSupported, setSpeakingCallback } from "@/services/tts";
 import { playFlipSound, playCorrectSound, playAgainSound, playHardSound } from "@/services/audio";
 import { previewIntervals } from "@/services/fsrs-engine";
 import { cn } from "@/lib/utils";
@@ -36,12 +36,32 @@ export function StudyMode(): JSX.Element {
 
   // Visual feedback for answer rating (for deaf users)
   const [ratingFlash, setRatingFlash] = useState<"again" | "hard" | "good" | "easy" | null>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  
+  useEffect(() => {
+    setSpeakingCallback(setIsSpeaking);
+    return () => setSpeakingCallback(() => {});
+  }, []);
+  
   useEffect(() => {
     if (ratingFlash) {
       const timer = setTimeout(() => setRatingFlash(null), 300);
       return () => clearTimeout(timer);
     }
   }, [ratingFlash]);
+
+  // Auto-read cards when TTS is enabled
+  useEffect(() => {
+    if (!settings?.ttsEnabled || !settings?.ttsAutoRead || !card) return;
+    if (activeStudy?.revealed) {
+      // Read back when answer revealed
+      setTimeout(() => speakText(card.back, "en-US", settings.ttsSpeed), 300);
+    } else {
+      // Read front when card shown
+      setTimeout(() => speakText(card.front, "en-US", settings.ttsSpeed), 300);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only trigger on card/reveal change
+  }, [card?.id, activeStudy?.revealed, settings?.ttsEnabled, settings?.ttsAutoRead]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent): void {
@@ -62,6 +82,11 @@ export function StudyMode(): JSX.Element {
       if (!activeStudy.revealed) {
         if (event.key.toLowerCase() === "b") { event.preventDefault(); buryCard(); return; }
         if (event.key.toLowerCase() === "s") { event.preventDefault(); void snoozeCard(120); toast.info("Snoozed for 2 hours"); return; }
+        if (event.key.toLowerCase() === "t" && settings?.ttsEnabled) {
+          event.preventDefault();
+          if (isSpeaking) { stopSpeaking(); } else { speakText(card!.front, "en-US", settings.ttsSpeed); }
+          return;
+        }
       }
 
       if (event.code === "Space" && !activeStudy.revealed) { event.preventDefault(); revealAnswer(); }
@@ -75,7 +100,7 @@ export function StudyMode(): JSX.Element {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeStudy, answerCurrentCard, revealAnswer, undoLastReview, buryCard, snoozeCard]);
+  }, [activeStudy, answerCurrentCard, revealAnswer, undoLastReview, buryCard, snoozeCard, settings, isSpeaking, card]);
 
   useEffect(() => { return () => stopSpeaking(); }, [cardId]);
 
@@ -209,13 +234,25 @@ export function StudyMode(): JSX.Element {
         </Button>
 
         <div className="flex items-center gap-4">
-          {isTTSSupported() && (
+          {isTTSSupported() && settings?.ttsEnabled && (
             <button
-              aria-label="Read card text aloud"
-              onClick={() => { const text = activeStudy.revealed ? `${card.front} ${card.back}` : card.front; speakText(text); }}
-              className="rounded-md p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 transition-colors dark:hover:text-zinc-300 dark:hover:bg-zinc-800"
+              aria-label={isSpeaking ? "Stop reading" : "Read card text aloud"}
+              onClick={() => {
+                if (isSpeaking) {
+                  stopSpeaking();
+                } else {
+                  const text = activeStudy.revealed ? `${card.front} ${card.back}` : card.front;
+                  speakText(text, "en-US", settings.ttsSpeed);
+                }
+              }}
+              className={`rounded-md p-1.5 transition-colors ${
+                isSpeaking
+                  ? "text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 animate-pulse"
+                  : "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 dark:hover:text-zinc-300 dark:hover:bg-zinc-800"
+              }`}
+              title="Read aloud (T)"
             >
-              <Volume2 className="h-4 w-4" />
+              {isSpeaking ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
             </button>
           )}
           <span className="flex items-center gap-1.5 text-sm tabular-nums text-zinc-400">
