@@ -39,8 +39,8 @@ This document outlines the planned features and improvements for Recall. Items a
 - [ ] Memory optimization for mobile devices
 
 ### Accessibility
+- [x] High contrast themes (Unreleased)
 - [ ] Screen reader support (ARIA labels, focus management)
-- [ ] High contrast themes
 - [ ] Customizable keyboard shortcuts
 - [ ] Dyslexia-friendly font option
 - [ ] Color-blind friendly UI

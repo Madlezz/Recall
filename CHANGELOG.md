@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ## [Unreleased]
 
 ### Added
+- High-contrast theme: pure black/white with stronger borders for accessibility
 - Retention curve: rolling 7-day retention rate visualization on stats dashboard
 - FSRS optimizer: analyze review history to auto-tune spacing weights and suggest optimal retention target
 - Text-to-Speech: enable TTS in settings for auto-read cards, adjustable speed (0.5x–2x), press T to toggle read aloud
