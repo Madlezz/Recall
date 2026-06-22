@@ -28,12 +28,15 @@ import type {
 import { navigationSlice, type NavigationSlice } from "./slices/navigation.slice";
 import { deckCardSlice, type DeckCardSlice, type DeckInput, type CardInput } from "./slices/deck-card.slice";
 import { settingsSlice, type SettingsSlice } from "./slices/settings.slice";
+import { createSavedSearchSlice, type SavedSearchSlice } from "./slices/saved-search.slice";
 import { dataState, persistSnapshot, persistReviewSnapshot, persistReviewDelta, getRepository, loadReviewLogs, runBackupIfDue } from "./store-helpers";
 
 export interface CustomStudyConfig {
   deckId?: string | null;
   count?: number;
   tagFilter?: string;
+  tags?: string[];
+  matchMode?: "all" | "any";
   newOnly?: boolean;
 }
 
@@ -42,7 +45,8 @@ export interface CustomStudyConfig {
 type RecallStore = RecallStateSnapshot &
   NavigationSlice &
   DeckCardSlice &
-  SettingsSlice & {
+  SettingsSlice &
+  SavedSearchSlice & {
     activeStudy: ActiveStudySession | null;
     lastSessionSummary: SessionSummary | null;
     isLoading: boolean;
@@ -95,6 +99,7 @@ export const useRecallStore = create<RecallStore>()((set, get) => {
   ...navigationSlice(setFn, getFn),
   ...deckCardSlice(setFn, getFn),
   ...settingsSlice(setFn, getFn),
+  ...createSavedSearchSlice(setFn, getFn),
 
   activeStudy: null,
   lastSessionSummary: null,
@@ -194,9 +199,25 @@ export const useRecallStore = create<RecallStore>()((set, get) => {
       config.deckId ? card.deckId === config.deckId : true,
     );
 
+    // Legacy single tag filter
     if (config.tagFilter) {
       const tag = config.tagFilter.toLowerCase();
       pool = pool.filter((c: Card) => c.tags.some((t) => t.toLowerCase() === tag));
+    }
+
+    // New multi-tag filter with match mode
+    if (config.tags && config.tags.length > 0) {
+      const searchTags = config.tags.map((t) => t.toLowerCase());
+      const matchMode = config.matchMode ?? "all";
+
+      pool = pool.filter((c: Card) => {
+        const cardTags = c.tags.map((t) => t.toLowerCase());
+        if (matchMode === "all") {
+          return searchTags.every((st) => cardTags.some((ct) => ct === st || ct.startsWith(`${st}::`)));
+        } else {
+          return searchTags.some((st) => cardTags.some((ct) => ct === st || ct.startsWith(`${st}::`)));
+        }
+      });
     }
 
     if (config.newOnly) {

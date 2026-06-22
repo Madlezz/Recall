@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Tag, ChevronRight, ChevronDown, Search, Trash2, Edit3, X, Check } from "lucide-react";
+import { Tag, ChevronRight, ChevronDown, Search, Trash2, Edit3, X, Check, Bookmark, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,7 @@ import {
   isValidTag,
 } from "@/lib/tags";
 import { toast } from "sonner";
+import type { SavedSearch } from "@/stores/slices/saved-search.slice";
 
 function TreeNode({
   node,
@@ -144,9 +145,16 @@ export function TagManager(): JSX.Element {
   const cards = useRecallStore((state) => state.cards);
   const updateCard = useRecallStore((state) => state.updateCard);
   const showBrowser = useRecallStore((state) => state.showBrowser);
+  const savedSearches = useRecallStore((state) => state.savedSearches);
+  const addSavedSearch = useRecallStore((state) => state.addSavedSearch);
+  const removeSavedSearch = useRecallStore((state) => state.removeSavedSearch);
+  const startCustomStudy = useRecallStore((state) => state.startCustomStudy);
   const [search, setSearch] = useState("");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [newSearchName, setNewSearchName] = useState("");
+  const [newSearchMatchMode, setNewSearchMatchMode] = useState<"all" | "any">("all");
 
   const tagCounts = useMemo(() => buildTagCounts(cards), [cards]);
   const tagTree = useMemo(() => buildTagTree(tagCounts), [tagCounts]);
@@ -237,6 +245,35 @@ export function TagManager(): JSX.Element {
     }
   }, [tagTree, expanded.size]);
 
+  function handleSaveSearch(): void {
+    if (!selectedTag || !newSearchName.trim()) {
+      toast.error("Please enter a name for the saved search");
+      return;
+    }
+    addSavedSearch(newSearchName.trim(), [selectedTag], newSearchMatchMode);
+    toast.success(`Saved search "${newSearchName.trim()}"`);
+    setNewSearchName("");
+    setNewSearchMatchMode("all");
+    setShowSaveDialog(false);
+  }
+
+  function handleStudySavedSearch(search: SavedSearch): void {
+    const result = startCustomStudy({
+      tags: search.tags,
+      matchMode: search.matchMode,
+      count: 50,
+    });
+    if (!result) {
+      toast.error("No cards match this saved search");
+    }
+  }
+
+  function handleDeleteSavedSearch(search: SavedSearch): void {
+    if (!confirm(`Delete saved search "${search.name}"?`)) return;
+    removeSavedSearch(search.id);
+    toast.success(`Deleted "${search.name}"`);
+  }
+
   const selectedCards = selectedTag ? getCardsInTagHierarchy(cards, selectedTag) : [];
   const totalTags = tagCounts.size;
 
@@ -260,6 +297,52 @@ export function TagManager(): JSX.Element {
           className="pl-9"
         />
       </div>
+
+      {/* Saved Searches */}
+      {savedSearches.length > 0 && (
+        <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+            <Bookmark className="h-4 w-4" />
+            Saved Searches
+          </h2>
+          <div className="space-y-2">
+            {savedSearches.map((search) => (
+              <div
+                key={search.id}
+                className="group flex items-center justify-between rounded-md border border-zinc-100 p-2 dark:border-zinc-800"
+              >
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{search.name}</div>
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {search.tags.map((t) => (
+                      <Badge key={t} tone="muted" className="text-[10px]">{t}</Badge>
+                    ))}
+                    <span className="text-[10px] text-muted-foreground">
+                      {search.matchMode === "all" ? "All tags" : "Any tag"}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handleStudySavedSearch(search)}
+                    className="rounded p-1.5 text-zinc-400 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-950"
+                    aria-label="Start study session"
+                  >
+                    <Play className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteSavedSearch(search)}
+                    className="rounded p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+                    aria-label="Delete saved search"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         {/* Tag tree */}
@@ -326,7 +409,7 @@ export function TagManager(): JSX.Element {
               </div>
 
               {/* Actions */}
-              <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800 space-y-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -338,7 +421,69 @@ export function TagManager(): JSX.Element {
                 >
                   View in Browser
                 </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => setShowSaveDialog(true)}
+                >
+                  <Bookmark className="mr-1.5 h-3 w-3" />
+                  Save as Search
+                </Button>
               </div>
+
+              {/* Save Search Dialog */}
+              {showSaveDialog && (
+                <div className="mt-3 rounded-md border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-800">
+                  <div className="mb-2 text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                    Save "{selectedTag}" as search
+                  </div>
+                  <Input
+                    placeholder="Search name..."
+                    value={newSearchName}
+                    onChange={(e) => setNewSearchName(e.target.value)}
+                    className="mb-2 h-8 text-xs"
+                    autoFocus
+                  />
+                  <div className="mb-2 flex gap-2">
+                    <label className="flex items-center gap-1 text-xs">
+                      <input
+                        type="radio"
+                        name="matchMode"
+                        value="all"
+                        checked={newSearchMatchMode === "all"}
+                        onChange={() => setNewSearchMatchMode("all")}
+                      />
+                      All tags
+                    </label>
+                    <label className="flex items-center gap-1 text-xs">
+                      <input
+                        type="radio"
+                        name="matchMode"
+                        value="any"
+                        checked={newSearchMatchMode === "any"}
+                        onChange={() => setNewSearchMatchMode("any")}
+                      />
+                      Any tag
+                    </label>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button size="sm" onClick={handleSaveSearch} className="flex-1">
+                      Save
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setShowSaveDialog(false);
+                        setNewSearchName("");
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
             </>
           ) : (
             <div className="py-8 text-center text-sm text-muted-foreground">
