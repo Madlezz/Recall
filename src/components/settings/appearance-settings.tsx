@@ -1,6 +1,6 @@
 import { SettingsCard } from "./settings-card";
 import { useRecallStore } from "@/stores/recall-store";
-import type { Theme, AccentColor } from "@/types";
+import type { AccentColor } from "@/types";
 
 const ACCENT_COLORS: AccentColor[] = [
   "zinc",

@@ -118,12 +118,7 @@ fn generate_simple_uuid() -> String {
     static COUNTER: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
     let count = COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
 
-    format!(
-        "{:x}-{:x}-{:x}",
-        nanos,
-        pid as u64,
-        count
-    )
+    format!("{:x}-{:x}-{:x}", nanos, pid as u64, count)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
