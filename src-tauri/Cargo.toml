@@ -1,6 +1,6 @@
 [package]
 name = "recall"
-version = "1.0.14"
+version = "1.0.15"
 description = "A minimal, local-first flashcard app for focused learning."
 authors = ["Madlezz"]
 edition = "2021"
