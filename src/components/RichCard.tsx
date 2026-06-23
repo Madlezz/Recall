@@ -143,6 +143,9 @@ export function RichCard({ content, isBack = false, cardType = "basic", revealed
             (t: string) => !["form", "input", "textarea", "button", "select", "details", "summary"].includes(t),
           ),
         }], rehypeHighlight, rehypeKatex]}
+        // SECURITY: Plugin order matters. rehypeSanitize runs BEFORE rehypeKatex.
+        // rehypeKatex emits raw HTML, but KaTeX's default trust:false prevents \href{javascript:...} attacks.
+        // DO NOT enable trust:true on rehypeKatex without re-auditing the sanitizer schema.
         components={{
           img({ src, alt }: React.ComponentPropsWithoutRef<"img">) {
             if (src && src.startsWith("https://recall.local/")) {

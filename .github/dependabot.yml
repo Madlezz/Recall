@@ -16,6 +16,10 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # Ignore minor/patch updates for Rust deps — require manual review for breaking changes
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
     groups:
       all-dependencies:
         patterns: ["*"]

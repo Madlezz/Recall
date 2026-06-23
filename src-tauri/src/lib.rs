@@ -119,9 +119,8 @@ fn generate_simple_uuid() -> String {
     let count = COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
 
     format!(
-        "{:x}-{:x}-{:x}-{:x}",
-        nanos >> 64,
-        nanos as u64,
+        "{:x}-{:x}-{:x}",
+        nanos,
         pid as u64,
         count
     )

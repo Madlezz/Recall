@@ -1,4 +1,4 @@
-import { Download, FolderOpen, HardDrive, Layers, Moon, RotateCcw, Save, Sun, Upload, Bell, BellOff, Volume2, Mic, TrendingUp, Eye, RefreshCw, Trash2 } from "lucide-react";
+import { Download, FolderOpen, HardDrive, Layers, Moon, RotateCcw, Save, Sun, Upload, Bell, BellOff, Volume2, Mic, TrendingUp, Eye, RefreshCw, Trash2, Check } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -28,6 +28,7 @@ export function Settings(): JSX.Element {
   const [importMode, setImportMode] = useState<ImportMode>("merge");
   const [pendingReplace, setPendingReplace] = useState<RecallExportPayload | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [lastAction, setLastAction] = useState<{ type: string; time: string } | null>(null);
   const settings = useRecallStore((state) => state.settings);
   const cards = useRecallStore((state) => state.cards);
   const decks = useRecallStore((state) => state.decks);
@@ -57,7 +58,10 @@ export function Settings(): JSX.Element {
     try {
       const payload = exportData();
       const saved = await saveExportPayload(payload);
-      if (saved) toast.success("Data exported successfully");
+      if (saved) {
+        toast.success("Data exported successfully");
+        setLastAction({ type: "Exported backup", time: new Date().toLocaleTimeString() });
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
       toast.error(`Could not export data: ${message}`);
@@ -68,6 +72,7 @@ export function Settings(): JSX.Element {
     try {
       await resetData();
       toast.success("Seed data restored. All your cards and review history have been reset");
+      setLastAction({ type: "Reset to seed data", time: new Date().toLocaleTimeString() });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
       toast.error(`Could not reset data: ${message}`);
@@ -78,6 +83,7 @@ export function Settings(): JSX.Element {
     try {
       await startFresh();
       toast.success("All data deleted. Starting fresh with empty state");
+      setLastAction({ type: "Deleted all data", time: new Date().toLocaleTimeString() });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
       toast.error(`Could not delete data: ${message}`);
@@ -90,10 +96,22 @@ export function Settings(): JSX.Element {
       await replaceData(pendingReplace);
       setPendingReplace(null);
       toast.success("Data replaced successfully");
+      setLastAction({ type: "Replaced all data", time: new Date().toLocaleTimeString() });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
       toast.error(`Could not replace data: ${message}`);
     }
+  }
+
+  async function processImportPayload(raw: string): Promise<void> {
+    const payload = parseImportPayload(raw);
+    if (importMode === "replace") {
+      setPendingReplace(payload);
+      return;
+    }
+    await mergeData(payload);
+    toast.success("Data imported and merged successfully");
+    setLastAction({ type: "Imported and merged", time: new Date().toLocaleTimeString() });
   }
 
   async function handleImport(event: React.ChangeEvent<HTMLInputElement>): Promise<void> {
@@ -101,13 +119,7 @@ export function Settings(): JSX.Element {
     event.target.value = "";
     if (!file) return;
     try {
-      const payload = parseImportPayload(await file.text());
-      if (importMode === "replace") {
-        setPendingReplace(payload);
-        return;
-      }
-      await mergeData(payload);
-      toast.success("Data imported and merged successfully");
+      await processImportPayload(await file.text());
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
       toast.error(`Invalid import file: ${message}. Make sure you're importing a valid Recall JSON export`);
@@ -121,13 +133,7 @@ export function Settings(): JSX.Element {
         if (!isTauriRuntime()) fileInputRef.current?.click();
         return;
       }
-      const payload = parseImportPayload(raw);
-      if (importMode === "replace") {
-        setPendingReplace(payload);
-        return;
-      }
-      await mergeData(payload);
-      toast.success("Data imported and merged successfully");
+      await processImportPayload(raw);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
       toast.error(`Invalid import file: ${message}. Make sure you're importing a valid Recall JSON export`);
@@ -424,6 +430,12 @@ export function Settings(): JSX.Element {
             </button>
           </div>
           <input ref={fileInputRef} type="file" accept="application/json,.json" className="hidden" onChange={handleImport} />
+          {lastAction && (
+            <div className="mt-3 flex items-center gap-2 rounded-md bg-emerald-50 px-3 py-2 text-xs text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
+              <Check className="h-3.5 w-3.5" />
+              <span>{lastAction.type} at {lastAction.time}</span>
+            </div>
+          )}
         </SettingsCard>
       </section>
 

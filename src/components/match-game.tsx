@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
 import { getLevel, triggerLevelUpConfetti } from "@/lib/xp";
+import { getMatchGameXp } from "@/lib/xp-rules";
 import { playTileClickSound, playMatchSound, playMismatchSound } from "@/services/audio";
 import type { Card } from "@/types";
 
@@ -168,13 +169,10 @@ export function MatchGame(): JSX.Element {
           // moves is stale after setMoves call — use +1
           const actualMoves = moves + 1;
           const perfectGame = actualMoves === pairCount;
-          const fastGame = elapsed < 60;
-          const quickGame = elapsed < 120;
-
-          let xp = 30; // base
-          if (perfectGame) xp += 25; // perfect: every tap was a match
-          if (fastGame) xp += 20;
-          else if (quickGame) xp += 10;
+          const xp = getMatchGameXp({
+            isPerfect: perfectGame,
+            elapsedSeconds: elapsed,
+          });
 
           setXpEarned(xp);
 

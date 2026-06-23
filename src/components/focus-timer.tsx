@@ -3,6 +3,7 @@ import { Coffee, CloudRain, Headphones, Pause, Play, RotateCcw, VolumeX } from "
 import { Button } from "@/components/ui/button";
 import { startSoundscape, stopSoundscape } from "@/services/audio";
 import { getLevel, triggerLevelUpConfetti } from "@/lib/xp";
+import { getFocusTimerXp } from "@/lib/xp-rules";
 import { useRecallStore } from "@/stores/recall-store";
 import type { Soundscape } from "@/services/audio";
 
@@ -82,7 +83,7 @@ export function FocusTimer(): JSX.Element {
 
         if (!xpAwardedRef.current) {
           xpAwardedRef.current = true;
-          const xp = duration <= 15 * 60 ? 15 : duration <= 25 * 60 ? 25 : 45;
+          const xp = getFocusTimerXp(duration);
           const oldLevel = getLevel(settingsRef.current.xp);
           void addXp(xp);
           if (getLevel(settingsRef.current.xp + xp) > oldLevel) {
