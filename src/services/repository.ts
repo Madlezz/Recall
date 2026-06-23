@@ -42,6 +42,7 @@ export interface RecallRepository {
   upsertCard(card: Card): Promise<void>;
   deleteDeck(deckId: string): Promise<void>;
   deleteCard(cardId: string): Promise<void>;
+  deleteCards(cardIds: string[]): Promise<void>;
   queryCards(filters: { deckId?: string; state?: string; search?: string; sortField: string; sortDir: string; limit: number; offset: number }): Promise<{ cards: Card[]; total: number }>;
 }
 
@@ -466,6 +467,14 @@ class SqliteRecallRepository implements RecallRepository {
       }
     }
 
+    async deleteCards(cardIds: string[]): Promise<void> {
+      if (cardIds.length === 0) return;
+      if (isTauriRuntime()) {
+        const { invoke } = await import("@tauri-apps/api/core");
+        await invoke("delete_cards_atomic", { cardIds });
+      }
+    }
+
     async queryCards(filters: { deckId?: string; state?: string; search?: string; sortField: string; sortDir: string; limit: number; offset: number }): Promise<{ cards: Card[]; total: number }> {
       if (!isTauriRuntime()) {
         return { cards: [], total: 0 };
@@ -556,6 +565,7 @@ class LocalStorageRecallRepository implements RecallRepository {
   async upsertCard(_card: Card): Promise<void> {}
   async deleteDeck(_deckId: string): Promise<void> {}
   async deleteCard(_cardId: string): Promise<void> {}
+  async deleteCards(_cardIds: string[]): Promise<void> {}
   async queryCards(_filters: { deckId?: string; state?: string; search?: string; sortField: string; sortDir: string; limit: number; offset: number }): Promise<{ cards: Card[]; total: number }> {
     // LocalStorage can't do DB-side queries; fallback to client-side
     const all = await this.loadAppData();

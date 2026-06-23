@@ -1,6 +1,6 @@
 import confetti from "canvas-confetti";
 import { AlertCircle, ArrowLeft, BookOpen, Check, Clock, EyeOff, RotateCcw, RotateCw, Timer, Volume2, VolumeX } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { RichCard } from "@/components/RichCard";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,7 @@ export function StudyMode(): JSX.Element {
   // Visual feedback for answer rating (for deaf users)
   const [ratingFlash, setRatingFlash] = useState<"again" | "hard" | "good" | "easy" | null>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const ttsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   useEffect(() => {
     setSpeakingCallback(setIsSpeaking);
@@ -53,12 +54,14 @@ export function StudyMode(): JSX.Element {
   // Auto-read cards when TTS is enabled
   useEffect(() => {
     if (!settings?.ttsEnabled || !settings?.ttsAutoRead || !card) return;
+    // Clear any pending TTS timeout from previous card
+    if (ttsTimeoutRef.current) { clearTimeout(ttsTimeoutRef.current); ttsTimeoutRef.current = null; }
     if (activeStudy?.revealed) {
       // Read back when answer revealed
-      setTimeout(() => speakText(card.back, "en-US", settings.ttsSpeed), 300);
+      ttsTimeoutRef.current = setTimeout(() => speakText(card.back, "en-US", settings.ttsSpeed), 300);
     } else {
       // Read front when card shown
-      setTimeout(() => speakText(card.front, "en-US", settings.ttsSpeed), 300);
+      ttsTimeoutRef.current = setTimeout(() => speakText(card.front, "en-US", settings.ttsSpeed), 300);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- only trigger on card/reveal change
   }, [card?.id, activeStudy?.revealed, settings?.ttsEnabled, settings?.ttsAutoRead]);
@@ -92,17 +95,17 @@ export function StudyMode(): JSX.Element {
       if (event.code === "Space" && !activeStudy.revealed) { event.preventDefault(); revealAnswer(); }
 
       if (!activeStudy.revealed) return;
-      if (event.key === "1") void answerCurrentCard("again");
-      if (event.key === "2") void answerCurrentCard("hard");
-      if (event.key === "3") void answerCurrentCard("good");
-      if (event.key === "4") void answerCurrentCard("easy");
+      if (event.key === "1") { event.preventDefault(); void answerCurrentCard("again"); }
+      if (event.key === "2") { event.preventDefault(); void answerCurrentCard("hard"); }
+      if (event.key === "3") { event.preventDefault(); void answerCurrentCard("good"); }
+      if (event.key === "4") { event.preventDefault(); void answerCurrentCard("easy"); }
     }
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeStudy, answerCurrentCard, revealAnswer, undoLastReview, buryCard, snoozeCard, settings, isSpeaking, card]);
 
-  useEffect(() => { return () => stopSpeaking(); }, [cardId]);
+  useEffect(() => { return () => { stopSpeaking(); if (ttsTimeoutRef.current) { clearTimeout(ttsTimeoutRef.current); ttsTimeoutRef.current = null; } }; }, [cardId]);
 
   const [elapsed, setElapsed] = useState(0);
   useEffect(() => {

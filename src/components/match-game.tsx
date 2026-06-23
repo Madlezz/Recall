@@ -42,7 +42,7 @@ type FeedbackType = "match" | "mismatch" | null;
 export function MatchGame(): JSX.Element {
   const _allCards = useRecallStore((state) => state.cards);
   const settings = useRecallStore((state) => state.settings);
-  const updateSettings = useRecallStore((state) => state.updateSettings);
+  const addXp = useRecallStore((state) => state.addXp);
   const showDashboard = useRecallStore((state) => state.showDashboard);
   const selectedDeckId = useRecallStore((state) => state.selectedDeckId);
   const _decks = useRecallStore((state) => state.decks);
@@ -164,10 +164,10 @@ export function MatchGame(): JSX.Element {
         // Award XP — only once per game
         if (!xpAwarded.current) {
           xpAwarded.current = true;
-          const totalPairs = tiles.length / 2;
+          const pairCount = tiles.length / 2;
           // moves is stale after setMoves call — use +1
           const actualMoves = moves + 1;
-          const perfectGame = actualMoves === totalPairs;
+          const perfectGame = actualMoves === pairCount;
           const fastGame = elapsed < 60;
           const quickGame = elapsed < 120;
 
@@ -182,7 +182,7 @@ export function MatchGame(): JSX.Element {
           const newXp = settings.xp + xp;
           const newLevel = getLevel(newXp);
 
-          void updateSettings({ xp: newXp });
+          void addXp(xp);
           if (newLevel > oldLevel) {
             setTimeout(() => triggerLevelUpConfetti(), 300);
           }

@@ -496,6 +496,36 @@ pub async fn delete_card_atomic(app: tauri::AppHandle, card_id: String) -> Resul
     Ok(())
 }
 
+/// Atomically delete multiple cards in a single transaction.
+#[tauri::command]
+pub async fn delete_cards_atomic(
+    app: tauri::AppHandle,
+    card_ids: Vec<String>,
+) -> Result<(), String> {
+    if card_ids.is_empty() {
+        return Ok(());
+    }
+    let conn = open_db_connection(&app)?;
+
+    conn.execute_batch("BEGIN IMMEDIATE")
+        .map_err(|e| format!("BEGIN failed: {}", e))?;
+
+    for card_id in &card_ids {
+        if let Err(e) = conn.execute(
+            "DELETE FROM cards WHERE id = ?1",
+            rusqlite::params![card_id],
+        ) {
+            let _ = conn.execute_batch("ROLLBACK");
+            return Err(format!("DELETE card '{}' failed: {}", card_id, e));
+        }
+    }
+
+    conn.execute_batch("COMMIT")
+        .map_err(|e| format!("COMMIT failed: {}", e))?;
+
+    Ok(())
+}
+
 /// Atomically upsert a single setting (insert or update).
 #[tauri::command]
 pub async fn upsert_setting_atomic(

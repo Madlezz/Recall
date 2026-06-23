@@ -9,6 +9,7 @@ import {
   persistDeckDelete,
   persistCardDelta,
   persistCardDelete,
+  persistCardsBatchDelete,
   persistSnapshot,
   touchDeck,
   type StoreSet,
@@ -37,6 +38,7 @@ export interface DeckCardSlice {
   createCard: (input: CardInput) => Promise<string>;
   updateCard: (cardId: string, input: CardInput) => Promise<void>;
   deleteCard: (cardId: string) => Promise<void>;
+  deleteCards: (cardIds: string[]) => Promise<void>;
   moveCard: (cardId: string, deckId: string) => Promise<void>;
   resetDeckProgress: (deckId: string) => Promise<void>;
 }
@@ -138,6 +140,18 @@ export const deckCardSlice = (
       reviewLogs: state.reviewLogs.filter((r: ReviewLog) => r.cardId !== cardId),
     };
     await persistCardDelete(set, snapshot, cardId);
+  },
+
+  async deleteCards(cardIds: string[]) {
+    if (cardIds.length === 0) return;
+    const idSet = new Set(cardIds);
+    const state = get();
+    const snapshot = {
+      ...dataState(state),
+      cards: state.cards.filter((c: Card) => !idSet.has(c.id)),
+      reviewLogs: state.reviewLogs.filter((r: ReviewLog) => !idSet.has(r.cardId)),
+    };
+    await persistCardsBatchDelete(set, snapshot, cardIds);
   },
 
   async moveCard(cardId: string, deckId: string) {

@@ -121,6 +121,18 @@ export async function persistCardDelete(
   set({ ...snapshot, ...extra, error: null });
 }
 
+export async function persistCardsBatchDelete(
+  set: StoreSet,
+  snapshot: RecallStateSnapshot,
+  cardIds: string[],
+  extra: Record<string, unknown> = {},
+): Promise<void> {
+  const repository = await getRepository();
+  await repository.deleteCards(cardIds);
+  applyTheme(snapshot.settings.theme);
+  set({ ...snapshot, ...extra, error: null });
+}
+
 export async function persistReviewSnapshot(
   set: StoreSet,
   snapshot: RecallStateSnapshot,

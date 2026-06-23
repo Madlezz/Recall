@@ -1,4 +1,4 @@
-import { Download, FolderOpen, HardDrive, Layers, Moon, RotateCcw, Save, Sun, Upload, Bell, BellOff, Volume2, Mic, TrendingUp, Eye, RefreshCw } from "lucide-react";
+import { Download, FolderOpen, HardDrive, Layers, Moon, RotateCcw, Save, Sun, Upload, Bell, BellOff, Volume2, Mic, TrendingUp, Eye, RefreshCw, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -39,6 +39,7 @@ export function Settings(): JSX.Element {
   const performSync = useRecallStore((state) => state.performSync);
   const updateSettings = useRecallStore((state) => state.updateSettings);
   const resetData = useRecallStore((state) => state.resetData);
+  const startFresh = useRecallStore((state) => state.startFresh);
   const exportData = useRecallStore((state) => state.exportData);
   const mergeData = useRecallStore((state) => state.mergeData);
   const replaceData = useRecallStore((state) => state.replaceData);
@@ -70,6 +71,16 @@ export function Settings(): JSX.Element {
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
       toast.error(`Could not reset data: ${message}`);
+    }
+  }
+
+  async function handleStartFresh(): Promise<void> {
+    try {
+      await startFresh();
+      toast.success("All data deleted. Starting fresh with empty state");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Could not delete data: ${message}`);
     }
   }
 
@@ -208,7 +219,7 @@ export function Settings(): JSX.Element {
               min="0" max="100"
               aria-label="Sound volume"
               value={settings.soundVolume}
-              onChange={(e) => void updateSettings({ soundVolume: parseInt(e.target.value, 10) })}
+              onChange={(e) => void updateSettings({ soundVolume: parseInt(e.target.value, 10) || 100 })}
               className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-zinc-200 accent-zinc-700 dark:bg-zinc-700 dark:accent-zinc-300"
             />
             <span className="w-9 text-right text-sm tabular-nums text-zinc-400" aria-live="polite">{settings.soundVolume}%</span>
@@ -244,7 +255,7 @@ export function Settings(): JSX.Element {
                 min="0.5" max="2.0" step="0.1"
                 aria-label="TTS speed"
                 value={settings.ttsSpeed}
-                onChange={(e) => void updateSettings({ ttsSpeed: parseFloat(e.target.value) })}
+                onChange={(e) => void updateSettings({ ttsSpeed: parseFloat(e.target.value) || 1.0 })}
                 disabled={!settings.ttsEnabled}
                 className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-zinc-200 accent-zinc-700 disabled:opacity-50 dark:bg-zinc-700 dark:accent-zinc-300"
               />
@@ -350,7 +361,7 @@ export function Settings(): JSX.Element {
               min="70" max="99"
               aria-label="Desired retention"
               value={Math.round(settings.desiredRetention * 100)}
-              onChange={(e) => void updateSettings({ desiredRetention: parseInt(e.target.value, 10) / 100 })}
+              onChange={(e) => void updateSettings({ desiredRetention: (parseInt(e.target.value, 10) || 90) / 100 })}
               className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-zinc-200 accent-zinc-700 dark:bg-zinc-700 dark:accent-zinc-300"
             />
             <span className="w-12 text-right text-sm tabular-nums text-zinc-400" aria-live="polite">{(settings.desiredRetention * 100).toFixed(0)}%</span>
@@ -556,31 +567,61 @@ export function Settings(): JSX.Element {
       {/* Reset */}
       <section>
         <h3 className="mb-4 text-sm font-bold text-red-600 dark:text-red-400">Danger Zone</h3>
-        <div className="rounded-lg border border-red-200 bg-red-50/30 p-5 dark:border-red-900 dark:bg-red-950/20">
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
-            Restore seeded demo data and clear all local progress. This cannot be undone.
-          </p>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <button className="flex items-center gap-1.5 rounded-md bg-red-600 px-3.5 py-2 text-sm font-semibold text-white hover:bg-red-700">
-                <RotateCcw className="h-4 w-4" /> Reset All Data
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Reset all data?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This clears current decks, cards, reviews, and sessions, then restores seed data.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertCancelButton />
-                <AlertDialogAction asChild>
-                  <Button variant="destructive" onClick={() => void handleReset()}>Reset data</Button>
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+        <div className="rounded-lg border border-red-200 bg-red-50/30 p-5 dark:border-red-900 dark:bg-red-950/20 space-y-5">
+          <div>
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Delete All Data</p>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-3">
+              Permanently delete all decks, cards, and review history. Starts with a completely empty state.
+            </p>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="flex items-center gap-1.5 rounded-md bg-red-600 px-3.5 py-2 text-sm font-semibold text-white hover:bg-red-700">
+                  <Trash2 className="h-4 w-4" /> Delete All Data
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete all data?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This permanently deletes all your decks, cards, reviews, and sessions. You will start with an empty state — no demo data will be loaded. This cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertCancelButton />
+                  <AlertDialogAction asChild>
+                    <Button variant="destructive" onClick={() => void handleStartFresh()}>Delete everything</Button>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+          <div className="border-t border-red-200 dark:border-red-900 pt-5">
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Restore Demo Decks</p>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-3">
+              Reset to the built-in demo decks. Clears all your current data and replaces it with sample content.
+            </p>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="flex items-center gap-1.5 rounded-md bg-red-600 px-3.5 py-2 text-sm font-semibold text-white hover:bg-red-700">
+                  <RotateCcw className="h-4 w-4" /> Restore Demo Decks
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Restore demo decks?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This clears current decks, cards, reviews, and sessions, then restores the built-in demo decks. This cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertCancelButton />
+                  <AlertDialogAction asChild>
+                    <Button variant="destructive" onClick={() => void handleReset()}>Restore demo decks</Button>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </div>
       </section>
 

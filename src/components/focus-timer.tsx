@@ -22,7 +22,7 @@ function formatTime(seconds: number): string {
 
 export function FocusTimer(): JSX.Element {
   const settings = useRecallStore((state) => state.settings);
-  const updateSettings = useRecallStore((state) => state.updateSettings);
+  const addXp = useRecallStore((state) => state.addXp);
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
 
@@ -84,7 +84,7 @@ export function FocusTimer(): JSX.Element {
           xpAwardedRef.current = true;
           const xp = duration <= 15 * 60 ? 15 : duration <= 25 * 60 ? 25 : 45;
           const oldLevel = getLevel(settingsRef.current.xp);
-          void updateSettings({ xp: settingsRef.current.xp + xp });
+          void addXp(xp);
           if (getLevel(settingsRef.current.xp + xp) > oldLevel) {
             setTimeout(() => triggerLevelUpConfetti(), 300);
           }

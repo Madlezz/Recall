@@ -1,5 +1,5 @@
-import { BookOpen, Home, LayoutGrid, Settings, Shield, Star, Tag, TrendingUp, Zap } from "lucide-react";
-import type { ReactNode } from "react";
+import { BookOpen, Home, LayoutGrid, Menu, Play, Settings, Shield, Star, Tag, Timer, TrendingUp, X, Zap } from "lucide-react";
+import { useState, type ReactNode } from "react";
 import { CommandPalette } from "@/components/command-palette";
 import { Button } from "@/components/ui/button";
 import { getDueTodayCount } from "@/lib/stats";
@@ -20,8 +20,19 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
   const showStats = useRecallStore((state) => state.showStats);
   const showBrowser = useRecallStore((state) => state.showBrowser);
   const showTags = useRecallStore((state) => state.showTags);
+  const startReview = useRecallStore((state) => state.startReview);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const dueCount = getDueTodayCount(cards);
+
+  function closeMobileNav(): void {
+    setMobileNavOpen(false);
+  }
+
+  function handleNavClick(action: () => void): void {
+    action();
+    closeMobileNav();
+  }
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
@@ -50,10 +61,24 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         {/* Nav */}
         <nav className="flex-1 px-3 py-3 space-y-1" aria-label="Main navigation">
           <NavButton active={view === "dashboard"} icon={Home} label="Dashboard" onClick={showDashboard} />
+          <NavButton 
+            active={view === "study"} 
+            icon={Play} 
+            label="Review" 
+            onClick={() => startReview(null)}
+            badge={dueCount > 0 ? dueCount : undefined}
+          />
           <NavButton active={view === "browser"} icon={LayoutGrid} label="Browser" onClick={showBrowser} />
           <NavButton active={view === "tags"} icon={Tag} label="Tags" onClick={showTags} />
           <NavButton active={view === "stats"} icon={TrendingUp} label="Stats" onClick={showStats} />
           <NavButton active={view === "settings"} icon={Settings} label="Settings" onClick={showSettings} />
+          
+          {/* Tools section */}
+          <div className="pt-3 pb-1 px-3">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Tools</span>
+          </div>
+          <NavButton active={false} icon={Timer} label="Focus Timer" onClick={showDashboard} />
+          <NavButton active={view === "match"} icon={Zap} label="Match Game" onClick={showBrowser} />
         </nav>
 
         {/* Divider */}
@@ -85,14 +110,60 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
 
       {/* ── Mobile header ── */}
       <header className="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-200 bg-white/90 px-4 py-3 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/90 lg:hidden">
-        <button className="flex items-center gap-2 font-semibold text-sm" onClick={showDashboard}>
-          <BookOpen className="h-5 w-5" />
-          Recall
-        </button>
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => setMobileNavOpen(true)} aria-label="Open navigation">
+            <Menu className="h-5 w-5" />
+          </Button>
+          <button className="flex items-center gap-2 font-semibold text-sm" onClick={showDashboard}>
+            <BookOpen className="h-5 w-5" />
+            Recall
+          </button>
+        </div>
         <Button variant="ghost" size="icon" onClick={showSettings} aria-label="Open settings">
           <Settings className="h-4 w-4" />
         </Button>
       </header>
+
+      {/* ── Mobile nav drawer ── */}
+      {mobileNavOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={closeMobileNav}
+            aria-hidden="true"
+          />
+          <div className="absolute inset-y-0 left-0 w-64 bg-white dark:bg-zinc-900 shadow-xl flex flex-col">
+            <div className="flex items-center justify-between px-4 h-14 border-b border-zinc-200 dark:border-zinc-800">
+              <span className="font-semibold text-sm">Navigation</span>
+              <Button variant="ghost" size="icon" onClick={closeMobileNav} aria-label="Close navigation">
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <nav className="flex-1 px-3 py-3 space-y-1" aria-label="Mobile navigation">
+              <NavButton active={view === "dashboard"} icon={Home} label="Dashboard" onClick={() => handleNavClick(showDashboard)} />
+              <NavButton 
+                active={view === "study"} 
+                icon={Play} 
+                label="Review" 
+                onClick={() => handleNavClick(() => startReview(null))}
+                badge={dueCount > 0 ? dueCount : undefined}
+              />
+              <NavButton active={view === "browser"} icon={LayoutGrid} label="Browser" onClick={() => handleNavClick(showBrowser)} />
+              <NavButton active={view === "tags"} icon={Tag} label="Tags" onClick={() => handleNavClick(showTags)} />
+              <NavButton active={view === "stats"} icon={TrendingUp} label="Stats" onClick={() => handleNavClick(showStats)} />
+              <NavButton active={view === "settings"} icon={Settings} label="Settings" onClick={() => handleNavClick(showSettings)} />
+              <div className="pt-3 pb-1 px-3">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Tools</span>
+              </div>
+              <NavButton active={false} icon={Timer} label="Focus Timer" onClick={() => handleNavClick(showDashboard)} />
+              <NavButton active={view === "match"} icon={Zap} label="Match Game" onClick={() => handleNavClick(showBrowser)} />
+            </nav>
+            <div className="px-5 py-3 border-t border-zinc-200 dark:border-zinc-800">
+              <LevelWidget />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Main content ── */}
       <main id="main-content" className="lg:pl-56" tabIndex={-1}>
@@ -112,9 +183,10 @@ interface NavButtonProps {
   icon: typeof Home;
   label: string;
   onClick: () => void;
+  badge?: number;
 }
 
-function NavButton({ active, icon: Icon, label, onClick }: NavButtonProps): JSX.Element {
+function NavButton({ active, icon: Icon, label, onClick, badge }: NavButtonProps): JSX.Element {
   return (
     <button
       onClick={onClick}
@@ -127,7 +199,12 @@ function NavButton({ active, icon: Icon, label, onClick }: NavButtonProps): JSX.
       )}
     >
       <Icon className="h-4 w-4 shrink-0" />
-      {label}
+      <span className="flex-1 text-left">{label}</span>
+      {badge !== undefined && badge > 0 && (
+        <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-semibold text-white">
+          {badge}
+        </span>
+      )}
     </button>
   );
 }

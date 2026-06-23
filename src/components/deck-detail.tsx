@@ -28,6 +28,17 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
 import { BulkAddDialog } from "@/components/bulk-add-dialog";
 import { CardDialog } from "@/components/card-dialog";
@@ -61,7 +72,7 @@ export function DeckDetail(): JSX.Element {
   const cards = useRecallStore((s) => s.cards);
   const showDashboard = useRecallStore((s) => s.showDashboard);
   const deleteDeck = useRecallStore((s) => s.deleteDeck);
-  const deleteCard = useRecallStore((s) => s.deleteCard);
+  const deleteCards = useRecallStore((s) => s.deleteCards);
   const createCard = useRecallStore((s) => s.createCard);
   const startReview = useRecallStore((s) => s.startReview);
   const resetDeckProgress = useRecallStore((s) => s.resetDeckProgress);
@@ -191,9 +202,7 @@ export function DeckDetail(): JSX.Element {
   async function handleBulkDelete(): Promise<void> {
     if (selectedCardIds.size === 0) return;
     const count = selectedCardIds.size;
-    for (const id of selectedCardIds) {
-      await deleteCard(id);
-    }
+    await deleteCards(Array.from(selectedCardIds));
     setSelectedCardIds(new Set());
     toast.success(`Deleted ${count} card${count > 1 ? "s" : ""}`);
   }
@@ -392,9 +401,9 @@ export function DeckDetail(): JSX.Element {
               Dismiss
             </Button>
           </div>
-          {qualityWarnings.map((warning, i) => (
+          {qualityWarnings.map((warning) => (
             <div
-              key={i}
+              key={`${warning.cardId}-${warning.severity}`}
               className={cn(
                 "rounded-md px-3 py-2 text-sm",
                 warning.severity === "high"
@@ -463,10 +472,30 @@ export function DeckDetail(): JSX.Element {
                 <span className="text-sm text-muted-foreground">
                   {selectedCardIds.size} selected
                 </span>
-                <Button variant="destructive" size="sm" onClick={() => void handleBulkDelete()}>
-                  <Trash2 className="h-4 w-4" />
-                  Delete Selected
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="sm">
+                      <Trash2 className="h-4 w-4" />
+                      Delete Selected
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete selected cards?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete {selectedCardIds.size} card{selectedCardIds.size > 1 ? "s" : ""}. This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction asChild>
+                        <Button variant="destructive" onClick={() => void handleBulkDelete()}>
+                          Delete
+                        </Button>
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </>
             )}
           </div>

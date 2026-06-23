@@ -11,6 +11,7 @@ export interface SettingsSlice {
   setDyslexiaFont: (enabled: boolean) => Promise<void>;
   performSync: () => Promise<void>;
   updateSettings: (partial: Partial<RecallStateSnapshot["settings"]>) => Promise<void>;
+  addXp: (delta: number) => Promise<void>;
   completeOnboarding: () => Promise<void>;
   startFresh: () => Promise<void>;
   importTemplateDecks: (decks: Deck[], cards: Card[]) => Promise<void>;
@@ -76,6 +77,18 @@ export const settingsSlice = (
     const repo = await getRepository();
     const current = dataState(get()).settings;
     const snapshot = await repo.saveSettings({ ...current, ...partial }, dataState(get()));
+    applyTheme(snapshot.settings.theme);
+    applyAccentColor(snapshot.settings.accentColor);
+    applyDyslexiaFont(snapshot.settings.dyslexiaFont);
+    setMasterVolume(snapshot.settings.soundVolume / 100);
+    setCustomWeights(snapshot.settings.fsrsWeights);
+    set({ ...snapshot, error: null });
+  },
+
+  async addXp(delta: number) {
+    const repo = await getRepository();
+    const current = dataState(get()).settings;
+    const snapshot = await repo.saveSettings({ ...current, xp: current.xp + delta }, dataState(get()));
     applyTheme(snapshot.settings.theme);
     applyAccentColor(snapshot.settings.accentColor);
     applyDyslexiaFont(snapshot.settings.dyslexiaFont);
