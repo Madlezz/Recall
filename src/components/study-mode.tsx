@@ -1,4 +1,3 @@
-import confetti from "canvas-confetti";
 import { AlertCircle, ArrowLeft, BookOpen, Check, Clock, EyeOff, RotateCcw, RotateCw, Timer, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -9,7 +8,8 @@ import { speakText, stopSpeaking, isTTSSupported, setSpeakingCallback } from "@/
 import { playFlipSound, playCorrectSound, playAgainSound, playHardSound } from "@/services/audio";
 import { previewIntervals } from "@/services/fsrs-engine";
 import { cn } from "@/lib/utils";
-import type { SessionSummary } from "@/types";
+import { SessionSummaryModal } from "./study-mode/session-summary-modal";
+import { AnswerButton, CompletionStat } from "./study-mode/study-helpers";
 
 export function StudyMode(): JSX.Element {
   const activeStudy = useRecallStore((state) => state.activeStudy);
@@ -358,155 +358,6 @@ export function StudyMode(): JSX.Element {
           </>
         )}
       </footer>
-    </div>
-  );
-}
-
-// ── Answer button ──
-
-type AnswerVariant = "again" | "hard" | "good" | "easy";
-
-const answerStyles: Record<AnswerVariant, string> = {
-  again: "bg-red-50 text-red-700 border-red-200 hover:bg-red-100 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900",
-  hard: "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900",
-  good: "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900",
-  easy: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900",
-};
-
-function AnswerButton({ label, keyHint, variant, interval, onClick }: { label: string; keyHint: string; variant: AnswerVariant; interval?: string; onClick: () => void }): JSX.Element {
-  const variantDescriptions: Record<AnswerVariant, string> = {
-    again: "Rate as Again - forgot completely",
-    hard: "Rate as Hard - remembered with difficulty",
-    good: "Rate as Good - remembered with moderate effort",
-    easy: "Rate as Easy - remembered easily",
-  };
-
-  return (
-    <button
-      onClick={onClick}
-      aria-label={variantDescriptions[variant]}
-      className={`flex flex-col items-center gap-0.5 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${answerStyles[variant]}`}
-    >
-      <span className="flex items-center gap-2">
-        <span className="text-[10px] font-medium opacity-60 w-4" aria-hidden="true">{keyHint}</span>
-        {label}
-      </span>
-      {interval && (
-        <span className="text-[10px] font-normal opacity-60" aria-label={`Next interval: ${interval}`}>{interval}</span>
-      )}
-    </button>
-  );
-}
-
-// ── Completion stat ──
-
-function CompletionStat({ label, value }: { label: string; value: number }): JSX.Element {
-  return (
-    <div className="rounded-lg bg-zinc-50 py-2.5 px-1 dark:bg-zinc-800/50">
-      <div className="text-lg font-bold tabular-nums text-zinc-800 dark:text-zinc-200">{value}</div>
-      <div className="mt-0.5 text-[10px] font-medium text-zinc-400">{label}</div>
-    </div>
-  );
-}
-
-// ── Session Summary Modal ──
-
-function formatTime(ms: number): string {
-  const sec = Math.floor(ms / 1000);
-  return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
-}
-
-function ratingLabel(avg: number): string {
-  if (avg >= 3.5) return "Easy";
-  if (avg >= 2.5) return "Good";
-  if (avg >= 1.5) return "Hard";
-  return "Again-heavy";
-}
-
-function SessionSummaryModal({ summary, onContinue }: { summary: SessionSummary; onContinue: () => void }): JSX.Element {
-  const total = summary.againCount + summary.hardCount + summary.goodCount + summary.easyCount;
-
-  useEffect(() => {
-      const goodScore = summary.goodCount + summary.easyCount;
-      const accuracy = goodScore / (total || 1);
-      if (accuracy >= 0.6) {
-        confetti({
-          particleCount: accuracy >= 0.9 ? 100 : 50,
-          spread: 70,
-          origin: { y: 0.6 },
-          colors: ["#a855f7", "#6366f1", "#8b5cf6", "#d946ef"],
-        });
-      }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- fire confetti once on mount
-        }, []);
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/50 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="session-summary-title">
-      <div className="mx-4 w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl dark:bg-zinc-900 max-h-[90vh] overflow-y-auto">
-        <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
-            <Check className="h-7 w-7 text-zinc-600 dark:text-zinc-400" />
-          </div>
-          <h2 id="session-summary-title" className="mt-5 text-xl font-bold text-zinc-800 dark:text-zinc-200">Session Complete</h2>
-          <p className="mt-1 text-sm text-zinc-500">{summary.cardsStudied} cards reviewed</p>
-        </div>
-
-        {summary.sessionXp > 0 && (
-          <div className="mt-5 rounded-xl bg-zinc-50 px-4 py-3 text-center dark:bg-zinc-800/50">
-            <div className="text-2xl font-bold text-zinc-800 dark:text-zinc-200">+{summary.sessionXp} XP</div>
-            <div className="text-xs text-zinc-400 mt-0.5">earned this session</div>
-          </div>
-        )}
-
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <div className="rounded-lg bg-zinc-50 p-3 text-center dark:bg-zinc-800/50">
-            <div className="text-lg font-bold tabular-nums text-zinc-800 dark:text-zinc-200">{formatTime(summary.timeSpentMs)}</div>
-            <div className="text-xs text-zinc-400 mt-0.5">Time spent</div>
-          </div>
-          <div className="rounded-lg bg-zinc-50 p-3 text-center dark:bg-zinc-800/50">
-            <div className="text-lg font-bold text-zinc-800 dark:text-zinc-200">{ratingLabel(summary.averageRating)}</div>
-            <div className="text-xs text-zinc-400 mt-0.5">Avg rating</div>
-          </div>
-        </div>
-
-        <div className="mt-3 grid grid-cols-4 gap-2">
-          <div className="rounded-md bg-red-50 p-2 text-center dark:bg-red-950/30">
-            <div className="font-bold text-red-600 dark:text-red-400">{summary.againCount}</div>
-            <div className="text-[10px] text-red-500/70">Again</div>
-          </div>
-          <div className="rounded-md bg-amber-50 p-2 text-center dark:bg-amber-950/30">
-            <div className="font-bold text-amber-600 dark:text-amber-400">{summary.hardCount}</div>
-            <div className="text-[10px] text-amber-500/70">Hard</div>
-          </div>
-          <div className="rounded-md bg-emerald-50 p-2 text-center dark:bg-emerald-950/30">
-            <div className="font-bold text-emerald-600 dark:text-emerald-400">{summary.goodCount}</div>
-            <div className="text-[10px] text-emerald-500/70">Good</div>
-          </div>
-          <div className="rounded-md bg-blue-50 p-2 text-center dark:bg-blue-950/30">
-            <div className="font-bold text-blue-600 dark:text-blue-400">{summary.easyCount}</div>
-            <div className="text-[10px] text-blue-500/70">Easy</div>
-          </div>
-        </div>
-
-        {summary.newAchievements.length > 0 && (
-          <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200 p-4 dark:bg-amber-950/20 dark:border-amber-900">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-600 mb-2">Achievement Unlocked</p>
-            <div className="space-y-2">
-              {summary.newAchievements.map((a) => (
-                <div key={a.id} className="flex items-center gap-2 text-sm">
-                  <span className="text-lg">{a.icon}</span>
-                  <div>
-                    <div className="font-semibold text-zinc-800 dark:text-zinc-200">{a.title}</div>
-                    <div className="text-xs text-zinc-500">{a.description}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <Button className="mt-6 w-full" onClick={onContinue}>Continue</Button>
-      </div>
     </div>
   );
 }
