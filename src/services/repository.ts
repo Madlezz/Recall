@@ -574,6 +574,11 @@ function exportPayloadToSnapshot(payload: RecallExportPayload): RecallStateSnaps
 }
 
 function migrateSettings(settings: Partial<RecallStateSnapshot["settings"]> & { theme: string; seededAt: string }): RecallStateSnapshot["settings"] {
+  // If user has existing data (seededAt exists) but no onboardingComplete field,
+  // they're an existing user upgrading — don't show onboarding again
+  const hasExistingData = !!settings.seededAt;
+  const defaultOnboardingComplete = hasExistingData ? true : false;
+
   return {
     theme: (settings.theme === "dark" || settings.theme === "light") ? settings.theme : "light",
     accentColor: (settings.accentColor === "zinc" || settings.accentColor === "blue" || settings.accentColor === "green" || settings.accentColor === "rose" || settings.accentColor === "amber" || settings.accentColor === "violet") ? settings.accentColor : "zinc",
@@ -581,7 +586,7 @@ function migrateSettings(settings: Partial<RecallStateSnapshot["settings"]> & { 
     seededAt: settings.seededAt,
     dailyNewCardLimit: typeof settings.dailyNewCardLimit === "number" ? settings.dailyNewCardLimit : 20,
     leechThreshold: typeof settings.leechThreshold === "number" ? settings.leechThreshold : 5,
-    onboardingComplete: typeof settings.onboardingComplete === "boolean" ? settings.onboardingComplete : false,
+    onboardingComplete: typeof settings.onboardingComplete === "boolean" ? settings.onboardingComplete : defaultOnboardingComplete,
     xp: typeof settings.xp === "number" ? settings.xp : 0,
     achievements: Array.isArray(settings.achievements) ? settings.achievements : [],
     dailyGoal: typeof settings.dailyGoal === "number" ? settings.dailyGoal : 20,
@@ -617,8 +622,11 @@ function loadLocalSnapshot(): RecallStateSnapshot | null {
         // Migrate settings to fill in fields added after the user's last save
         snapshot.settings = migrateSettings(snapshot.settings);
         return snapshot;
-  } catch {
-    localStorage.removeItem(STORAGE_KEY);
+  } catch (error) {
+    // CRITICAL: Don't silently delete corrupted data - user loses everything
+    console.error("Failed to load localStorage data:", error);
+    // Keep corrupted data in localStorage for potential recovery
+    // Return null to trigger seed data load, but user can export/import backup
     return null;
   }
 }

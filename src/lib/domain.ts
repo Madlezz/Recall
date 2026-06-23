@@ -4,7 +4,7 @@ export const SCHEMA_VERSION = "4";
 
 export const deckColors: DeckColor[] = ["blue", "green", "amber", "rose", "violet", "slate"];
 export const cardStates: CardState[] = ["new", "learning", "review", "relearning"];
-export const cardTypes: CardType[] = ["basic", "cloze"];
+export const cardTypes: CardType[] = ["basic", "cloze", "image-occlusion"];
 export const reviewRatings: ReviewRating[] = ["again", "hard", "good", "easy"];
 
 export function isDeckColor(value: unknown): value is DeckColor {

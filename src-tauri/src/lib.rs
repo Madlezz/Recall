@@ -309,11 +309,11 @@ fn migrations() -> Vec<Migration> {
                        strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-30 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day')
                 FROM recall_seed_guard WHERE should_seed = 1;
             INSERT INTO decks (id, name, description, color, created_at, updated_at)
-                SELECT 'deck_art', '🎨 Art & Design', 'Art movements, color theory, typography, and design principles.', 'pink',
+                SELECT 'deck_art', '🎨 Art & Design', 'Art movements, color theory, typography, and design principles.', 'slate',
                        strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-25 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-5 days')
                 FROM recall_seed_guard WHERE should_seed = 1;
             INSERT INTO decks (id, name, description, color, created_at, updated_at)
-                SELECT 'deck_psych', '🧠 Psychology', 'Cognitive biases, psychological theories, and behavioral science.', 'cyan',
+                SELECT 'deck_psych', '🧠 Psychology', 'Cognitive biases, psychological theories, and behavioral science.', 'blue',
                        strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-20 days'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-2 days')
                 FROM recall_seed_guard WHERE should_seed = 1;
 
