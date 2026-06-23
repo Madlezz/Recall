@@ -724,8 +724,12 @@ mod tests {
         conn.execute_batch("PRAGMA foreign_keys = ON;").unwrap();
 
         for migration in migrations() {
-            conn.execute_batch(&migration.sql)
-                .unwrap_or_else(|e| panic!("Migration {} ({}) failed: {}", migration.version, migration.description, e));
+            conn.execute_batch(&migration.sql).unwrap_or_else(|e| {
+                panic!(
+                    "Migration {} ({}) failed: {}",
+                    migration.version, migration.description, e
+                )
+            });
         }
 
         // Verify core tables exist
@@ -739,9 +743,18 @@ mod tests {
 
         assert!(tables.contains(&"decks".to_string()), "decks table missing");
         assert!(tables.contains(&"cards".to_string()), "cards table missing");
-        assert!(tables.contains(&"settings".to_string()), "settings table missing");
-        assert!(tables.contains(&"study_sessions".to_string()), "study_sessions table missing");
-        assert!(tables.contains(&"review_logs".to_string()), "review_logs table missing");
+        assert!(
+            tables.contains(&"settings".to_string()),
+            "settings table missing"
+        );
+        assert!(
+            tables.contains(&"study_sessions".to_string()),
+            "study_sessions table missing"
+        );
+        assert!(
+            tables.contains(&"review_logs".to_string()),
+            "review_logs table missing"
+        );
 
         // Verify schema_version was set by migration 5
         let version: String = conn
