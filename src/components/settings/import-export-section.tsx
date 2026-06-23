@@ -1,5 +1,5 @@
 import { Download, Upload, Check } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SettingsCard } from "./settings-card";
@@ -14,14 +14,12 @@ type ImportMode = "merge" | "replace";
 export function ImportExportSection({
   importMode,
   setImportMode,
-  pendingReplace,
   setPendingReplace,
   lastAction,
   setLastAction,
 }: {
   importMode: ImportMode;
   setImportMode: (mode: ImportMode) => void;
-  pendingReplace: RecallExportPayload | null;
   setPendingReplace: (payload: RecallExportPayload | null) => void;
   lastAction: { type: string; time: string } | null;
   setLastAction: (action: { type: string; time: string } | null) => void;
@@ -29,7 +27,6 @@ export function ImportExportSection({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const exportData = useRecallStore((state) => state.exportData);
   const mergeData = useRecallStore((state) => state.mergeData);
-  const replaceData = useRecallStore((state) => state.replaceData);
 
   async function handleExport(): Promise<void> {
     try {

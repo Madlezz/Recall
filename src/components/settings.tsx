@@ -64,7 +64,6 @@ export function Settings(): JSX.Element {
         <ImportExportSection
           importMode={importMode}
           setImportMode={setImportMode}
-          pendingReplace={pendingReplace}
           setPendingReplace={setPendingReplace}
           lastAction={lastAction}
           setLastAction={setLastAction}
