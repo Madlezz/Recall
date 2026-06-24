@@ -10,6 +10,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { isTauriRuntime } from "@/db/client";
 import { useRecallStore } from "@/stores/recall-store";
 import type { RecallExportPayload } from "@/types";
@@ -42,7 +43,7 @@ export function Settings(): JSX.Element {
   }
 
   return (
-    <div className="animate-fade-in space-y-10">
+    <div className="animate-fade-in space-y-6">
       {/* Header */}
       <section>
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">Preferences</p>
@@ -52,29 +53,45 @@ export function Settings(): JSX.Element {
         </p>
       </section>
 
-      {/* Appearance + Audio */}
-      <AppearanceSection />
+      {/* Tabbed settings */}
+      <Tabs defaultValue="general">
+        <TabsList>
+          <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="study">Study</TabsTrigger>
+          <TabsTrigger value="data">Data</TabsTrigger>
+          {isTauriRuntime() && <TabsTrigger value="about">About</TabsTrigger>}
+        </TabsList>
 
-      {/* FSRS + Study Settings */}
-      <StudySection />
+        {/* General: Appearance + Notifications */}
+        <TabsContent value="general" className="space-y-6">
+          <AppearanceSection />
+          <NotificationsSection />
+        </TabsContent>
 
-      {/* Notifications + Import/Export */}
-      <section className="grid gap-4 lg:grid-cols-2">
-        <NotificationsSection />
-        <ImportExportSection
-          importMode={importMode}
-          setImportMode={setImportMode}
-          setPendingReplace={setPendingReplace}
-          lastAction={lastAction}
-          setLastAction={setLastAction}
-        />
-      </section>
+        {/* Study: FSRS + scheduling */}
+        <TabsContent value="study">
+          <StudySection />
+        </TabsContent>
 
-      {/* Data Management */}
-      <DataSection />
+        {/* Data: Import/Export + Danger Zone */}
+        <TabsContent value="data" className="space-y-6">
+          <ImportExportSection
+            importMode={importMode}
+            setImportMode={setImportMode}
+            setPendingReplace={setPendingReplace}
+            lastAction={lastAction}
+            setLastAction={setLastAction}
+          />
+          <DataSection />
+        </TabsContent>
 
-      {/* Updates (Tauri only) */}
-      {isTauriRuntime() && <UpdatesSection />}
+        {/* About: Updates (Tauri only) */}
+        {isTauriRuntime() && (
+          <TabsContent value="about">
+            <UpdatesSection />
+          </TabsContent>
+        )}
+      </Tabs>
 
       {/* Replace Confirmation Dialog */}
       <AlertDialog open={pendingReplace !== null} onOpenChange={(open) => !open && setPendingReplace(null)}>
