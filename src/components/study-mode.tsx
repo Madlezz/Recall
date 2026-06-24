@@ -1,8 +1,9 @@
-import { AlertCircle, ArrowLeft, BookOpen, Check, Clock, EyeOff, RotateCcw, RotateCw, Timer, Volume2, VolumeX } from "lucide-react";
+import { AlertCircle, ArrowLeft, BookOpen, Check, Clock, Edit3, EyeOff, RotateCcw, RotateCw, Timer, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { RichCard } from "@/components/RichCard";
 import { Button } from "@/components/ui/button";
+import { CardDialog } from "@/components/card-dialog";
 import { useRecallStore } from "@/stores/recall-store";
 import { speakText, stopSpeaking, isTTSSupported, setSpeakingCallback } from "@/services/tts";
 import { playFlipSound, playCorrectSound, playAgainSound, playHardSound } from "@/services/audio";
@@ -345,6 +346,19 @@ export function StudyMode(): JSX.Element {
             <AnswerButton label="Good" keyHint="3" variant="good" interval={intervals?.good} onClick={() => { playCorrectSound(); setRatingFlash("good"); void answerCurrentCard("good"); }} />
             <AnswerButton label="Easy" keyHint="4" variant="easy" interval={intervals?.easy} onClick={() => { playCorrectSound(); setRatingFlash("easy"); void answerCurrentCard("easy"); }} />
           </>
+        )}
+
+        {/* Edit card mid-review */}
+        {activeStudy.revealed && card && (
+          <CardDialog
+            card={card}
+            deckId={card.deckId}
+            trigger={
+              <Button variant="ghost" size="sm" className="gap-1.5" title="Edit this card (E)">
+                <Edit3 className="h-3.5 w-3.5" /> Edit
+              </Button>
+            }
+          />
         )}
 
         {!activeStudy.revealed && (
