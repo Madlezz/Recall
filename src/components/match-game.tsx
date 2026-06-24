@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
-import { prefersReducedMotion } from "@/lib/xp";
+import { prefersReducedMotion, CONFETTI_COLORS } from "@/lib/xp";
 import { getLevel, triggerLevelUpConfetti } from "@/lib/xp";
 import { getMatchGameXp } from "@/lib/xp-rules";
 import { playTileClickSound, playMatchSound, playMismatchSound } from "@/services/audio";
@@ -161,7 +161,7 @@ export function MatchGame(): JSX.Element {
             particleCount: 200,
             spread: 100,
             origin: { y: 0.4 },
-            colors: ["#a855f7", "#6366f1", "#22c55e", "#f59e0b", "#ec4899"],
+            colors: [...CONFETTI_COLORS.celebration],
           });
         }
 

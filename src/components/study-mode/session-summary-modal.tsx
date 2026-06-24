@@ -2,6 +2,7 @@ import confetti from "canvas-confetti";
 import { Check } from "lucide-react";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { CONFETTI_COLORS, prefersReducedMotion } from "@/lib/xp";
 import type { SessionSummary } from "@/types";
 
 function formatTime(ms: number): string {
@@ -22,12 +23,12 @@ export function SessionSummaryModal({ summary, onContinue }: { summary: SessionS
   useEffect(() => {
       const goodScore = summary.goodCount + summary.easyCount;
       const accuracy = goodScore / (total || 1);
-      if (accuracy >= 0.6) {
+      if (accuracy >= 0.6 && !prefersReducedMotion()) {
         confetti({
           particleCount: accuracy >= 0.9 ? 100 : 50,
           spread: 70,
           origin: { y: 0.6 },
-          colors: ["#a855f7", "#6366f1", "#8b5cf6", "#d946ef"],
+          colors: [...CONFETTI_COLORS.celebration.slice(0, 4)],
         });
       }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- fire confetti once on mount

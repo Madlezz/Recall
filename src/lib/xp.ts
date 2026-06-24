@@ -108,6 +108,13 @@ export function prefersReducedMotion(): boolean {
     && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 }
 
+/** Shared confetti color palettes (centralized so all celebrations stay consistent) */
+export const CONFETTI_COLORS = {
+  celebration: ["#a855f7", "#6366f1", "#8b5cf6", "#d946ef", "#f59e0b", "#ec4899"],
+  achievement: ["#22c55e", "#3b82f6", "#f59e0b", "#ec4899"],
+  daily: ["#22c55e", "#a855f7", "#f59e0b", "#3b82f6"],
+} as const;
+
 /** Level-up confetti - bigger, flashier (respects reduced-motion) */
 export function triggerLevelUpConfetti(): void {
   if (prefersReducedMotion()) return;
@@ -115,7 +122,7 @@ export function triggerLevelUpConfetti(): void {
     particleCount: 150,
     spread: 100,
     origin: { y: 0.3 },
-    colors: ["#a855f7", "#6366f1", "#8b5cf6", "#d946ef", "#f59e0b", "#ec4899"],
+    colors: [...CONFETTI_COLORS.celebration],
     ticks: 200,
   });
 }
@@ -127,6 +134,6 @@ export function triggerAchievementConfetti(): void {
     particleCount: 60,
     spread: 60,
     origin: { y: 0.5 },
-    colors: ["#22c55e", "#3b82f6", "#f59e0b", "#ec4899"],
+    colors: [...CONFETTI_COLORS.achievement],
   });
 }

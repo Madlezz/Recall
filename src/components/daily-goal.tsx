@@ -1,7 +1,7 @@
 import confetti from "canvas-confetti";
 import { useEffect, useMemo, useState } from "react";
 import { useRecallStore } from "@/stores/recall-store";
-import { prefersReducedMotion } from "@/lib/xp";
+import { prefersReducedMotion, CONFETTI_COLORS } from "@/lib/xp";
 
 function localDateStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -29,7 +29,7 @@ export function DailyGoal(): JSX.Element {
           particleCount: 80,
           spread: 60,
           origin: { y: 0.5 },
-          colors: ["#22c55e", "#a855f7", "#f59e0b", "#3b82f6"],
+          colors: [...CONFETTI_COLORS.daily],
         });
       }
     }
