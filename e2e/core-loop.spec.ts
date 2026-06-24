@@ -29,7 +29,7 @@ test.describe("Core Study Loop", () => {
     await newDeckBtn.click();
 
     // Fill deck dialog
-    const nameInput = page.getByLabel(/deck name|name/i).first();
+    const nameInput = page.getByPlaceholder("Systems Design").first();
     await expect(nameInput).toBeVisible({ timeout: 5000 });
     await nameInput.fill("E2E Test Deck");
     await page.getByRole("button", { name: /Create|Save/i }).click();
