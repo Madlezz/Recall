@@ -229,3 +229,86 @@ export function getDeckHealth(
       return { date: key, due: b?.due ?? 0, newCount: b?.newCount ?? 0 };
     });
   }
+
+  // ── Forgetting curve: retention by interval bucket ──
+
+  export interface ForgettingCurvePoint {
+    interval: string;       // label like "1d", "3d", "7d", "14d+", "30d+"
+    retention: number;      // 0-100, % of good+easy in this bucket
+    reviewCount: number;
+  }
+
+  /**
+   * Compute retention rate by scheduled-interval bucket.
+   * Shows how well users remember cards at different spacing intervals.
+   * Data comes directly from review_logs (FSRS stores scheduledDays per review).
+   */
+  export function getForgettingCurve(reviewLogs: ReviewLog[]): ForgettingCurvePoint[] {
+    if (reviewLogs.length === 0) return [];
+
+    const buckets: { label: string; min: number; max: number; good: number; total: number }[] = [
+      { label: "1d", min: 0, max: 1, good: 0, total: 0 },
+      { label: "2-3d", min: 2, max: 3, good: 0, total: 0 },
+      { label: "4-7d", min: 4, max: 7, good: 0, total: 0 },
+      { label: "8-14d", min: 8, max: 14, good: 0, total: 0 },
+      { label: "15-30d", min: 15, max: 30, good: 0, total: 0 },
+      { label: "30d+", min: 31, max: Infinity, good: 0, total: 0 },
+    ];
+
+    for (const log of reviewLogs) {
+      const days = log.scheduledDays;
+      const bucket = buckets.find((b) => days >= b.min && days <= b.max);
+      if (!bucket) continue;
+      bucket.total++;
+      if (log.rating === "good" || log.rating === "easy") bucket.good++;
+    }
+
+    return buckets
+      .filter((b) => b.total > 0)
+      .map((b) => ({
+        interval: b.label,
+        retention: b.total === 0 ? 0 : Math.round((b.good / b.total) * 100),
+        reviewCount: b.total,
+      }));
+  }
+
+  // ── Best time of day to study ──
+
+  export interface StudyTimeInsight {
+    hour: number;            // 0-23
+    label: string;           // "6 AM", "10 PM", etc.
+    accuracy: number;        // 0-100, % good+easy
+    reviewCount: number;
+  }
+
+  /**
+   * Find the hour of day with the highest accuracy (good+easy rate).
+   * Requires at least 10 reviews in that hour to be meaningful.
+   * Returns null if not enough data.
+   */
+  export function getBestStudyTime(reviewLogs: ReviewLog[]): StudyTimeInsight | null {
+    if (reviewLogs.length === 0) return null;
+
+    const byHour = new Map<number, { good: number; total: number }>();
+
+    for (const log of reviewLogs) {
+      const hour = new Date(log.reviewDate).getHours();
+      const entry = byHour.get(hour) ?? { good: 0, total: 0 };
+      entry.total++;
+      if (log.rating === "good" || log.rating === "easy") entry.good++;
+      byHour.set(hour, entry);
+    }
+
+    let best: StudyTimeInsight | null = null;
+
+    for (const [hour, { good, total }] of byHour) {
+      if (total < 10) continue; // need at least 10 reviews for significance
+      const accuracy = Math.round((good / total) * 100);
+      if (!best || accuracy > best.accuracy) {
+        const label = hour === 0 ? "12 AM" : hour < 12 ? `${hour} AM` : hour === 12 ? "12 PM" : `${hour - 12} PM`;
+        best = { hour, label, accuracy, reviewCount: total };
+      }
+    }
+
+    return best;
+  }
