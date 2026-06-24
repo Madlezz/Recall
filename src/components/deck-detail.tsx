@@ -10,6 +10,7 @@ import {
   Play,
   RefreshCw,
   ShieldCheck,
+  TrendingUp,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -26,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { getDeckStats } from "@/lib/stats";
 import { checkDeckQuality, type CardQualityWarning } from "@/lib/card-quality";
 import { useRecallStore } from "@/stores/recall-store";
+import { optimizeFromHistory, formatOptimizationResult } from "@/services/fsrs-optimizer";
 import {
   exportDeckToJson,
   exportDeckPackage,
@@ -39,6 +41,9 @@ export function DeckDetail(): JSX.Element {
   const selectedDeckId = useRecallStore((s) => s.selectedDeckId);
   const deck = useRecallStore((s) => s.decks.find((d) => d.id === selectedDeckId));
   const cards = useRecallStore((s) => s.cards);
+  const reviewLogs = useRecallStore((s) => s.reviewLogs);
+  const settings = useRecallStore((s) => s.settings);
+  const updateSettings = useRecallStore((s) => s.updateSettings);
   const showDashboard = useRecallStore((s) => s.showDashboard);
   const deleteDeck = useRecallStore((s) => s.deleteDeck);
   const deleteCards = useRecallStore((s) => s.deleteCards);
@@ -144,6 +149,20 @@ export function DeckDetail(): JSX.Element {
     toast.success(`Deleted ${count} card${count > 1 ? "s" : ""}`);
   }
 
+  function handleOptimizeDeck(): void {
+    if (!currentDeckId) return;
+    const result = optimizeFromHistory(reviewLogs, cards, settings.desiredRetention, currentDeckId);
+    if (result.success) {
+      void updateSettings({
+        desiredRetention: result.suggestedRetention,
+        fsrsWeights: result.weights,
+      });
+      toast.success(`Optimized for ${d.name}: ${formatOptimizationResult(result)}`);
+    } else {
+      toast.error(`Optimize ${d.name}: ${formatOptimizationResult(result)}`);
+    }
+  }
+
   return (
     <div className="animate-fade-in space-y-7">
       {/* Top bar */}
@@ -176,6 +195,14 @@ export function DeckDetail(): JSX.Element {
           >
             <ShieldCheck className="h-4 w-4" aria-hidden="true" />
             Check Quality
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleOptimizeDeck}
+            title="Optimize FSRS spacing for this deck based on review history"
+          >
+            <TrendingUp className="h-4 w-4" aria-hidden="true" />
+            Optimize
           </Button>
           <Button variant="outline" onClick={() => setShowCustomStudy(true)}>
             <Beaker className="h-4 w-4" aria-hidden="true" />

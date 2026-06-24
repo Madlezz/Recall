@@ -31,30 +31,38 @@ export interface OptimizationResult {
  * @param reviewLogs - All review logs from the database
  * @param cards - All cards (used to identify first reviews)
  * @param currentRetention - Current desiredRetention setting
+ * @param deckId - Optional deck ID to filter optimization to a single deck
  * @returns Optimization result with optimized weights and suggestions
  */
 export function optimizeFromHistory(
   reviewLogs: ReviewLog[],
   cards: Card[],
-  currentRetention: number
+  currentRetention: number,
+  deckId?: string,
 ): OptimizationResult {
+  // Filter to a specific deck if requested
+  const filteredCards = deckId ? cards.filter((c) => c.deckId === deckId) : cards;
+  const deckCardIds = new Set(filteredCards.map((c) => c.id));
+  const filteredLogs = deckId
+    ? reviewLogs.filter((log) => deckCardIds.has(log.cardId))
+    : reviewLogs;
   // Need at least 50 reviews for meaningful optimization
-  if (reviewLogs.length < 50) {
+  if (filteredLogs.length < 50) {
     return {
       weights: [...default_w],
       suggestedRetention: currentRetention,
       actualRetention: 0,
-      reviewCount: reviewLogs.length,
+      reviewCount: filteredLogs.length,
       success: false,
-      error: `Need at least 50 reviews for optimization (currently have ${reviewLogs.length})`,
+      error: `Need at least 50 reviews for optimization (currently have ${filteredLogs.length})`,
     };
   }
 
   // Calculate actual retention rate
-  const actualRetention = calculateRetention(reviewLogs);
+  const actualRetention = calculateRetention(filteredLogs);
 
   // Analyze first-review patterns to adjust initial stability
-  const firstReviewAnalysis = analyzeFirstReviews(reviewLogs, cards);
+  const firstReviewAnalysis = analyzeFirstReviews(filteredLogs, filteredCards);
 
   // Start with default weights
   const optimizedWeights = [...default_w];
@@ -93,7 +101,7 @@ export function optimizeFromHistory(
     weights: optimizedWeights,
     suggestedRetention,
     actualRetention,
-    reviewCount: reviewLogs.length,
+    reviewCount: filteredLogs.length,
     success: true,
   };
 }
