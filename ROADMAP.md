@@ -5,7 +5,9 @@ This document outlines the planned features and improvements for Recall. Items a
 ## In Progress
 
 - [ ] Mobile app (iOS and Android) using Tauri's cross-platform capabilities
+  - [ ] PWA (Progressive Web App) as lightweight alternative to native mobile builds
 - [ ] Sync protocol for optional cloud backup (privacy-preserving, end-to-end encrypted)
+  - [ ] Auto-detect iCloud Drive / OneDrive folders for one-click "painless cloud sync"
 - [ ] Spaced repetition algorithm options (switch between FSRS variants)
 
 ## Planned
@@ -14,8 +16,12 @@ This document outlines the planned features and improvements for Recall. Items a
 - [ ] Deck sharing and marketplace (community card decks)
 - [ ] Collaborative deck editing (multi-user real-time)
 - [ ] Advanced statistics (retention curves, forgetting curves, optimal review timing)
+  - [ ] FSRS-specific metrics: Stability (S), Difficulty (D) visualization
+  - [ ] Desired Retention target overlay on retention curve
+  - [ ] Forgetting curve prediction graph with actual vs predicted comparison
 - [ ] Custom scheduling algorithms (user-defined intervals)
 - [ ] Plugin system for extensions (themes, card types, import/export formats)
+  - [ ] Local API / Webhook system for third-party integrations (like AnkiConnect)
 
 ### Study Experience
 - [ ] Voice input for card creation (speech-to-text)

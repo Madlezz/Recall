@@ -20,3 +20,6 @@ coverage/
 gen-key.py
 *.key
 *.pub
+
+# Audit documents (internal only)
+RECALL_AUDIT.md
