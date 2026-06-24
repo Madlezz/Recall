@@ -102,8 +102,15 @@ export function applyNewAchievements(
   return achievements;
 }
 
-/** Level-up confetti — bigger, flashier */
+/** Check if user prefers reduced motion (accessibility) */
+export function prefersReducedMotion(): boolean {
+  return typeof window !== "undefined"
+    && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+}
+
+/** Level-up confetti - bigger, flashier (respects reduced-motion) */
 export function triggerLevelUpConfetti(): void {
+  if (prefersReducedMotion()) return;
   confetti({
     particleCount: 150,
     spread: 100,
@@ -113,8 +120,9 @@ export function triggerLevelUpConfetti(): void {
   });
 }
 
-/** Achievement unlock confetti — smaller burst */
+/** Achievement unlock confetti - smaller burst (respects reduced-motion) */
 export function triggerAchievementConfetti(): void {
+  if (prefersReducedMotion()) return;
   confetti({
     particleCount: 60,
     spread: 60,
