@@ -27,14 +27,14 @@ export default defineConfig({
         "playwright.config.ts",
       ],
       thresholds: {
-        // Ratchet: set to actual measured coverage (2026-06-24, 250 tests).
+        // Ratchet: set to actual measured coverage (2026-06-24, 295 tests).
         // Prevents regression — deleting tests or reducing coverage fails CI.
         // Raise these as more store/service/component tests are added.
-        // Target: 45-55% lines once stores + services have coverage.
-        lines: 14,
-        functions: 10,
-        branches: 15,
-        statements: 15,
+        // Target: 45-55% lines once recall-store.ts + components have coverage.
+        lines: 18,
+        functions: 14,
+        branches: 16,
+        statements: 17,
       },
     },
   },
