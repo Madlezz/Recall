@@ -120,13 +120,16 @@ export const settingsSlice = (
   async startFresh() {
     const repo = await getRepository();
     const settings = { ...dataState(get()).settings, onboardingComplete: true };
-    const snapshot = await repo.saveSettings(settings, {
+    // Use saveSnapshot (not saveSettings) so ALL tables are atomically cleared.
+    // saveSettings only upserts setting rows — decks/cards/reviews would survive in DB.
+    const snapshot: RecallStateSnapshot = {
       decks: [],
       cards: [],
       studySessions: [],
       reviewLogs: [],
       settings,
-    });
+    };
+    await repo.saveSnapshot(snapshot);
     applyTheme(snapshot.settings.theme);
     applyAccentColor(snapshot.settings.accentColor);
     applyDyslexiaFont(snapshot.settings.dyslexiaFont);
