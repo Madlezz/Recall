@@ -19,19 +19,18 @@
 
 ## Why Recall?
 
-| | Recall | Anki | RemNote / Mochi |
-|---|---|---|---|
-| Algorithm | **FSRS** (2023, state-of-art) | SM-2 (1987) | Proprietary |
-| Storage | **Local SQLite** | Local (custom format) | Cloud |
-| Account required | **No** | No | Yes |
-| Open source | **Yes** (MIT) | Yes (AGPL) | No |
-| Native desktop | **Yes** (Tauri, Rust) | Yes (Qt, Python) | Electron |
-| Stack | **React + TypeScript** | Python + Qt | React |
+| | Recall | Anki | RemNote | Mochi |
+|---|---|---|---|---|
+| Algorithm | **FSRS** (native, default) | FSRS (built-in since v23.10) or SM-2 | Proprietary + FSRS option | SM-2 |
+| Storage | **Local SQLite** | Local SQLite | Cloud-first (offline cache) | Local files |
+| Account required | **No** | No | Yes | No (offline free) |
+| Open source | **Yes** (MIT) | Yes (AGPL) | No | No |
+| Native desktop | **Yes** (Tauri, Rust) | Yes (Qt, Python) | Yes (Electron) | Yes (Electron) |
+| Stack | **React + TypeScript** | Python + Qt | React | ClojureScript |
 
-Anki pioneered spaced repetition and has an enormous card ecosystem, but its codebase is
-15+ years old and difficult to extend. Cloud alternatives like RemNote require accounts and
-subscriptions. Recall fills the gap: a **modern, open-source, privacy-first** desktop app
-that implements FSRS — the current scientific standard for spaced repetition — on a maintainable,
+Anki pioneered spaced repetition and has an enormous add-on ecosystem. Cloud alternatives like
+RemNote require accounts and subscriptions. Recall fills the gap: a **modern, open-source,
+privacy-first** desktop app that implements FSRS as the default algorithm on a maintainable,
 contributor-friendly TypeScript stack.
 
 ---
@@ -49,45 +48,45 @@ contributor-friendly TypeScript stack.
 ## Features
 
 ### 🧠 Smart Study
-- **FSRS scheduling** — Again / Hard / Good / Easy, the algorithm handles the rest
-- **Cloze deletion** — `{{c1::hidden text}}` fill-in-the-blank cards
-- **Rich cards** — Markdown, LaTeX, syntax-highlighted code blocks
-- **Anki import** — bring your `.apkg` decks
-- **CSV import** — upload a spreadsheet, map columns
-- **Custom study** — deck, count, tag filter, new-only
-- **Card browser** — search, filter, sort, bulk tag/delete/move
-- **Tags** — hierarchical tag tree, saved searches, tag autocomplete
-- Keyboard-first: `Space` reveal, `1`–`4` rate, `R` to start review, `Ctrl+N` quick-add
+- **FSRS scheduling** - Again / Hard / Good / Easy, the algorithm handles the rest
+- **Cloze deletion** - `{{c1::hidden text}}` fill-in-the-blank cards
+- **Rich cards** - Markdown, LaTeX, syntax-highlighted code blocks
+- **Anki import** - bring your `.apkg` decks
+- **CSV import** - upload a spreadsheet, map columns
+- **Custom study** - deck, count, tag filter, new-only
+- **Card browser** - search, filter, sort, bulk tag/delete/move
+- **Tags** - hierarchical tag tree, saved searches, tag autocomplete
+- Keyboard-first: `Space` reveal, `1`-`4` rate, `R` to start review, `Ctrl+N` quick-add
 
 ### 🎮 Stay Motivated
-- **XP & levels** — earn XP per review, climb from Curious Mind to Legend
-- **Achievements** — 14 milestones (streaks, volume, accuracy, time-based)
-- **Daily goal** — set a target, watch the progress bar, confetti on completion
-- **Session summaries** — ratings breakdown, XP earned, achievement unlocks
-- **Onboarding gallery** — choose from 4 starter decks (Languages, Coding, GRE, Medical)
+- **XP & levels** - earn XP per review, climb from Curious Mind to Legend
+- **Achievements** - 14 milestones (streaks, volume, accuracy, time-based)
+- **Daily goal** - set a target, watch the progress bar, confetti on completion
+- **Session summaries** - ratings breakdown, XP earned, achievement unlocks
+- **Onboarding gallery** - choose from 4 starter decks (Languages, Coding, GRE, Medical)
 
 ### 🧘 Study Tools
-- **Focus timer** — Pomodoro with 15/25/45m presets
-- **Ambient soundscapes** — Rain, Cafe, Lofi (synthesized locally, zero files)
-- **Match game** — turn cards into a tile-matching puzzle
-- **Review calendar** — month grid showing study activity heatmap
-- **Sound effects** — card flip, correct/incorrect feedback, level-up fanfares
+- **Focus timer** - Pomodoro with 15/25/45m presets
+- **Ambient soundscapes** - Rain, Cafe, Lofi (synthesized locally, zero files)
+- **Match game** - turn cards into a tile-matching puzzle
+- **Review calendar** - month grid showing study activity heatmap
+- **Sound effects** - card flip, correct/incorrect feedback, level-up fanfares
 
 ### 📊 Analytics
-- **Stats dashboard** — review volume, rating distribution, time-of-day patterns
-- **Deck health** — retention %, leeches, overdue per deck
-- **Activity heatmap** — GitHub-style contribution graph
+- **Stats dashboard** - review volume, rating distribution, time-of-day patterns
+- **Deck health** - retention %, leeches, overdue per deck
+- **Activity heatmap** - GitHub-style contribution graph
 
 ### 🔒 Privacy First
 - No account, no cloud, no telemetry
-- 100% offline — SQLite database on your machine
-- JSON export/import — portable and human-readable
-- Optional cloud sync — point to any folder (Dropbox, Google Drive, etc.)
+- 100% offline, SQLite database on your machine
+- JSON export/import, portable and human-readable
+- Optional cloud sync, point to any folder (Dropbox, Google Drive, etc.)
 
 ### 🎨 Customization
-- **6 accent colors** — zinc, blue, green, rose, amber, violet
-- **Dyslexia-friendly font** — optional OpenDyslexic/Comic Sans fallback
-- **Dark/Light/High-contrast themes** — three themes to match your preference
+- **6 accent colors** - zinc, blue, green, rose, amber, violet
+- **Dyslexia-friendly font** - optional OpenDyslexic/Comic Sans fallback
+- **Dark/Light/High-contrast themes** - three themes to match your preference
 
 ---
 
@@ -111,7 +110,7 @@ pnpm dev             # Browser-only preview (no Rust needed)
 ### Testing
 
 ```bash
-pnpm test            # Unit tests (165 tests)
+pnpm test            # Unit tests (241 tests)
 pnpm lint            # ESLint
 pnpm build           # Production build
 pnpm test:e2e        # Playwright E2E (requires `pnpm dev` running first)
@@ -132,13 +131,13 @@ Pre-built binaries are available on the [Releases page](https://github.com/Madle
 | macOS (Intel) | `.dmg` |
 | Linux | `.AppImage` |
 
-Or build from source — see [Quick Start](#quick-start).
+Or build from source, see [Quick Start](#quick-start).
 
 ---
 
 ## Security
 
-Recall is a local-first application — your data never leaves your machine. We take security seriously:
+Recall is a local-first application; your data never leaves your machine. We take security seriously:
 
 - **Automated auditing**: `cargo audit` (Rust) and Dependabot (JS/TS) run on every CI push
 - **CodeQL analysis**: GitHub CodeQL scans for vulnerabilities on every PR
@@ -153,7 +152,7 @@ For known transitive vulnerabilities in upstream dependencies, see [SECURITY.md]
 | Keys | Action |
 |------|--------|
 | `Space` | Reveal answer |
-| `1`–`4` | Rate Again / Hard / Good / Easy |
+| `1`-`4` | Rate Again / Hard / Good / Easy |
 | `R` | Start review |
 | `B` | Bury card |
 | `S` | Snooze card |

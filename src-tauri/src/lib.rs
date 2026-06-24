@@ -364,8 +364,17 @@ mod tests {
             .collect::<Result<Vec<_>, _>>()
             .unwrap();
 
-        for expected in &["decks", "cards", "settings", "study_sessions", "review_logs"] {
-            assert!(tables.contains(&expected.to_string()), "{expected} table missing");
+        for expected in &[
+            "decks",
+            "cards",
+            "settings",
+            "study_sessions",
+            "review_logs",
+        ] {
+            assert!(
+                tables.contains(&expected.to_string()),
+                "{expected} table missing"
+            );
         }
     }
 
@@ -379,8 +388,19 @@ mod tests {
             .unwrap()
             .collect::<Result<Vec<_>, _>>()
             .unwrap();
-        for col in &["id", "name", "description", "color", "created_at", "updated_at", "exam_deadline"] {
-            assert!(deck_cols.contains(&col.to_string()), "decks missing column: {col}");
+        for col in &[
+            "id",
+            "name",
+            "description",
+            "color",
+            "created_at",
+            "updated_at",
+            "exam_deadline",
+        ] {
+            assert!(
+                deck_cols.contains(&col.to_string()),
+                "decks missing column: {col}"
+            );
         }
 
         // cards columns — must include all 19 from the parity test + source
@@ -392,12 +412,30 @@ mod tests {
             .collect::<Result<Vec<_>, _>>()
             .unwrap();
         for col in &[
-            "id", "deck_id", "front", "back", "hint", "tags", "card_type",
-            "state", "last_review_date", "next_review_date", "stability",
-            "difficulty", "elapsed_days", "scheduled_days", "reps", "lapses",
-            "created_at", "updated_at", "source",
+            "id",
+            "deck_id",
+            "front",
+            "back",
+            "hint",
+            "tags",
+            "card_type",
+            "state",
+            "last_review_date",
+            "next_review_date",
+            "stability",
+            "difficulty",
+            "elapsed_days",
+            "scheduled_days",
+            "reps",
+            "lapses",
+            "created_at",
+            "updated_at",
+            "source",
         ] {
-            assert!(card_cols.contains(&col.to_string()), "cards missing column: {col}");
+            assert!(
+                card_cols.contains(&col.to_string()),
+                "cards missing column: {col}"
+            );
         }
     }
 
@@ -439,7 +477,8 @@ mod tests {
             "INSERT INTO cards (id, deck_id, front, back, next_review_date, created_at, updated_at)
              VALUES ('c1', 'd1', 'Q', 'A', '2026-06-01', '2026-01-01', '2026-01-01')",
             [],
-        ).unwrap();
+        )
+        .unwrap();
         conn.execute(
             "INSERT INTO review_logs (id, card_id, rating, review_date, stability, difficulty, elapsed_days, scheduled_days)
              VALUES ('r1', 'c1', 'good', '2026-01-01', 1.0, 5.0, 1, 3)",
@@ -449,7 +488,8 @@ mod tests {
             "INSERT INTO study_sessions (id, deck_id, started_at, ended_at, cards_studied)
              VALUES ('s1', 'd1', '2026-01-01T00:00:00Z', '2026-01-01T00:05:00Z', 1)",
             [],
-        ).unwrap();
+        )
+        .unwrap();
 
         // Apply remaining migrations
         for migration in migrations().iter().skip(3) {
@@ -466,34 +506,52 @@ mod tests {
         assert_schema_columns(&conn);
 
         let deck_name: String = conn
-            .query_row("SELECT name FROM decks WHERE id = 'd1'", [], |row| row.get(0))
+            .query_row("SELECT name FROM decks WHERE id = 'd1'", [], |row| {
+                row.get(0)
+            })
             .expect("deck d1 should survive migrations");
         assert_eq!(deck_name, "Test Deck");
 
         let card_front: String = conn
-            .query_row("SELECT front FROM cards WHERE id = 'c1'", [], |row| row.get(0))
+            .query_row("SELECT front FROM cards WHERE id = 'c1'", [], |row| {
+                row.get(0)
+            })
             .expect("card c1 should survive migrations");
         assert_eq!(card_front, "Q");
 
         let log_rating: String = conn
-            .query_row("SELECT rating FROM review_logs WHERE id = 'r1'", [], |row| row.get(0))
+            .query_row(
+                "SELECT rating FROM review_logs WHERE id = 'r1'",
+                [],
+                |row| row.get(0),
+            )
             .expect("review log r1 should survive migrations");
         assert_eq!(log_rating, "good");
 
         let session_count: i64 = conn
-            .query_row("SELECT cards_studied FROM study_sessions WHERE id = 's1'", [], |row| row.get(0))
+            .query_row(
+                "SELECT cards_studied FROM study_sessions WHERE id = 's1'",
+                [],
+                |row| row.get(0),
+            )
             .expect("session s1 should survive migrations");
         assert_eq!(session_count, 1);
 
         // Verify new columns from later migrations have default values
         let card_source: String = conn
-            .query_row("SELECT source FROM cards WHERE id = 'c1'", [], |row| row.get(0))
+            .query_row("SELECT source FROM cards WHERE id = 'c1'", [], |row| {
+                row.get(0)
+            })
             .expect("source column should have default after migration 4");
         assert_eq!(card_source, "");
 
         // Verify TTS settings from migration 6
         let tts_enabled: String = conn
-            .query_row("SELECT value FROM settings WHERE key = 'tts_enabled'", [], |row| row.get(0))
+            .query_row(
+                "SELECT value FROM settings WHERE key = 'tts_enabled'",
+                [],
+                |row| row.get(0),
+            )
             .expect("tts_enabled setting should exist after migration 6");
         assert_eq!(tts_enabled, "false");
     }
