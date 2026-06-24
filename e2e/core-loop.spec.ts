@@ -32,7 +32,10 @@ test.describe("Core Study Loop", () => {
     const nameInput = page.getByPlaceholder("Systems Design").first();
     await expect(nameInput).toBeVisible({ timeout: 5000 });
     await nameInput.fill("E2E Test Deck");
-    await page.getByRole("button", { name: /Create|Save/i }).click();
+    await page.getByRole("button", { name: /Create deck|Save changes/i }).click();
+
+    // Wait for dialog to close
+    await expect(page.getByPlaceholder("Systems Design")).not.toBeVisible({ timeout: 5000 });
 
     // Verify deck appears on dashboard
     await expect(page.getByText("E2E Test Deck")).toBeVisible({ timeout: 10000 });
