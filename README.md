@@ -19,19 +19,21 @@
 
 ## Why Recall?
 
-| | Recall | Anki | RemNote | Mochi |
+| | Recall | Anki (v26.05) | RemNote | Mochi |
 |---|---|---|---|---|
-| Algorithm | **FSRS** (native, default) | FSRS (built-in since v23.10) or SM-2 | Proprietary + FSRS option | SM-2 |
+| Algorithm | **FSRS** (default) | FSRS (default for new users) or SM-2 | SM-2 (default) + FSRS option | SM-2 |
 | Storage | **Local SQLite** | Local SQLite | Cloud-first (offline cache) | Local files |
 | Account required | **No** | No | Yes | No (offline free) |
 | Open source | **Yes** (MIT) | Yes (AGPL) | No | No |
+| Add-on ecosystem | Growing | **Massive** (20+ years) | Plugins | Limited |
+| Built-in gamification | **Yes** (XP, levels, achievements) | Via add-ons | Basic | No |
 | Native desktop | **Yes** (Tauri, Rust) | Yes (Qt, Python) | Yes (Electron) | Yes (Electron) |
 | Stack | **React + TypeScript** | Python + Qt | React | ClojureScript |
 
-Anki pioneered spaced repetition and has an enormous add-on ecosystem. Cloud alternatives like
-RemNote require accounts and subscriptions. Recall fills the gap: a **modern, open-source,
-privacy-first** desktop app that implements FSRS as the default algorithm on a maintainable,
-contributor-friendly TypeScript stack.
+Anki pioneered spaced repetition and has an enormous add-on ecosystem built over two decades.
+Recall takes a different approach: a **modern, privacy-first** desktop app that implements FSRS
+as the default algorithm on a contributor-friendly TypeScript stack, with built-in gamification,
+focus tools, and a polished UX that doesn't require hunting for add-ons.
 
 ---
 
