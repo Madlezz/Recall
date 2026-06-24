@@ -66,7 +66,7 @@ test.describe("Core Study Loop", () => {
     await page.getByRole("button", { name: /Start Review/i }).first().click();
 
     // Should enter study mode
-    await expect(page.getByText(/\\d+\\s*\\/\\s*\\d+/)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/\d+\s*\/\s*\d+/)).toBeVisible({ timeout: 10000 });
 
     // Reveal answer with Space
     await page.keyboard.press("Space");

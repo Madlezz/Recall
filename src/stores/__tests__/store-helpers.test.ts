@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { dataState, ensureDeckName, ensureCardInput, touchDeck } from "@/stores/store-helpers";
-import type { Card, Deck, RecallStateSnapshot } from "@/types";
+import type { Deck, RecallStateSnapshot } from "@/types";
 
 function makeDeck(overrides: Partial<Deck> = {}): Deck {
   return {
