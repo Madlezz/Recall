@@ -21,6 +21,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
   const showBrowser = useRecallStore((state) => state.showBrowser);
   const showTags = useRecallStore((state) => state.showTags);
   const startReview = useRecallStore((state) => state.startReview);
+  const startMatch = useRecallStore((state) => state.startMatch);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const dueCount = getDueTodayCount(cards);
@@ -78,7 +79,16 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
             <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Tools</span>
           </div>
           <NavButton active={false} icon={Timer} label="Focus Timer" onClick={showDashboard} />
-          <NavButton active={view === "match"} icon={Zap} label="Match Game" onClick={showBrowser} />
+          <NavButton
+            active={view === "match"}
+            icon={Zap}
+            label="Match Game"
+            onClick={() => {
+              const firstDeck = decks[0];
+              if (firstDeck) startMatch(firstDeck.id);
+              else showDashboard();
+            }}
+          />
         </nav>
 
         {/* Divider */}
@@ -156,7 +166,16 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Tools</span>
               </div>
               <NavButton active={false} icon={Timer} label="Focus Timer" onClick={() => handleNavClick(showDashboard)} />
-              <NavButton active={view === "match"} icon={Zap} label="Match Game" onClick={() => handleNavClick(showBrowser)} />
+              <NavButton
+                active={view === "match"}
+                icon={Zap}
+                label="Match Game"
+                onClick={() => handleNavClick(() => {
+                  const firstDeck = decks[0];
+                  if (firstDeck) startMatch(firstDeck.id);
+                  else showDashboard();
+                })}
+              />
             </nav>
             <div className="px-5 py-3 border-t border-zinc-200 dark:border-zinc-800">
               <LevelWidget />
