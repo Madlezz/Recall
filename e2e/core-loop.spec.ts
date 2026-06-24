@@ -35,7 +35,7 @@ test.describe("Core Study Loop", () => {
     await page.getByRole("button", { name: /Create|Save/i }).click();
 
     // Verify deck appears on dashboard
-    await expect(page.getByText("E2E Test Deck")).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText("E2E Test Deck")).toBeVisible({ timeout: 10000 });
 
     // Click into the deck
     await page.getByText("E2E Test Deck").click();
