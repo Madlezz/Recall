@@ -86,9 +86,15 @@ export const settingsSlice = (
   },
 
   async addXp(delta: number) {
+    // Immediately update in-memory XP to prevent race conditions
+    // (if two addXp calls happen concurrently, both read fresh state)
+    const state = get();
+    const newXp = dataState(state).settings.xp + delta;
+    set({ ...dataState(state), settings: { ...dataState(state).settings, xp: newXp } });
+
+    // Then persist to DB (async)
     const repo = await getRepository();
-    const current = dataState(get()).settings;
-    const snapshot = await repo.saveSettings({ ...current, xp: current.xp + delta }, dataState(get()));
+    const snapshot = await repo.saveSettings({ ...dataState(get()).settings }, dataState(get()));
     applyTheme(snapshot.settings.theme);
     applyAccentColor(snapshot.settings.accentColor);
     applyDyslexiaFont(snapshot.settings.dyslexiaFont);
