@@ -16,7 +16,7 @@ import { RecallImportDialog } from "@/components/recall-import-dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { getDeckColorClass } from "@/lib/deck-colors";
-import { getDeckStats, getDeckHealth, getStudyStreak, isCardDueToday } from "@/lib/stats";
+import { getDeckStats, getDeckHealth, getStudyStreak, isCardDueToday, getDueTodayCount } from "@/lib/stats";
 import { getLevel, getLevelTitle, levelProgress } from "@/lib/xp";
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
@@ -25,6 +25,7 @@ import type { Deck } from "@/types";
 export function Dashboard(): JSX.Element {
   const decks = useRecallStore((state) => state.decks);
   const cards = useRecallStore((state) => state.cards);
+  const reviewLogs = useRecallStore((state) => state.reviewLogs);
   const isLoading = useRecallStore((state) => state.isLoading);
   const showDeck = useRecallStore((state) => state.showDeck);
   const startReview = useRecallStore((state) => state.startReview);
@@ -92,6 +93,18 @@ export function Dashboard(): JSX.Element {
           </Button>
         </div>
       </section>
+
+      {/* ── Today band: due/new/reviewed + primary CTA ── */}
+      <TodayBand
+        dueCount={getDueTodayCount(cards)}
+        newCount={cards.filter((c) => c.state === "new").length}
+        reviewedToday={reviewLogs.filter((l) => {
+          const d = new Date(l.reviewDate);
+          const now = new Date();
+          return d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        }).length}
+        onStartReview={handleStartReview}
+      />
 
       {/* ── Review Inbox ── */}
       <ReviewInbox />
@@ -383,5 +396,55 @@ function LevelTile(): JSX.Element {
       </div>
       <div className="mt-1.5 text-xs text-zinc-400 tabular-nums">{xp.toLocaleString()} XP</div>
     </div>
+  );
+}
+
+// ═══════════════════════════════════════════════
+// TodayBand - hero band with due/new/reviewed + CTA
+// ═══════════════════════════════════════════════
+
+interface TodayBandProps {
+  dueCount: number;
+  newCount: number;
+  reviewedToday: number;
+  onStartReview: () => void;
+}
+
+function TodayBand({ dueCount, newCount, reviewedToday, onStartReview }: TodayBandProps): JSX.Element {
+  return (
+    <section className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-center gap-6">
+        <div className="flex flex-col">
+          <span className="text-3xl font-bold tabular-nums text-zinc-800 dark:text-zinc-100">
+            {dueCount}
+          </span>
+          <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">Due</span>
+        </div>
+        <div className="h-10 w-px bg-zinc-100 dark:bg-zinc-800" />
+        <div className="flex flex-col">
+          <span className="text-3xl font-bold tabular-nums text-zinc-400 dark:text-zinc-500">
+            {newCount}
+          </span>
+          <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">New</span>
+        </div>
+        <div className="h-10 w-px bg-zinc-100 dark:bg-zinc-800" />
+        <div className="flex flex-col">
+          <span className="text-3xl font-bold tabular-nums text-zinc-400 dark:text-zinc-500">
+            {reviewedToday}
+          </span>
+          <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">Reviewed</span>
+        </div>
+      </div>
+      <Button
+        size="lg"
+        onClick={onStartReview}
+        className="gap-2"
+        disabled={dueCount === 0}
+        aria-label="Start reviewing due cards"
+      >
+        <RotateCw className="h-5 w-5" />
+        {dueCount > 0 ? `Start Review (${dueCount})` : "All caught up"}
+      </Button>
+    </section>
   );
 }
