@@ -1,13 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { navigationSlice } from "@/stores/slices/navigation.slice";
-import type { NavigationSlice } from "@/stores/slices/navigation.slice";
 
 describe("navigationSlice", () => {
   function createNav() {
-    let state: Partial<NavigationSlice> = {};
+    let state: Record<string, unknown> = {};
     const set = (partial: Record<string, unknown>) => { state = { ...state, ...partial }; };
-    const get = () => state as Record<string, unknown>;
-    const nav = navigationSlice(set as (partial: Record<string, unknown>) => void, get);
+    const get = () => state;
+    const nav = navigationSlice(set, get);
     return { nav, getState: () => state };
   }
 

@@ -46,7 +46,7 @@ function makeSettings(overrides: Record<string, unknown> = {}) {
     leechThreshold: 5,
     onboardingComplete: true,
     xp: 0,
-    achievements: [] as string[],
+    achievements: [],
     dailyGoal: 20,
     notificationsEnabled: false,
     soundVolume: 100,
@@ -71,7 +71,7 @@ function makeSnapshot(overrides: Partial<RecallStateSnapshot> = {}): RecallState
     cards: [],
     studySessions: [],
     reviewLogs: [],
-    settings: makeSettings() as RecallStateSnapshot["settings"],
+    settings: makeSettings() as any,
     ...overrides,
   };
 }

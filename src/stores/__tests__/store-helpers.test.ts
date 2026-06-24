@@ -7,7 +7,7 @@ function makeDeck(overrides: Partial<Deck> = {}): Deck {
     id: "deck-1",
     name: "Test Deck",
     description: "A test deck",
-    color: "zinc",
+    color: "slate",
     createdAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-01T00:00:00.000Z",
     ...overrides,

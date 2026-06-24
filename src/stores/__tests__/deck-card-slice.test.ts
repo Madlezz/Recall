@@ -38,7 +38,7 @@ import type { Card, Deck, RecallStateSnapshot } from "@/types";
 
 function makeDeck(overrides: Partial<Deck> = {}): Deck {
   return {
-    id: "deck-1", name: "Test", description: "desc", color: "zinc",
+    id: "deck-1", name: "Test", description: "desc", color: "slate",
     createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z",
     ...overrides,
   };
@@ -59,7 +59,7 @@ function makeSettings() {
   return {
     theme: "light" as const, accentColor: "zinc" as const, dyslexiaFont: false,
     seededAt: "2026-01-01T00:00:00.000Z", dailyNewCardLimit: 20, leechThreshold: 5,
-    onboardingComplete: true, xp: 0, achievements: [] as string[], dailyGoal: 20,
+    onboardingComplete: true, xp: 0, achievements: [] as any[], dailyGoal: 20,
     notificationsEnabled: false, soundVolume: 100, allowHtml: false,
     desiredRetention: 0.9, backupFolder: null, backupSchedule: "never" as const,
     lastBackupAt: null, syncFolder: null, syncEnabled: false,
@@ -98,13 +98,13 @@ describe("deckCardSlice", () => {
 
     it("throws on empty name", async () => {
       const { slice } = createSliceWithState();
-      await expect(slice.createDeck({ name: "", description: "", color: "zinc" }))
+      await expect(slice.createDeck({ name: "", description: "", color: "slate" }))
         .rejects.toThrow("Deck name is required");
     });
 
     it("throws on duplicate name", async () => {
       const { slice } = createSliceWithState({ decks: [makeDeck({ name: "Existing" })] });
-      await expect(slice.createDeck({ name: "Existing", description: "", color: "zinc" }))
+      await expect(slice.createDeck({ name: "Existing", description: "", color: "slate" }))
         .rejects.toThrow("unique");
     });
   });
