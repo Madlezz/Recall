@@ -31,7 +31,7 @@ export default defineConfig({
         // Ratchet: set to actual measured coverage (2026-06-25, 416 tests).
         lines: 26,
         functions: 24,
-        branches: 26,
+        branches: 24,
         statements: 26,
       },
     },

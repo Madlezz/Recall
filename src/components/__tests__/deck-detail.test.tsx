@@ -35,7 +35,7 @@ vi.mock("@/components/deck-detail/deck-header-section", () => ({
     ),
 }));
 vi.mock("@/components/deck-detail/card-list-section", () => ({
-  CardListSection: ({ filteredCards, search, setSearch, allTags, onBulkDelete, onBulkAdd }: any) =>
+  CardListSection: ({ filteredCards, search, setSearch, _allTags, onBulkDelete, onBulkAdd }: any) =>
     React.createElement("div", null,
       React.createElement("input", { value: search, onChange: (e: any) => setSearch(e.target.value), placeholder: "Search cards" }),
       React.createElement("span", null, `${filteredCards.length} cards`),
@@ -105,7 +105,6 @@ vi.mock("sonner", () => ({
 }));
 
 import { DeckDetail } from "@/components/deck-detail";
-import { checkDeckQuality } from "@/lib/card-quality";
 import { optimizeFromHistory } from "@/services/fsrs-optimizer";
 
 describe("DeckDetail", () => {

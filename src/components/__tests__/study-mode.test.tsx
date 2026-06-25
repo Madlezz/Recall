@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
+import { render, screen, cleanup } from "@testing-library/react";
 import React from "react";
 
 const mockStore: any = {
@@ -33,7 +33,7 @@ vi.mock("@/components/ui/button", () => ({
     React.createElement("button", { onClick, disabled, ...props }, children),
 }));
 vi.mock("@/components/study-mode/session-summary-modal", () => ({
-  SessionSummaryModal: ({ summary, onContinue }: any) =>
+  SessionSummaryModal: ({ onContinue }: any) =>
     React.createElement("div", null,
       React.createElement("span", null, "Session Summary"),
       React.createElement("button", { onClick: onContinue }, "Continue"),

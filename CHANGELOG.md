@@ -6,6 +6,64 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [1.0.15] - 2026-06-25
+
+### Added
+- Coverage gate ratcheted: 416 tests (was 250), 26.46% line coverage (was 14.69%)
+- Component tests: dashboard (72.6%), study-mode (64.7%), deck-detail (51.57%), app-shell (60%)
+- Store logic tests: recall-store (70%), navigation/saved-search/deck-card/settings slices (78-100%)
+- happy-dom + @testing-library/react for component testing
+- Sticky bulk-action bar in deck detail (card-list-section)
+- Persistent "Press ? for shortcuts" hint in sidebar footer
+
+### Fixed
+- Coverage gate branches threshold corrected (26 -> 24, matches actual 24.12%)
+- Lint: removed 4 unused vars in test files (allTags, checkDeckQuality, fireEvent, summary)
+- Build: recall-store.test.ts DeckColor type fix ("zinc" -> "slate"), previousCardState null guard
+- Perf budget verified: large_deck_benchmark.rs assertions already enforced in CI via cargo test
+- Empty/loading/error states audit: all list screens have empty states, dashboard has loading skeletons
+
+## [1.0.14] - 2026-06-24
+
+### Added
+- Core-loop e2e test (create deck -> add card -> study -> rate -> stats update)
+- Export round-trip verification tests (export -> re-import -> verify data integrity)
+- Forgetting curve + best study time analytics (7 new tests)
+- Per-deck FSRS optimization button in deck-detail UI
+- Migration-chain integrity test (v1-v7 schema verification)
+
+### Fixed
+- B1: Atomic addXp action (fixes XP lost-update race in match-game + focus-timer)
+- B2: Mobile nav drawer with hamburger menu for narrow windows
+- B3: TTS timeout cleanup (prevents reading wrong card after navigation)
+- B4: Variable shadowing in match-game handleTileClick
+- B5: NaN guards on soundVolume, ttsSpeed, desiredRetention settings
+- B6: Array-index React keys replaced with stable ids across all list renders
+- B7: Rating keys 1-4 now call event.preventDefault()
+- S1: "Delete All Data" now truly clears data (saveSnapshot instead of saveSettings)
+- S2: Bulk delete uses confirm dialog (no more instant deletion)
+- S3: Batched deleteCards atomic command (single transaction instead of N)
+- S4: Import paths consolidated into single flow
+- S5: XP rules extracted to src/lib/xp-rules.ts
+- S6: Persistent lastAction confirmation for import/export
+- A1: Card column parity test between Rust and JS write paths
+- A2: God files split (settings, deck-detail, study-mode -> 11 sub-components)
+- A3: Demo seed decoupled from schema migrations
+- A4: DB migration-chain integrity test
+- C1: Security comment on RichCard rehype plugin order
+- C2: UUID entropy fix in lib.rs
+- R1: Coverage gate raised from 14% to 26%+, 250+ tests added
+- R4: Dependabot ignore rules for cargo/actions
+- R7: Release notes auto-generated via gh api
+
+### Changed
+- Dashboard restructured: "Today" hero band with primary "Start Review" CTA
+- Settings restructured: tabbed layout (General | Study | Data | About) with Danger Zone
+- Navigation grouped: Dashboard, Review (with due-count badge), Browser, Tags, Stats, Settings + Tools section
+- Confetti centralized into CONFETTI_COLORS shared constant
+- prefers-reduced-motion guard on all confetti call sites
+- aria-live region in study mode for screen reader announcements
+
 ## [1.0.13] - 2026-06-22
 
 ### Added

@@ -90,7 +90,7 @@ function makeCard(overrides: Partial<Card> = {}): Card {
 
 function makeDeck(overrides: Partial<Deck> = {}): Deck {
   return {
-    id: "deck-1", name: "Test Deck", description: "desc", color: "zinc",
+    id: "deck-1", name: "Test Deck", description: "desc", color: "slate",
     createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z",
     ...overrides,
   };
@@ -326,7 +326,7 @@ describe("recall-store", () => {
       expect(active.revealed).toBe(false);
       expect(active.ratings.good).toBe(1);
       expect(active.sessionXp).toBe(2); // REVIEW_XP.good = 2
-      expect(active.previousCardState.id).toBe("c1");
+      expect(active.previousCardState!.id).toBe("c1");
     });
 
     it("completes study on last card", async () => {
