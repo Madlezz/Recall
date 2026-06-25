@@ -85,9 +85,9 @@ export function CardListSection({
         />
       </div>
 
-      {/* Bulk selection bar */}
+      {/* Bulk selection bar — sticky while scrolling long card lists */}
       {filteredCards.length > 0 && (
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="sticky top-0 z-10 flex flex-wrap items-center gap-3 rounded-lg bg-background/95 backdrop-blur py-2">
           <Button variant="outline" size="sm" onClick={toggleSelectAll}>
             {selectedCardIds.size === filteredCards.length ? (
               <CheckSquare className="h-4 w-4" />

@@ -116,6 +116,17 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         <div className="px-5 pb-4 pt-1">
           <LevelWidget />
         </div>
+
+        {/* Shortcut hint */}
+        <div className="px-5 pb-3">
+          <button
+            onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "?" }))}
+            className="text-[10px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+            aria-label="Show keyboard shortcuts"
+          >
+            Press ? for shortcuts
+          </button>
+        </div>
       </aside>
 
       {/* ── Mobile header ── */}
