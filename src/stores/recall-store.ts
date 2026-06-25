@@ -317,6 +317,10 @@ export const useRecallStore = create<RecallStore>()((set, get) => {
     const active = state.activeStudy;
     if (!active || active.completed || !active.revealed) return;
 
+    // Synchronously mark as not revealed to prevent double-answer race
+    // (two rapid taps both seeing revealed=true → duplicate review log)
+    set({ activeStudy: { ...active, revealed: false } });
+
     const cardId = active.cardIds[active.currentIndex];
     const card = state.cards.find((c: Card) => c.id === cardId);
     if (!card) return;

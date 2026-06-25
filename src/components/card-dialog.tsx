@@ -194,7 +194,7 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
                 <SelectContent>
                   <SelectItem value="basic">Basic</SelectItem>
                   <SelectItem value="cloze">Cloze Deletion</SelectItem>
-                  <SelectItem value="image-occlusion">Image Occlusion</SelectItem>
+                  {/* Image Occlusion — WIP, disabled until cardType roundtrip is implemented */}
                 </SelectContent>
               </Select>
             </div>

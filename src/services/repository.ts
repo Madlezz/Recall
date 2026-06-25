@@ -560,12 +560,42 @@ class LocalStorageRecallRepository implements RecallRepository {
     return snapshot;
   }
 
-  // LocalStorage doesn't support targeted updates; these are no-ops (tests only)
-  async upsertDeck(_deck: Deck): Promise<void> {}
-  async upsertCard(_card: Card): Promise<void> {}
-  async deleteDeck(_deckId: string): Promise<void> {}
-  async deleteCard(_cardId: string): Promise<void> {}
-  async deleteCards(_cardIds: string[]): Promise<void> {}
+  // LocalStorage targeted ops: read-modify-write full snapshot (browser/dev mode)
+  async upsertDeck(deck: Deck): Promise<void> {
+    const snapshot = await this.loadAppData();
+    const idx = snapshot.decks.findIndex((d) => d.id === deck.id);
+    if (idx >= 0) snapshot.decks[idx] = deck;
+    else snapshot.decks.push(deck);
+    await this.saveSnapshot(snapshot);
+  }
+
+  async upsertCard(card: Card): Promise<void> {
+    const snapshot = await this.loadAppData();
+    const idx = snapshot.cards.findIndex((c) => c.id === card.id);
+    if (idx >= 0) snapshot.cards[idx] = card;
+    else snapshot.cards.push(card);
+    await this.saveSnapshot(snapshot);
+  }
+
+  async deleteDeck(deckId: string): Promise<void> {
+    const snapshot = await this.loadAppData();
+    snapshot.decks = snapshot.decks.filter((d) => d.id !== deckId);
+    snapshot.cards = snapshot.cards.filter((c) => c.deckId !== deckId);
+    await this.saveSnapshot(snapshot);
+  }
+
+  async deleteCard(cardId: string): Promise<void> {
+    const snapshot = await this.loadAppData();
+    snapshot.cards = snapshot.cards.filter((c) => c.id !== cardId);
+    await this.saveSnapshot(snapshot);
+  }
+
+  async deleteCards(cardIds: string[]): Promise<void> {
+    const idSet = new Set(cardIds);
+    const snapshot = await this.loadAppData();
+    snapshot.cards = snapshot.cards.filter((c) => !idSet.has(c.id));
+    await this.saveSnapshot(snapshot);
+  }
   async queryCards(_filters: { deckId?: string; state?: string; search?: string; sortField: string; sortDir: string; limit: number; offset: number }): Promise<{ cards: Card[]; total: number }> {
     // LocalStorage can't do DB-side queries; fallback to client-side
     const all = await this.loadAppData();
