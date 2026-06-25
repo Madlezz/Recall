@@ -28,11 +28,11 @@ export default defineConfig({
         "playwright.config.ts",
       ],
       thresholds: {
-        // Ratchet: set to actual measured coverage (2026-06-25, 397 tests).
-        lines: 25,
-        functions: 23,
-        branches: 23,
-        statements: 25,
+        // Ratchet: set to actual measured coverage (2026-06-25, 416 tests).
+        lines: 26,
+        functions: 24,
+        branches: 26,
+        statements: 26,
       },
     },
   },
