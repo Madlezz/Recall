@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [1.0.16] - 2026-06-26
+
+### Fixed
+- Double-answer race: `answerCurrentCard` now sets `revealed=false` synchronously before async persist, preventing duplicate review logs from rapid taps
+- LocalStorage data loss: `LocalStorageRecallRepository` targeted ops (upsertCard/upsertDeck/delete*) were no-ops; now read-modify-write full snapshot (browser/dev mode only, Tauri unaffected)
+- XP/achievement loss on nav: sidebar navigation now auto-calls `exitStudy()` when leaving a completed study session
+- Image-occlusion card type hidden from UI (WIP — createCard ignores cardType, mappers lose it on SQLite reload)
+
 ## [1.0.15] - 2026-06-25
 
 ### Added
