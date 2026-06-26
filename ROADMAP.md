@@ -12,6 +12,13 @@ This document outlines the planned features and improvements for Recall. Items a
 
 ## Planned
 
+### Internationalization
+- [ ] Additional languages: Spanish (es), Portuguese (pt), Chinese Simplified (zh-CN), Japanese (ja)
+  - **Trigger:** Implement after core feature development slows down (post-v1.1 stable). During active development, new UI strings are added frequently — each new language adds maintenance overhead per string change. Starting too early means constant catch-up translation work.
+  - **Approach:** Generate initial translations from en.json (873 keys) using LLM, then community review/refine. Zero code changes needed per language — just add a JSON file to `src/locales/`.
+  - **CJK note:** Verify font rendering on all target platforms before release.
+  - **Future:** Arabic (ar) requires RTL layout support (CSS `dir="rtl"`), defer to separate milestone.
+
 ### Core Features
 - [ ] Deck sharing and marketplace (community card decks)
 - [ ] Collaborative deck editing (multi-user real-time)
@@ -73,7 +80,7 @@ This document outlines the planned features and improvements for Recall. Items a
 - [x] Keyboard-first navigation
 - [x] Global hotkey for quick-add
 - [x] Multi-platform (Windows, macOS, Linux)
-- [x] Comprehensive test suite (165 tests)
+- [x] Comprehensive test suite (416 tests)
 - [x] CI/CD with automated releases
 - [x] Accessibility documentation and ARIA labels
 - [x] User-friendly error messages across all dialogs
@@ -103,6 +110,7 @@ This document outlines the planned features and improvements for Recall. Items a
 - [x] Folder-based cloud sync: merge-on-import to Dropbox/Google Drive/etc. (v1.0.13)
 - [x] Image Occlusion cards: draw rectangles on images, reveal during study (Unreleased)
 - [x] Richer Anki import: media extraction (images from .apkg) with recall:// URLs (Unreleased)
+- [x] Internationalization (i18n): react-i18next with English + Bahasa Indonesia, 40 namespaces / 873 keys, language switcher in Settings (Unreleased)
 
 ## Contributing
 

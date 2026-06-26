@@ -89,6 +89,7 @@ focus tools, and a polished UX that doesn't require hunting for add-ons.
 - **6 accent colors** - zinc, blue, green, rose, amber, violet
 - **Dyslexia-friendly font** - optional OpenDyslexic/Comic Sans fallback
 - **Dark/Light/High-contrast themes** - three themes to match your preference
+- **Multi-language** - English and Bahasa Indonesia, switch anytime in Settings
 
 ---
 
@@ -112,7 +113,7 @@ pnpm dev             # Browser-only preview (no Rust needed)
 ### Testing
 
 ```bash
-pnpm test            # Unit tests (241 tests)
+pnpm test            # Unit tests (416 tests)
 pnpm lint            # ESLint
 pnpm build           # Production build
 pnpm test:e2e        # Playwright E2E (requires `pnpm dev` running first)
@@ -187,6 +188,7 @@ project structure, and code style guidelines.
 | Storage | SQLite |
 | State | Zustand |
 | Algorithm | FSRS (ts-fsrs) |
+| i18n | react-i18next |
 | Icons | Lucide |
 
 ---

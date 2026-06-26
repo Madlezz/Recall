@@ -58,6 +58,13 @@ src-tauri/
 - Prefer pure functions in `src/lib/` and `src/services/`
 - UI state → Zustand slices in `src/stores/slices/`
 - Database access only through `src/services/repository.ts`
+- **i18n**: All user-facing strings must use `t()` from `useTranslation()`. Never hardcode English in JSX.
+  - Add `import { useTranslation } from "react-i18next"` and `const { t } = useTranslation()` to each component
+  - Use dotted keys: `t("namespace.key")` (e.g., `t("dashboard.title")`)
+  - Add new keys to **both** `src/locales/en.json` and `src/locales/id.json`
+  - Interpolation: `t("key", { count: 5 })` → `"{{count}} items"` in JSON
+  - Plurals: use `_one`/`_other` suffixes (e.g., `cards_one`, `cards_other`)
+  - Test environment auto-initializes i18n via `src/test-setup.ts`
 
 ## Running Tests
 

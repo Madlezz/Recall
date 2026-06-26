@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+- Internationalization (i18n): full UI localization with react-i18next
+  - English (en) and Bahasa Indonesia (id) locales, 873 translation keys across 40 namespaces
+  - Language switcher in Settings → Appearance
+  - All user-facing strings wired: every component, dialog, toast, and aria-label
+  - Test environment initializes i18n to prevent assertion failures
+
 ## [1.0.16] - 2026-06-26
 
 ### Fixed
