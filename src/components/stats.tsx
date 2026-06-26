@@ -1,4 +1,5 @@
 import { Brain, Calendar, Flame, Lock, TrendingUp, Zap } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useStats } from "./use-stats";
 import { ACHIEVEMENT_DEFS } from "@/types";
 import { WorkloadForecast } from "@/components/workload-forecast";
@@ -75,13 +76,14 @@ function StackedBarChart({ data }: { data: { again: number; hard: number; good: 
 // ── RetentionCurve ──
 
 function RetentionCurve({ data }: { data: number[] }): JSX.Element {
+  const { t } = useTranslation();
   // Filter out days with no data (-1)
   const validData = data.filter((v) => v >= 0);
   const height = 80;
   const width = 100; // percentage
 
   if (validData.length === 0) {
-    return <p className="text-sm text-zinc-400">Not enough data yet</p>;
+    return <p className="text-sm text-zinc-400">{t("stats.notEnoughData")}</p>;
   }
 
   const maxVal = 100;
@@ -136,6 +138,7 @@ function RetentionCurve({ data }: { data: number[] }): JSX.Element {
 // ── Component ──
 
 export function Stats(): JSX.Element {
+  const { t } = useTranslation();
   const {
     settings,
     streak,
@@ -159,19 +162,19 @@ export function Stats(): JSX.Element {
     <div className="animate-fade-in space-y-10">
       {/* Header */}
       <section>
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">Analytics</p>
-        <h1 className="mt-2 text-[1.75rem] font-bold leading-tight tracking-tight text-zinc-900 dark:text-zinc-100">Stats</h1>
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">{t("stats.analytics")}</p>
+        <h1 className="mt-2 text-[1.75rem] font-bold leading-tight tracking-tight text-zinc-900 dark:text-zinc-100">{t("stats.title")}</h1>
         <p className="mt-2 max-w-lg text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-          Your learning journey, quantified. All data stays on your machine.
+          {t("stats.headerDescription")}
         </p>
       </section>
 
       {/* Overview */}
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatTile icon={Flame} label="Streak" value={`${streak} day${streak === 1 ? "" : "s"}`} />
-        <StatTile icon={Zap} label="Total Reviews" value={String(totalReviews)} />
-        <StatTile icon={Calendar} label="Sessions" value={String(totalSessions)} />
-        <StatTile icon={TrendingUp} label="Accuracy" value={`${accuracy}%`} />
+        <StatTile icon={Flame} label={t("stats.streak")} value={t("stats.streakDays", { count: streak })} />
+        <StatTile icon={Zap} label={t("stats.totalReviews")} value={String(totalReviews)} />
+        <StatTile icon={Calendar} label={t("stats.sessions")} value={String(totalSessions)} />
+        <StatTile icon={TrendingUp} label={t("stats.accuracy")} value={`${accuracy}%`} />
       </section>
 
       {/* Level + XP */}
@@ -180,16 +183,16 @@ export function Stats(): JSX.Element {
           <Brain className="h-6 w-6 text-zinc-600 dark:text-zinc-400" />
         </div>
         <div>
-          <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">Level {level}</span>
+          <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">{t("stats.level", { level })}</span>
           <h3 className="text-xl font-bold text-zinc-800 dark:text-zinc-200">{title}</h3>
-          <p className="text-xs text-zinc-500 mt-0.5">{settings.xp.toLocaleString()} XP total</p>
+          <p className="text-xs text-zinc-500 mt-0.5">{t("stats.xpTotal", { count: settings.xp.toLocaleString() })}</p>
         </div>
       </section>
 
       {/* Achievements */}
       <section>
         <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">
-          Achievements{" "}
+          {t("stats.achievements")}{" "}
           <span className="font-normal text-zinc-400">
             ({settings.achievements.filter((a) => a.unlockedAt).length}/{Object.keys(ACHIEVEMENT_DEFS).length})
           </span>
@@ -222,13 +225,13 @@ export function Stats(): JSX.Element {
       {/* Rating distribution */}
       {totalRated > 0 && (
         <section>
-          <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">Rating Distribution</h3>
+          <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("stats.ratingDistribution")}</h3>
           <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
             <div className="space-y-4">
-              <RatingBar color="bg-red-500" label="Again" count={ratingDist.again} total={totalRated} />
-              <RatingBar color="bg-amber-500" label="Hard" count={ratingDist.hard} total={totalRated} />
-              <RatingBar color="bg-emerald-500" label="Good" count={ratingDist.good} total={totalRated} />
-              <RatingBar color="bg-blue-500" label="Easy" count={ratingDist.easy} total={totalRated} />
+              <RatingBar color="bg-red-500" label={t("study.again")} count={ratingDist.again} total={totalRated} />
+              <RatingBar color="bg-amber-500" label={t("study.hard")} count={ratingDist.hard} total={totalRated} />
+              <RatingBar color="bg-emerald-500" label={t("study.good")} count={ratingDist.good} total={totalRated} />
+              <RatingBar color="bg-blue-500" label={t("study.easy")} count={ratingDist.easy} total={totalRated} />
             </div>
           </div>
         </section>
@@ -237,7 +240,7 @@ export function Stats(): JSX.Element {
       {/* Review volume */}
       {totalReviews > 0 && (
         <section>
-          <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">Reviews — Last 30 Days</h3>
+          <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("stats.reviewsLast30Days")}</h3>
           <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
             <MiniBarChart data={dayData} maxHeight={80} />
           </div>
@@ -247,14 +250,14 @@ export function Stats(): JSX.Element {
       {/* Rating breakdown */}
       {totalReviews > 0 && (
         <section>
-          <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">Daily Rating Breakdown</h3>
+          <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("stats.dailyRatingBreakdown")}</h3>
           <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
             <StackedBarChart data={dayRatingData} />
             <div className="flex items-center gap-4 mt-4 text-xs text-zinc-500">
-              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-red-500/70" /> Again</span>
-              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-amber-500/70" /> Hard</span>
-              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-emerald-500/70" /> Good</span>
-              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-blue-500/70" /> Easy</span>
+              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-red-500/70" /> {t("study.again")}</span>
+              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-amber-500/70" /> {t("study.hard")}</span>
+              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-emerald-500/70" /> {t("study.good")}</span>
+              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-blue-500/70" /> {t("study.easy")}</span>
             </div>
           </div>
         </section>
@@ -264,13 +267,13 @@ export function Stats(): JSX.Element {
       {totalReviews > 0 && (
         <section>
           <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">
-            Retention Over Time
-            <span className="ml-2 text-xs font-normal text-zinc-400">(7-day rolling)</span>
+            {t("stats.retentionOverTime")}
+            <span className="ml-2 text-xs font-normal text-zinc-400">{t("stats.sevenDayRolling")}</span>
           </h3>
           <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
             <RetentionCurve data={retentionData} />
             <p className="mt-3 text-xs text-zinc-400">
-              Shows the percentage of Good/Easy ratings over a rolling 7-day window. Higher = better retention.
+              {t("stats.retentionDescription")}
             </p>
           </div>
         </section>
@@ -279,7 +282,7 @@ export function Stats(): JSX.Element {
       {/* Time-of-day heatmap */}
       {totalReviews > 0 && (
         <section>
-          <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">When You Study</h3>
+          <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("stats.whenYouStudy")}</h3>
           <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
             <div className="space-y-1">
               <div className="grid gap-[2px]" style={{ gridTemplateColumns: "repeat(24, minmax(0, 1fr))" }}>
@@ -295,7 +298,7 @@ export function Stats(): JSX.Element {
                       }}
                     />
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-white border border-zinc-200 rounded px-2 py-1 text-xs whitespace-nowrap z-10 shadow-sm dark:bg-zinc-800 dark:border-zinc-700">
-                      {h}:00 — {count} review{count === 1 ? "" : "s"}
+                      {h}:00 — {t("stats.reviewCount", { count })}
                     </div>
                   </div>
                 ))}
@@ -314,12 +317,12 @@ export function Stats(): JSX.Element {
       {/* Top decks */}
       {topDecks.length > 0 && (
         <section>
-          <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">Top Decks</h3>
+          <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("stats.topDecks")}</h3>
           <div className="rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 divide-y divide-zinc-100 dark:divide-zinc-800">
             {topDecks.map(({ name, count }) => (
               <div key={name} className="flex items-center justify-between px-5 py-3 text-sm">
                 <span className="font-medium text-zinc-700 dark:text-zinc-300">{name}</span>
-                <span className="text-zinc-400 tabular-nums">{count} review{count === 1 ? "" : "s"}</span>
+                <span className="text-zinc-400 tabular-nums">{t("stats.reviewCount", { count })}</span>
               </div>
             ))}
           </div>
