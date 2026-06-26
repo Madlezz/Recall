@@ -299,7 +299,8 @@
     "downloading": "Downloading... {{size}}KB",
     "installUpdate": "Install Update",
     "updateCheckFailed": "Failed to check for updates",
-    "updateInstallFailed": "Failed to install update"
+    "updateInstallFailed": "Failed to install update",
+    "languageDescription": "Choose your preferred language for the interface."
   },
   "stats": {
     "title": "Statistics",

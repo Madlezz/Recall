@@ -1,12 +1,17 @@
-import { Moon, Sun, Eye, Volume2, Mic } from "lucide-react";
+import { Moon, Sun, Eye, Volume2, Mic, Languages } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SettingsCard } from "./settings-card";
 import { useRecallStore } from "@/stores/recall-store";
 import { toast } from "sonner";
 import type { Theme } from "@/types";
 
+const LANGUAGES: { code: string; label: string; nativeLabel: string }[] = [
+  { code: "en", label: "English", nativeLabel: "English" },
+  { code: "id", label: "Indonesian", nativeLabel: "Bahasa Indonesia" },
+];
+
 export function AppearanceSection(): JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const settings = useRecallStore((state) => state.settings);
   const setTheme = useRecallStore((state) => state.setTheme);
   const setAccentColor = useRecallStore((state) => state.setAccentColor);
@@ -20,6 +25,11 @@ export function AppearanceSection(): JSX.Element {
       const message = error instanceof Error ? error.message : "Unknown error";
       toast.error(t("settings.themeChangeFailed", { message }));
     }
+  }
+
+  function handleLanguageChange(code: string): void {
+    i18n.changeLanguage(code);
+    localStorage.setItem("i18nextLng", code);
   }
 
   return (
@@ -85,6 +95,26 @@ export function AppearanceSection(): JSX.Element {
             />
             {t("settings.dyslexiaFont")}
           </label>
+        </div>
+      </SettingsCard>
+
+      <SettingsCard title={t("settings.language")}>
+        <p className="mb-3 text-xs text-zinc-500 dark:text-zinc-400">{t("settings.languageDescription")}</p>
+        <div className="flex gap-2">
+          {LANGUAGES.map((lang) => (
+            <button
+              key={lang.code}
+              onClick={() => handleLanguageChange(lang.code)}
+              className={`flex items-center gap-2 rounded-md px-3.5 py-2 text-sm font-medium transition-colors ${
+                i18n.language === lang.code || (i18n.language.startsWith(lang.code))
+                  ? "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200"
+                  : "text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+              }`}
+            >
+              <Languages className="h-4 w-4" />
+              {lang.nativeLabel}
+            </button>
+          ))}
         </div>
       </SettingsCard>
 

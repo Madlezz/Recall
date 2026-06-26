@@ -299,7 +299,8 @@
     "downloading": "Mengunduh... {{size}}KB",
     "installUpdate": "Pasang Pembaruan",
     "updateCheckFailed": "Gagal memeriksa pembaruan",
-    "updateInstallFailed": "Gagal memasang pembaruan"
+    "updateInstallFailed": "Gagal memasang pembaruan",
+    "languageDescription": "Pilih bahasa antarmuka yang kamu inginkan."
   },
   "stats": {
     "title": "Statistik",
