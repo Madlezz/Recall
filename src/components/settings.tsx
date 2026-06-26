@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -24,6 +25,7 @@ import { UpdatesSection } from "./settings/updates-section";
 type ImportMode = "merge" | "replace";
 
 export function Settings(): JSX.Element {
+  const { t } = useTranslation();
   const [importMode, setImportMode] = useState<ImportMode>("merge");
   const [pendingReplace, setPendingReplace] = useState<RecallExportPayload | null>(null);
   const [lastAction, setLastAction] = useState<{ type: string; time: string } | null>(null);
@@ -34,11 +36,11 @@ export function Settings(): JSX.Element {
     try {
       await replaceData(pendingReplace);
       setPendingReplace(null);
-      toast.success("Data replaced successfully");
-      setLastAction({ type: "Replaced all data", time: new Date().toLocaleTimeString() });
+      toast.success(t("settings.dataReplacedSuccess"));
+      setLastAction({ type: t("settings.replacedAllData"), time: new Date().toLocaleTimeString() });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
-      toast.error(`Could not replace data: ${message}`);
+      toast.error(t("settings.dataReplaceFailed", { message }));
     }
   }
 
@@ -46,20 +48,20 @@ export function Settings(): JSX.Element {
     <div className="animate-fade-in space-y-6">
       {/* Header */}
       <section>
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">Preferences</p>
-        <h1 className="mt-2 text-[1.75rem] font-bold leading-tight tracking-tight text-zinc-900 dark:text-zinc-100">Settings</h1>
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">{t("settings.preferences")}</p>
+        <h1 className="mt-2 text-[1.75rem] font-bold leading-tight tracking-tight text-zinc-900 dark:text-zinc-100">{t("settings.title")}</h1>
         <p className="mt-2 max-w-lg text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-          Everything stays local. Export JSON when you want a portable backup.
+          {t("settings.headerDescription")}
         </p>
       </section>
 
       {/* Tabbed settings */}
       <Tabs defaultValue="general">
         <TabsList>
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="study">Study</TabsTrigger>
-          <TabsTrigger value="data">Data</TabsTrigger>
-          {isTauriRuntime() && <TabsTrigger value="about">About</TabsTrigger>}
+          <TabsTrigger value="general">{t("settings.general")}</TabsTrigger>
+          <TabsTrigger value="study">{t("settings.study")}</TabsTrigger>
+          <TabsTrigger value="data">{t("settings.data")}</TabsTrigger>
+          {isTauriRuntime() && <TabsTrigger value="about">{t("settings.about")}</TabsTrigger>}
         </TabsList>
 
         {/* General: Appearance + Notifications */}
@@ -97,14 +99,14 @@ export function Settings(): JSX.Element {
       <AlertDialog open={pendingReplace !== null} onOpenChange={(open) => !open && setPendingReplace(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Replace all data?</AlertDialogTitle>
+            <AlertDialogTitle>{t("settings.replaceDialogTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              This removes local decks, cards, reviews, and sessions before loading the import file.
+              {t("settings.replaceDialogDescription")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction asChild>
-              <Button variant="destructive" onClick={() => void handleReplace()}>Replace data</Button>
+              <Button variant="destructive" onClick={() => void handleReplace()}>{t("settings.replaceData")}</Button>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

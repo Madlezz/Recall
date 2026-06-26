@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SettingsCard } from "./settings-card";
 
 export function UpdatesSection(): JSX.Element {
+  const { t } = useTranslation();
   const [checking, setChecking] = useState(false);
   const [updateInfo, setUpdateInfo] = useState<{ version: string; body?: string } | null>(null);
   const [downloading, setDownloading] = useState(false);
@@ -17,7 +19,7 @@ export function UpdatesSection(): JSX.Element {
       const info = await checkForUpdates();
       setUpdateInfo(info);
     } catch (error) {
-      toast.error("Failed to check for updates");
+      toast.error(t("settings.updateCheckFailed"));
       console.error(error);
     } finally {
       setChecking(false);
@@ -35,7 +37,7 @@ export function UpdatesSection(): JSX.Element {
         }
       });
     } catch (error) {
-      toast.error("Failed to install update");
+      toast.error(t("settings.updateInstallFailed"));
       console.error(error);
     } finally {
       setDownloading(false);
@@ -44,7 +46,7 @@ export function UpdatesSection(): JSX.Element {
 
   return (
     <section>
-      <SettingsCard title="Updates" description="Check for and install new versions">
+      <SettingsCard title={t("settings.updatesTitle")} description={t("settings.updatesDescription")}>
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <Button
@@ -52,15 +54,15 @@ export function UpdatesSection(): JSX.Element {
               disabled={checking || downloading}
               size="sm"
             >
-              {checking ? "Checking..." : "Check for Updates"}
+              {checking ? t("settings.checking") : t("settings.checkForUpdates")}
             </Button>
             {updateInfo && (
               <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                Update available: v{updateInfo.version}
+                {t("settings.updateAvailable", { version: updateInfo.version })}
               </span>
             )}
             {!updateInfo && !checking && (
-              <span className="text-sm text-zinc-500">You're up to date</span>
+              <span className="text-sm text-zinc-500">{t("settings.upToDate")}</span>
             )}
           </div>
           {updateInfo && (
@@ -75,7 +77,7 @@ export function UpdatesSection(): JSX.Element {
                 disabled={downloading}
                 size="sm"
               >
-                {downloading ? `Downloading... ${Math.round(progress / 1024)}KB` : "Install Update"}
+                {downloading ? t("settings.downloading", { size: Math.round(progress / 1024) }) : t("settings.installUpdate")}
               </Button>
             </div>
           )}

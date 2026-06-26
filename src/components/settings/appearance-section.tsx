@@ -1,10 +1,12 @@
 import { Moon, Sun, Eye, Volume2, Mic } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { SettingsCard } from "./settings-card";
 import { useRecallStore } from "@/stores/recall-store";
 import { toast } from "sonner";
 import type { Theme } from "@/types";
 
 export function AppearanceSection(): JSX.Element {
+  const { t } = useTranslation();
   const settings = useRecallStore((state) => state.settings);
   const setTheme = useRecallStore((state) => state.setTheme);
   const setAccentColor = useRecallStore((state) => state.setAccentColor);
@@ -16,13 +18,13 @@ export function AppearanceSection(): JSX.Element {
       await setTheme(theme);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
-      toast.error(`Could not change theme: ${message}`);
+      toast.error(t("settings.themeChangeFailed", { message }));
     }
   }
 
   return (
     <section className="grid gap-4 lg:grid-cols-2">
-      <SettingsCard title="Appearance">
+      <SettingsCard title={t("settings.appearance")}>
         <div className="flex gap-2">
           <button
             onClick={() => void handleTheme("dark")}
@@ -32,7 +34,7 @@ export function AppearanceSection(): JSX.Element {
                 : "text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
             }`}
           >
-            <Moon className="h-4 w-4" /> Dark
+            <Moon className="h-4 w-4" /> {t("settings.themeDark")}
           </button>
           <button
             onClick={() => void handleTheme("light")}
@@ -42,7 +44,7 @@ export function AppearanceSection(): JSX.Element {
                 : "text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
             }`}
           >
-            <Sun className="h-4 w-4" /> Light
+            <Sun className="h-4 w-4" /> {t("settings.themeLight")}
           </button>
           <button
             onClick={() => void handleTheme("high-contrast")}
@@ -52,12 +54,12 @@ export function AppearanceSection(): JSX.Element {
                 : "text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
             }`}
           >
-            <Eye className="h-4 w-4" /> High Contrast
+            <Eye className="h-4 w-4" /> {t("settings.themeHighContrast")}
           </button>
         </div>
 
         <div className="mt-4 space-y-2">
-          <label className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Accent Color</label>
+          <label className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{t("settings.accentColor")}</label>
           <div className="flex gap-2">
             {(["zinc", "blue", "green", "rose", "amber", "violet"] as const).map((color) => (
               <button
@@ -81,18 +83,18 @@ export function AppearanceSection(): JSX.Element {
               onChange={(e) => void setDyslexiaFont(e.target.checked)}
               className="rounded"
             />
-            Dyslexia-friendly font
+            {t("settings.dyslexiaFont")}
           </label>
         </div>
       </SettingsCard>
 
-      <SettingsCard title="Sound Volume">
+      <SettingsCard title={t("settings.soundVolume")}>
         <div className="flex items-center gap-3">
           <Volume2 className="h-4 w-4 text-zinc-400 shrink-0" aria-hidden="true" />
           <input
             type="range"
             min="0" max="100"
-            aria-label="Sound volume"
+            aria-label={t("settings.soundVolume")}
             value={settings.soundVolume}
             onChange={(e) => void updateSettings({ soundVolume: parseInt(e.target.value, 10) || 100 })}
             className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-zinc-200 accent-zinc-700 dark:bg-zinc-700 dark:accent-zinc-300"
@@ -101,7 +103,7 @@ export function AppearanceSection(): JSX.Element {
         </div>
       </SettingsCard>
 
-      <SettingsCard title="Text-to-Speech">
+      <SettingsCard title={t("settings.tts")}>
         <div className="space-y-3">
           <label className="flex items-center gap-2 cursor-pointer">
             <input
@@ -111,7 +113,7 @@ export function AppearanceSection(): JSX.Element {
               className="h-4 w-4 rounded border-zinc-300 text-zinc-700 focus:ring-zinc-400 dark:border-zinc-600"
             />
             <Mic className="h-4 w-4 text-zinc-400" aria-hidden="true" />
-            <span className="text-sm text-zinc-700 dark:text-zinc-300">Enable TTS in study mode</span>
+            <span className="text-sm text-zinc-700 dark:text-zinc-300">{t("settings.ttsEnabled")}</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input
@@ -121,14 +123,14 @@ export function AppearanceSection(): JSX.Element {
               disabled={!settings.ttsEnabled}
               className="h-4 w-4 rounded border-zinc-300 text-zinc-700 focus:ring-zinc-400 disabled:opacity-50 dark:border-zinc-600"
             />
-            <span className="text-sm text-zinc-700 dark:text-zinc-300">Auto-read cards</span>
+            <span className="text-sm text-zinc-700 dark:text-zinc-300">{t("settings.ttsAutoRead")}</span>
           </label>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-zinc-400 w-12">Speed</span>
+            <span className="text-xs text-zinc-400 w-12">{t("settings.ttsSpeed")}</span>
             <input
               type="range"
               min="0.5" max="2.0" step="0.1"
-              aria-label="TTS speed"
+              aria-label={t("settings.ttsSpeed")}
               value={settings.ttsSpeed}
               onChange={(e) => void updateSettings({ ttsSpeed: parseFloat(e.target.value) || 1.0 })}
               disabled={!settings.ttsEnabled}
