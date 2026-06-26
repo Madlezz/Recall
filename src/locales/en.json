@@ -378,7 +378,83 @@
     "noResults": "No results found"
   },
   "commandPalette": {
-    "placeholder": "Type a command or search...",
-    "noResults": "No results found."
+    "placeholder": "Type a command or search…",
+    "noResults": "No commands found",
+    "title": "Command Palette",
+    "commands": {
+      "dashboard": "Go to Dashboard",
+      "browser": "Open Card Browser",
+      "tags": "Manage Tags",
+      "stats": "Go to Stats",
+      "settings": "Go to Settings",
+      "review": "Start Review",
+      "themeLight": "Switch to Light Theme",
+      "themeDark": "Switch to Dark Theme",
+      "search": "Search Cards…"
+    },
+    "ariaSearch": "Command search",
+    "ariaCommands": "Commands",
+    "hints": {
+      "navigate": "navigate",
+      "select": "select",
+      "close": "close"
+    }
+  },
+  "cardBrowser": {
+    "title": "Card Browser",
+    "cardCount": "{{count}} cards",
+    "loading": "loading...",
+    "selectedCount": "{{count}} selected",
+    "searchPlaceholder": "Search front, back, hint, tags...",
+    "allDecks": "All decks",
+    "allStates": "All states",
+    "state": {
+      "new": "New",
+      "learning": "Learning",
+      "review": "Review",
+      "relearning": "Relearning"
+    },
+    "clear": "Clear",
+    "deleteSelectedTitle": "Delete selected cards?",
+    "deleteSelectedDescription": "This will permanently delete {{count}} card(s) and their review history.",
+    "delete": "Delete",
+    "deleteTrigger": "Delete ({{count}})",
+    "moveToDeck": "Move to deck...",
+    "add": "Add",
+    "set": "Set",
+    "remove": "Remove",
+    "tagToRemove": "tag to remove...",
+    "tagsPlaceholder": "tag1, tag2...",
+    "apply": "Apply",
+    "tag": "Tag",
+    "columns": {
+      "front": "Front",
+      "deck": "Deck",
+      "state": "State",
+      "nextReview": "Next Review",
+      "lapses": "Lapses",
+      "tags": "Tags"
+    },
+    "emptyState": "No cards yet — create a deck and add some cards to get started.",
+    "noMatches": "No cards match your current filters.",
+    "clearFilters": "Clear filters",
+    "empty": "(empty)",
+    "openDeck": "Open deck",
+    "openDeckForCard": "Open deck for card {{id}}",
+    "pagination": "Showing {{from}} to {{to}} of {{total}} cards",
+    "previous": "Previous",
+    "next": "Next",
+    "date": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "daysAgo": "{{count}}d ago",
+      "inDays": "in {{count}}d"
+    },
+    "toasts": {
+      "deleted": "Deleted {{count}} card(s)",
+      "moved": "Moved {{count}} card(s) to {{name}}",
+      "tagged": "Tagged {{count}} card(s)",
+      "untagged": "Untagged {{count}} card(s)"
+    }
   }
 }

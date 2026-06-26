@@ -1,4 +1,5 @@
 import { ArrowUpDown, ChevronLeft, ChevronRight, ExternalLink, Filter, PackageOpen, Search, Tag, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -6,21 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { ConfirmAction } from "@/components/confirm-action";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useCardBrowser, type SortField, type SortDir, STATE_LABELS, STATE_COLORS } from "./use-card-browser";
+import { useCardBrowser, type SortField, type SortDir, STATE_COLORS } from "./use-card-browser";
 import { useRecallStore } from "@/stores/recall-store";
 
 const PAGE_SIZE = 50;
-
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  const now = new Date();
-  const diffMs = d.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-  if (diffDays < 0) return `${Math.abs(diffDays)}d ago`;
-  if (diffDays === 0) return "Today";
-  if (diffDays === 1) return "Tomorrow";
-  return `in ${diffDays}d`;
-}
 
 interface SortHeaderProps {
   field: SortField;
@@ -88,6 +78,28 @@ export function CardBrowser(): JSX.Element {
     updateCard,
   } = useCardBrowser();
   const showDeck = useRecallStore((s) => s.showDeck);
+  const { t } = useTranslation();
+
+  function formatDate(iso: string): string {
+    const d = new Date(iso);
+    const now = new Date();
+    const diffMs = d.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays < 0) return t("cardBrowser.date.daysAgo", { count: Math.abs(diffDays) });
+    if (diffDays === 0) return t("cardBrowser.date.today");
+    if (diffDays === 1) return t("cardBrowser.date.tomorrow");
+    return t("cardBrowser.date.inDays", { count: diffDays });
+  }
+
+  function stateLabel(state: string): string {
+    switch (state) {
+      case "new": return t("cardBrowser.state.new");
+      case "learning": return t("cardBrowser.state.learning");
+      case "review": return t("cardBrowser.state.review");
+      case "relearning": return t("cardBrowser.state.relearning");
+      default: return state;
+    }
+  }
 
   async function bulkDelete() {
     const ids = [...selected];
@@ -98,7 +110,7 @@ export function CardBrowser(): JSX.Element {
         // continue
       }
     }
-    toast.success(`Deleted ${ids.length} card(s)`);
+    toast.success(t("cardBrowser.toasts.deleted", { count: ids.length }));
     clearSelection();
   }
 
@@ -115,7 +127,7 @@ export function CardBrowser(): JSX.Element {
     }
     if (moved > 0) {
       const name = deckMap.get(deckId)?.name ?? deckId;
-      toast.success(`Moved ${moved} card(s) to ${name}`);
+      toast.success(t("cardBrowser.toasts.moved", { count: moved, name }));
     }
     clearSelection();
   }
@@ -123,7 +135,7 @@ export function CardBrowser(): JSX.Element {
   async function applyBulkTags() {
     const tags = bulkTagInput
       .split(",")
-      .map((t) => t.trim())
+      .map((tag) => tag.trim())
       .filter(Boolean);
     if (tags.length === 0 && bulkTagMode !== "remove") return;
 
@@ -140,7 +152,7 @@ export function CardBrowser(): JSX.Element {
           newTags = tags;
         } else {
           const removeSet = new Set(tags);
-          newTags = card.tags.filter((t) => !removeSet.has(t));
+          newTags = card.tags.filter((tag) => !removeSet.has(tag));
         }
         await updateCard(id, { deckId: card.deckId, front: card.front, back: card.back, hint: card.hint, source: card.source, tags: newTags });
         updated++;
@@ -148,8 +160,10 @@ export function CardBrowser(): JSX.Element {
         // skip
       }
     }
-    const verb = bulkTagMode === "remove" ? "Untagged" : "Tagged";
-    toast.success(`${verb} ${updated} card(s)`);
+    const msg = bulkTagMode === "remove"
+      ? t("cardBrowser.toasts.untagged", { count: updated })
+      : t("cardBrowser.toasts.tagged", { count: updated });
+    toast.success(msg);
     setShowBulkTag(false);
     setBulkTagInput("");
     setBulkTagMode("add");
@@ -161,10 +175,9 @@ export function CardBrowser(): JSX.Element {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-normal">Card Browser</h1>
+          <h1 className="text-2xl font-semibold tracking-normal">{t("cardBrowser.title")}</h1>
           <p className="text-sm text-muted-foreground">
-            {totalCount} cards{loading && " · loading..."}
-            {selected.size > 0 && <> · {selected.size} selected</>}
+            {t("cardBrowser.cardCount", { count: totalCount })}{loading && ` · ${t("cardBrowser.loading")}`}{selected.size > 0 && <> · {t("cardBrowser.selectedCount", { count: selected.size })}</>}
           </p>
         </div>
       </div>
@@ -174,7 +187,7 @@ export function CardBrowser(): JSX.Element {
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search front, back, hint, tags..."
+            placeholder={t("cardBrowser.searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
@@ -184,10 +197,10 @@ export function CardBrowser(): JSX.Element {
         <Select value={deckFilter} onValueChange={setDeckFilter}>
           <SelectTrigger className="w-40">
             <Filter className="mr-2 h-3.5 w-3.5" />
-            <SelectValue placeholder="All decks" />
+            <SelectValue placeholder={t("cardBrowser.allDecks")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All decks</SelectItem>
+            <SelectItem value="all">{t("cardBrowser.allDecks")}</SelectItem>
             {decks.map((d) => (
               <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
             ))}
@@ -196,21 +209,21 @@ export function CardBrowser(): JSX.Element {
 
         <Select value={stateFilter} onValueChange={setStateFilter}>
           <SelectTrigger className="w-36">
-            <SelectValue placeholder="All states" />
+            <SelectValue placeholder={t("cardBrowser.allStates")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All states</SelectItem>
-            <SelectItem value="new">New</SelectItem>
-            <SelectItem value="learning">Learning</SelectItem>
-            <SelectItem value="review">Review</SelectItem>
-            <SelectItem value="relearning">Relearning</SelectItem>
+            <SelectItem value="all">{t("cardBrowser.allStates")}</SelectItem>
+            <SelectItem value="new">{t("cardBrowser.state.new")}</SelectItem>
+            <SelectItem value="learning">{t("cardBrowser.state.learning")}</SelectItem>
+            <SelectItem value="review">{t("cardBrowser.state.review")}</SelectItem>
+            <SelectItem value="relearning">{t("cardBrowser.state.relearning")}</SelectItem>
           </SelectContent>
         </Select>
 
         {(search || deckFilter !== "all" || stateFilter !== "all") && (
           <Button variant="ghost" size="sm" onClick={clearFilters}>
             <X className="mr-1 h-3.5 w-3.5" />
-            Clear
+            {t("cardBrowser.clear")}
           </Button>
         )}
       </div>
@@ -218,20 +231,20 @@ export function CardBrowser(): JSX.Element {
       {/* Bulk actions bar */}
       {selected.size > 0 && (
         <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-accent/40 p-3">
-          <span className="text-sm font-medium">{selected.size} selected</span>
+          <span className="text-sm font-medium">{t("cardBrowser.selectedCount", { count: selected.size })}</span>
           <div className="flex flex-wrap gap-2">
             <ConfirmAction
-              title="Delete selected cards?"
-              description={`This will permanently delete ${selected.size} card(s) and their review history.`}
-              actionLabel="Delete"
-              triggerLabel={`Delete (${selected.size})`}
+              title={t("cardBrowser.deleteSelectedTitle")}
+              description={t("cardBrowser.deleteSelectedDescription", { count: selected.size })}
+              actionLabel={t("cardBrowser.delete")}
+              triggerLabel={t("cardBrowser.deleteTrigger", { count: selected.size })}
               destructive
               onConfirm={bulkDelete}
             />
 
             <Select onValueChange={bulkMove}>
               <SelectTrigger className="h-8 w-40 text-xs">
-                <SelectValue placeholder="Move to deck..." />
+                <SelectValue placeholder={t("cardBrowser.moveToDeck")} />
               </SelectTrigger>
               <SelectContent>
                 {decks.map((d) => (
@@ -245,13 +258,13 @@ export function CardBrowser(): JSX.Element {
                 <Select value={bulkTagMode} onValueChange={(v) => setBulkTagMode(v as "add" | "set" | "remove")}>
                   <SelectTrigger className="h-8 w-20 text-xs"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="add">Add</SelectItem>
-                    <SelectItem value="set">Set</SelectItem>
-                    <SelectItem value="remove">Remove</SelectItem>
+                    <SelectItem value="add">{t("cardBrowser.add")}</SelectItem>
+                    <SelectItem value="set">{t("cardBrowser.set")}</SelectItem>
+                    <SelectItem value="remove">{t("cardBrowser.remove")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <Input
-                  placeholder={bulkTagMode === "remove" ? "tag to remove..." : "tag1, tag2..."}
+                  placeholder={bulkTagMode === "remove" ? t("cardBrowser.tagToRemove") : t("cardBrowser.tagsPlaceholder")}
                   value={bulkTagInput}
                   onChange={(e) => setBulkTagInput(e.target.value)}
                   className="h-8 w-40 text-xs"
@@ -261,16 +274,16 @@ export function CardBrowser(): JSX.Element {
                   }}
                   autoFocus
                 />
-                <Button size="sm" variant="ghost" onClick={() => void applyBulkTags()}>Apply</Button>
+                <Button size="sm" variant="ghost" onClick={() => void applyBulkTags()}>{t("cardBrowser.apply")}</Button>
               </div>
             ) : (
               <Button variant="outline" size="sm" onClick={() => setShowBulkTag(true)}>
-                <Tag className="mr-1 h-3.5 w-3.5" /> Tag
+                <Tag className="mr-1 h-3.5 w-3.5" /> {t("cardBrowser.tag")}
               </Button>
             )}
 
             <Button variant="ghost" size="sm" onClick={clearSelection}>
-              <X className="mr-1 h-3.5 w-3.5" /> Clear
+              <X className="mr-1 h-3.5 w-3.5" /> {t("cardBrowser.clear")}
             </Button>
           </div>
         </div>
@@ -289,12 +302,12 @@ export function CardBrowser(): JSX.Element {
                   className="h-4 w-4 rounded border-muted-foreground/30"
                 />
               </th>
-              <SortHeader field="front" label="Front" current={sortField} dir={sortDir} onClick={handleSort} />
-              <SortHeader field="deck" label="Deck" current={sortField} dir={sortDir} onClick={handleSort} />
-              <SortHeader field="state" label="State" current={sortField} dir={sortDir} onClick={handleSort} />
-              <SortHeader field="nextReview" label="Next Review" current={sortField} dir={sortDir} onClick={handleSort} />
-              <SortHeader field="lapses" label="Lapses" current={sortField} dir={sortDir} onClick={handleSort} />
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Tags</th>
+              <SortHeader field="front" label={t("cardBrowser.columns.front")} current={sortField} dir={sortDir} onClick={handleSort} />
+              <SortHeader field="deck" label={t("cardBrowser.columns.deck")} current={sortField} dir={sortDir} onClick={handleSort} />
+              <SortHeader field="state" label={t("cardBrowser.columns.state")} current={sortField} dir={sortDir} onClick={handleSort} />
+              <SortHeader field="nextReview" label={t("cardBrowser.columns.nextReview")} current={sortField} dir={sortDir} onClick={handleSort} />
+              <SortHeader field="lapses" label={t("cardBrowser.columns.lapses")} current={sortField} dir={sortDir} onClick={handleSort} />
+              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">{t("cardBrowser.columns.tags")}</th>
               <th className="w-10 px-3 py-2" />
             </tr>
           </thead>
@@ -312,12 +325,12 @@ export function CardBrowser(): JSX.Element {
                     </div>
                     <p className="text-sm font-medium text-muted-foreground">
                       {cards.length === 0
-                        ? "No cards yet — create a deck and add some cards to get started."
-                        : "No cards match your current filters."}
+                        ? t("cardBrowser.emptyState")
+                        : t("cardBrowser.noMatches")}
                     </p>
                     {(search || deckFilter !== "all" || stateFilter !== "all") && (
                       <Button variant="outline" size="sm" onClick={clearFilters}>
-                        Clear filters
+                        {t("cardBrowser.clearFilters")}
                       </Button>
                     )}
                   </div>
@@ -338,8 +351,8 @@ export function CardBrowser(): JSX.Element {
                       />
                     </td>
                     <td className="max-w-xs px-3 py-2">
-                      <div className="truncate font-medium">{card.front || <span className="italic text-muted-foreground">(empty)</span>}</div>
-                      <div className="truncate text-xs text-muted-foreground">{card.back || <span className="italic">(empty)</span>}</div>
+                      <div className="truncate font-medium">{card.front || <span className="italic text-muted-foreground">{t("cardBrowser.empty")}</span>}</div>
+                      <div className="truncate text-xs text-muted-foreground">{card.back || <span className="italic">{t("cardBrowser.empty")}</span>}</div>
                     </td>
                     <td className="px-3 py-2 whitespace-nowrap">
                       {deck ? (
@@ -350,7 +363,7 @@ export function CardBrowser(): JSX.Element {
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
                     </td>
-                    <td className="px-3 py-2 whitespace-nowrap"><Badge tone="warning" className={cn("text-xs", STATE_COLORS[card.state])}>{STATE_LABELS[card.state]}</Badge></td>
+                    <td className="px-3 py-2 whitespace-nowrap"><Badge tone="warning" className={cn("text-xs", STATE_COLORS[card.state])}>{stateLabel(card.state)}</Badge></td>
                     <td className="px-3 py-2 whitespace-nowrap text-xs text-muted-foreground">{formatDate(card.nextReviewDate)}</td>
                     <td className="px-3 py-2 whitespace-nowrap text-xs">
                       {card.lapses > 0 ? (
@@ -369,10 +382,10 @@ export function CardBrowser(): JSX.Element {
                     </td>
                     <td className="px-3 py-2">
                       <button
-                        aria-label={`Open deck for card ${card.id}`}
+                        aria-label={t("cardBrowser.openDeckForCard", { id: card.id })}
                         className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
                         onClick={() => showDeck?.(card.deckId)}
-                        title="Open deck"
+                        title={t("cardBrowser.openDeck")}
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
                       </button>
@@ -389,7 +402,7 @@ export function CardBrowser(): JSX.Element {
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-xs text-muted-foreground">
-            Showing {currentPage * PAGE_SIZE + 1} to {Math.min((currentPage + 1) * PAGE_SIZE, totalCount)} of {totalCount} cards
+            {t("cardBrowser.pagination", { from: currentPage * PAGE_SIZE + 1, to: Math.min((currentPage + 1) * PAGE_SIZE, totalCount), total: totalCount })}
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -400,7 +413,7 @@ export function CardBrowser(): JSX.Element {
               className="gap-1"
             >
               <ChevronLeft className="h-3.5 w-3.5" />
-              Previous
+              {t("cardBrowser.previous")}
             </Button>
             <span className="text-sm tabular-nums">
               {currentPage + 1} / {totalPages}
@@ -412,7 +425,7 @@ export function CardBrowser(): JSX.Element {
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               className="gap-1"
             >
-              Next
+              {t("cardBrowser.next")}
               <ChevronRight className="h-3.5 w-3.5" />
             </Button>
           </div>

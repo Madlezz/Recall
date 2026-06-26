@@ -1,5 +1,6 @@
 import { Home, LayoutGrid, Moon, Search, Settings, Sun, Tag, TrendingUp, Zap } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -30,34 +31,35 @@ export function CommandPalette(): JSX.Element {
   const setTheme = useRecallStore((s) => s.setTheme);
   const settings = useRecallStore((s) => s.settings);
   const activeStudy = useRecallStore((s) => s.activeStudy);
+  const { t } = useTranslation();
 
   const commands: Command[] = useMemo(() => [
-    { id: "dashboard", label: "Go to Dashboard", icon: Home, action: showDashboard },
-    { id: "browser", label: "Open Card Browser", icon: LayoutGrid, action: showBrowser },
-    { id: "tags", label: "Manage Tags", icon: Tag, action: showTags },
-    { id: "stats", label: "Go to Stats", icon: TrendingUp, action: showStats },
-    { id: "settings", label: "Go to Settings", icon: Settings, action: showSettings },
+    { id: "dashboard", label: t("commandPalette.commands.dashboard"), icon: Home, action: showDashboard },
+    { id: "browser", label: t("commandPalette.commands.browser"), icon: LayoutGrid, action: showBrowser },
+    { id: "tags", label: t("commandPalette.commands.tags"), icon: Tag, action: showTags },
+    { id: "stats", label: t("commandPalette.commands.stats"), icon: TrendingUp, action: showStats },
+    { id: "settings", label: t("commandPalette.commands.settings"), icon: Settings, action: showSettings },
     {
       id: "review",
-      label: "Start Review",
+      label: t("commandPalette.commands.review"),
       icon: Zap,
       shortcut: "R",
       action: () => startReview(),
     },
     {
       id: "theme",
-      label: settings.theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme",
+      label: settings.theme === "dark" ? t("commandPalette.commands.themeLight") : t("commandPalette.commands.themeDark"),
       icon: settings.theme === "dark" ? Sun : Moon,
       action: () => void setTheme(settings.theme === "dark" ? "light" as Theme : "dark" as Theme),
     },
     {
       id: "search",
-      label: "Search Cards…",
+      label: t("commandPalette.commands.search"),
       icon: Search,
       shortcut: "Ctrl+K",
       action: () => { showBrowser(); },
     },
-  ], [showDashboard, showBrowser, showTags, showStats, showSettings, startReview, setTheme, settings.theme]);
+  ], [showDashboard, showBrowser, showTags, showStats, showSettings, startReview, setTheme, settings.theme, t]);
 
   // Filter commands based on query
   const filtered = useMemo(() => {
@@ -124,7 +126,7 @@ export function CommandPalette(): JSX.Element {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="p-0 overflow-hidden" aria-describedby={undefined}>
-        <DialogTitle className="sr-only">Command Palette</DialogTitle>
+        <DialogTitle className="sr-only">{t("commandPalette.title")}</DialogTitle>
         <div className="flex items-center gap-3 border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
           <Search className="h-4 w-4 shrink-0 text-zinc-400" />
           <Input
@@ -132,19 +134,19 @@ export function CommandPalette(): JSX.Element {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type a command or search…"
+            placeholder={t("commandPalette.placeholder")}
             className="h-auto border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
-            aria-label="Command search"
+            aria-label={t("commandPalette.ariaSearch")}
           />
           <kbd className="hidden rounded border bg-zinc-100 px-1.5 py-0.5 text-[10px] font-mono text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500 sm:inline-block">
             Esc
           </kbd>
         </div>
 
-        <div ref={listRef} className="max-h-[300px] overflow-y-auto py-2" role="listbox" aria-label="Commands">
+        <div ref={listRef} className="max-h-[300px] overflow-y-auto py-2" role="listbox" aria-label={t("commandPalette.ariaCommands")}>
           {filtered.length === 0 && (
             <div className="px-4 py-6 text-center text-sm text-zinc-400">
-              No commands found
+              {t("commandPalette.noResults")}
             </div>
           )}
           {filtered.map((cmd, i) => {
@@ -177,13 +179,13 @@ export function CommandPalette(): JSX.Element {
 
         <div className="flex items-center gap-4 border-t border-zinc-200 px-4 py-2 dark:border-zinc-800">
           <span className="flex items-center gap-1 text-[10px] text-zinc-400">
-            <kbd className="rounded border bg-zinc-100 px-1 py-0.5 font-mono dark:bg-zinc-800">↑↓</kbd> navigate
+            <kbd className="rounded border bg-zinc-100 px-1 py-0.5 font-mono dark:bg-zinc-800">↑↓</kbd> {t("commandPalette.hints.navigate")}
           </span>
           <span className="flex items-center gap-1 text-[10px] text-zinc-400">
-            <kbd className="rounded border bg-zinc-100 px-1 py-0.5 font-mono dark:bg-zinc-800">↵</kbd> select
+            <kbd className="rounded border bg-zinc-100 px-1 py-0.5 font-mono dark:bg-zinc-800">↵</kbd> {t("commandPalette.hints.select")}
           </span>
           <span className="flex items-center gap-1 text-[10px] text-zinc-400">
-            <kbd className="rounded border bg-zinc-100 px-1 py-0.5 font-mono dark:bg-zinc-800">esc</kbd> close
+            <kbd className="rounded border bg-zinc-100 px-1 py-0.5 font-mono dark:bg-zinc-800">esc</kbd> {t("commandPalette.hints.close")}
           </span>
         </div>
       </DialogContent>

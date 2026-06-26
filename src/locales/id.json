@@ -378,7 +378,83 @@
     "noResults": "Tidak ada hasil"
   },
   "commandPalette": {
-    "placeholder": "Ketik perintah atau cari...",
-    "noResults": "Tidak ada hasil."
+    "placeholder": "Ketik perintah atau cari…",
+    "noResults": "Tidak ada perintah yang ditemukan",
+    "title": "Palet Perintah",
+    "commands": {
+      "dashboard": "Buka Dasbor",
+      "browser": "Buka Browser Kartu",
+      "tags": "Kelola Tag",
+      "stats": "Buka Statistik",
+      "settings": "Buka Pengaturan",
+      "review": "Mulai Ulangan",
+      "themeLight": "Ganti ke Tema Terang",
+      "themeDark": "Ganti ke Tema Gelap",
+      "search": "Cari Kartu…"
+    },
+    "ariaSearch": "Pencarian perintah",
+    "ariaCommands": "Perintah",
+    "hints": {
+      "navigate": "navigasi",
+      "select": "pilih",
+      "close": "tutup"
+    }
+  },
+  "cardBrowser": {
+    "title": "Browser Kartu",
+    "cardCount": "{{count}} kartu",
+    "loading": "memuat...",
+    "selectedCount": "{{count}} dipilih",
+    "searchPlaceholder": "Cari depan, belakang, petunjuk, tag...",
+    "allDecks": "Semua dek",
+    "allStates": "Semua status",
+    "state": {
+      "new": "Baru",
+      "learning": "Sedang dipelajari",
+      "review": "Ulangan",
+      "relearning": "Mempelajari ulang"
+    },
+    "clear": "Bersihkan",
+    "deleteSelectedTitle": "Hapus kartu yang dipilih?",
+    "deleteSelectedDescription": "Ini akan menghapus {{count}} kartu secara permanen beserta riwayat ulangannya.",
+    "delete": "Hapus",
+    "deleteTrigger": "Hapus ({{count}})",
+    "moveToDeck": "Pindahkan ke dek...",
+    "add": "Tambah",
+    "set": "Atur",
+    "remove": "Hapus",
+    "tagToRemove": "tag untuk dihapus...",
+    "tagsPlaceholder": "tag1, tag2...",
+    "apply": "Terapkan",
+    "tag": "Tag",
+    "columns": {
+      "front": "Depan",
+      "deck": "Dek",
+      "state": "Status",
+      "nextReview": "Ulangan Berikutnya",
+      "lapses": "Kegagalan",
+      "tags": "Tag"
+    },
+    "emptyState": "Belum ada kartu — buat dek dan tambahkan beberapa kartu untuk memulai.",
+    "noMatches": "Tidak ada kartu yang cocok dengan filter saat ini.",
+    "clearFilters": "Bersihkan filter",
+    "empty": "(kosong)",
+    "openDeck": "Buka dek",
+    "openDeckForCard": "Buka dek untuk kartu {{id}}",
+    "pagination": "Menampilkan {{from}} hingga {{to}} dari {{total}} kartu",
+    "previous": "Sebelumnya",
+    "next": "Berikutnya",
+    "date": {
+      "today": "Hari ini",
+      "tomorrow": "Besok",
+      "daysAgo": "{{count}}h lalu",
+      "inDays": "dalam {{count}}h"
+    },
+    "toasts": {
+      "deleted": "Menghapus {{count}} kartu",
+      "moved": "Memindahkan {{count}} kartu ke {{name}}",
+      "tagged": "Memberi tag pada {{count}} kartu",
+      "untagged": "Menghapus tag dari {{count}} kartu"
+    }
   }
 }
