@@ -1,5 +1,6 @@
 import { AlertCircle, ArrowLeft, BookOpen, Check, Clock, Edit3, EyeOff, RotateCcw, RotateCw, Timer, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { RichCard } from "@/components/RichCard";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { SessionSummaryModal } from "./study-mode/session-summary-modal";
 import { AnswerButton, CompletionStat } from "./study-mode/study-helpers";
 
 export function StudyMode(): JSX.Element {
+  const { t } = useTranslation();
   const activeStudy = useRecallStore((state) => state.activeStudy);
   const decks = useRecallStore((state) => state.decks);
   const settings = useRecallStore((state) => state.settings);
@@ -77,15 +79,15 @@ export function StudyMode(): JSX.Element {
       if (event.ctrlKey && event.key === "z" && !activeStudy.revealed && activeStudy.currentIndex > 0) {
         event.preventDefault();
         void undoLastReview().then((didUndo) => {
-          if (didUndo) toast.info("Review undone");
-          else toast.info("Nothing to undo");
+          if (didUndo) toast.info(t("study.reviewUndone"));
+          else toast.info(t("study.nothingToUndo"));
         });
         return;
       }
 
       if (!activeStudy.revealed) {
         if (event.key.toLowerCase() === "b") { event.preventDefault(); buryCard(); return; }
-        if (event.key.toLowerCase() === "s") { event.preventDefault(); void snoozeCard(120); toast.info("Snoozed for 2 hours"); return; }
+        if (event.key.toLowerCase() === "s") { event.preventDefault(); void snoozeCard(120); toast.info(t("study.snoozed")); return; }
         if (event.key.toLowerCase() === "t" && settings?.ttsEnabled) {
           event.preventDefault();
           if (isSpeaking) { stopSpeaking(); } else { speakText(card!.front, "en-US", settings.ttsSpeed); }
@@ -142,9 +144,9 @@ export function StudyMode(): JSX.Element {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
             <BookOpen className="h-7 w-7 text-zinc-400" />
           </div>
-          <h1 className="text-xl font-semibold text-zinc-800 dark:text-zinc-200">No active session</h1>
-          <p className="text-sm text-zinc-500">Start a study session from the dashboard or a deck.</p>
-          <Button className="mt-2" onClick={exitStudy}>Back to dashboard</Button>
+          <h1 className="text-xl font-semibold text-zinc-800 dark:text-zinc-200">{t("study.noActiveSession")}</h1>
+          <p className="text-sm text-zinc-500">{t("study.startSessionHint")}</p>
+          <Button className="mt-2" onClick={exitStudy}>{t("study.backToDashboard")}</Button>
         </div>
       </div>
     );
@@ -162,24 +164,24 @@ export function StudyMode(): JSX.Element {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
             <Check className="h-7 w-7 text-zinc-600 dark:text-zinc-400" />
           </div>
-          <h1 className="mt-5 text-2xl font-bold text-zinc-800 dark:text-zinc-200">Session complete</h1>
-          <p className="mt-1 text-sm text-zinc-500">{deck?.name ?? "All due cards"}</p>
+          <h1 className="mt-5 text-2xl font-bold text-zinc-800 dark:text-zinc-200">{t("study.sessionComplete")}</h1>
+          <p className="mt-1 text-sm text-zinc-500">{deck?.name ?? t("study.allDueCards")}</p>
 
           <div className="mt-6 grid grid-cols-5 gap-2">
-            <CompletionStat label="Cards" value={totalReviews} />
-            <CompletionStat label="Again" value={activeStudy.ratings.again} />
-            <CompletionStat label="Hard" value={activeStudy.ratings.hard} />
-            <CompletionStat label="Good" value={activeStudy.ratings.good} />
-            <CompletionStat label="Easy" value={activeStudy.ratings.easy} />
+            <CompletionStat label={t("study.cards")} value={totalReviews} />
+            <CompletionStat label={t("study.again")} value={activeStudy.ratings.again} />
+            <CompletionStat label={t("study.hard")} value={activeStudy.ratings.hard} />
+            <CompletionStat label={t("study.good")} value={activeStudy.ratings.good} />
+            <CompletionStat label={t("study.easy")} value={activeStudy.ratings.easy} />
           </div>
 
           <div className="mt-4 flex items-center justify-center gap-3 text-sm">
-            <span className="text-zinc-500">Accuracy</span>
+            <span className="text-zinc-500">{t("study.accuracy")}</span>
             <span className="font-bold tabular-nums text-zinc-800 dark:text-zinc-200">{accuracy}%</span>
           </div>
 
           <Button className="mt-6 w-full gap-2" onClick={exitStudy}>
-            <ArrowLeft className="h-4 w-4" /> Return
+            <ArrowLeft className="h-4 w-4" /> {t("study.return")}
           </Button>
         </div>
       </div>
@@ -194,9 +196,9 @@ export function StudyMode(): JSX.Element {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
             <AlertCircle className="h-7 w-7 text-zinc-400" />
           </div>
-          <h1 className="text-xl font-semibold text-zinc-800 dark:text-zinc-200">Card not found</h1>
-          <p className="text-sm text-zinc-500">This card may have been deleted or moved.</p>
-          <Button onClick={exitStudy}>Back to dashboard</Button>
+          <h1 className="text-xl font-semibold text-zinc-800 dark:text-zinc-200">{t("study.cardNotFound")}</h1>
+          <p className="text-sm text-zinc-500">{t("study.cardNotFoundHint")}</p>
+          <Button onClick={exitStudy}>{t("study.backToDashboard")}</Button>
         </div>
       </div>
     );
@@ -227,20 +229,20 @@ export function StudyMode(): JSX.Element {
 
       {/* Screen reader announcements */}
       <div className="sr-only" role="status" aria-live="polite">
-        Card {activeStudy.currentIndex + 1} of {total}.
-        {activeStudy.revealed ? "Answer revealed. Choose your rating." : "Press Space to reveal answer."}
+        {t("study.cardProgress", { answered: activeStudy.currentIndex + 1, total })}
+        {activeStudy.revealed ? t("study.answerRevealedSr") : t("study.pressSpaceSr")}
       </div>
 
       {/* Top bar */}
       <header className="flex items-center justify-between py-2">
-        <Button variant="ghost" size="sm" onClick={exitStudy} className="gap-1.5" aria-label="Exit study mode">
-          <ArrowLeft className="h-4 w-4" /> Exit
+        <Button variant="ghost" size="sm" onClick={exitStudy} className="gap-1.5" aria-label={t("study.exitStudyMode")}>
+          <ArrowLeft className="h-4 w-4" /> {t("study.exit")}
         </Button>
 
         <div className="flex items-center gap-4">
           {isTTSSupported() && settings?.ttsEnabled && (
             <button
-              aria-label={isSpeaking ? "Stop reading" : "Read card text aloud"}
+              aria-label={isSpeaking ? t("study.stopReading") : t("study.readAloud")}
               onClick={() => {
                 if (isSpeaking) {
                   stopSpeaking();
@@ -254,7 +256,7 @@ export function StudyMode(): JSX.Element {
                   ? "text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 animate-pulse"
                   : "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 dark:hover:text-zinc-300 dark:hover:bg-zinc-800"
               }`}
-              title="Read aloud (T)"
+              title={t("study.readAloudTitle")}
             >
               {isSpeaking ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
             </button>
@@ -268,7 +270,7 @@ export function StudyMode(): JSX.Element {
           <div className="text-sm font-medium tabular-nums text-zinc-600 dark:text-zinc-400">
             {activeStudy.currentIndex + 1} / {total}
           </div>
-          <div className="mt-1.5 h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100} aria-label={`Study progress: ${activeStudy.currentIndex} of ${total} cards`}>
+          <div className="mt-1.5 h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100} aria-label={t("study.studyProgress", { current: activeStudy.currentIndex, total })}>
             <div
               className="h-full rounded-full bg-zinc-500 transition-[width] duration-300 dark:bg-zinc-400"
               style={{ width: `${progress}%` }}
@@ -292,7 +294,7 @@ export function StudyMode(): JSX.Element {
               "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
             )}
           >
-            📅 {daysLeft <= 0 ? "Exam is today!" : daysLeft === 1 ? "Exam tomorrow — final push!" : `Exam in ${daysLeft} days`}
+            📅 {daysLeft <= 0 ? t("study.examToday") : daysLeft === 1 ? t("study.examTomorrow") : t("study.examInDays", { days: daysLeft })}
             {daysLeft <= 3 ? " ⚡" : ""}
           </div>
         );
@@ -304,17 +306,17 @@ export function StudyMode(): JSX.Element {
           <div className="study-card relative min-h-[380px]" data-revealed={activeStudy.revealed}>
             {/* Front */}
             <div className="study-card-face absolute inset-0 flex flex-col justify-center rounded-xl border border-zinc-200 bg-white p-10 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-              <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{deck?.name ?? "Review"}</p>
+              <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{deck?.name ?? t("study.review")}</p>
               <div className="mt-5 text-balance text-xl font-semibold leading-relaxed text-zinc-800 dark:text-zinc-200 sm:text-2xl">
                 <RichCard content={card.front} cardType={card.cardType} revealed={activeStudy.revealed} allowHtml={settings?.allowHtml} />
               </div>
               {card.hint && (
-                <p className="mt-6 text-sm text-zinc-400">Hint: {card.hint}</p>
+                <p className="mt-6 text-sm text-zinc-400">{t("study.hint")}: {card.hint}</p>
               )}
             </div>
             {/* Back */}
             <div className="study-card-face study-card-back absolute inset-0 flex flex-col justify-center rounded-xl border border-zinc-200 bg-white p-10 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-              <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Answer</p>
+              <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{t("study.answer")}</p>
               <div className="mt-5 text-balance text-xl font-semibold leading-relaxed text-zinc-800 dark:text-zinc-200 sm:text-2xl">
                 <RichCard content={card.back} isBack allowHtml={settings?.allowHtml} />
               </div>
@@ -328,23 +330,23 @@ export function StudyMode(): JSX.Element {
         {!activeStudy.revealed && activeStudy.currentIndex > 0 && (
           <Button
             variant="ghost" size="sm"
-            onClick={() => void undoLastReview().then((didUndo) => { if (didUndo) toast.info("Review undone"); else toast.info("Nothing to undo"); })}
+            onClick={() => void undoLastReview().then((didUndo) => { if (didUndo) toast.info(t("study.reviewUndone")); else toast.info(t("study.nothingToUndo")); })}
             className="gap-1.5"
           >
-            <RotateCcw className="h-3.5 w-3.5" /> Undo
+            <RotateCcw className="h-3.5 w-3.5" /> {t("study.undo")}
           </Button>
         )}
 
         {!activeStudy.revealed ? (
           <Button size="lg" onClick={() => { playFlipSound(); revealAnswer(); }} className="gap-2 min-w-[140px]">
-            <RotateCw className="h-4 w-4" /> Reveal
+            <RotateCw className="h-4 w-4" /> {t("study.reveal")}
           </Button>
         ) : (
           <>
-            <AnswerButton label="Again" keyHint="1" variant="again" interval={intervals?.again} onClick={() => { playAgainSound(); setRatingFlash("again"); void answerCurrentCard("again"); }} />
-            <AnswerButton label="Hard" keyHint="2" variant="hard" interval={intervals?.hard} onClick={() => { playHardSound(); setRatingFlash("hard"); void answerCurrentCard("hard"); }} />
-            <AnswerButton label="Good" keyHint="3" variant="good" interval={intervals?.good} onClick={() => { playCorrectSound(); setRatingFlash("good"); void answerCurrentCard("good"); }} />
-            <AnswerButton label="Easy" keyHint="4" variant="easy" interval={intervals?.easy} onClick={() => { playCorrectSound(); setRatingFlash("easy"); void answerCurrentCard("easy"); }} />
+            <AnswerButton label={t("study.again")} keyHint="1" variant="again" interval={intervals?.again} onClick={() => { playAgainSound(); setRatingFlash("again"); void answerCurrentCard("again"); }} />
+            <AnswerButton label={t("study.hard")} keyHint="2" variant="hard" interval={intervals?.hard} onClick={() => { playHardSound(); setRatingFlash("hard"); void answerCurrentCard("hard"); }} />
+            <AnswerButton label={t("study.good")} keyHint="3" variant="good" interval={intervals?.good} onClick={() => { playCorrectSound(); setRatingFlash("good"); void answerCurrentCard("good"); }} />
+            <AnswerButton label={t("study.easy")} keyHint="4" variant="easy" interval={intervals?.easy} onClick={() => { playCorrectSound(); setRatingFlash("easy"); void answerCurrentCard("easy"); }} />
           </>
         )}
 
@@ -354,8 +356,8 @@ export function StudyMode(): JSX.Element {
             card={card}
             deckId={card.deckId}
             trigger={
-              <Button variant="ghost" size="sm" className="gap-1.5" title="Edit this card (E)">
-                <Edit3 className="h-3.5 w-3.5" /> Edit
+              <Button variant="ghost" size="sm" className="gap-1.5" title={t("study.editCardTitle")}>
+                <Edit3 className="h-3.5 w-3.5" /> {t("study.edit")}
               </Button>
             }
           />
@@ -364,10 +366,10 @@ export function StudyMode(): JSX.Element {
         {!activeStudy.revealed && (
           <>
             <Button variant="ghost" size="sm" onClick={buryCard} className="gap-1.5">
-              <EyeOff className="h-3.5 w-3.5" /> Bury
+              <EyeOff className="h-3.5 w-3.5" /> {t("study.bury")}
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => { void snoozeCard(120); toast.info("Snoozed for 2 hours"); }} className="gap-1.5">
-              <Clock className="h-3.5 w-3.5" /> Snooze
+            <Button variant="ghost" size="sm" onClick={() => { void snoozeCard(120); toast.info(t("study.snoozed")); }} className="gap-1.5">
+              <Clock className="h-3.5 w-3.5" /> {t("study.snooze")}
             </Button>
           </>
         )}
