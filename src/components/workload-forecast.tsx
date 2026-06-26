@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { forecastDueByDay } from "@/lib/stats";
 import { cn } from "@/lib/utils";
 import type { Card } from "@/types";
@@ -9,6 +10,7 @@ interface WorkloadForecastProps {
 }
 
 export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): JSX.Element {
+  const { t } = useTranslation();
   const forecast = useMemo(() => forecastDueByDay(cards, days), [cards, days]);
 
   const totalPerDay = forecast.map((d) => d.due + d.newCount);
@@ -26,19 +28,19 @@ export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): J
   const totalNew = forecast.reduce((s, d) => s + d.newCount, 0);
 
   function formatDayLabel(dateStr: string, i: number): string {
-    if (i === 0) return "Today";
-    if (i === 1) return "Tomorrow";
+    if (i === 0) return t("workloadForecast.today");
+    if (i === 1) return t("workloadForecast.tomorrow");
     const d = new Date(dateStr + "T00:00:00");
-    if (i < 7) return d.toLocaleDateString("en", { weekday: "short" });
-    return d.toLocaleDateString("en", { month: "short", day: "numeric" });
+    if (i < 7) return d.toLocaleDateString(undefined, { weekday: "short" });
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
   }
 
   if (totalDue === 0) {
     return (
       <section>
-        <h3 className="mb-3 text-sm font-bold text-zinc-800 dark:text-zinc-200">Workload Forecast</h3>
+        <h3 className="mb-3 text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("workloadForecast.title")}</h3>
         <p className="text-sm text-zinc-400 py-6 text-center rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-          No cards scheduled yet. Start reviewing to see your workload forecast.
+          {t("workloadForecast.noSchedule")}
         </p>
       </section>
     );
@@ -47,10 +49,10 @@ export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): J
   return (
     <section>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Workload Forecast</h3>
+        <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("workloadForecast.title")}</h3>
         <div className="flex items-center gap-3 text-xs tabular-nums text-zinc-400">
-          <span>7-day avg: <strong className="text-zinc-700 dark:text-zinc-300">{avg7}</strong>/day</span>
-          <span>Total: <strong className="text-zinc-700 dark:text-zinc-300">{totalDue}</strong></span>
+          <span>{t("workloadForecast.sevenDayAvg", { count: avg7 })}</span>
+          <span>{t("workloadForecast.total", { count: totalDue })}</span>
         </div>
       </div>
 
@@ -106,9 +108,9 @@ export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): J
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block z-10">
                   <div className="bg-white border border-zinc-200 rounded px-2 py-1 text-xs whitespace-nowrap shadow-sm dark:bg-zinc-800 dark:border-zinc-700">
                     <div className="font-medium text-zinc-800 dark:text-zinc-200">{formatDayLabel(day.date, i)}</div>
-                    {day.due > 0 && <div className="text-zinc-500">{day.due} review</div>}
-                    {day.newCount > 0 && <div className="text-emerald-600 dark:text-emerald-400">{day.newCount} new</div>}
-                    {isHeaviest && <div className="text-amber-600 dark:text-amber-400 font-medium mt-0.5">⚡ Heaviest</div>}
+                    {day.due > 0 && <div className="text-zinc-500">{t("workloadForecast.reviewCount", { count: day.due })}</div>}
+                    {day.newCount > 0 && <div className="text-emerald-600 dark:text-emerald-400">{t("workloadForecast.newCount", { count: day.newCount })}</div>}
+                    {isHeaviest && <div className="text-amber-600 dark:text-amber-400 font-medium mt-0.5">{t("workloadForecast.heaviest")}</div>}
                   </div>
                 </div>
               </div>
@@ -120,26 +122,26 @@ export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): J
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-4 text-xs text-zinc-500">
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-sm bg-zinc-500 dark:bg-zinc-400" /> Review
+              <span className="h-2.5 w-2.5 rounded-sm bg-zinc-500 dark:bg-zinc-400" /> {t("workloadForecast.review")}
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-sm bg-emerald-500/70" /> New
+              <span className="h-2.5 w-2.5 rounded-sm bg-emerald-500/70" /> {t("workloadForecast.new")}
             </span>
             {heaviestIdx >= 0 && totalPerDay[heaviestIdx] > 0 && (
               <span className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-sm bg-amber-500" /> Heaviest
+                <span className="h-2.5 w-2.5 rounded-sm bg-amber-500" /> {t("workloadForecast.heaviest")}
               </span>
             )}
           </div>
           <div className="flex items-center gap-3 text-xs text-zinc-400">
             {totalNew > 0 && (
               <span className="flex items-center gap-1">
-                <span className="font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">{totalNew}</span> new
+                <span className="font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">{totalNew}</span> {t("workloadForecast.new")}
               </span>
             )}
             {forecast[0].due > 0 && (
               <span className="flex items-center gap-1">
-                <span className="font-bold text-zinc-700 dark:text-zinc-300 tabular-nums">{forecast[0].due}</span> due today
+                <span className="font-bold text-zinc-700 dark:text-zinc-300 tabular-nums">{forecast[0].due}</span> {t("workloadForecast.dueToday")}
               </span>
             )}
           </div>

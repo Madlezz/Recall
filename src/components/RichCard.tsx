@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
@@ -93,13 +94,14 @@ function preprocessContent(content: string): string {
 }
 
 export function RichCard({ content, isBack = false, cardType = "basic", revealed = true, allowHtml = false }: RichCardProps): JSX.Element {
+  const { t } = useTranslation();
   // Image occlusion cards
   if (cardType === "image-occlusion") {
     let occlusionData: ImageOcclusionData;
     try {
       occlusionData = JSON.parse(content) as ImageOcclusionData;
     } catch {
-      return <div className="text-red-500">Invalid image occlusion data</div>;
+      return <div className="text-red-500">{t("richCard.invalidOcclusion")}</div>;
     }
     return (
       <div className="w-full">

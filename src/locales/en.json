@@ -898,5 +898,47 @@
     "revealNext": "Reveal Next",
     "revealAll": "Reveal All",
     "revealed": "Revealed {{current}} of {{total}}"
+  },
+  "activityHeatmap": {
+    "heatmapAria": "Study activity heatmap",
+    "studyActivity": "Study Activity",
+    "dayStreak": "{{count}} day streak",
+    "reviewCount": "{{count}} reviews",
+    "reviewCount_one": "{{count}} review",
+    "reviewCount_other": "{{count}} reviews",
+    "less": "Less",
+    "more": "More",
+    "srSummary": "Study activity: {{total}} total reviews over {{days}} days in the past year. Average {{avg}} reviews per active day.",
+    "srLongestStreak": "Longest streak: {{count}} days."
+  },
+  "retentionForecast": {
+    "dueForecast": "Due Forecast",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "noSchedule": "No cards scheduled yet. Start reviewing to see your forecast.",
+    "cardsIn30Days": "{{count}} cards in 30 days",
+    "cardCount": "{{count}} cards",
+    "cardCount_one": "{{count}} card",
+    "cardCount_other": "{{count}} cards",
+    "dueToday": "due today"
+  },
+  "workloadForecast": {
+    "title": "Workload Forecast",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "noSchedule": "No cards scheduled yet. Start reviewing to see your workload forecast.",
+    "sevenDayAvg": "7-day avg: {{count}}/day",
+    "total": "Total: {{count}}",
+    "reviewCount": "{{count}} review",
+    "reviewCount_one": "{{count}} review",
+    "reviewCount_other": "{{count}} reviews",
+    "newCount": "{{count}} new",
+    "heaviest": "Heaviest",
+    "review": "Review",
+    "new": "New",
+    "dueToday": "due today"
+  },
+  "richCard": {
+    "invalidOcclusion": "Invalid image occlusion data"
   }
 }

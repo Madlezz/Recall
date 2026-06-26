@@ -898,5 +898,47 @@
     "revealNext": "Tampilkan Berikutnya",
     "revealAll": "Tampilkan Semua",
     "revealed": "Ditampilkan {{current}} dari {{total}}"
+  },
+  "activityHeatmap": {
+    "heatmapAria": "Peta aktivitas belajar",
+    "studyActivity": "Aktivitas Belajar",
+    "dayStreak": "Rentetan {{count}} hari",
+    "reviewCount": "{{count}} ulasan",
+    "reviewCount_one": "{{count}} ulasan",
+    "reviewCount_other": "{{count}} ulasan",
+    "less": "Sedikit",
+    "more": "Banyak",
+    "srSummary": "Aktivitas belajar: {{total}} total ulasan selama {{days}} hari dalam setahun terakhir. Rata-rata {{avg}} ulasan per hari aktif.",
+    "srLongestStreak": "Rentetan terpanjang: {{count}} hari."
+  },
+  "retentionForecast": {
+    "dueForecast": "Prakiraan Jatuh Tempo",
+    "today": "Hari ini",
+    "tomorrow": "Besok",
+    "noSchedule": "Belum ada kartu dijadwalkan. Mulai ulasan untuk melihat prakiraanmu.",
+    "cardsIn30Days": "{{count}} kartu dalam 30 hari",
+    "cardCount": "{{count}} kartu",
+    "cardCount_one": "{{count}} kartu",
+    "cardCount_other": "{{count}} kartu",
+    "dueToday": "jatuh tempo hari ini"
+  },
+  "workloadForecast": {
+    "title": "Prakiraan Beban Kerja",
+    "today": "Hari ini",
+    "tomorrow": "Besok",
+    "noSchedule": "Belum ada kartu dijadwalkan. Mulai ulasan untuk melihat prakiraan beban kerjamu.",
+    "sevenDayAvg": "Rata-rata 7 hari: {{count}}/hari",
+    "total": "Total: {{count}}",
+    "reviewCount": "{{count}} ulasan",
+    "reviewCount_one": "{{count}} ulasan",
+    "reviewCount_other": "{{count}} ulasan",
+    "newCount": "{{count}} baru",
+    "heaviest": "Terberat",
+    "review": "Ulasan",
+    "new": "Baru",
+    "dueToday": "jatuh tempo hari ini"
+  },
+  "richCard": {
+    "invalidOcclusion": "Data oklusi gambar tidak valid"
   }
 }

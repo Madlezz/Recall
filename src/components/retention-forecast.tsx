@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { getDueForecast } from "@/lib/stats";
 import type { Card } from "@/types";
 
@@ -7,6 +8,7 @@ interface RetentionForecastProps {
 }
 
 export function RetentionForecast({ cards }: RetentionForecastProps): JSX.Element {
+  const { t } = useTranslation();
   const forecast = useMemo(() => getDueForecast(cards, 30), [cards]);
   const maxCount = Math.max(...forecast.map((d) => d.count), 1);
 
@@ -14,10 +16,10 @@ export function RetentionForecast({ cards }: RetentionForecastProps): JSX.Elemen
     const d = new Date(dateStr + "T00:00:00");
     const today = new Date();
     const diff = Math.round((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    if (diff === 0) return "Today";
-    if (diff === 1) return "Tomorrow";
-    if (diff < 7) return d.toLocaleDateString("en", { weekday: "short" });
-    return d.toLocaleDateString("en", { month: "short", day: "numeric" });
+    if (diff === 0) return t("retentionForecast.today");
+    if (diff === 1) return t("retentionForecast.tomorrow");
+    if (diff < 7) return d.toLocaleDateString(undefined, { weekday: "short" });
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
   }
 
   const totalDue = forecast.reduce((sum, d) => sum + d.count, 0);
@@ -25,9 +27,9 @@ export function RetentionForecast({ cards }: RetentionForecastProps): JSX.Elemen
   if (totalDue === 0) {
     return (
       <section>
-        <h3 className="mb-3 text-sm font-bold text-zinc-800 dark:text-zinc-200">Due Forecast</h3>
+        <h3 className="mb-3 text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("retentionForecast.dueForecast")}</h3>
         <p className="text-sm text-zinc-400 py-6 text-center rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-          No cards scheduled yet. Start reviewing to see your forecast.
+          {t("retentionForecast.noSchedule")}
         </p>
       </section>
     );
@@ -36,8 +38,8 @@ export function RetentionForecast({ cards }: RetentionForecastProps): JSX.Elemen
   return (
     <section>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Due Forecast</h3>
-        <span className="text-xs tabular-nums text-zinc-400">{totalDue} cards in 30 days</span>
+        <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("retentionForecast.dueForecast")}</h3>
+        <span className="text-xs tabular-nums text-zinc-400">{t("retentionForecast.cardsIn30Days", { count: totalDue })}</span>
       </div>
 
       <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
@@ -48,14 +50,13 @@ export function RetentionForecast({ cards }: RetentionForecastProps): JSX.Elemen
             return (
               <div
                 key={day.date}
-                className="flex-1 relative group"
-                title={`${formatDate(day.date)}: ${day.count} cards`}
+                className="group relative flex-1 flex flex-col justify-end"
               >
                 <div
-                  className={`w-full rounded-sm transition-colors ${
+                  className={`w-full rounded-t-sm transition-colors ${
                     day.count > 0
                       ? isWeekend
-                        ? "bg-zinc-300 hover:bg-zinc-400 dark:bg-zinc-600 dark:hover:bg-zinc-500"
+                        ? "bg-zinc-400 hover:bg-zinc-500 dark:bg-zinc-500 dark:hover:bg-zinc-400"
                         : "bg-zinc-500 hover:bg-zinc-600 dark:bg-zinc-400 dark:hover:bg-zinc-300"
                       : "bg-zinc-100 dark:bg-zinc-800"
                   }`}
@@ -68,7 +69,7 @@ export function RetentionForecast({ cards }: RetentionForecastProps): JSX.Elemen
                 )}
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block z-10">
                   <span className="text-xs bg-white border border-zinc-200 text-zinc-700 px-2 py-1 rounded shadow-sm whitespace-nowrap dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-300">
-                    {formatDate(day.date)}: {day.count} card{day.count !== 1 ? "s" : ""}
+                    {formatDate(day.date)}: {t("retentionForecast.cardCount", { count: day.count })}
                   </span>
                 </div>
               </div>
@@ -78,8 +79,8 @@ export function RetentionForecast({ cards }: RetentionForecastProps): JSX.Elemen
 
         {forecast[0].count > 0 && (
           <p className="mt-6 text-center text-sm">
-            <span className="font-bold text-zinc-800 dark:text-zinc-200">{forecast[0].count} card{forecast[0].count !== 1 ? "s" : ""}</span>
-            <span className="text-zinc-500"> due today</span>
+            <span className="font-bold text-zinc-800 dark:text-zinc-200">{t("retentionForecast.cardCount", { count: forecast[0].count })}</span>
+            <span className="text-zinc-500"> {t("retentionForecast.dueToday")}</span>
           </p>
         )}
       </div>

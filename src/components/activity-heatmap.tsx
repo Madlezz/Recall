@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useRecallStore } from "@/stores/recall-store";
 
 interface DayData {
@@ -30,6 +31,7 @@ const LEVEL_OPACITY: Record<number, string> = {
 };
 
 export function ActivityHeatmap(): JSX.Element {
+  const { t } = useTranslation();
   const reviewLogs = useRecallStore((state) => state.reviewLogs);
 
   const heatmapData = useMemo(() => {
@@ -87,17 +89,17 @@ export function ActivityHeatmap(): JSX.Element {
   }, [heatmapData]);
 
   return (
-    <div role="region" aria-label="Study activity heatmap">
+    <div role="region" aria-label={t("activityHeatmap.heatmapAria")}>
       <div className="flex items-center justify-between mb-3">
-        <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Study Activity</span>
+        <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("activityHeatmap.studyActivity")}</span>
         <div className="flex items-center gap-3 text-xs tabular-nums text-zinc-400">
           {longestStreak > 0 && (
             <span className="text-zinc-500 dark:text-zinc-300">
-              {longestStreak} day streak
+              {t("activityHeatmap.dayStreak", { count: longestStreak })}
             </span>
           )}
           <span>
-            {totalReviews} review{totalReviews !== 1 ? "s" : ""}
+            {t("activityHeatmap.reviewCount", { count: totalReviews })}
           </span>
         </div>
       </div>
@@ -111,8 +113,8 @@ export function ActivityHeatmap(): JSX.Element {
                   <div
                     key={day.date}
                     className={`h-[11px] w-[11px] rounded-sm ${LEVEL_COLORS[day.level]} ${LEVEL_OPACITY[day.level]} ${day.level === 3 ? "ring-1 ring-emerald-600/30 dark:ring-emerald-400/30" : ""}`}
-                    title={`${day.date}: ${day.count} review${day.count !== 1 ? "s" : ""}`}
-                    aria-label={`${day.date}: ${day.count} review${day.count !== 1 ? "s" : ""}`}
+                    title={`${day.date}: ${t("activityHeatmap.reviewCount", { count: day.count })}`}
+                    aria-label={`${day.date}: ${t("activityHeatmap.reviewCount", { count: day.count })}`}
                   />
                 ))}
               </div>
@@ -122,18 +124,17 @@ export function ActivityHeatmap(): JSX.Element {
       </div>
 
       <div className="flex items-center gap-2 mt-3 text-[10px] text-zinc-400">
-        <span>Less</span>
+        <span>{t("activityHeatmap.less")}</span>
         {[0, 1, 2, 3].map((lvl) => (
           <div key={lvl} className={`h-[11px] w-[11px] rounded-sm ${LEVEL_COLORS[lvl]}`} />
         ))}
-        <span>More</span>
+        <span>{t("activityHeatmap.more")}</span>
       </div>
 
       {/* Screen reader summary */}
       <div className="sr-only" aria-live="polite">
-        Study activity: {totalReviews} total reviews over {daysStudied} days in the past year.
-        Average {avgPerDay} reviews per active day.
-        {longestStreak > 0 && ` Longest streak: ${longestStreak} days.`}
+        {t("activityHeatmap.srSummary", { total: totalReviews, days: daysStudied, avg: avgPerDay })}
+        {longestStreak > 0 && ` ${t("activityHeatmap.srLongestStreak", { count: longestStreak })}`}
       </div>
     </div>
   );
