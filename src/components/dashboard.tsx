@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ArrowRight, Beaker, FileSpreadsheet, Flame, Library, Plus, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { AnkiImportDialog } from "@/components/anki-import-dialog";
@@ -23,6 +24,7 @@ import { useRecallStore } from "@/stores/recall-store";
 import type { Deck } from "@/types";
 
 export function Dashboard(): JSX.Element {
+  const { t } = useTranslation();
   const decks = useRecallStore((state) => state.decks);
   const cards = useRecallStore((state) => state.cards);
   const reviewLogs = useRecallStore((state) => state.reviewLogs);
@@ -36,7 +38,7 @@ export function Dashboard(): JSX.Element {
 
   function handleStartReview(): void {
     if (!startReview(null)) {
-      toast.info("No cards due right now");
+      toast.info(t("dashboard.noCardsDue"));
     }
   }
 
@@ -61,34 +63,34 @@ export function Dashboard(): JSX.Element {
       {/* ── Hero ── */}
       <section className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">Spaced Repetition</p>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">{t("dashboard.subtitle")}</p>
           <h1 className="mt-2 text-[1.75rem] font-bold leading-tight tracking-tight text-zinc-900 dark:text-zinc-100">
-            Dashboard
+            {t("dashboard.title")}
           </h1>
           <p className="mt-2 max-w-lg text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-            Review what's due, keep your decks tidy, and stay focused — no accounts, no cloud, just your data.
+            {t("dashboard.description")}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button onClick={handleStartReview} className="gap-2" aria-label="Start reviewing due cards across all decks">
+          <Button onClick={handleStartReview} className="gap-2" aria-label={t("deck.startReview")}>
             <RotateCw className="h-4 w-4" aria-hidden="true" />
-            Start Review
+            {t("dashboard.startReview")}
           </Button>
           <DeckDialog
             trigger={
-              <Button variant="outline" className="gap-2" aria-label="Create a new deck">
+              <Button variant="outline" className="gap-2" aria-label={t("deck.createNewDeck")}>
                 <Plus className="h-4 w-4" aria-hidden="true" />
-                New Deck
+                {t("dashboard.newDeck")}
               </Button>
             }
           />
           <AnkiImportDialog />
-          <Button variant="outline" size="icon" onClick={() => setShowCsvImport(true)} title="CSV Import" aria-label="Import cards from CSV">
+          <Button variant="outline" size="icon" onClick={() => setShowCsvImport(true)} title={t("dashboard.csvImport")} aria-label={t("deck.importFromCsv")}>
             <FileSpreadsheet className="h-4 w-4" />
           </Button>
           <MarkdownImportDialog />
           <RecallImportDialog />
-          <Button variant="outline" size="icon" onClick={() => setShowCustomStudy(true)} title="Custom Study" aria-label="Custom study session">
+          <Button variant="outline" size="icon" onClick={() => setShowCustomStudy(true)} title={t("dashboard.customStudy")} aria-label={t("deck.customStudySession")}>
             <Beaker className="h-4 w-4" />
           </Button>
         </div>
@@ -132,9 +134,9 @@ export function Dashboard(): JSX.Element {
       {/* ── Decks ── */}
       <section>
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold tracking-tight text-zinc-800 dark:text-zinc-200">Your Decks</h2>
+          <h2 className="text-lg font-bold tracking-tight text-zinc-800 dark:text-zinc-200">{t("dashboard.yourDecks")}</h2>
           <div className="flex items-center gap-3">
-            <span className="text-xs tabular-nums text-zinc-400">{decks.length} total</span>
+            <span className="text-xs tabular-nums text-zinc-400">{t("dashboard.totalDecks", { count: decks.length })}</span>
             {/* Segmented sort */}
             <div className="flex rounded-md bg-zinc-100 p-0.5 dark:bg-zinc-800">
               {(["name", "due", "cards"] as const).map((s) => (
@@ -148,7 +150,7 @@ export function Dashboard(): JSX.Element {
                       : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200",
                   )}
                 >
-                  {s === "name" ? "Name" : s === "due" ? "Due" : "Cards"}
+                  {s === "name" ? t("dashboard.sortName") : s === "due" ? t("dashboard.sortDue") : t("dashboard.sortCards")}
                 </button>
               ))}
             </div>
@@ -175,18 +177,18 @@ export function Dashboard(): JSX.Element {
             <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
               <Library className="h-8 w-8 text-zinc-400" />
             </div>
-            <h3 className="text-xl font-bold tracking-tight text-zinc-800 dark:text-zinc-200">Your library is empty</h3>
+            <h3 className="text-xl font-bold tracking-tight text-zinc-800 dark:text-zinc-200">{t("dashboard.emptyTitle")}</h3>
             <p className="mt-2 max-w-sm text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-              Create your first deck and start building knowledge that sticks.
+              {t("dashboard.emptyDescription")}
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Button size="lg" onClick={() => setShowCreateDeck(true)} className="gap-2">
                 <Plus className="h-4 w-4" />
-                Create Deck
+                {t("dashboard.createDeck")}
               </Button>
               <Button size="lg" variant="outline" onClick={() => setShowCsvImport(true)} className="gap-2">
                 <ArrowRight className="h-4 w-4" />
-                Import Cards
+                {t("dashboard.importCards")}
               </Button>
             </div>
           </div>
@@ -216,6 +218,7 @@ interface DeckCardProps {
 }
 
 function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
+  const { t } = useTranslation();
   const cards = useRecallStore((state) => state.cards);
   const reviewLogs = useRecallStore((state) => state.reviewLogs);
   const leechThreshold = useRecallStore((state) => state.settings.leechThreshold);
@@ -246,7 +249,7 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
   return (
     <button
       onClick={onOpen}
-      aria-label={`Open deck: ${deck.name}. ${stats.due} cards due, ${stats.total} total, ${progress}% mastered.`}
+      aria-label={t("deck.openDeck", { name: deck.name, due: stats.due, total: stats.total, progress })}
       className="group relative flex flex-col rounded-lg border border-zinc-200 bg-white p-5 text-left transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
     >
       {/* Top row: name + arrow */}
@@ -266,12 +269,12 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
                       : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400",
                 )}
               >
-                📅 {examDays <= 0 ? "Today!" : examDays === 1 ? "Tomorrow" : `${examDays}d`}
+                📅 {examDays <= 0 ? t("deck.examToday") : examDays === 1 ? t("deck.examTomorrow") : t("deck.examDays", { count: examDays })}
               </span>
             )}
           </div>
           <p className="mt-1.5 line-clamp-1 text-xs text-zinc-500 dark:text-zinc-400">
-            {deck.description || "No description"}
+            {deck.description || t("deck.noDescription")}
           </p>
         </div>
         <ArrowRight className="h-4 w-4 shrink-0 text-zinc-300 transition-colors group-hover:text-zinc-500 dark:text-zinc-600 dark:group-hover:text-zinc-400" />
@@ -281,7 +284,7 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
       <div className="mt-4 space-y-1.5">
         <div className="flex items-center justify-between text-xs text-zinc-500">
           <span>
-            {stats.mastered}/{stats.total} mastered
+            {t("deck.mastered", { mastered: stats.mastered, total: stats.total })}
           </span>
           <span className="tabular-nums">{progress}%</span>
         </div>
@@ -290,35 +293,35 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
 
       {/* Metrics */}
       <div className="mt-3 grid grid-cols-3 gap-2">
-        <MiniStat label="Due" value={stats.due} accent={stats.due > 0} />
-        <MiniStat label="Accuracy" value={`${stats.accuracy}%`} />
-        <MiniStat label="Cards" value={stats.total} />
+        <MiniStat label={t("deck.due")} value={stats.due} accent={stats.due > 0} />
+        <MiniStat label={t("deck.accuracy")} value={`${stats.accuracy}%`} />
+        <MiniStat label={t("deck.cards")} value={stats.total} />
       </div>
 
       {/* Footer */}
       <div className="mt-3 flex items-center gap-3 border-t border-zinc-100 pt-3 text-xs dark:border-zinc-800">
-        <span className={cn("font-semibold tabular-nums", retentionColor)}>{health.retention}% retention</span>
+        <span className={cn("font-semibold tabular-nums", retentionColor)}>{t("deck.retention", { percent: health.retention })}</span>
         {health.leeches > 0 && (
           <span className="tabular-nums text-amber-600 dark:text-amber-400">
-            ⚠ {health.leeches} {health.leeches === 1 ? "leech" : "leeches"}
+            ⚠ {t("deck.leech", { count: health.leeches })}
           </span>
         )}
         {health.overdue > 0 && (
-          <span className="tabular-nums text-red-600 dark:text-red-400">{health.overdue} overdue</span>
+          <span className="tabular-nums text-red-600 dark:text-red-400">{t("deck.overdue", { count: health.overdue })}</span>
         )}
-        {stats.newCards > 0 && <span className="text-zinc-400 tabular-nums">{stats.newCards} new</span>}
-        {lastStudied && <span className="ml-auto text-zinc-400">{formatLastStudied(lastStudied)}</span>}
+        {stats.newCards > 0 && <span className="text-zinc-400 tabular-nums">{t("deck.newCards", { count: stats.newCards })}</span>}
+        {lastStudied && <span className="ml-auto text-zinc-400">{formatLastStudied(lastStudied, t)}</span>}
       </div>
     </button>
   );
 }
 
-function formatLastStudied(d: Date): string {
+function formatLastStudied(d: Date, t: (key: string, opts?: Record<string, unknown>) => string): string {
   const now = new Date();
   const diffDays = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
-  if (diffDays === 0) return "Today";
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffDays === 0) return t("deck.today");
+  if (diffDays === 1) return t("deck.yesterday");
+  if (diffDays < 7) return t("deck.daysAgo", { count: diffDays });
   return d.toLocaleDateString();
 }
 
@@ -347,6 +350,7 @@ function MiniStat({ label, value, accent }: { label: string; value: string | num
 // ═══════════════════════════════════════════════
 
 function StreakWidget(): JSX.Element {
+  const { t } = useTranslation();
   const reviewLogs = useRecallStore((state) => state.reviewLogs);
   const streak = useMemo(() => getStudyStreak(reviewLogs), [reviewLogs]);
 
@@ -361,13 +365,13 @@ function StreakWidget(): JSX.Element {
 
   return (
     <div className="flex flex-col items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 py-5 dark:border-zinc-800 dark:bg-zinc-900">
-      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">Streak</span>
+      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">{t("streak.title")}</span>
       <div className="mt-2 flex items-baseline gap-1">
         <Flame className={cn("h-5 w-5", flameColor)} />
         <span className={cn("text-3xl font-bold tabular-nums tracking-tight", flameColor)}>{streak}</span>
       </div>
       <span className="mt-1 text-xs text-zinc-400">
-        {streak === 0 ? "Study today!" : streak === 1 ? "1 day" : `${streak} days`}
+        {streak === 0 ? t("streak.studyToday") : streak === 1 ? t("streak.oneDay") : t("streak.days", { count: streak })}
       </span>
     </div>
   );
@@ -378,6 +382,7 @@ function StreakWidget(): JSX.Element {
 // ═══════════════════════════════════════════════
 
 function LevelTile(): JSX.Element {
+  const { t } = useTranslation();
   const settings = useRecallStore((state) => state.settings);
   const xp = settings.xp;
   const level = getLevel(xp);
@@ -386,7 +391,7 @@ function LevelTile(): JSX.Element {
 
   return (
     <div className="rounded-lg border border-zinc-200 bg-white px-4 py-5 dark:border-zinc-800 dark:bg-zinc-900">
-      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">Level {level}</span>
+      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">{t("level.label", { level })}</span>
       <div className="mt-1.5 text-lg font-bold tracking-tight text-zinc-800 dark:text-zinc-200">{title}</div>
       <div className="mt-3 h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
         <div
@@ -411,6 +416,7 @@ interface TodayBandProps {
 }
 
 function TodayBand({ dueCount, newCount, reviewedToday, onStartReview }: TodayBandProps): JSX.Element {
+  const { t } = useTranslation();
   return (
     <section className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-6">
@@ -418,21 +424,21 @@ function TodayBand({ dueCount, newCount, reviewedToday, onStartReview }: TodayBa
           <span className="text-3xl font-bold tabular-nums text-zinc-800 dark:text-zinc-100">
             {dueCount}
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">Due</span>
+          <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">{t("todayBand.due")}</span>
         </div>
         <div className="h-10 w-px bg-zinc-100 dark:bg-zinc-800" />
         <div className="flex flex-col">
           <span className="text-3xl font-bold tabular-nums text-zinc-400 dark:text-zinc-500">
             {newCount}
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">New</span>
+          <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">{t("todayBand.new")}</span>
         </div>
         <div className="h-10 w-px bg-zinc-100 dark:bg-zinc-800" />
         <div className="flex flex-col">
           <span className="text-3xl font-bold tabular-nums text-zinc-400 dark:text-zinc-500">
             {reviewedToday}
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">Reviewed</span>
+          <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">{t("todayBand.reviewed")}</span>
         </div>
       </div>
       <Button
@@ -440,10 +446,10 @@ function TodayBand({ dueCount, newCount, reviewedToday, onStartReview }: TodayBa
         onClick={onStartReview}
         className="gap-2"
         disabled={dueCount === 0}
-        aria-label="Start reviewing due cards"
+        aria-label={t("deck.startReview")}
       >
         <RotateCw className="h-5 w-5" />
-        {dueCount > 0 ? `Start Review (${dueCount})` : "All caught up"}
+        {dueCount > 0 ? t("dashboard.startReviewCount", { count: dueCount }) : t("dashboard.allCaughtUp")}
       </Button>
     </section>
   );

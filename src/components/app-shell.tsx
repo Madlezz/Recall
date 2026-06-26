@@ -1,5 +1,6 @@
 import { BookOpen, Home, LayoutGrid, Menu, Play, Settings, Shield, Star, Tag, Timer, TrendingUp, X, Zap } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { CommandPalette } from "@/components/command-palette";
 import { Button } from "@/components/ui/button";
 import { getDueTodayCount } from "@/lib/stats";
@@ -12,6 +13,7 @@ interface AppShellProps {
 }
 
 export function AppShell({ children }: AppShellProps): JSX.Element {
+  const { t } = useTranslation();
   const view = useRecallStore((state) => state.view);
   const decks = useRecallStore((state) => state.decks);
   const cards = useRecallStore((state) => state.cards);
@@ -49,7 +51,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-56 flex-col border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 lg:flex">
         {/* Logo */}
         <button
-          aria-label="Go to dashboard"
+          aria-label={t("nav.goToDashboard")}
           onClick={showDashboard}
           className="flex items-center gap-2.5 px-5 h-14 shrink-0"
         >
@@ -60,29 +62,29 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         </button>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-3 space-y-1" aria-label="Main navigation">
-          <NavButton active={view === "dashboard"} icon={Home} label="Dashboard" onClick={showDashboard} />
+        <nav className="flex-1 px-3 py-3 space-y-1" aria-label={t("nav.mainNav")}>
+          <NavButton active={view === "dashboard"} icon={Home} label={t("nav.dashboard")} onClick={showDashboard} />
           <NavButton 
             active={view === "study"} 
             icon={Play} 
-            label="Review" 
+            label={t("nav.review")} 
             onClick={() => startReview(null)}
             badge={dueCount > 0 ? dueCount : undefined}
           />
-          <NavButton active={view === "browser"} icon={LayoutGrid} label="Browser" onClick={showBrowser} />
-          <NavButton active={view === "tags"} icon={Tag} label="Tags" onClick={showTags} />
-          <NavButton active={view === "stats"} icon={TrendingUp} label="Stats" onClick={showStats} />
-          <NavButton active={view === "settings"} icon={Settings} label="Settings" onClick={showSettings} />
+          <NavButton active={view === "browser"} icon={LayoutGrid} label={t("nav.browser")} onClick={showBrowser} />
+          <NavButton active={view === "tags"} icon={Tag} label={t("nav.tags")} onClick={showTags} />
+          <NavButton active={view === "stats"} icon={TrendingUp} label={t("nav.stats")} onClick={showStats} />
+          <NavButton active={view === "settings"} icon={Settings} label={t("nav.settings")} onClick={showSettings} />
           
           {/* Tools section */}
           <div className="pt-3 pb-1 px-3">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Tools</span>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">{t("nav.tools")}</span>
           </div>
-          <NavButton active={false} icon={Timer} label="Focus Timer" onClick={showDashboard} />
+          <NavButton active={false} icon={Timer} label={t("nav.focusTimer")} onClick={showDashboard} />
           <NavButton
             active={view === "match"}
             icon={Zap}
-            label="Match Game"
+            label={t("nav.matchGame")}
             onClick={() => {
               const firstDeck = decks[0];
               if (firstDeck) startMatch(firstDeck.id);
@@ -97,12 +99,12 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         {/* Library stats */}
         <div className="px-5 py-3">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">Library</span>
-            <span className="text-[10px] tabular-nums text-zinc-400">{decks.length} decks</span>
+            <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">{t("library.title")}</span>
+            <span className="text-[10px] tabular-nums text-zinc-400">{t("library.decks", { count: decks.length })}</span>
           </div>
           <div className="flex items-center text-sm tabular-nums">
             <span className="font-semibold text-zinc-700 dark:text-zinc-300">{cards.length}</span>
-            <span className="ml-1.5 text-zinc-400">cards</span>
+            <span className="ml-1.5 text-zinc-400">{t("library.cards")}</span>
             {dueCount > 0 && (
               <span className="ml-auto flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400">
                 <Zap className="h-3 w-3" />
@@ -122,9 +124,9 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
           <button
             onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "?" }))}
             className="text-[10px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
-            aria-label="Show keyboard shortcuts"
+            aria-label={t("nav.showShortcuts")}
           >
-            Press ? for shortcuts
+            {t("nav.pressForShortcuts")}
           </button>
         </div>
       </aside>
@@ -132,7 +134,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
       {/* ── Mobile header ── */}
       <header className="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-200 bg-white/90 px-4 py-3 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/90 lg:hidden">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setMobileNavOpen(true)} aria-label="Open navigation">
+          <Button variant="ghost" size="icon" onClick={() => setMobileNavOpen(true)} aria-label={t("nav.openNav")}>
             <Menu className="h-5 w-5" />
           </Button>
           <button className="flex items-center gap-2 font-semibold text-sm" onClick={showDashboard}>
@@ -140,7 +142,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
             Recall
           </button>
         </div>
-        <Button variant="ghost" size="icon" onClick={showSettings} aria-label="Open settings">
+        <Button variant="ghost" size="icon" onClick={showSettings} aria-label={t("nav.openSettings")}>
           <Settings className="h-4 w-4" />
         </Button>
       </header>
@@ -155,32 +157,32 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
           />
           <div className="absolute inset-y-0 left-0 w-64 bg-white dark:bg-zinc-900 shadow-xl flex flex-col">
             <div className="flex items-center justify-between px-4 h-14 border-b border-zinc-200 dark:border-zinc-800">
-              <span className="font-semibold text-sm">Navigation</span>
-              <Button variant="ghost" size="icon" onClick={closeMobileNav} aria-label="Close navigation">
+              <span className="font-semibold text-sm">{t("nav.navigation")}</span>
+              <Button variant="ghost" size="icon" onClick={closeMobileNav} aria-label={t("nav.closeNav")}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <nav className="flex-1 px-3 py-3 space-y-1" aria-label="Mobile navigation">
-              <NavButton active={view === "dashboard"} icon={Home} label="Dashboard" onClick={() => handleNavClick(showDashboard)} />
+            <nav className="flex-1 px-3 py-3 space-y-1" aria-label={t("nav.mobileNav")}>
+              <NavButton active={view === "dashboard"} icon={Home} label={t("nav.dashboard")} onClick={() => handleNavClick(showDashboard)} />
               <NavButton 
                 active={view === "study"} 
                 icon={Play} 
-                label="Review" 
+                label={t("nav.review")} 
                 onClick={() => handleNavClick(() => startReview(null))}
                 badge={dueCount > 0 ? dueCount : undefined}
               />
-              <NavButton active={view === "browser"} icon={LayoutGrid} label="Browser" onClick={() => handleNavClick(showBrowser)} />
-              <NavButton active={view === "tags"} icon={Tag} label="Tags" onClick={() => handleNavClick(showTags)} />
-              <NavButton active={view === "stats"} icon={TrendingUp} label="Stats" onClick={() => handleNavClick(showStats)} />
-              <NavButton active={view === "settings"} icon={Settings} label="Settings" onClick={() => handleNavClick(showSettings)} />
+              <NavButton active={view === "browser"} icon={LayoutGrid} label={t("nav.browser")} onClick={() => handleNavClick(showBrowser)} />
+              <NavButton active={view === "tags"} icon={Tag} label={t("nav.tags")} onClick={() => handleNavClick(showTags)} />
+              <NavButton active={view === "stats"} icon={TrendingUp} label={t("nav.stats")} onClick={() => handleNavClick(showStats)} />
+              <NavButton active={view === "settings"} icon={Settings} label={t("nav.settings")} onClick={() => handleNavClick(showSettings)} />
               <div className="pt-3 pb-1 px-3">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Tools</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">{t("nav.tools")}</span>
               </div>
-              <NavButton active={false} icon={Timer} label="Focus Timer" onClick={() => handleNavClick(showDashboard)} />
+              <NavButton active={false} icon={Timer} label={t("nav.focusTimer")} onClick={() => handleNavClick(showDashboard)} />
               <NavButton
                 active={view === "match"}
                 icon={Zap}
-                label="Match Game"
+                label={t("nav.matchGame")}
                 onClick={() => handleNavClick(() => {
                   const firstDeck = decks[0];
                   if (firstDeck) startMatch(firstDeck.id);
@@ -242,6 +244,7 @@ function NavButton({ active, icon: Icon, label, onClick, badge }: NavButtonProps
 // ── LevelWidget ──
 
 function LevelWidget(): JSX.Element {
+  const { t } = useTranslation();
   const settings = useRecallStore((state) => state.settings);
   const level = getLevel(settings.xp);
   const title = getLevelTitle(level);
@@ -252,7 +255,7 @@ function LevelWidget(): JSX.Element {
     <div>
       <div className="flex items-center justify-between mb-1.5">
         <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">
-          Level {level}
+          {t("level.label", { level })}
         </span>
         <span className="text-[10px] text-zinc-400 tabular-nums">{settings.xp} XP</span>
       </div>
@@ -263,7 +266,7 @@ function LevelWidget(): JSX.Element {
       </div>
 
       {/* Progress bar */}
-      <div className="relative h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label={`Level ${level} progress: ${settings.xp} XP`}>
+      <div className="relative h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label={t("level.progress", { level, xp: settings.xp })}>
         <div
           className="absolute inset-y-0 left-0 rounded-full bg-zinc-700 transition-[width] duration-700 ease-out dark:bg-zinc-300"
           style={{ width: `${Math.round(progress * 100)}%` }}
