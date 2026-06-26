@@ -1,5 +1,6 @@
 import { Calendar, Play, Brain } from "lucide-react";
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -15,6 +16,7 @@ interface DeckHeaderSectionProps {
 }
 
 export function DeckHeaderSection({ deck, deckCards, onStudyNow }: DeckHeaderSectionProps): JSX.Element {
+  const { t } = useTranslation();
   const startMatch = useRecallStore((s) => s.startMatch);
   const setExamDeadline = useRecallStore((s) => s.setExamDeadline);
 
@@ -34,13 +36,13 @@ export function DeckHeaderSection({ deck, deckCards, onStudyNow }: DeckHeaderSec
   async function handleSetExamDeadline(): Promise<void> {
     if (!examDateInput) {
       await setExamDeadline(deck.id, null);
-      toast.success("Exam deadline removed");
+      toast.success(t("deckDetail.examDeadlineRemoved"));
       setShowExamPicker(false);
       return;
     }
     const deadline = new Date(examDateInput + "T23:59:59").toISOString();
     await setExamDeadline(deck.id, deadline);
-    toast.success(`Exam set for ${examDateInput}`);
+    toast.success(t("deckDetail.examSetFor", { date: examDateInput }));
     setShowExamPicker(false);
   }
 
@@ -50,17 +52,17 @@ export function DeckHeaderSection({ deck, deckCards, onStudyNow }: DeckHeaderSec
         <div className="max-w-3xl">
           <h1 className="text-3xl font-semibold tracking-normal">{deck.name}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            {deck.description || "No description"}
+            {deck.description || t("deckDetail.noDescription")}
           </p>
         </div>
         <div className="flex gap-2">
-          <Button size="lg" onClick={onStudyNow} aria-label="Start studying this deck">
+          <Button size="lg" onClick={onStudyNow} aria-label={t("deckDetail.studyNowAria")}>
             <Play className="h-4 w-4" aria-hidden="true" />
-            Study Now
+            {t("deckDetail.studyNow")}
           </Button>
-          <Button size="lg" variant="outline" onClick={() => startMatch(deck.id)} aria-label="Play match game with this deck">
+          <Button size="lg" variant="outline" onClick={() => startMatch(deck.id)} aria-label={t("deckDetail.matchGameAria")}>
             <Brain className="h-4 w-4" aria-hidden="true" />
-            Match Game
+            {t("deckDetail.matchGame")}
           </Button>
         </div>
       </div>
@@ -84,22 +86,22 @@ export function DeckHeaderSection({ deck, deckCards, onStudyNow }: DeckHeaderSec
           <Calendar className="h-4 w-4" />
           {examDays !== null
             ? examDays <= 0
-              ? "Exam today!"
+              ? t("deckDetail.examToday")
               : examDays === 1
-                ? "Exam tomorrow"
-                : `Exam in ${examDays} days`
-            : "Set exam date"}
+                ? t("deckDetail.examTomorrow")
+                : t("deckDetail.examInDays", { count: examDays })
+            : t("deckDetail.setExamDate")}
         </button>
         {examDays !== null && examDays <= 3 && (
           <span className="text-xs font-medium text-amber-400">
-            ⚡ Cram mode — all new cards unlocked
+            {t("deckDetail.cramMode")}
           </span>
         )}
       </div>
 
       {showExamPicker && (
-        <div id="exam-date-picker" className="flex items-center gap-2" role="group" aria-label="Exam date picker">
-          <label htmlFor="exam-date-input" className="sr-only">Exam date</label>
+        <div id="exam-date-picker" className="flex items-center gap-2" role="group" aria-label={t("deckDetail.examDatePicker")}>
+          <label htmlFor="exam-date-input" className="sr-only">{t("deckDetail.examDate")}</label>
           <input
             id="exam-date-input"
             type="date"
@@ -108,7 +110,7 @@ export function DeckHeaderSection({ deck, deckCards, onStudyNow }: DeckHeaderSec
             className="rounded-md border bg-background px-3 py-1.5 text-sm"
           />
           <Button size="sm" onClick={() => void handleSetExamDeadline()}>
-            Save
+            {t("deckDetail.save")}
           </Button>
           {deck.examDeadline && (
             <Button
@@ -119,7 +121,7 @@ export function DeckHeaderSection({ deck, deckCards, onStudyNow }: DeckHeaderSec
                 void handleSetExamDeadline();
               }}
             >
-              Remove
+              {t("deckDetail.remove")}
             </Button>
           )}
         </div>
@@ -129,7 +131,7 @@ export function DeckHeaderSection({ deck, deckCards, onStudyNow }: DeckHeaderSec
       <div className="max-w-xl space-y-2">
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>
-            {stats.mastered}/{stats.total} mastered
+            {t("deckDetail.masteredProgress", { mastered: stats.mastered, total: stats.total })}
           </span>
           <span>{progress}%</span>
         </div>

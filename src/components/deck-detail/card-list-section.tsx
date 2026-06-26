@@ -1,4 +1,5 @@
 import { Search, Trash2, CheckSquare, Square, X, FileText, Plus, BookOpen } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -48,13 +49,14 @@ export function CardListSection({
   onBulkDelete,
   onBulkAdd,
 }: CardListSectionProps): JSX.Element {
+  const { t } = useTranslation();
   return (
     <section className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Cards</h2>
+          <h2 className="text-lg font-semibold">{t("deckDetail.cards")}</h2>
           <p className="text-sm text-muted-foreground">
-            Search, edit, or move cards inside this deck.
+            {t("deckDetail.cardsDescription")}
           </p>
         </div>
         <div className="flex gap-2">
@@ -63,13 +65,13 @@ export function CardListSection({
             trigger={
               <Button>
                 <Plus className="h-4 w-4" />
-                Add Card
+                {t("cardDialog.addCard")}
               </Button>
             }
           />
           <Button variant="outline" onClick={onBulkAdd}>
             <FileText className="h-4 w-4" />
-            Bulk Add
+            {t("deckDetail.bulkAdd")}
           </Button>
         </div>
       </div>
@@ -81,7 +83,7 @@ export function CardListSection({
           className="pl-9"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search cards"
+          placeholder={t("deckDetail.searchCards")}
         />
       </div>
 
@@ -94,32 +96,32 @@ export function CardListSection({
             ) : (
               <Square className="h-4 w-4" />
             )}
-            {selectedCardIds.size === filteredCards.length ? "Deselect All" : "Select All"}
+            {selectedCardIds.size === filteredCards.length ? t("deckDetail.deselectAll") : t("deckDetail.selectAll")}
           </Button>
           {selectedCardIds.size > 0 && (
             <>
               <span className="text-sm text-muted-foreground">
-                {selectedCardIds.size} selected
+                {t("deckDetail.selectedCount", { count: selectedCardIds.size })}
               </span>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" size="sm">
                     <Trash2 className="h-4 w-4" />
-                    Delete Selected
+                    {t("deckDetail.deleteSelected")}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete selected cards?</AlertDialogTitle>
+                    <AlertDialogTitle>{t("deckDetail.deleteSelectedTitle")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will permanently delete {selectedCardIds.size} card{selectedCardIds.size > 1 ? "s" : ""}. This action cannot be undone.
+                      {t("deckDetail.deleteSelectedDescription", { count: selectedCardIds.size })}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel>{t("confirmAction.cancel")}</AlertDialogCancel>
                     <AlertDialogAction asChild>
                       <Button variant="destructive" onClick={() => void onBulkDelete()}>
-                        Delete
+                        {t("deckDetail.delete")}
                       </Button>
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -133,7 +135,7 @@ export function CardListSection({
       {/* Tag filter */}
       {allTags.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-muted-foreground">Filter by tag:</span>
+          <span className="text-xs font-medium text-muted-foreground">{t("deckDetail.filterByTag")}</span>
           {allTags.map((tag) => (
             <button
               key={tag}
@@ -159,10 +161,9 @@ export function CardListSection({
             <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-muted/60">
               <BookOpen className="h-8 w-8 text-muted-foreground/60" />
             </div>
-            <h3 className="text-lg font-semibold">This deck is empty</h3>
+            <h3 className="text-lg font-semibold">{t("deckDetail.deckEmpty")}</h3>
             <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              Add flashcards to start learning. Use the Add Card button above, or try Markdown and
-              LaTeX for rich content.
+              {t("deckDetail.deckEmptyDescription")}
             </p>
           </div>
         ) : (
@@ -170,9 +171,9 @@ export function CardListSection({
             <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-muted/60">
               <Search className="h-8 w-8 text-muted-foreground/60" />
             </div>
-            <h3 className="text-lg font-semibold">No matches</h3>
+            <h3 className="text-lg font-semibold">{t("deckDetail.noMatches")}</h3>
             <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              Try a different search term or clear the tag filter.
+              {t("deckDetail.noMatchesDescription")}
             </p>
           </div>
         )

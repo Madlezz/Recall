@@ -1,5 +1,6 @@
 import { CheckSquare, Square } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -20,6 +21,7 @@ interface CardRowProps {
 }
 
 export function CardRow({ card, deckId, isSelected, onToggle }: CardRowProps): JSX.Element {
+  const { t } = useTranslation();
   const [isDeleting, setIsDeleting] = useState(false);
   const deleteCard = useRecallStore((s) => s.deleteCard);
   const leechThreshold = useRecallStore((s) => s.settings.leechThreshold);
@@ -29,9 +31,9 @@ export function CardRow({ card, deckId, isSelected, onToggle }: CardRowProps): J
     setIsDeleting(true);
     try {
       await deleteCard(card.id);
-      toast.success("Card deleted");
+      toast.success(t("deckDetail.cardDeleted"));
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not delete card");
+      toast.error(error instanceof Error ? error.message : t("deckDetail.cardDeleteFailed"));
     } finally {
       setIsDeleting(false);
     }
@@ -51,7 +53,7 @@ export function CardRow({ card, deckId, isSelected, onToggle }: CardRowProps): J
             <button
               onClick={() => onToggle(card.id)}
               className="flex h-5 w-5 items-center justify-center rounded border border-input transition-colors hover:bg-muted"
-              aria-label={isSelected ? "Deselect card" : "Select card"}
+              aria-label={isSelected ? t("deckDetail.deselectCard") : t("deckDetail.selectCard")}
             >
               {isSelected ? (
                 <CheckSquare className="h-4 w-4 text-primary" />
@@ -73,9 +75,9 @@ export function CardRow({ card, deckId, isSelected, onToggle }: CardRowProps): J
             {isLeech && (
               <Badge
                 tone="warning"
-                title={`Failed ${card.lapses} times (threshold: ${leechThreshold}). Consider rewriting this card.`}
+                title={t("deckDetail.leechTitle", { lapses: card.lapses, threshold: leechThreshold })}
               >
-                ⚠️ Leech
+                {t("deckDetail.leech")}
               </Badge>
             )}
             {card.tags.map((tag) => (
@@ -96,7 +98,7 @@ export function CardRow({ card, deckId, isSelected, onToggle }: CardRowProps): J
               {card.back}
             </ReactMarkdown>
           </div>
-          {card.hint && <p className="mt-2 text-xs text-muted-foreground">Hint: {card.hint}</p>}
+          {card.hint && <p className="mt-2 text-xs text-muted-foreground">{t("deckDetail.hintLabel")}: {card.hint}</p>}
         </div>
 
         {/* Actions */}
@@ -104,10 +106,10 @@ export function CardRow({ card, deckId, isSelected, onToggle }: CardRowProps): J
           <CardDialog
             deckId={deckId}
             card={card}
-            trigger={<Button variant="outline">Edit</Button>}
+            trigger={<Button variant="outline">{t("deckDetail.edit")}</Button>}
           />
           <Button variant="ghost" onClick={() => void handleDelete()} disabled={isDeleting}>
-            Delete
+            {t("deckDetail.delete")}
           </Button>
         </div>
       </div>
