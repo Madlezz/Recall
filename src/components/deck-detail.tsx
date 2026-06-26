@@ -13,6 +13,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { StatTile } from "@/components/stat-tile";
@@ -38,6 +39,7 @@ import { DeckHeaderSection } from "./deck-detail/deck-header-section";
 import { CardListSection } from "./deck-detail/card-list-section";
 
 export function DeckDetail(): JSX.Element {
+  const { t } = useTranslation();
   const selectedDeckId = useRecallStore((s) => s.selectedDeckId);
   const deck = useRecallStore((s) => s.decks.find((d) => d.id === selectedDeckId));
   const cards = useRecallStore((s) => s.cards);
@@ -85,9 +87,9 @@ export function DeckDetail(): JSX.Element {
   if (!deck) {
     return (
       <div className="rounded-lg border border-dashed p-10 text-center">
-        <h1 className="font-semibold">Deck not found</h1>
+        <h1 className="font-semibold">{t("deckDetail.notFound")}</h1>
         <Button className="mt-4" onClick={showDashboard}>
-          Back to dashboard
+          {t("deckDetail.backToDashboard")}
         </Button>
       </div>
     );
@@ -99,14 +101,14 @@ export function DeckDetail(): JSX.Element {
 
   function handleStudyNow(): void {
     if (!startReview(currentDeckId)) {
-      toast.info("No cards due in this deck");
+      toast.info(t("deckDetail.noCardsDue"));
     }
   }
 
   async function handleExport(): Promise<void> {
     const json = exportDeckToJson(d, deckCards);
     const ok = await downloadFile(`${d.name.replace(/\s+/g, "_")}.json`, json);
-    if (ok) toast.success("Deck exported");
+    if (ok) toast.success(t("deckDetail.deckExported"));
   }
 
   async function handleExportRecall(): Promise<void> {
@@ -115,13 +117,13 @@ export function DeckDetail(): JSX.Element {
       const saved = await saveRecallPackage(json, d.name);
       if (saved) {
         if (imageReport.warnings.length > 0) {
-          toast.warning(`Deck exported as .recall package (${imageReport.warnings[0]})`);
+          toast.warning(t("deckDetail.exportedRecallWithWarning", { warning: imageReport.warnings[0] }));
         } else {
-          toast.success("Deck exported as .recall package");
+          toast.success(t("deckDetail.exportedRecall"));
         }
       }
     } catch {
-      toast.error("Could not export .recall package");
+      toast.error(t("deckDetail.exportRecallFailed"));
     }
   }
 
@@ -146,7 +148,7 @@ export function DeckDetail(): JSX.Element {
     const count = selectedCardIds.size;
     await deleteCards(Array.from(selectedCardIds));
     setSelectedCardIds(new Set());
-    toast.success(`Deleted ${count} card${count > 1 ? "s" : ""}`);
+    toast.success(t("deckDetail.cardsDeleted", { count }));
   }
 
   function handleOptimizeDeck(): void {
@@ -157,9 +159,9 @@ export function DeckDetail(): JSX.Element {
         desiredRetention: result.suggestedRetention,
         fsrsWeights: result.weights,
       });
-      toast.success(`Optimized for ${d.name}: ${formatOptimizationResult(result)}`);
+      toast.success(t("deckDetail.optimizedFor", { name: d.name, result: formatOptimizationResult(result) }));
     } else {
-      toast.error(`Optimize ${d.name}: ${formatOptimizationResult(result)}`);
+      toast.error(t("deckDetail.optimizeFailed", { name: d.name, result: formatOptimizationResult(result) }));
     }
   }
 
@@ -167,9 +169,9 @@ export function DeckDetail(): JSX.Element {
     <div className="animate-fade-in space-y-7">
       {/* Top bar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Button variant="ghost" onClick={showDashboard} aria-label="Back to dashboard">
+        <Button variant="ghost" onClick={showDashboard} aria-label={t("deckDetail.backToDashboard")}>
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-          Dashboard
+          {t("dashboard.title")}
         </Button>
         <div className="flex flex-wrap gap-2">
           <DeckDialog
@@ -177,69 +179,69 @@ export function DeckDetail(): JSX.Element {
             trigger={
               <Button variant="outline">
                 <Edit3 className="h-4 w-4" aria-hidden="true" />
-                Edit
+                {t("deckDetail.edit")}
               </Button>
             }
           />
           <Button variant="outline" onClick={handleExport}>
             <Download className="h-4 w-4" aria-hidden="true" />
-            Export JSON
+            {t("deckDetail.exportJson")}
           </Button>
           <Button variant="outline" onClick={() => void handleExportRecall()}>
             <PackageOpen className="h-4 w-4" aria-hidden="true" />
-            Export .recall
+            {t("deckDetail.exportRecall")}
           </Button>
           <Button
             variant="outline"
             onClick={() => setQualityWarnings(checkDeckQuality(deckCards).warnings)}
           >
             <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-            Check Quality
+            {t("deckDetail.checkQuality")}
           </Button>
           <Button
             variant="outline"
             onClick={handleOptimizeDeck}
-            title="Optimize FSRS spacing for this deck based on review history"
+            title={t("deckDetail.optimizeTitle")}
           >
             <TrendingUp className="h-4 w-4" aria-hidden="true" />
-            Optimize
+            {t("deckDetail.optimize")}
           </Button>
           <Button variant="outline" onClick={() => setShowCustomStudy(true)}>
             <Beaker className="h-4 w-4" aria-hidden="true" />
-            Custom Study
+            {t("deckDetail.customStudy")}
           </Button>
           <Button variant="outline" onClick={() => setShowCsvImport(true)}>
             <FileSpreadsheet className="h-4 w-4" aria-hidden="true" />
-            CSV Import
+            {t("deckDetail.csvImport")}
           </Button>
           <MarkdownImportDialog deckId={currentDeckId} />
           <RecallImportDialog deckId={currentDeckId} />
           <ConfirmAction
-            title="Reset progress?"
-            description="This resets all cards in this deck back to 'new' state. Card content is kept, but all review history and scheduling data is cleared."
-            actionLabel="Reset progress"
-            triggerLabel="Reset"
+            title={t("deckDetail.resetProgressTitle")}
+            description={t("deckDetail.resetProgressDescription")}
+            actionLabel={t("deckDetail.resetProgress")}
+            triggerLabel={t("deckDetail.reset")}
             onConfirm={async () => {
               try {
                 await resetDeckProgress(currentDeckId);
-                toast.success("Deck progress reset");
+                toast.success(t("deckDetail.progressReset"));
               } catch (error) {
-                toast.error(error instanceof Error ? error.message : "Could not reset deck progress");
+                toast.error(error instanceof Error ? error.message : t("deckDetail.progressResetFailed"));
               }
             }}
           />
           <ConfirmAction
-            title="Delete deck?"
-            description="This permanently deletes the deck and all cards inside it."
-            actionLabel="Delete deck"
-            triggerLabel="Delete"
+            title={t("deckDetail.deleteDeckTitle")}
+            description={t("deckDetail.deleteDeckDescription")}
+            actionLabel={t("deckDetail.deleteDeck")}
+            triggerLabel={t("deckDetail.delete")}
             destructive
             onConfirm={async () => {
               try {
                 await deleteDeck(currentDeckId);
-                toast.success("Deck deleted");
+                toast.success(t("deckDetail.deckDeleted"));
               } catch (error) {
-                toast.error(error instanceof Error ? error.message : "Could not delete deck");
+                toast.error(error instanceof Error ? error.message : t("deckDetail.deckDeleteFailed"));
               }
             }}
           />
@@ -251,10 +253,10 @@ export function DeckDetail(): JSX.Element {
 
       {/* Stat tiles */}
       <section className="grid gap-3 sm:grid-cols-4">
-        <StatTile icon={Play} label="Due" value={String(stats.due)} />
-        <StatTile icon={BookOpen} label="New" value={String(stats.newCards)} />
-        <StatTile icon={Brain} label="Learning" value={String(stats.learning)} />
-        <StatTile icon={RefreshCw} label="Review" value={String(stats.review)} />
+        <StatTile icon={Play} label={t("deckDetail.due")} value={String(stats.due)} />
+        <StatTile icon={BookOpen} label={t("deckDetail.new")} value={String(stats.newCards)} />
+        <StatTile icon={Brain} label={t("deckDetail.learning")} value={String(stats.learning)} />
+        <StatTile icon={RefreshCw} label={t("deckDetail.review")} value={String(stats.review)} />
       </section>
 
       {/* Quality warnings */}
@@ -263,15 +265,15 @@ export function DeckDetail(): JSX.Element {
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold">
               {qualityWarnings.length === 0 ? (
-                <span className="text-green-400">✅ All {deckCards.length} cards look great!</span>
+                <span className="text-green-400">{t("deckDetail.allCardsGreat", { count: deckCards.length })}</span>
               ) : (
                 <span className="text-amber-400">
-                  ⚠️ {qualityWarnings.length} issue{qualityWarnings.length > 1 ? "s" : ""} found
+                  {t("deckDetail.issuesFound", { count: qualityWarnings.length })}
                 </span>
               )}
             </h3>
             <Button variant="ghost" size="sm" onClick={() => setQualityWarnings(null)}>
-              Dismiss
+              {t("deckDetail.dismiss")}
             </Button>
           </div>
           {qualityWarnings.map((warning) => (
