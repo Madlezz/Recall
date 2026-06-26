@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +28,7 @@ interface DeckDialogProps {
 }
 
 export function DeckDialog({ deck, trigger, open: controlledOpen, onOpenChange }: DeckDialogProps): JSX.Element {
+  const { t } = useTranslation();
   const [internalOpen, setInternalOpen] = useState(false);
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const handleOpenChange = controlledOpen !== undefined ? onOpenChange! : setInternalOpen;
@@ -49,23 +51,23 @@ export function DeckDialog({ deck, trigger, open: controlledOpen, onOpenChange }
     event.preventDefault();
 
     if (!name.trim()) {
-      toast.error("Deck name cannot be empty");
+      toast.error(t("deckDialog.nameEmpty"));
       return;
     }
 
     try {
       if (deck) {
         await updateDeck(deck.id, { name: name.trim(), description, color });
-        toast.success(`Deck "${name.trim()}" updated`);
+        toast.success(t("deckDialog.updated", { name: name.trim() }));
       } else {
         const deckId = await createDeck({ name: name.trim(), description, color });
         showDeck(deckId);
-        toast.success(`Deck "${name.trim()}" created`);
+        toast.success(t("deckDialog.created", { name: name.trim() }));
       }
       handleOpenChange(false);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error";
-      toast.error(`Could not save deck: ${message}`);
+      const message = error instanceof Error ? error.message : t("deckDialog.unknownError");
+      toast.error(t("deckDialog.saveFailed", { message }));
     }
   }
 
@@ -75,40 +77,40 @@ export function DeckDialog({ deck, trigger, open: controlledOpen, onOpenChange }
         {trigger ?? (
           <Button>
             <Plus className="h-4 w-4" />
-            New Deck
+            {t("deckDialog.newDeck")}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent>
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{deck ? "Edit deck" : "New deck"}</DialogTitle>
-            <DialogDescription>Keep decks focused. One topic, one study loop.</DialogDescription>
+            <DialogTitle>{deck ? t("deckDialog.editDeckTitle") : t("deckDialog.newDeckTitle")}</DialogTitle>
+            <DialogDescription>{t("deckDialog.description")}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-5">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Name</label>
+              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{t("deckDialog.nameLabel")}</label>
               <Input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                placeholder="Systems Design"
+                placeholder={t("deckDialog.namePlaceholder")}
                 className="border-zinc-200 dark:border-zinc-800"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Description</label>
+              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{t("deckDialog.descriptionLabel")}</label>
               <Textarea
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
-                placeholder="Short context for this deck"
+                placeholder={t("deckDialog.descriptionPlaceholder")}
                 className="border-zinc-200 dark:border-zinc-800"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Color</label>
+              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{t("deckDialog.colorLabel")}</label>
               <Select value={color} onValueChange={(value) => setColor(value as DeckColor)}>
                 <SelectTrigger className="border-zinc-200 dark:border-zinc-800">
                   <SelectValue />
@@ -129,9 +131,9 @@ export function DeckDialog({ deck, trigger, open: controlledOpen, onOpenChange }
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} className="border-zinc-200 text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100">
-              Cancel
+              {t("deckDialog.cancel")}
             </Button>
-            <Button type="submit" className="bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200">{deck ? "Save changes" : "Create deck"}</Button>
+            <Button type="submit" className="bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200">{deck ? t("deckDialog.saveChanges") : t("deckDialog.createDeck")}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

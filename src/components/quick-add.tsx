@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ interface QuickAddProps {
 }
 
 export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
+  const { t } = useTranslation();
   const decks = useRecallStore((state) => state.decks);
   const createCard = useRecallStore((state) => state.createCard);
   const [deckId, setDeckId] = useState("");
@@ -35,29 +37,29 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
 
   async function handleSubmit(e: React.FormEvent): Promise<void> {
     e.preventDefault();
-    
+
     if (!deckId) {
-      toast.error("Please select a deck first");
+      toast.error(t("quickAdd.selectDeckFirst"));
       return;
     }
     if (!front.trim()) {
-      toast.error("Card front (question) cannot be empty");
+      toast.error(t("quickAdd.frontEmpty"));
       return;
     }
     if (!back.trim()) {
-      toast.error("Card back (answer) cannot be empty");
+      toast.error(t("quickAdd.backEmpty"));
       return;
     }
 
     try {
       await createCard({ deckId, front, back, hint: "", source: "", tags: [] });
-      toast.success("Card added successfully");
+      toast.success(t("quickAdd.added"));
       setFront("");
       setBack("");
       frontRef.current?.focus();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      toast.error(`Failed to add card: ${message}`);
+      const message = err instanceof Error ? err.message : t("quickAdd.unknownError");
+      toast.error(t("quickAdd.addFailed", { message }));
     }
   }
 
@@ -83,15 +85,15 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
         onKeyDown={handleKeyDown}
       >
         <div className="mb-5">
-          <h2 id="quick-add-title" className="text-base font-medium tracking-tight text-zinc-900 dark:text-zinc-100">Quick add</h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">Press Escape to close</p>
+          <h2 id="quick-add-title" className="text-base font-medium tracking-tight text-zinc-900 dark:text-zinc-100">{t("quickAdd.title")}</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("quickAdd.pressEscapeToClose")}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           {decks.length > 0 ? (
             <Select value={deckId} onValueChange={setDeckId}>
-              <SelectTrigger className="border-zinc-200 dark:border-zinc-800" aria-label="Select deck">
-                <SelectValue placeholder="Select deck" />
+              <SelectTrigger className="border-zinc-200 dark:border-zinc-800" aria-label={t("quickAdd.selectDeckAria")}>
+                <SelectValue placeholder={t("quickAdd.selectDeckPlaceholder")} />
               </SelectTrigger>
               <SelectContent>
                 {decks.map((d) => (
@@ -100,23 +102,23 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
               </SelectContent>
             </Select>
           ) : (
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">Create a deck first to add cards.</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("quickAdd.createDeckFirst")}</p>
           )}
 
           <Textarea
             ref={frontRef}
             value={front}
             onChange={(e) => setFront(e.target.value)}
-            placeholder="Front (question)..."
-            aria-label="Card front (question)"
+            placeholder={t("quickAdd.frontPlaceholder")}
+            aria-label={t("quickAdd.frontAria")}
             className="min-h-[80px] border-zinc-200 font-mono text-sm dark:border-zinc-800"
             disabled={decks.length === 0}
           />
           <Input
             value={back}
             onChange={(e) => setBack(e.target.value)}
-            placeholder="Back (answer)..."
-            aria-label="Card back (answer)"
+            placeholder={t("quickAdd.backPlaceholder")}
+            aria-label={t("quickAdd.backAria")}
             className="border-zinc-200 dark:border-zinc-800"
             disabled={decks.length === 0}
             onKeyDown={(e) => {
@@ -129,11 +131,11 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
 
           <div className="flex justify-end gap-2 border-t border-zinc-100 pt-4 dark:border-zinc-800">
             <Button type="button" variant="ghost" size="sm" onClick={onClose} className="text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800">
-              Cancel
+              {t("quickAdd.cancel")}
             </Button>
             <Button type="submit" size="sm" disabled={!deckId || !front.trim() || !back.trim()} className="bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200">
               <Plus className="h-4 w-4 mr-1" />
-              Add Card
+              {t("quickAdd.addCard")}
             </Button>
           </div>
         </form>

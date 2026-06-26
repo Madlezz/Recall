@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 interface ShortcutHelpProps {
   open: boolean;
@@ -7,23 +8,24 @@ interface ShortcutHelpProps {
 }
 
 const SHORTCUTS = [
-  { keys: ["Ctrl", "K"], description: "Command palette" },
-  { keys: ["Space"], description: "Reveal answer (in study mode)" },
-  { keys: ["1"], description: "Rate — Again" },
-  { keys: ["2"], description: "Rate — Hard" },
-  { keys: ["3"], description: "Rate — Good" },
-  { keys: ["4"], description: "Rate — Easy" },
-  { keys: ["B"], description: "Bury card (skip, see later)" },
-  { keys: ["S"], description: "Snooze card for 2 hours" },
-  { keys: ["R"], description: "Start review (from dashboard)" },
-  { keys: ["F"], description: "Start/pause focus timer" },
-  { keys: ["Ctrl", "N"], description: "Quick-add card" },
-  { keys: ["Ctrl", "Z"], description: "Undo last review" },
-  { keys: ["?"], description: "Show this help" },
-  { keys: ["Esc"], description: "Close dialog / Exit" },
+  { keys: ["Ctrl", "K"], descKey: "shortcutHelp.commandPalette" },
+  { keys: ["Space"], descKey: "shortcutHelp.revealAnswer" },
+  { keys: ["1"], descKey: "shortcutHelp.rateAgain" },
+  { keys: ["2"], descKey: "shortcutHelp.rateHard" },
+  { keys: ["3"], descKey: "shortcutHelp.rateGood" },
+  { keys: ["4"], descKey: "shortcutHelp.rateEasy" },
+  { keys: ["B"], descKey: "shortcutHelp.buryCard" },
+  { keys: ["S"], descKey: "shortcutHelp.snoozeCard" },
+  { keys: ["R"], descKey: "shortcutHelp.startReview" },
+  { keys: ["F"], descKey: "shortcutHelp.focusTimer" },
+  { keys: ["Ctrl", "N"], descKey: "shortcutHelp.quickAddCard" },
+  { keys: ["Ctrl", "Z"], descKey: "shortcutHelp.undoReview" },
+  { keys: ["?"], descKey: "shortcutHelp.showHelp" },
+  { keys: ["Esc"], descKey: "shortcutHelp.closeDialog" },
 ];
 
 export function ShortcutHelp({ open, onClose }: ShortcutHelpProps): JSX.Element {
+  const { t } = useTranslation();
   useEffect(() => {
     if (!open) return;
     function handleKeyDown(event: KeyboardEvent): void {
@@ -51,10 +53,10 @@ export function ShortcutHelp({ open, onClose }: ShortcutHelpProps): JSX.Element 
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 id="shortcut-help-title" className="font-semibold">Keyboard Shortcuts</h2>
+          <h2 id="shortcut-help-title" className="font-semibold">{t("shortcutHelp.title")}</h2>
           <button
             onClick={onClose}
-            aria-label="Close keyboard shortcuts"
+            aria-label={t("shortcutHelp.closeAria")}
             className="rounded p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
           >
             <X className="h-4 w-4" />
@@ -64,7 +66,7 @@ export function ShortcutHelp({ open, onClose }: ShortcutHelpProps): JSX.Element 
         <div className="space-y-2">
           {SHORTCUTS.map((s, i) => (
             <div key={i} className="flex items-center justify-between text-sm">
-              <span className="text-zinc-500 dark:text-zinc-400">{s.description}</span>
+              <span className="text-zinc-500 dark:text-zinc-400">{t(s.descKey)}</span>
               <span className="flex items-center gap-1">
                 {s.keys.map((k, j) => (
                   <kbd
@@ -80,7 +82,7 @@ export function ShortcutHelp({ open, onClose }: ShortcutHelpProps): JSX.Element 
         </div>
 
         <p className="mt-4 text-xs text-zinc-500 dark:text-zinc-400 text-center">
-          Press <kbd className="rounded border bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 text-[10px] font-mono">?</kbd> anywhere to show this
+          {t("shortcutHelp.pressPrefix")} <kbd className="rounded border bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 text-[10px] font-mono">?</kbd> {t("shortcutHelp.anywhereToShow")}
         </p>
       </div>
     </div>

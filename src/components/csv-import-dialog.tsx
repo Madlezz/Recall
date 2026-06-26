@@ -1,5 +1,6 @@
 import { FileSpreadsheet, Upload } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -28,6 +29,7 @@ interface CsvRow {
 }
 
 export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps): JSX.Element {
+  const { t } = useTranslation();
   const decks = useRecallStore((s) => s.decks);
   const createCard = useRecallStore((s) => s.createCard);
   const [targetDeck, setTargetDeck] = useState(deckId ?? "");
@@ -36,8 +38,8 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
   const fileRef = useRef<HTMLInputElement>(null);
 
   const deckName = useMemo(
-    () => decks.find((d) => d.id === targetDeck)?.name ?? "Select a deck",
-    [decks, targetDeck],
+    () => decks.find((d) => d.id === targetDeck)?.name ?? t("csvImport.selectDeck"),
+    [decks, targetDeck, t],
   );
 
   function parseCsvLine(line: string): string[] {
@@ -76,7 +78,7 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
       const text = reader.result as string;
       const lines = text.split(/\r?\n/).filter((l) => l.trim());
       if (lines.length === 0) {
-        toast.error("CSV file is empty. Add at least one row with front and back content");
+        toast.error(t("csvImport.fileEmpty"));
         return;
       }
 
@@ -100,14 +102,12 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
 
       if (csvRows.length === 0) {
         const skipped = dataRows.length - csvRows.length;
-        toast.error(
-          `No valid cards found. Each row needs at least 2 columns: front and back. ${skipped} row(s) were skipped.`,
-        );
+        toast.error(t("csvImport.noValidCards", { skipped }));
         return;
       }
 
       setRows(csvRows);
-      toast.success(`Parsed ${csvRows.length} cards`);
+      toast.success(t("csvImport.parsedCards", { count: csvRows.length }));
     };
     reader.readAsText(file);
   }
@@ -131,13 +131,13 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
         });
         imported++;
       }
-      toast.success(`Imported ${imported} card(s) to ${deckName}`);
+      toast.success(t("csvImport.importedTo", { count: imported, deck: deckName }));
       setRows(null);
       if (fileRef.current) fileRef.current.value = "";
       onClose();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      toast.error(`Import failed: ${message}. Check that the deck exists and try again.`);
+      const message = err instanceof Error ? err.message : t("csvImport.unknownError");
+      toast.error(t("csvImport.importFailed", { message }));
     } finally {
       setPending(false);
     }
@@ -157,20 +157,20 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileSpreadsheet className="h-5 w-5 text-zinc-900 dark:text-zinc-100" />
-            CSV Import
+            {t("csvImport.title")}
           </DialogTitle>
           <DialogDescription>
-            Import cards from a CSV file. First column = front, second = back, third = hint, fourth = tags.
+            {t("csvImport.description")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 pt-2">
           {/* Deck selector */}
           <div className="space-y-1.5">
-            <Label className="text-xs">Target deck</Label>
+            <Label className="text-xs">{t("csvImport.targetDeck")}</Label>
             <Select value={targetDeck} onValueChange={setTargetDeck}>
               <SelectTrigger>
-                <SelectValue placeholder="Select a deck" />
+                <SelectValue placeholder={t("csvImport.selectDeck")} />
               </SelectTrigger>
               <SelectContent>
                 {decks.map((d) => (
@@ -184,7 +184,7 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
 
           {/* File picker */}
           <div className="space-y-1.5">
-            <Label className="text-xs">CSV file</Label>
+            <Label className="text-xs">{t("csvImport.csvFile")}</Label>
             <input
               ref={fileRef}
               type="file"
@@ -195,7 +195,9 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
                 file:text-sm file:font-medium"
             />
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              Format: <code className="text-zinc-900 dark:text-zinc-100">front,back,hint,tags</code> (one card per line)
+              {t("csvImport.formatLabel")}{" "}
+              <code className="text-zinc-900 dark:text-zinc-100">front,back,hint,tags</code>{" "}
+              {t("csvImport.oneCardPerLine")}
             </p>
           </div>
 
@@ -203,16 +205,16 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
           {rows && rows.length > 0 && (
             <div className="space-y-2">
               <p className="text-xs font-medium">
-                Preview — {rows.length} card(s) ready
+                {t("csvImport.previewReady", { count: rows.length })}
               </p>
               <div className="max-h-48 overflow-y-auto rounded-md border">
                 <table className="w-full text-xs">
                   <thead className="bg-zinc-100/50 dark:bg-zinc-800/50">
                     <tr>
-                      <th className="px-2 py-1.5 text-left">Front</th>
-                      <th className="px-2 py-1.5 text-left">Back</th>
-                      <th className="px-2 py-1.5 text-left">Hint</th>
-                      <th className="px-2 py-1.5 text-left">Tags</th>
+                      <th className="px-2 py-1.5 text-left">{t("csvImport.front")}</th>
+                      <th className="px-2 py-1.5 text-left">{t("csvImport.back")}</th>
+                      <th className="px-2 py-1.5 text-left">{t("csvImport.hint")}</th>
+                      <th className="px-2 py-1.5 text-left">{t("csvImport.tags")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -231,7 +233,7 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
                     {rows.length > 20 && (
                       <tr>
                         <td colSpan={4} className="px-2 py-1 text-center text-zinc-500 dark:text-zinc-400">
-                          ... and {rows.length - 20} more
+                          {t("csvImport.andMore", { count: rows.length - 20 })}
                         </td>
                       </tr>
                     )}
@@ -244,14 +246,14 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
 
         <div className="flex items-center justify-between pt-2">
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            {rows ? `${rows.length} cards to import` : "Pick a file first"}
+            {rows ? t("csvImport.cardsToImport", { count: rows.length }) : t("csvImport.pickFileFirst")}
           </p>
           <Button
             onClick={() => void handleImport()}
             disabled={!rows || rows.length === 0 || !targetDeck || pending}
           >
             <Upload className="mr-1.5 h-4 w-4" />
-            {pending ? "Importing..." : `Import ${rows?.length ?? 0} cards`}
+            {pending ? t("csvImport.importing") : t("csvImport.importCards", { count: rows?.length ?? 0 })}
           </Button>
         </div>
       </DialogContent>

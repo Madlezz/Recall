@@ -2,10 +2,12 @@ import { BookCheck, Brain, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRecallStore } from "@/stores/recall-store";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { TEMPLATE_DECKS, createCardsFromTemplate, type TemplateDeck } from "@/data/templates";
 
 export function Onboarding(): JSX.Element {
+  const { t } = useTranslation();
   const completeOnboarding = useRecallStore((state) => state.completeOnboarding);
   const startFresh = useRecallStore((state) => state.startFresh);
   const importTemplateDecks = useRecallStore((state) => state.importTemplateDecks);
@@ -13,8 +15,8 @@ export function Onboarding(): JSX.Element {
   const [selectedTemplates, setSelectedTemplates] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 50);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setVisible(true), 50);
+    return () => clearTimeout(timer);
   }, []);
 
   function toggleTemplate(id: string): void {
@@ -35,7 +37,7 @@ export function Onboarding(): JSX.Element {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.error("Failed to complete onboarding:", error);
-      toast.error(`Failed to load demo cards: ${message}`);
+      toast.error(t("onboarding.loadDemoFailed", { message }));
     }
   }
 
@@ -45,13 +47,13 @@ export function Onboarding(): JSX.Element {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.error("Failed to start fresh:", error);
-      toast.error(`Failed to reset data: ${message}`);
+      toast.error(t("onboarding.resetDataFailed", { message }));
     }
   }
 
   async function handleImportTemplates(): Promise<void> {
     if (selectedTemplates.size === 0) {
-      toast.error("Please select at least one template");
+      toast.error(t("onboarding.selectAtLeastOne"));
       return;
     }
 
@@ -60,7 +62,7 @@ export function Onboarding(): JSX.Element {
       const allCards = [];
 
       for (const templateId of selectedTemplates) {
-        const template = TEMPLATE_DECKS.find((t) => t.id === templateId);
+        const template = TEMPLATE_DECKS.find((tpl) => tpl.id === templateId);
         if (template) {
           const { deck, cards } = createCardsFromTemplate(template);
           allDecks.push(deck);
@@ -69,11 +71,11 @@ export function Onboarding(): JSX.Element {
       }
 
       await importTemplateDecks(allDecks, allCards);
-      toast.success(`Imported ${allDecks.length} template deck(s)`);
+      toast.success(t("onboarding.importedDecks", { count: allDecks.length }));
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.error("Failed to import templates:", error);
-      toast.error(`Failed to import templates: ${message}`);
+      toast.error(t("onboarding.importFailed", { message }));
     }
   }
 
@@ -84,7 +86,7 @@ export function Onboarding(): JSX.Element {
           visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
         }`}
         role="region"
-        aria-label="Welcome to Recall"
+        aria-label={t("onboarding.welcomeAria")}
       >
         <div className="space-y-4">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
@@ -92,39 +94,39 @@ export function Onboarding(): JSX.Element {
           </div>
           <div className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-              Recall
+              {t("onboarding.appName")}
             </h1>
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Beautiful flashcards, no cloud, no account.
+              {t("onboarding.tagline")}
             </p>
           </div>
         </div>
 
-        <div className="space-y-3 text-left" role="group" aria-label="Features">
+        <div className="space-y-3 text-left" role="group" aria-label={t("onboarding.featuresAria")}>
           <div className="space-y-2 rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
             <div className="flex items-center gap-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
               <Zap className="h-4 w-4 text-zinc-600 dark:text-zinc-400" aria-hidden="true" />
-              Smart Review, Zero Setup
+              {t("onboarding.feature1Title")}
             </div>
             <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
-              Uses the best spaced repetition algorithm (FSRS). You just review, it handles the rest.
+              {t("onboarding.feature1Desc")}
             </p>
           </div>
 
           <div className="space-y-2 rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
             <div className="flex items-center gap-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
               <BookCheck className="h-4 w-4 text-zinc-600 dark:text-zinc-400" aria-hidden="true" />
-              Rich Cards, Plain Text
+              {t("onboarding.feature2Title")}
             </div>
             <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
-              Markdown, LaTeX math, code highlighting. But it works great with plain text too.
+              {t("onboarding.feature2Desc")}
             </p>
           </div>
         </div>
 
         <div className="space-y-3 text-left">
           <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-            Start with a template (optional)
+            {t("onboarding.templateHeader")}
           </h2>
           <div className="grid grid-cols-2 gap-3">
             {TEMPLATE_DECKS.map((template) => (
@@ -144,10 +146,10 @@ export function Onboarding(): JSX.Element {
               size="lg"
               className="w-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
               onClick={() => void handleImportTemplates()}
-              aria-label={`Import ${selectedTemplates.size} template(s)`}
+              aria-label={t("onboarding.importTemplatesAria", { count: selectedTemplates.size })}
             >
               <Sparkles className="mr-2 h-4 w-4" aria-hidden="true" />
-              Import {selectedTemplates.size} Template{selectedTemplates.size > 1 ? "s" : ""}
+              {t("onboarding.importTemplates", { count: selectedTemplates.size })}
             </Button>
           )}
 
@@ -160,9 +162,9 @@ export function Onboarding(): JSX.Element {
                 : "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
             }`}
             onClick={() => void handleTryDemo()}
-            aria-label="Try with Demo Cards"
+            aria-label={t("onboarding.tryDemoAria")}
           >
-            Try with Demo Cards
+            {t("onboarding.tryDemo")}
           </Button>
 
           <Button
@@ -170,13 +172,13 @@ export function Onboarding(): JSX.Element {
             variant="outline"
             className="w-full border-zinc-200 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-900"
             onClick={() => void handleStartFresh()}
-            aria-label="Start fresh with empty decks"
+            aria-label={t("onboarding.startFreshAria")}
           >
-            Start Fresh
+            {t("onboarding.startFresh")}
           </Button>
 
           <p className="text-xs text-zinc-400 dark:text-zinc-500" id="privacy-note">
-            Your data lives on your computer. No account, no cloud, no telemetry.
+            {t("onboarding.privacyNote")}
           </p>
         </div>
       </div>
@@ -193,6 +195,7 @@ function TemplateCard({
   selected: boolean;
   onToggle: () => void;
 }): JSX.Element {
+  const { t } = useTranslation();
   return (
     <button
       onClick={onToggle}
@@ -214,7 +217,7 @@ function TemplateCard({
             {template.description}
           </p>
           <p className="text-xs text-zinc-400 dark:text-zinc-500">
-            {template.cards.length} cards
+            {t("onboarding.cardsCount", { count: template.cards.length })}
           </p>
         </div>
         {selected && (

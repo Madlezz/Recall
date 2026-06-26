@@ -5,12 +5,13 @@ import { startSoundscape, stopSoundscape } from "@/services/audio";
 import { getLevel, triggerLevelUpConfetti } from "@/lib/xp";
 import { getFocusTimerXp } from "@/lib/xp-rules";
 import { useRecallStore } from "@/stores/recall-store";
+import { useTranslation } from "react-i18next";
 import type { Soundscape } from "@/services/audio";
 
-const SOUNDSCAPES: { id: Soundscape; label: string; icon: typeof Headphones }[] = [
-  { id: "rain", label: "Rain", icon: CloudRain },
-  { id: "cafe", label: "Cafe", icon: Coffee },
-  { id: "lofi", label: "Lofi", icon: Headphones },
+const SOUNDSCAPES: { id: Soundscape; labelKey: string; icon: typeof Headphones }[] = [
+  { id: "rain", labelKey: "focusTimer.rain", icon: CloudRain },
+  { id: "cafe", labelKey: "focusTimer.cafe", icon: Coffee },
+  { id: "lofi", labelKey: "focusTimer.lofi", icon: Headphones },
 ];
 
 const PRESETS = [15, 25, 45];
@@ -22,6 +23,7 @@ function formatTime(seconds: number): string {
 }
 
 export function FocusTimer(): JSX.Element {
+  const { t } = useTranslation();
   const settings = useRecallStore((state) => state.settings);
   const addXp = useRecallStore((state) => state.addXp);
   const settingsRef = useRef(settings);
@@ -146,19 +148,19 @@ export function FocusTimer(): JSX.Element {
         ? "border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.4)] dark:border-emerald-500 dark:shadow-[0_0_20px_rgba(52,211,153,0.3)]"
         : "border-zinc-200 dark:border-zinc-800"
     }`}>
-      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">Focus Timer</span>
+      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">{t("focusTimer.title")}</span>
 
       {/* Screen reader announcement for timer completion */}
       {showCompletionFlash && (
         <div className="sr-only" role="alert" aria-live="assertive">
-          Focus timer complete! Great work.
+          {t("focusTimer.completeAria")}
         </div>
       )}
 
       {/* Timer ring */}
       <div className="flex justify-center mt-4">
         <div className="relative">
-          <svg width="160" height="160" className="-rotate-90" role="img" aria-label={`Focus timer: ${formatTime(remaining)} remaining, ${Math.round(progress * 100)}% complete`}>
+          <svg width="160" height="160" className="-rotate-90" role="img" aria-label={t("focusTimer.timerAria", { remaining: formatTime(remaining), progress: Math.round(progress * 100) })}>
             <circle cx="80" cy="80" r="72" fill="none" stroke="currentColor" strokeWidth="5" className="text-zinc-100 dark:text-zinc-800" />
             <circle
               cx="80" cy="80" r="72"
@@ -180,7 +182,7 @@ export function FocusTimer(): JSX.Element {
             <span className={`mt-0.5 text-[11px] font-semibold transition-colors duration-500 ${
               showCompletionFlash ? "text-emerald-500" : "text-zinc-400"
             }`}>
-              {running ? "focusing" : completed ? "done!" : "ready"}
+              {running ? t("focusTimer.focusing") : completed ? t("focusTimer.done") : t("focusTimer.ready")}
             </span>
           </div>
         </div>
@@ -199,7 +201,7 @@ export function FocusTimer(): JSX.Element {
                 : "text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
             }`}
           >
-            {m}m
+            {t("focusTimer.presetMinutes", { count: m })}
           </button>
         ))}
       </div>
@@ -207,21 +209,21 @@ export function FocusTimer(): JSX.Element {
       {/* Controls */}
       <div className="flex justify-center gap-2 mt-3">
         {running ? (
-          <Button size="sm" variant="outline" onClick={pause} className="gap-1.5" aria-label="Pause focus timer">
-            <Pause className="h-3.5 w-3.5" /> Pause
+          <Button size="sm" variant="outline" onClick={pause} className="gap-1.5" aria-label={t("focusTimer.pauseAria")}>
+            <Pause className="h-3.5 w-3.5" /> {t("focusTimer.pause")}
           </Button>
         ) : (
-          <Button size="sm" onClick={start} disabled={remaining === 0 && completed} className="gap-1.5" aria-label={remaining === duration ? "Start focus timer" : "Resume focus timer"}>
-            <Play className="h-3.5 w-3.5" /> {remaining === duration ? "Start" : "Resume"}
+          <Button size="sm" onClick={start} disabled={remaining === 0 && completed} className="gap-1.5" aria-label={t(remaining === duration ? "focusTimer.startAria" : "focusTimer.resumeAria")}>
+            <Play className="h-3.5 w-3.5" /> {t(remaining === duration ? "focusTimer.start" : "focusTimer.resume")}
           </Button>
         )}
-        <Button size="sm" variant="ghost" onClick={reset} disabled={running || (remaining === duration && !completed)} aria-label="Reset focus timer">
+        <Button size="sm" variant="ghost" onClick={reset} disabled={running || (remaining === duration && !completed)} aria-label={t("focusTimer.resetAria")}>
           <RotateCcw className="h-3.5 w-3.5" />
         </Button>
       </div>
 
       <p className="mt-2 text-center text-[10px] text-zinc-400">
-        Press <kbd className="rounded border bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 text-[10px] font-mono">F</kbd> to {running ? "pause" : "start"}
+        {t("focusTimer.pressPrefix")} <kbd className="rounded border bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 text-[10px] font-mono">F</kbd> {t(running ? "focusTimer.toPause" : "focusTimer.toStart")}
       </p>
 
       {/* Soundscapes */}
@@ -233,9 +235,9 @@ export function FocusTimer(): JSX.Element {
           }`}
         >
           <VolumeX className="h-3 w-3 inline mr-0.5" />
-          Off
+          {t("focusTimer.off")}
         </button>
-        {SOUNDSCAPES.map(({ id, label, icon: Icon }) => (
+        {SOUNDSCAPES.map(({ id, labelKey, icon: Icon }) => (
           <button
             key={id}
             onClick={() => toggleSoundscape(id)}
@@ -244,7 +246,7 @@ export function FocusTimer(): JSX.Element {
             }`}
           >
             <Icon className="h-3 w-3 inline mr-0.5" />
-            {label}
+            {t(labelKey)}
           </button>
         ))}
       </div>

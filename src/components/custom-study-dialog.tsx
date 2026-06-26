@@ -1,5 +1,6 @@
 import { Beaker, Hash, Library, Play, Tag, X } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,7 @@ interface CustomStudyDialogProps {
 }
 
 export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogProps): JSX.Element {
+  const { t } = useTranslation();
   const decks = useRecallStore((s) => s.decks);
   const cards = useRecallStore((s) => s.cards);
   const startCustomStudy = useRecallStore((s) => s.startCustomStudy);
@@ -72,10 +74,10 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
     });
     if (!started) {
       const reason = eligibleCount === 0
-        ? "No cards match your selected filters"
+        ? t("customStudy.noCardsMatchFilters")
         : newOnly && eligibleCount === 0
-          ? "No new cards available in the selected deck(s)"
-          : "Could not start custom study session";
+          ? t("customStudy.noNewCards")
+          : t("customStudy.couldNotStart");
       toast.info(reason);
       return;
     }
@@ -96,10 +98,10 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Beaker className="h-5 w-5 text-zinc-900 dark:text-zinc-100" />
-            Custom Study
+            {t("customStudy.title")}
           </DialogTitle>
           <DialogDescription>
-            Build a study session outside the normal schedule. Great for cramming or focused review.
+            {t("customStudy.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -108,14 +110,14 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
           <div className="space-y-1.5">
             <Label className="flex items-center gap-1.5 text-xs">
               <Library className="h-3.5 w-3.5" />
-              Deck
+              {t("customStudy.deckLabel")}
             </Label>
             <Select value={selectedDeck} onValueChange={setSelectedDeck}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All decks</SelectItem>
+                <SelectItem value="all">{t("customStudy.allDecks")}</SelectItem>
                 {decks.map((d) => (
                   <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
                 ))}
@@ -127,7 +129,7 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
           <div className="space-y-1.5">
             <Label className="flex items-center gap-1.5 text-xs">
               <Hash className="h-3.5 w-3.5" />
-              Number of cards
+              {t("customStudy.cardCountLabel")}
             </Label>
             <Input
               type="number"
@@ -135,12 +137,12 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
               max={eligibleCount || 999}
               value={cardCount}
               onChange={(e) => setCardCount(e.target.value)}
-              placeholder="All"
+              placeholder={t("customStudy.allPlaceholder")}
             />
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              Leave empty or set to 0 for all matching cards.
+              {t("customStudy.allCardsHint")}
               {eligibleCount > 0 && (
-                <span className="ml-1 text-zinc-900 dark:text-zinc-100">{eligibleCount} available</span>
+                <span className="ml-1 text-zinc-900 dark:text-zinc-100">{t("customStudy.available", { count: eligibleCount })}</span>
               )}
             </p>
           </div>
@@ -149,7 +151,7 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
           <div className="space-y-1.5">
             <Label className="flex items-center gap-1.5 text-xs">
               <Tag className="h-3.5 w-3.5" />
-              Filter by tag <span className="text-zinc-500 dark:text-zinc-400">(optional)</span>
+              {t("customStudy.filterByTag")} <span className="text-zinc-500 dark:text-zinc-400">{t("customStudy.optional")}</span>
             </Label>
             {availableTags.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
@@ -170,7 +172,7 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">No tags in this deck</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">{t("customStudy.noTags")}</p>
             )}
           </div>
 
@@ -182,19 +184,19 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
               onChange={(e) => setNewOnly(e.target.checked)}
               className="h-4 w-4 rounded border-muted-foreground/30"
             />
-            <span className="text-sm">New cards only</span>
+            <span className="text-sm">{t("customStudy.newCardsOnly")}</span>
           </label>
         </div>
 
         <div className="flex items-center justify-between pt-2">
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
             {eligibleCount > 0
-              ? `${Math.min(clamped, eligibleCount)} card(s) will be picked randomly`
-              : "No cards match"}
+              ? t("customStudy.cardsWillBePicked", { count: Math.min(clamped, eligibleCount) })
+              : t("customStudy.noCardsMatch")}
           </p>
           <Button onClick={handleStart} disabled={eligibleCount === 0}>
             <Play className="mr-1.5 h-4 w-4" />
-            Start
+            {t("customStudy.start")}
           </Button>
         </div>
       </DialogContent>
