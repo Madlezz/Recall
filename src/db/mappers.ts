@@ -1,5 +1,5 @@
 import type { Achievement, Card, CardState, CardType, Deck, DeckColor, RecallSettings, ReviewLog, ReviewRating, StudySession } from "@/types";
-import { SCHEMA_VERSION, isCardState, isDeckColor, isReviewRating } from "@/lib/domain";
+import { SCHEMA_VERSION, isCardState, isCardType, isDeckColor, isReviewRating } from "@/lib/domain";
 
 export interface DeckRow {
   id: string;
@@ -89,6 +89,9 @@ export function cardFromRow(row: CardRow): Card {
   if (!isCardState(row.state)) {
     throw new Error("Invalid card state");
   }
+  if (!isCardType(row.card_type)) {
+    throw new Error(`Invalid card type: ${row.card_type}`);
+  }
 
   return {
         id: row.id,
@@ -98,7 +101,7 @@ export function cardFromRow(row: CardRow): Card {
         hint: row.hint,
         source: row.source ?? "",
         tags: parseTags(row.tags),
-      cardType: (row.card_type === "cloze" ? "cloze" : "basic") as CardType,
+      cardType: row.card_type as CardType,
       state: row.state as CardState,
     lastReviewDate: row.last_review_date,
     nextReviewDate: row.next_review_date,

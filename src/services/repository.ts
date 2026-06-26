@@ -96,7 +96,8 @@ export function validateImportSnapshot(snapshot: RecallStateSnapshot): void {
           throw new Error("Card front is required");
         }
         const isCloze = /\{\{c\d+::[^}]+\}\}/.test(card.front);
-        if (!card.back.trim() && !isCloze) {
+        const isImageOcclusion = card.cardType === "image-occlusion";
+        if (!card.back.trim() && !isCloze && !isImageOcclusion) {
           throw new Error("Card back is required");
         }
     if (cardIds.has(card.id)) {

@@ -151,8 +151,9 @@ export function ensureDeckName(name: string, decks: Deck[]): void {
   }
 }
 
-export function ensureCardInput(input: { front: string; back: string }): void {
+export function ensureCardInput(input: { front: string; back: string; cardType?: string }): void {
   if (!input.front.trim()) throw new Error("Front is required.");
+  if (input.cardType === "image-occlusion") return; // image-occlusion stores data in front as JSON, back is empty
   const isCloze = /\{\{c\d::[^}]+\}\}/.test(input.front);
   if (!input.back.trim() && !isCloze) throw new Error("Back is required.");
 }

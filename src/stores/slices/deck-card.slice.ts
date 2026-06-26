@@ -1,6 +1,6 @@
 import { createId, normalizeName } from "@/lib/utils";
 import { hasCloze } from "@/lib/cloze";
-import type { Card, Deck, DeckColor, RecallStateSnapshot, ReviewLog, StudySession } from "@/types";
+import type { Card, CardType, Deck, DeckColor, RecallStateSnapshot, ReviewLog, StudySession } from "@/types";
 import {
   dataState,
   ensureCardInput,
@@ -28,6 +28,7 @@ export interface CardInput {
   hint: string;
   source: string;
   tags: string[];
+  cardType?: CardType;
 }
 
 export interface DeckCardSlice {
@@ -105,7 +106,7 @@ export const deckCardSlice = (
       front: input.front.trim(), back: input.back.trim(),
       hint: input.hint.trim(), source: input.source.trim(),
       tags: input.tags,
-      cardType: hasCloze(input.front) ? "cloze" : "basic",
+      cardType: input.cardType ?? (hasCloze(input.front) ? "cloze" : "basic"),
       state: "new", lastReviewDate: null, nextReviewDate: now,
       stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0,
       reps: 0, lapses: 0, createdAt: now, updatedAt: now,
@@ -123,7 +124,8 @@ export const deckCardSlice = (
     ensureCardInput(input);
     const state = get();
     const now = new Date().toISOString();
-    const updatedCard = { ...state.cards.find((c: Card) => c.id === cardId)!, deckId: input.deckId, front: input.front.trim(), back: input.back.trim(), hint: input.hint.trim(), source: input.source.trim(), tags: input.tags, updatedAt: now };
+    const existingCard = state.cards.find((c: Card) => c.id === cardId)!;
+    const updatedCard = { ...existingCard, deckId: input.deckId, front: input.front.trim(), back: input.back.trim(), hint: input.hint.trim(), source: input.source.trim(), tags: input.tags, cardType: input.cardType ?? existingCard.cardType, updatedAt: now };
     const snapshot = {
       ...dataState(state),
       cards: state.cards.map((c: Card) => c.id === cardId ? updatedCard : c),
@@ -157,7 +159,7 @@ export const deckCardSlice = (
   async moveCard(cardId: string, deckId: string) {
     const card = get().cards.find((c: Card) => c.id === cardId);
     if (!card || card.deckId === deckId) return;
-    await get().updateCard(cardId, { deckId, front: card.front, back: card.back, hint: card.hint, source: card.source, tags: card.tags });
+    await get().updateCard(cardId, { deckId, front: card.front, back: card.back, hint: card.hint, source: card.source, tags: card.tags, cardType: card.cardType });
   },
 
   async resetDeckProgress(deckId: string) {
