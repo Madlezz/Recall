@@ -1,5 +1,6 @@
 import { FileText } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +22,7 @@ interface MarkdownImportDialogProps {
 }
 
 export function MarkdownImportDialog({ deckId }: MarkdownImportDialogProps): JSX.Element {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [cards, setCards] = useState<MarkdownCardInput[]>([]);
   const [targetDeckId, setTargetDeckId] = useState(deckId ?? "");
@@ -44,7 +46,7 @@ export function MarkdownImportDialog({ deckId }: MarkdownImportDialogProps): JSX
       const parsed = parseMarkdownCards(content);
       
       if (parsed.length === 0) {
-        toast.error("No cards found in the markdown file. Make sure cards are separated by '---' with front and back sections");
+        toast.error(t("markdownImport.noCardsFound"));
         return;
       }
       
@@ -53,8 +55,8 @@ export function MarkdownImportDialog({ deckId }: MarkdownImportDialogProps): JSX
         setTargetDeckId(deckId ?? decks[0].id);
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      toast.error(`Could not read markdown file: ${message}`);
+      const message = err instanceof Error ? err.message : t("markdownImport.unknownError");
+      toast.error(t("markdownImport.couldNotReadFile", { message }));
     } finally {
       setLoading(false);
     }
@@ -81,9 +83,9 @@ export function MarkdownImportDialog({ deckId }: MarkdownImportDialogProps): JSX
       }
     }
     if (failed > 0) {
-      toast.warning(`Imported ${imported} of ${cards.length} cards. ${failed} card(s) failed`);
+      toast.warning(t("markdownImport.partialImport", { imported, total: cards.length, failed }));
     } else {
-      toast.success(`Successfully imported ${imported} card(s)`);
+      toast.success(t("markdownImport.importedSuccess", { count: imported }));
     }
     setOpen(false);
     setCards([]);
@@ -99,14 +101,14 @@ export function MarkdownImportDialog({ deckId }: MarkdownImportDialogProps): JSX
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <FileText className="h-4 w-4 mr-1" />
-          Import MD
+          {t("markdownImport.importMd")}
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[min(92vw,700px)] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Import from Markdown</DialogTitle>
+          <DialogTitle>{t("markdownImport.title")}</DialogTitle>
           <DialogDescription>
-            Parse a Markdown file into flashcards. Supports heading-based (## question) and Q:/A: pair formats.
+            {t("markdownImport.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -115,28 +117,28 @@ export function MarkdownImportDialog({ deckId }: MarkdownImportDialogProps): JSX
             <div className="flex flex-col items-center gap-4 py-8">
               <FileText className="h-12 w-12 text-zinc-500 dark:text-zinc-400" />
               <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                Select a Markdown file to parse flashcards from it.
+                {t("markdownImport.selectFileHint")}
               </p>
               <Button onClick={handleFilePick} disabled={loading}>
-                {loading ? "Reading..." : "Choose File"}
+                {loading ? t("markdownImport.reading") : t("markdownImport.chooseFile")}
               </Button>
             </div>
           ) : (
             <>
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium">
-                  Found {cards.length} card{cards.length !== 1 ? "s" : ""}
+                  {t("markdownImport.cardsFound", { count: cards.length })}
                 </p>
                 <Button variant="ghost" size="sm" onClick={handleFilePick} disabled={loading}>
-                  Choose different file
+                  {t("markdownImport.chooseDifferentFile")}
                 </Button>
               </div>
 
               <div className="space-y-2">
-                <Label>Target Deck</Label>
+                <Label>{t("markdownImport.targetDeck")}</Label>
                 <Select value={targetDeckId} onValueChange={setTargetDeckId}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a deck" />
+                    <SelectValue placeholder={t("markdownImport.selectDeck")} />
                   </SelectTrigger>
                   <SelectContent>
                     {decks.map((deck) => (
@@ -156,11 +158,11 @@ export function MarkdownImportDialog({ deckId }: MarkdownImportDialogProps): JSX
                     {(card.hint || card.tags.length > 0) && (
                       <div className="flex gap-2 mt-1.5">
                         {card.hint && (
-                          <span className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">Hint: {card.hint}</span>
+                          <span className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">{t("markdownImport.hintLabel")}: {card.hint}</span>
                         )}
-                        {card.tags.map((t) => (
-                          <span key={t} className="text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 px-1.5 py-0.5 rounded">
-                            {t}
+                        {card.tags.map((tag) => (
+                          <span key={tag} className="text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 px-1.5 py-0.5 rounded">
+                            {tag}
                           </span>
                         ))}
                       </div>
@@ -174,10 +176,10 @@ export function MarkdownImportDialog({ deckId }: MarkdownImportDialogProps): JSX
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
-            Cancel
+            {t("markdownImport.cancel")}
           </Button>
           <Button onClick={handleImport} disabled={cards.length === 0 || !targetDeckId}>
-            Import {cards.length > 0 ? `${cards.length} cards` : ""}
+            {t("markdownImport.importCards", { count: cards.length })}
           </Button>
         </DialogFooter>
       </DialogContent>

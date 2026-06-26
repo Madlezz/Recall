@@ -4,6 +4,7 @@ import { parseAnkiApkg } from "@/services/anki-import";
 import type { AnkiCard } from "@/services/anki-import";
 import { useRecallStore } from "@/stores/recall-store";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -31,6 +32,7 @@ interface ImportReport {
 }
 
 export function AnkiImportDialog(): JSX.Element {
+  const { t } = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [deckName, setDeckName] = useState("");
@@ -48,8 +50,8 @@ export function AnkiImportDialog(): JSX.Element {
 
   async function handleFileSelect() {
     const filePath = await open({
-      title: "Select Anki .apkg file",
-      filters: [{ name: "Anki Package", extensions: ["apkg"] }],
+      title: t("ankiImport.dialogTitle"),
+      filters: [{ name: t("ankiImport.ankiPackage"), extensions: ["apkg"] }],
     });
 
     if (typeof filePath === "string") {
@@ -61,15 +63,15 @@ export function AnkiImportDialog(): JSX.Element {
 
   async function handleImport() {
     if (!selectedFile && !deckName.trim()) {
-      toast.error("Please select an Anki file and enter a deck name");
+      toast.error(t("ankiImport.errorSelectFileAndDeck"));
       return;
     }
     if (!selectedFile) {
-      toast.error("Please select an Anki .apkg file");
+      toast.error(t("ankiImport.errorSelectFile"));
       return;
     }
     if (!deckName.trim()) {
-      toast.error("Please enter a name for the deck");
+      toast.error(t("ankiImport.errorEnterDeckName"));
       return;
     }
 
@@ -79,7 +81,7 @@ export function AnkiImportDialog(): JSX.Element {
       const ankiCards = ankiReport.cards;
 
       if (ankiCards.length === 0) {
-        toast.error("No cards found. Make sure you selected a valid Anki .apkg file (not .colpkg)");
+        toast.error(t("ankiImport.noCardsFound"));
         setIsImporting(false);
         return;
       }
@@ -107,7 +109,7 @@ export function AnkiImportDialog(): JSX.Element {
 
         const newDeckId = await createDeck({
           name: resolvedName,
-          description: `Imported from Anki on ${new Date().toLocaleDateString()}`,
+          description: t("ankiImport.deckDescription", { date: new Date().toLocaleDateString() }),
           color: "blue",
         });
         decksCreated.push(resolvedName);
@@ -120,7 +122,7 @@ export function AnkiImportDialog(): JSX.Element {
               back: ankiCard.back.trim(),
               hint: "",
               source: "",
-              tags: ankiCard.tags.filter((t) => t.trim() !== ""),
+              tags: ankiCard.tags.filter((tag) => tag.trim() !== ""),
             });
             imported++;
 
@@ -130,8 +132,8 @@ export function AnkiImportDialog(): JSX.Element {
               basicCount++;
             }
 
-            for (const t of ankiCard.tags) {
-              if (t.trim()) tagSet.add(t.trim());
+            for (const tag of ankiCard.tags) {
+              if (tag.trim()) tagSet.add(tag.trim());
             }
           } catch (err) {
             console.error("Failed to create card:", err);
@@ -153,14 +155,14 @@ export function AnkiImportDialog(): JSX.Element {
       });
     } catch (error) {
       console.error("Anki import failed:", error);
-      const message = error instanceof Error ? error.message : "Unknown error";
+      const message = error instanceof Error ? error.message : t("ankiImport.unknownError");
       
       if (message.includes("sqlite") || message.includes("database")) {
-        toast.error("Could not read Anki file. The file may be corrupted or from an unsupported Anki version");
+        toast.error(t("ankiImport.errorCorruptedFile"));
       } else if (message.includes("not found") || message.includes("ENOENT")) {
-        toast.error("File not found. Please make sure the file still exists at the selected location");
+        toast.error(t("ankiImport.errorFileNotFound"));
       } else {
-        toast.error(`Import failed: ${message}. Try re-exporting from Anki or check the console for details`);
+        toast.error(t("ankiImport.importFailed", { message }));
       }
     } finally {
       setIsImporting(false);
@@ -177,7 +179,7 @@ export function AnkiImportDialog(): JSX.Element {
       <DialogTrigger asChild>
         <Button variant="outline">
           <Upload className="h-4 w-4" />
-          Import from Anki
+          {t("ankiImport.importFromAnki")}
         </Button>
       </DialogTrigger>
 
@@ -185,35 +187,35 @@ export function AnkiImportDialog(): JSX.Element {
       {!report && (
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Import Anki Deck</DialogTitle>
+            <DialogTitle>{t("ankiImport.importAnkiDeck")}</DialogTitle>
             <DialogDescription>
-              Select an .apkg file to import your existing Anki cards into Recall.
+              {t("ankiImport.importDescription")}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="deck-name">Deck Name</Label>
+              <Label htmlFor="deck-name">{t("ankiImport.deckName")}</Label>
               <Input
                 id="deck-name"
                 value={deckName}
                 onChange={(e) => setDeckName(e.target.value)}
-                placeholder="My Imported Deck"
+                placeholder={t("ankiImport.deckNamePlaceholder")}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="file-select">Anki File (.apkg)</Label>
+              <Label htmlFor="file-select">{t("ankiImport.ankiFile")}</Label>
               <div className="flex gap-2">
                 <Input
                   id="file-select"
                   value={selectedFile ? selectedFile.split(/[/\\]/).pop() : ""}
                   readOnly
-                  placeholder="No file selected"
+                  placeholder={t("ankiImport.noFileSelected")}
                   className="flex-1"
                 />
                 <Button variant="outline" onClick={handleFileSelect} disabled={isImporting}>
-                  Browse
+                  {t("ankiImport.browse")}
                 </Button>
               </div>
             </div>
@@ -221,10 +223,10 @@ export function AnkiImportDialog(): JSX.Element {
 
           <DialogFooter>
             <Button variant="ghost" onClick={handleClose} disabled={isImporting}>
-              Cancel
+              {t("ankiImport.cancel")}
             </Button>
             <Button onClick={handleImport} disabled={isImporting || !selectedFile || !deckName.trim()}>
-              {isImporting ? "Importing..." : "Import Cards"}
+              {isImporting ? t("ankiImport.importing") : t("ankiImport.importCards")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -240,10 +242,10 @@ export function AnkiImportDialog(): JSX.Element {
               ) : (
                 <Check className="h-5 w-5 text-emerald-500" />
               )}
-              Import Complete
+              {t("ankiImport.importComplete")}
             </DialogTitle>
             <DialogDescription>
-              Deck <span className="font-medium">{report.deckName}</span> created
+              {t("ankiImport.deckCreated", { name: report.deckName })}
             </DialogDescription>
           </DialogHeader>
 
@@ -251,20 +253,20 @@ export function AnkiImportDialog(): JSX.Element {
             <div className="grid grid-cols-2 gap-2">
               <ReportTile
                 icon={Layers}
-                label="Found"
+                label={t("ankiImport.found")}
                 value={report.totalFound}
                 color="text-zinc-500 dark:text-zinc-400"
               />
               <ReportTile
                 icon={Check}
-                label="Imported"
+                label={t("ankiImport.imported")}
                 value={report.imported}
                 color="text-emerald-500"
               />
               {report.failed > 0 && (
                 <ReportTile
                   icon={X}
-                  label="Failed"
+                  label={t("ankiImport.failed")}
                   value={report.failed}
                   color="text-red-500"
                 />
@@ -273,16 +275,16 @@ export function AnkiImportDialog(): JSX.Element {
 
             <div className="rounded-md bg-zinc-100/50 dark:bg-zinc-800/50 p-3 text-sm space-y-1">
               <div className="flex justify-between">
-                <span className="text-zinc-500 dark:text-zinc-400">Basic cards</span>
+                <span className="text-zinc-500 dark:text-zinc-400">{t("ankiImport.basicCards")}</span>
                 <span className="font-medium">{report.cardTypes.basic}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-500 dark:text-zinc-400">Cloze cards</span>
+                <span className="text-zinc-500 dark:text-zinc-400">{t("ankiImport.clozeCards")}</span>
                 <span className="font-medium">{report.cardTypes.cloze}</span>
               </div>
               {report.mediaImported > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-zinc-500 dark:text-zinc-400">Media files</span>
+                  <span className="text-zinc-500 dark:text-zinc-400">{t("ankiImport.mediaFiles")}</span>
                   <span className="font-medium">{report.mediaImported}</span>
                 </div>
               )}
@@ -292,17 +294,17 @@ export function AnkiImportDialog(): JSX.Element {
               <div>
                 <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 mb-2">
                   <Tag className="h-3 w-3" />
-                  Tags found
+                  {t("ankiImport.tagsFound")}
                 </div>
                 <div className="flex flex-wrap gap-1">
-                  {report.tags.slice(0, 10).map((t) => (
-                    <span key={t} className="rounded bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs">
-                      {t}
+                  {report.tags.slice(0, 10).map((tag) => (
+                    <span key={tag} className="rounded bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs">
+                      {tag}
                     </span>
                   ))}
                   {report.tags.length > 10 && (
                     <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                      +{report.tags.length - 10} more
+                      {t("ankiImport.moreTags", { count: report.tags.length - 10 })}
                     </span>
                   )}
                 </div>
@@ -313,7 +315,7 @@ export function AnkiImportDialog(): JSX.Element {
               <div>
                 <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 mb-2">
                   <Layers className="h-3 w-3" />
-                  Decks created ({report.decksCreated.length})
+                  {t("ankiImport.decksCreatedCount", { count: report.decksCreated.length })}
                 </div>
                 <div className="flex flex-wrap gap-1">
                   {report.decksCreated.slice(0, 8).map((d) => (
@@ -323,7 +325,7 @@ export function AnkiImportDialog(): JSX.Element {
                   ))}
                   {report.decksCreated.length > 8 && (
                     <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                      +{report.decksCreated.length - 8} more
+                      {t("ankiImport.moreDecks", { count: report.decksCreated.length - 8 })}
                     </span>
                   )}
                 </div>
@@ -334,7 +336,7 @@ export function AnkiImportDialog(): JSX.Element {
               <div className="rounded-md bg-amber-50 border border-amber-200 p-3 dark:bg-amber-950/20 dark:border-amber-900">
                 <div className="flex items-center gap-1 text-xs font-semibold text-amber-700 dark:text-amber-400 mb-2">
                   <AlertTriangle className="h-3 w-3" />
-                  Warnings
+                  {t("ankiImport.warnings")}
                 </div>
                 <ul className="space-y-1">
                   {report.warnings.map((w, i) => (
@@ -349,7 +351,7 @@ export function AnkiImportDialog(): JSX.Element {
 
           <DialogFooter>
             <Button onClick={handleClose} className="w-full">
-              Done
+              {t("ankiImport.done")}
             </Button>
           </DialogFooter>
         </DialogContent>

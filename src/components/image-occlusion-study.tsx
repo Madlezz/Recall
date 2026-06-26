@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import type { ImageOcclusionData, OcclusionShape } from "@/types";
 import { getImageUrl } from "@/services/images";
 
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function ImageOcclusionStudy({ data, revealed }: Props) {
+  const { t } = useTranslation();
   const [revealedIndex, setRevealedIndex] = useState<number | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
@@ -126,14 +128,14 @@ export function ImageOcclusionStudy({ data, revealed }: Props) {
             onClick={handleRevealNext}
             className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
           >
-            {revealedIndex === null ? "Reveal First" : "Reveal Next"}
+            {revealedIndex === null ? t("imageOcclusionStudy.revealFirst") : t("imageOcclusionStudy.revealNext")}
           </button>
           {revealedIndex !== null && (
             <button
               onClick={handleRevealAll}
               className="rounded-lg bg-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-300 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600"
             >
-              Reveal All
+              {t("imageOcclusionStudy.revealAll")}
             </button>
           )}
         </div>
@@ -141,7 +143,7 @@ export function ImageOcclusionStudy({ data, revealed }: Props) {
 
       {revealedIndex !== null && !revealed && (
         <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
-          Revealed {revealedIndex + 1} of {data.occlusions.length}
+          {t("imageOcclusionStudy.revealed", { current: revealedIndex + 1, total: data.occlusions.length })}
         </p>
       )}
     </div>

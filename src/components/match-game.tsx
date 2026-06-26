@@ -1,6 +1,7 @@
 import confetti from "canvas-confetti";
 import { ArrowLeft, Check, Clock, RotateCcw, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
@@ -42,6 +43,7 @@ function buildTiles(cards: Card[]): MatchTile[] {
 type FeedbackType = "match" | "mismatch" | null;
 
 export function MatchGame(): JSX.Element {
+  const { t } = useTranslation();
   const _allCards = useRecallStore((state) => state.cards);
   const settings = useRecallStore((state) => state.settings);
   const addXp = useRecallStore((state) => state.addXp);
@@ -87,7 +89,7 @@ export function MatchGame(): JSX.Element {
     // Clean up any running state
     if (intervalRef.current) clearInterval(intervalRef.current);
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    
+
     const picked = pickCards(deckCards, pairCount);
     setGameCards(picked);
     setTiles(buildTiles(picked));
@@ -142,7 +144,7 @@ export function MatchGame(): JSX.Element {
     if (first.cardId === second.cardId && first.side !== second.side) {
       playMatchSound();
       setFeedback("match");
-      setAnnouncement(`Matched! ${matchedPairs + 1} of ${totalPairs} pairs found.`);
+      setAnnouncement(t("matchGame.matchedAnnouncement", { matched: matchedPairs + 1, total: totalPairs }));
       setMatched((prev) => new Set([...prev, first.id, second.id]));
       setSelected(null);
 
@@ -153,7 +155,7 @@ export function MatchGame(): JSX.Element {
         if (intervalRef.current) clearInterval(intervalRef.current);
         setRunning(false);
         setFinished(true);
-        setAnnouncement(`All ${totalPairs} pairs matched in ${formatTime(elapsed)} with ${moves + 1} moves!`);
+        setAnnouncement(t("matchGame.completeAnnouncement", { total: totalPairs, time: formatTime(elapsed), moves: moves + 1 }));
 
         // Big confetti
         if (!prefersReducedMotion()) {
@@ -193,7 +195,7 @@ export function MatchGame(): JSX.Element {
       // No match — shake
       playMismatchSound();
       setFeedback("mismatch");
-      setAnnouncement("Not a match. Try again.");
+      setAnnouncement(t("matchGame.notAMatch"));
       setShaking(new Set([first.id, second.id]));
       timeoutRef.current = setTimeout(() => {
         setShaking(new Set());
@@ -209,9 +211,9 @@ export function MatchGame(): JSX.Element {
     return (
       <div className="flex min-h-[70vh] items-center justify-center">
         <div className="text-center space-y-4">
-          <h1 className="text-xl font-semibold">Not enough cards</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">Add at least 2 cards to play Match Game</p>
-          <Button onClick={showDashboard}>Back</Button>
+          <h1 className="text-xl font-semibold">{t("matchGame.notEnoughCards")}</h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("matchGame.addCardsHint")}</p>
+          <Button onClick={showDashboard}>{t("matchGame.back")}</Button>
         </div>
       </div>
     );
@@ -236,29 +238,29 @@ export function MatchGame(): JSX.Element {
 
       {/* Header */}
       <header className="flex items-center justify-between pb-4">
-        <Button variant="ghost" onClick={showDashboard} aria-label="Exit match game">
+        <Button variant="ghost" onClick={showDashboard} aria-label={t("matchGame.exitAria")}>
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-          Exit
+          {t("matchGame.exit")}
         </Button>
 
-        <div className="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-400" role="group" aria-label="Game stats">
-          <span className="flex items-center gap-1" aria-label={`Time elapsed: ${formatTime(elapsed)}`}>
+        <div className="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-400" role="group" aria-label={t("matchGame.gameStatsAria")}>
+          <span className="flex items-center gap-1" aria-label={t("matchGame.timeElapsedAria", { time: formatTime(elapsed) })}>
             <Clock className="h-4 w-4" aria-hidden="true" />
             {formatTime(elapsed)}
           </span>
-          <span className="flex items-center gap-1" aria-label={`${matchedPairs} of ${totalPairs} pairs matched`}>
+          <span className="flex items-center gap-1" aria-label={t("matchGame.pairsMatchedAria", { matched: matchedPairs, total: totalPairs })}>
             <Check className="h-4 w-4" aria-hidden="true" />
             {matchedPairs}/{totalPairs}
           </span>
-          <span className="flex items-center gap-1" aria-label={`${moves} moves made`}>
+          <span className="flex items-center gap-1" aria-label={t("matchGame.movesAria", { count: moves })}>
             <Zap className="h-4 w-4" aria-hidden="true" />
-            {moves} moves
+            {t("matchGame.moves", { count: moves })}
           </span>
         </div>
 
-        <Button variant="outline" size="sm" onClick={startGame} aria-label="Restart game">
+        <Button variant="outline" size="sm" onClick={startGame} aria-label={t("matchGame.restartAria")}>
           <RotateCcw className="h-4 w-4 mr-1" aria-hidden="true" />
-          Restart
+          {t("matchGame.restart")}
         </Button>
       </header>
 
@@ -268,24 +270,24 @@ export function MatchGame(): JSX.Element {
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-500">
             <Check className="h-6 w-6" aria-hidden="true" />
           </div>
-          <h2 className="mt-3 text-xl font-bold">All matched!</h2>
+          <h2 className="mt-3 text-xl font-bold">{t("matchGame.allMatched")}</h2>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            {totalPairs} pairs in {formatTime(elapsed)} · {moves} moves
+            {t("matchGame.summary", { total: totalPairs, time: formatTime(elapsed), moves })}
           </p>
           {xpEarned > 0 && (
             <p className="mt-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              +{xpEarned} XP
+              {t("matchGame.xpEarned", { count: xpEarned })}
             </p>
           )}
           <Button className="mt-4" onClick={startGame}>
-            Play Again
+            {t("matchGame.playAgain")}
           </Button>
         </div>
       )}
 
       {/* Tile grid */}
       <div className="flex-1 flex items-start justify-center pt-2">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 w-full max-w-4xl" role="group" aria-label="Match game tiles">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 w-full max-w-4xl" role="group" aria-label={t("matchGame.tilesAria")}>
           {tiles.map((tile) => {
             const isMatched = matched.has(tile.id);
             const isShaking = shaking.has(tile.id);
@@ -297,8 +299,8 @@ export function MatchGame(): JSX.Element {
                 key={tile.id}
                 onClick={() => handleTileClick(tile.id)}
                 disabled={isMatched}
-                aria-label={`${isFront ? "Question" : "Answer"}: ${tile.text}. ${
-                  isMatched ? "Already matched" : isSelected ? "Currently selected" : ""
+                aria-label={`${isFront ? t("matchGame.question") : t("matchGame.answer")}: ${tile.text}. ${
+                  isMatched ? t("matchGame.alreadyMatched") : isSelected ? t("matchGame.currentlySelected") : ""
                 }`}
                 aria-selected={isSelected}
                 aria-disabled={isMatched}
@@ -317,7 +319,7 @@ export function MatchGame(): JSX.Element {
                 )}
               >
                 <span className="text-[10px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1 block">
-                  {isFront ? "Question" : "Answer"}
+                  {isFront ? t("matchGame.question") : t("matchGame.answer")}
                 </span>
                 <p className="line-clamp-3 leading-snug">{tile.text}</p>
               </button>

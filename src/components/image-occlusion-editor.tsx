@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { X, Plus } from "lucide-react";
 import type { ImageOcclusionData, OcclusionShape } from "@/types";
 import { insertImage, getImageUrl } from "@/services/images";
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function ImageOcclusionEditor({ value, onChange }: Props) {
+  const { t } = useTranslation();
   const [drawing, setDrawing] = useState(false);
   const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(null);
   const [currentShape, setCurrentShape] = useState<OcclusionShape | null>(null);
@@ -127,7 +129,7 @@ export function ImageOcclusionEditor({ value, onChange }: Props) {
   const handleMouseUp = () => {
     if (!drawing || !currentShape || !value) return;
 
-    const label = prompt("Enter label for this occlusion:");
+    const label = prompt(t("imageOcclusionEditor.enterLabelPrompt"));
     if (label === null) {
       // Cancelled
       setDrawing(false);
@@ -179,7 +181,7 @@ export function ImageOcclusionEditor({ value, onChange }: Props) {
           className="w-full rounded-lg border-2 border-dashed border-zinc-300 bg-zinc-50 p-8 text-center hover:border-zinc-400 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
         >
           <Plus className="mx-auto mb-2 h-8 w-8 text-zinc-400" />
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">Click to upload image</p>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("imageOcclusionEditor.clickToUpload")}</p>
         </button>
       ) : (
         <>
@@ -196,14 +198,14 @@ export function ImageOcclusionEditor({ value, onChange }: Props) {
               onClick={handleUploadImage}
               className="absolute right-2 top-2 rounded bg-zinc-900/80 px-3 py-1 text-xs text-white hover:bg-zinc-900"
             >
-              Change Image
+              {t("imageOcclusionEditor.changeImage")}
             </button>
           </div>
 
           {value.occlusions.length > 0 && (
             <div className="space-y-2">
               <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Occlusions ({value.occlusions.length}):
+                {t("imageOcclusionEditor.occlusions", { count: value.occlusions.length })}:
               </p>
               {value.occlusions.map((shape, i) => (
                 <div
@@ -225,7 +227,7 @@ export function ImageOcclusionEditor({ value, onChange }: Props) {
           )}
 
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Draw rectangles on the image to create occlusions. Each rectangle becomes a card.
+            {t("imageOcclusionEditor.drawHint")}
           </p>
         </>
       )}

@@ -1,5 +1,6 @@
 import confetti from "canvas-confetti";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useRecallStore } from "@/stores/recall-store";
 import { prefersReducedMotion, CONFETTI_COLORS } from "@/lib/xp";
 
@@ -13,6 +14,7 @@ function reviewsToday(reviewLogs: { reviewDate: string }[]): number {
 }
 
 export function DailyGoal(): JSX.Element {
+  const { t } = useTranslation();
   const reviewLogs = useRecallStore((state) => state.reviewLogs);
   const goal = useRecallStore((state) => state.settings.dailyGoal);
   const [celebrated, setCelebrated] = useState(false);
@@ -40,7 +42,7 @@ export function DailyGoal(): JSX.Element {
 
   return (
     <div className="rounded-lg border border-zinc-200 bg-white px-4 py-5 dark:border-zinc-800 dark:bg-zinc-900">
-      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">Daily Goal</span>
+      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">{t("dailyGoal.title")}</span>
 
       <div className="mt-2 flex items-baseline gap-1.5">
         <span
@@ -52,7 +54,7 @@ export function DailyGoal(): JSX.Element {
         <span className="text-lg text-zinc-400 tabular-nums">{goal}</span>
       </div>
 
-      <div className="mt-3 h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label={`Daily goal progress: ${done} of ${goal} reviews`}>
+      <div className="mt-3 h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label={t("dailyGoal.progressAria", { done, goal })}>
         <div
           className={achieved ? "h-full rounded-full bg-emerald-500 transition-[width] duration-700 ease-out" : "h-full rounded-full bg-zinc-700 transition-[width] duration-700 ease-out dark:bg-zinc-300"}
           style={{ width: `${Math.round(progress * 100)}%` }}
@@ -60,7 +62,7 @@ export function DailyGoal(): JSX.Element {
       </div>
 
       <p className="mt-1.5 text-xs text-zinc-400">
-        {achieved ? "Goal crushed! 🎉" : progress > 0.5 ? `${goal - done} more to go` : `${goal - done} cards today`}
+        {achieved ? t("dailyGoal.goalCrushed") : progress > 0.5 ? t("dailyGoal.moreToGo", { count: goal - done }) : t("dailyGoal.cardsToday", { count: goal - done })}
       </p>
     </div>
   );

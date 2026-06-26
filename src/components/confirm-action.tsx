@@ -1,7 +1,7 @@
 import {
-  AlertCancelButton,
   AlertDialog,
   AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface ConfirmActionProps {
   title: string;
@@ -29,6 +30,7 @@ export function ConfirmAction({
   destructive = false,
   onConfirm,
 }: ConfirmActionProps): JSX.Element {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
 
@@ -61,7 +63,11 @@ export function ConfirmAction({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertCancelButton />
+          <AlertDialogCancel asChild>
+            <Button variant="outline" className="border-zinc-200 text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100">
+              {t("confirmAction.cancel")}
+            </Button>
+          </AlertDialogCancel>
           <AlertDialogAction asChild>
             <Button
               variant={destructive ? "destructive" : "default"}

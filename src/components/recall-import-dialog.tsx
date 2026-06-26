@@ -1,5 +1,6 @@
 import { PackageOpen } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +22,7 @@ interface RecallImportDialogProps {
 }
 
 export function RecallImportDialog({ deckId }: RecallImportDialogProps): JSX.Element {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [pkgData, setPkgData] = useState<{
     deckName: string;
@@ -72,7 +74,7 @@ export function RecallImportDialog({ deckId }: RecallImportDialogProps): JSX.Ele
         setTargetDeckId(decks[0].id);
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not open .recall file");
+      toast.error(err instanceof Error ? err.message : t("recallImport.couldNotOpenFile"));
     } finally {
       setLoading(false);
     }
@@ -90,7 +92,7 @@ export function RecallImportDialog({ deckId }: RecallImportDialogProps): JSX.Ele
         targetId = newId;
         setTargetDeckId(newId);
       } catch {
-        toast.error("Could not create deck");
+        toast.error(t("recallImport.couldNotCreateDeck"));
         return;
       }
     }
@@ -114,7 +116,7 @@ export function RecallImportDialog({ deckId }: RecallImportDialogProps): JSX.Ele
       }
     }
 
-    toast.success(`Imported ${imported} of ${pkgData.cards.length} cards`);
+    toast.success(t("recallImport.imported", { imported, total: pkgData.cards.length }));
     setOpen(false);
     setPkgData(null);
   }
@@ -129,35 +131,35 @@ export function RecallImportDialog({ deckId }: RecallImportDialogProps): JSX.Ele
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" onClick={handleOpen}>
           <PackageOpen className="h-4 w-4 mr-1" />
-          Import .recall
+          {t("recallImport.importRecall")}
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[min(92vw,600px)] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Import .recall Package</DialogTitle>
+          <DialogTitle>{t("recallImport.title")}</DialogTitle>
           <DialogDescription>
-            Import a shareable Recall deck package with cards and images.
+            {t("recallImport.description")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           {loading ? (
-            <p className="text-sm text-muted-foreground text-center py-8">Reading package...</p>
+            <p className="text-sm text-muted-foreground text-center py-8">{t("recallImport.readingPackage")}</p>
           ) : pkgData ? (
             <>
               <div className="rounded-md border p-4 space-y-2">
                 <p className="font-medium">{pkgData.deckName}</p>
-                <p className="text-sm text-muted-foreground">{pkgData.cardCount} cards</p>
+                <p className="text-sm text-muted-foreground">{t("recallImport.cardCount", { count: pkgData.cardCount })}</p>
               </div>
 
               <div className="space-y-2">
-                <Label>Target Deck</Label>
+                <Label>{t("recallImport.targetDeck")}</Label>
                 <Select value={targetDeckId} onValueChange={setTargetDeckId}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select or create deck" />
+                    <SelectValue placeholder={t("recallImport.selectOrCreateDeck")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="__new__">+ Create new deck "{pkgData.deckName}"</SelectItem>
+                    <SelectItem value="__new__">{t("recallImport.createNewDeck", { name: pkgData.deckName })}</SelectItem>
                     {decks.map((deck) => (
                       <SelectItem key={deck.id} value={deck.id}>
                         {deck.name}
@@ -176,7 +178,7 @@ export function RecallImportDialog({ deckId }: RecallImportDialogProps): JSX.Ele
                 ))}
                 {pkgData.cards.length > 20 && (
                   <p className="text-xs text-muted-foreground pt-1">
-                    ...and {pkgData.cards.length - 20} more
+                    {t("recallImport.andMore", { count: pkgData.cards.length - 20 })}
                   </p>
                 )}
               </div>
@@ -185,7 +187,7 @@ export function RecallImportDialog({ deckId }: RecallImportDialogProps): JSX.Ele
             <div className="flex flex-col items-center gap-3 py-8">
               <PackageOpen className="h-10 w-10 text-muted-foreground" />
               <p className="text-sm text-muted-foreground text-center">
-                Select a .recall file to preview and import.
+                {t("recallImport.selectFileHint")}
               </p>
             </div>
           )}
@@ -193,10 +195,10 @@ export function RecallImportDialog({ deckId }: RecallImportDialogProps): JSX.Ele
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
-            Cancel
+            {t("recallImport.cancel")}
           </Button>
           <Button onClick={handleImport} disabled={!pkgData || (!targetDeckId && targetDeckId !== "__new__")}>
-            Import {pkgData ? `${pkgData.cardCount} cards` : ""}
+            {t("recallImport.importCards", { count: pkgData ? pkgData.cardCount : 0 })}
           </Button>
         </DialogFooter>
       </DialogContent>
