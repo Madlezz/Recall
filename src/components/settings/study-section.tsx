@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { SettingsCard } from "./settings-card";
 import { useRecallStore } from "@/stores/recall-store";
 import { toast } from "sonner";
-import { optimizeFromHistory, formatOptimizationResult } from "@/services/fsrs-optimizer";
+import { optimizeFromHistory } from "@/services/fsrs-optimizer";
 
 export function StudySection(): JSX.Element {
   const { t } = useTranslation();
@@ -30,9 +30,13 @@ export function StudySection(): JSX.Element {
                     desiredRetention: result.suggestedRetention,
                     fsrsWeights: result.weights,
                   });
-                  toast.success(formatOptimizationResult(result));
+                  toast.success(t("settings.optimizeSuccess", {
+                    reviewCount: result.reviewCount,
+                    actualRetention: Math.round(result.actualRetention * 100),
+                    suggestedRetention: Math.round(result.suggestedRetention * 100),
+                  }));
                 } else {
-                  toast.error(formatOptimizationResult(result));
+                  toast.error(result.error ?? t("settings.optimizeFailed"));
                 }
               }}
               disabled={reviewLogs.length < 100}

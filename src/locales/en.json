@@ -300,7 +300,9 @@
     "installUpdate": "Install Update",
     "updateCheckFailed": "Failed to check for updates",
     "updateInstallFailed": "Failed to install update",
-    "languageDescription": "Choose your preferred language for the interface."
+    "languageDescription": "Choose your preferred language for the interface.",
+    "optimizeSuccess": "Analyzed {{reviewCount}} reviews. Your actual retention: {{actualRetention}}%. Suggested target: {{suggestedRetention}}%.",
+    "optimizeFailed": "Optimization failed"
   },
   "stats": {
     "title": "Statistics",
