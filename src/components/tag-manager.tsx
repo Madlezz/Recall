@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Tag, ChevronRight, ChevronDown, Search, Trash2, Edit3, X, Check, Bookmark, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ function TreeNode({
   expanded: Set<string>;
   onToggle: (tag: string) => void;
 }): JSX.Element {
+  const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(node.fullPath);
   const isExpanded = expanded.has(node.fullPath);
@@ -57,7 +59,7 @@ function TreeNode({
           <button
             onClick={() => onToggle(node.fullPath)}
             className="flex h-5 w-5 items-center justify-center rounded text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-            aria-label={isExpanded ? "Collapse" : "Expand"}
+            aria-label={isExpanded ? t("tagManager.collapse") : t("tagManager.expand")}
           >
             {isExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
           </button>
@@ -105,14 +107,14 @@ function TreeNode({
               <button
                 onClick={() => { setEditing(true); setEditValue(node.fullPath); }}
                 className="p-1 rounded text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200 dark:hover:text-zinc-300 dark:hover:bg-zinc-700"
-                aria-label="Rename tag"
+                aria-label={t("tagManager.renameTag")}
               >
                 <Edit3 className="h-3 w-3" />
               </button>
               <button
                 onClick={() => onDelete(node.fullPath)}
                 className="p-1 rounded text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
-                aria-label="Delete tag"
+                aria-label={t("tagManager.deleteTag")}
               >
                 <Trash2 className="h-3 w-3" />
               </button>
@@ -142,6 +144,7 @@ function TreeNode({
 }
 
 export function TagManager(): JSX.Element {
+  const { t } = useTranslation();
   const cards = useRecallStore((state) => state.cards);
   const updateCard = useRecallStore((state) => state.updateCard);
   const showBrowser = useRecallStore((state) => state.showBrowser);
@@ -184,7 +187,7 @@ export function TagManager(): JSX.Element {
   async function handleRename(oldTag: string, newTag: string): Promise<void> {
     const affectedCards = cards.filter((c) => c.tags.includes(oldTag));
     if (affectedCards.length === 0) {
-      toast.info("No cards with this tag");
+      toast.info(t("tagManager.noCardsWithTag"));
       return;
     }
 
@@ -205,18 +208,18 @@ export function TagManager(): JSX.Element {
         // skip
       }
     }
-    toast.success(`Renamed "${oldTag}" → "${newTag}" (${updated} cards)`);
+    toast.success(t("tagManager.renamedTag", { oldTag, newTag, count: updated }));
     setSelectedTag(null);
   }
 
   async function handleDelete(tag: string): Promise<void> {
     const affectedCards = cards.filter((c) => c.tags.includes(tag));
     if (affectedCards.length === 0) {
-      toast.info("No cards with this tag");
+      toast.info(t("tagManager.noCardsWithTag"));
       return;
     }
 
-    if (!confirm(`Remove tag "${tag}" from ${affectedCards.length} card(s)?`)) return;
+    if (!confirm(t("tagManager.confirmRemoveTag", { tag, count: affectedCards.length }))) return;
 
     let updated = 0;
     for (const card of affectedCards) {
@@ -234,7 +237,7 @@ export function TagManager(): JSX.Element {
         // skip
       }
     }
-    toast.success(`Removed "${tag}" from ${updated} card(s)`);
+    toast.success(t("tagManager.removedTag", { tag, count: updated }));
     if (selectedTag === tag) setSelectedTag(null);
   }
 
@@ -248,11 +251,11 @@ export function TagManager(): JSX.Element {
 
   function handleSaveSearch(): void {
     if (!selectedTag || !newSearchName.trim()) {
-      toast.error("Please enter a name for the saved search");
+      toast.error(t("tagManager.enterSearchName"));
       return;
     }
     addSavedSearch(newSearchName.trim(), [selectedTag], newSearchMatchMode);
-    toast.success(`Saved search "${newSearchName.trim()}"`);
+    toast.success(t("tagManager.savedSearchSaved", { name: newSearchName.trim() }));
     setNewSearchName("");
     setNewSearchMatchMode("all");
     setShowSaveDialog(false);
@@ -265,14 +268,14 @@ export function TagManager(): JSX.Element {
       count: 50,
     });
     if (!result) {
-      toast.error("No cards match this saved search");
+      toast.error(t("tagManager.noCardsMatchSearch"));
     }
   }
 
   function handleDeleteSavedSearch(search: SavedSearch): void {
-    if (!confirm(`Delete saved search "${search.name}"?`)) return;
+    if (!confirm(t("tagManager.confirmDeleteSearch", { name: search.name }))) return;
     removeSavedSearch(search.id);
-    toast.success(`Deleted "${search.name}"`);
+    toast.success(t("tagManager.searchDeleted", { name: search.name }));
   }
 
   const selectedCards = selectedTag ? getCardsInTagHierarchy(cards, selectedTag) : [];
@@ -282,9 +285,9 @@ export function TagManager(): JSX.Element {
     <div className="animate-fade-in space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold tracking-normal">Tags</h1>
+        <h1 className="text-2xl font-semibold tracking-normal">{t("tagManager.title")}</h1>
         <p className="text-sm text-muted-foreground">
-          {totalTags} tags · {cards.length} cards
+          {t("tagManager.tagStats", { tags: totalTags, cards: cards.length })}
         </p>
       </div>
 
@@ -292,7 +295,7 @@ export function TagManager(): JSX.Element {
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          placeholder="Search tags..."
+          placeholder={t("tagManager.searchPlaceholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="pl-9"
@@ -304,7 +307,7 @@ export function TagManager(): JSX.Element {
         <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
           <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
             <Bookmark className="h-4 w-4" />
-            Saved Searches
+            {t("tagManager.savedSearches")}
           </h2>
           <div className="space-y-2">
             {savedSearches.map((search) => (
@@ -319,7 +322,7 @@ export function TagManager(): JSX.Element {
                       <Badge key={t} tone="muted" className="text-[10px]">{t}</Badge>
                     ))}
                     <span className="text-[10px] text-muted-foreground">
-                      {search.matchMode === "all" ? "All tags" : "Any tag"}
+                      {search.matchMode === "all" ? t("tagManager.allTags") : t("tagManager.anyTag")}
                     </span>
                   </div>
                 </div>
@@ -327,14 +330,14 @@ export function TagManager(): JSX.Element {
                   <button
                     onClick={() => handleStudySavedSearch(search)}
                     className="rounded p-1.5 text-zinc-400 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-950"
-                    aria-label="Start study session"
+                    aria-label={t("tagManager.startStudy")}
                   >
                     <Play className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() => handleDeleteSavedSearch(search)}
                     className="rounded p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
-                    aria-label="Delete saved search"
+                    aria-label={t("tagManager.deleteSavedSearch")}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -351,7 +354,7 @@ export function TagManager(): JSX.Element {
           {filteredTree.length === 0 ? (
             <div className="py-12 text-center text-sm text-muted-foreground">
               <Tag className="mx-auto h-8 w-8 mb-2 opacity-40" />
-              {search ? "No matching tags" : "No tags yet — add tags to your cards!"}
+              {search ? t("tagManager.noMatchingTags") : t("tagManager.noTagsYet")}
             </div>
           ) : (
             <ul className="space-y-0.5">
@@ -377,7 +380,7 @@ export function TagManager(): JSX.Element {
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{selectedTag}</h3>
-                  <p className="text-xs text-muted-foreground">{selectedCards.length} cards</p>
+                  <p className="text-xs text-muted-foreground">{t("tagManager.cardCount", { count: selectedCards.length })}</p>
                 </div>
                 <button
                   onClick={() => setSelectedTag(null)}
@@ -404,7 +407,7 @@ export function TagManager(): JSX.Element {
                 ))}
                 {selectedCards.length > 20 && (
                   <p className="text-xs text-muted-foreground text-center">
-                    +{selectedCards.length - 20} more
+                    {t("tagManager.andMore", { count: selectedCards.length - 20 })}
                   </p>
                 )}
               </div>
@@ -416,11 +419,10 @@ export function TagManager(): JSX.Element {
                   size="sm"
                   className="w-full"
                   onClick={() => {
-                    // Navigate to browser with tag filter
                     showBrowser();
                   }}
                 >
-                  View in Browser
+                  {t("tagManager.viewInBrowser")}
                 </Button>
                 <Button
                   variant="outline"
@@ -429,7 +431,7 @@ export function TagManager(): JSX.Element {
                   onClick={() => setShowSaveDialog(true)}
                 >
                   <Bookmark className="mr-1.5 h-3 w-3" />
-                  Save as Search
+                  {t("tagManager.saveAsSearch")}
                 </Button>
               </div>
 
@@ -437,10 +439,10 @@ export function TagManager(): JSX.Element {
               {showSaveDialog && (
                 <div className="mt-3 rounded-md border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-800">
                   <div className="mb-2 text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                    Save "{selectedTag}" as search
+                    {t("tagManager.saveAsSearchLabel", { tag: selectedTag })}
                   </div>
                   <Input
-                    placeholder="Search name..."
+                    placeholder={t("tagManager.searchNamePlaceholder")}
                     value={newSearchName}
                     onChange={(e) => setNewSearchName(e.target.value)}
                     className="mb-2 h-8 text-xs"
@@ -455,7 +457,7 @@ export function TagManager(): JSX.Element {
                         checked={newSearchMatchMode === "all"}
                         onChange={() => setNewSearchMatchMode("all")}
                       />
-                      All tags
+                      {t("tagManager.allTags")}
                     </label>
                     <label className="flex items-center gap-1 text-xs">
                       <input
@@ -465,12 +467,12 @@ export function TagManager(): JSX.Element {
                         checked={newSearchMatchMode === "any"}
                         onChange={() => setNewSearchMatchMode("any")}
                       />
-                      Any tag
+                      {t("tagManager.anyTag")}
                     </label>
                   </div>
                   <div className="flex gap-2">
                     <Button size="sm" onClick={handleSaveSearch} className="flex-1">
-                      Save
+                      {t("tagManager.save")}
                     </Button>
                     <Button
                       size="sm"
@@ -480,7 +482,7 @@ export function TagManager(): JSX.Element {
                         setNewSearchName("");
                       }}
                     >
-                      Cancel
+                      {t("tagManager.cancel")}
                     </Button>
                   </div>
                 </div>
@@ -488,7 +490,7 @@ export function TagManager(): JSX.Element {
             </>
           ) : (
             <div className="py-8 text-center text-sm text-muted-foreground">
-              Click a tag to see its cards
+              {t("tagManager.clickTagToSee")}
             </div>
           )}
         </div>
