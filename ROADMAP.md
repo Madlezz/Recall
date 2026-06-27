@@ -80,7 +80,7 @@ This document outlines the planned features and improvements for Recall. Items a
 - [x] Keyboard-first navigation
 - [x] Global hotkey for quick-add
 - [x] Multi-platform (Windows, macOS, Linux)
-- [x] Comprehensive test suite (416 tests)
+- [x] Comprehensive test suite (731 tests)
 - [x] CI/CD with automated releases
 - [x] Accessibility documentation and ARIA labels
 - [x] User-friendly error messages across all dialogs
