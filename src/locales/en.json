@@ -1,4 +1,19 @@
 {
+  "app": {
+    "loading": "Loading local data...",
+    "couldNotLoad": "Could not load Recall",
+    "noCardsDue": "No cards due right now",
+    "loadingView": "Loading...",
+    "dashboardView": "Dashboard view",
+    "deckDetailView": "Deck detail view",
+    "studyModeView": "Study mode",
+    "matchGameView": "Match game",
+    "browserView": "Card browser",
+    "tagsView": "Tags",
+    "statsView": "Statistics",
+    "settingsView": "Settings",
+    "onboardingView": "Welcome to Recall"
+  },
   "nav": {
     "dashboard": "Dashboard",
     "review": "Review",

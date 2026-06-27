@@ -1,4 +1,19 @@
 {
+  "app": {
+    "loading": "Memuat data lokal...",
+    "couldNotLoad": "Tidak dapat memuat Recall",
+    "noCardsDue": "Tidak ada kartu jatuh tempo",
+    "loadingView": "Memuat...",
+    "dashboardView": "Tampilan dasbor",
+    "deckDetailView": "Tampilan detail dek",
+    "studyModeView": "Mode belajar",
+    "matchGameView": "Permainan mencocokkan",
+    "browserView": "Browser kartu",
+    "tagsView": "Tag",
+    "statsView": "Statistik",
+    "settingsView": "Pengaturan",
+    "onboardingView": "Selamat datang di Recall"
+  },
   "nav": {
     "dashboard": "Beranda",
     "review": "Ulangan",
