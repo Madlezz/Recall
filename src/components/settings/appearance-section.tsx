@@ -75,6 +75,7 @@ export function AppearanceSection(): JSX.Element {
               <button
                 key={color}
                 onClick={() => void setAccentColor(color)}
+                aria-pressed={settings.accentColor === color}
                 className={`h-8 w-8 rounded-full border-2 transition-all ${
                   settings.accentColor === color ? "border-zinc-900 scale-110" : "border-zinc-300 dark:border-zinc-700"
                 }`}

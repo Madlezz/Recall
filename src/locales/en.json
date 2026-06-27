@@ -60,6 +60,7 @@
     "sortName": "Name",
     "sortDue": "Due",
     "sortCards": "Cards",
+    "sortLabel": "Sort decks by",
     "emptyTitle": "Your library is empty",
     "emptyDescription": "Create your first deck and start building knowledge that sticks.",
     "createDeck": "Create Deck",

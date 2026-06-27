@@ -138,12 +138,13 @@ export function Dashboard(): JSX.Element {
           <div className="flex items-center gap-3">
             <span className="text-xs tabular-nums text-zinc-400">{t("dashboard.totalDecks", { count: decks.length })}</span>
             {/* Segmented sort */}
-            <div className="flex rounded-md bg-zinc-100 p-0.5 dark:bg-zinc-800">
-              {(["name", "due", "cards"] as const).map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSortBy(s)}
-                  className={cn(
+                        <div className="flex rounded-md bg-zinc-100 p-0.5 dark:bg-zinc-800" role="group" aria-label={t("dashboard.sortLabel")}>
+                          {(["name", "due", "cards"] as const).map((s) => (
+                            <button
+                              key={s}
+                              onClick={() => setSortBy(s)}
+                              aria-pressed={sortBy === s}
+                              className={cn(
                     "px-3 py-1 text-xs font-medium rounded-sm transition-colors",
                     sortBy === s
                       ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-100"

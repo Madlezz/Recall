@@ -195,6 +195,7 @@ export function FocusTimer(): JSX.Element {
             key={m}
             disabled={running}
             onClick={() => pickPreset(m)}
+            aria-pressed={duration === m * 60}
             className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
               duration === m * 60
                 ? "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200"
@@ -230,6 +231,7 @@ export function FocusTimer(): JSX.Element {
       <div className="mt-4 flex justify-center gap-1">
         <button
           onClick={() => toggleSoundscape("none")}
+          aria-pressed={sc === "none"}
           className={`px-2 py-1.5 rounded text-[10px] font-medium transition-colors ${
             sc === "none" ? "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200" : "text-zinc-400 hover:text-zinc-600"
           }`}
@@ -241,6 +243,7 @@ export function FocusTimer(): JSX.Element {
           <button
             key={id}
             onClick={() => toggleSoundscape(id)}
+            aria-pressed={sc === id}
             className={`px-2 py-1.5 rounded text-[10px] font-medium transition-colors ${
               sc === id ? "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200" : "text-zinc-400 hover:text-zinc-600"
             }`}
