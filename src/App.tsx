@@ -65,7 +65,7 @@ export function App(): JSX.Element {
 
     window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-      }, [view, startReview]);
+      }, [t, view, startReview]);
 
       // Listen for global shortcut (Ctrl+Shift+N) from Tauri — works even when app is in background
       useEffect(() => {
