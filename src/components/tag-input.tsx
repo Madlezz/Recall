@@ -140,28 +140,35 @@ export function TagInput({ value, onChange, className, placeholder = "Add tags..
           </span>
         ))}
         <input
-          ref={inputRef}
-          type="text"
-          value={input}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          onFocus={() => {
-            if (input.trim()) setShowSuggestions(true);
-          }}
-          placeholder={value.length === 0 ? placeholder : ""}
-          className="min-w-[80px] flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400"
-          autoComplete="off"
-        />
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  onFocus={() => {
+                    if (input.trim()) setShowSuggestions(true);
+                  }}
+                  placeholder={value.length === 0 ? placeholder : ""}
+                  className="min-w-[80px] flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400"
+                  autoComplete="off"
+                  role="combobox"
+                  aria-expanded={showSuggestions && suggestions.length > 0}
+                  aria-controls="tag-suggestions"
+                  aria-activedescendant={showSuggestions && suggestions.length > 0 ? `tag-opt-${selectedIndex}` : undefined}
+                />
       </div>
 
       {/* Suggestions dropdown */}
       {showSuggestions && suggestions.length > 0 && (
         <div className="absolute z-50 mt-1 w-full rounded-md border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-          <ul className="max-h-48 overflow-y-auto py-1">
-            {suggestions.map((tag, i) => (
-              <li
-                key={tag}
-                className={cn(
+          <ul id="tag-suggestions" role="listbox" className="max-h-48 overflow-y-auto py-1">
+                      {suggestions.map((tag, i) => (
+                        <li
+                          key={tag}
+                          id={`tag-opt-${i}`}
+                          role="option"
+                          aria-selected={i === selectedIndex}
+                          className={cn(
                   "cursor-pointer px-3 py-1.5 text-sm transition-colors",
                   i === selectedIndex
                     ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100"
