@@ -93,12 +93,12 @@ describe("deckCardSlice – coverage tests", () => {
         decks: [makeDeck({ id: "d1", name: "Old", description: "old desc", color: "blue" })],
       });
 
-      await slice.updateDeck("d1", { name: "Renamed", description: " new desc ", color: "red" });
+      await slice.updateDeck("d1", { name: "Renamed", description: " new desc ", color: "rose" });
 
       const deck = getState().decks[0];
       expect(deck.name).toBe("Renamed");
       expect(deck.description).toBe("new desc");
-      expect(deck.color).toBe("red");
+      expect(deck.color).toBe("rose");
       expect(deck.id).toBe("d1");
     });
 

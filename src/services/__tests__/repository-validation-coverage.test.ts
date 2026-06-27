@@ -233,7 +233,7 @@ describe("validateImportSnapshot — card validation", () => {
 
   it("allows null nextReviewDate", () => {
     const snap = makeValidSnapshot();
-    snap.cards = [{ ...snap.cards[0], nextReviewDate: null }];
+    snap.cards = [{ ...snap.cards[0], nextReviewDate: "" as string }];
     expect(() => validateImportSnapshot(snap)).not.toThrow();
   });
 

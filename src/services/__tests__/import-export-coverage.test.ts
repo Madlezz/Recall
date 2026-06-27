@@ -3,9 +3,11 @@ import type {
   Card,
   Deck,
   RecallExportPayload,
+  RecallSettings,
   RecallStateSnapshot,
   ReviewLog,
   StudySession,
+  Theme,
 } from "@/types";
 
 // --- Tauri mocks ---
@@ -986,7 +988,7 @@ describe("mergeImportPayload - additional coverage", () => {
   });
 
   it("preserves current settings and ignores incoming settings", () => {
-    const currentSettings = makeSettings();
+    const currentSettings: RecallSettings = makeSettings();
     currentSettings.theme = "light";
     currentSettings.dailyGoal = 50;
     const current = makeSnapshot({ settings: currentSettings });
