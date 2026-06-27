@@ -106,7 +106,7 @@ export function StudyMode(): JSX.Element {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeStudy, answerCurrentCard, revealAnswer, undoLastReview, buryCard, snoozeCard, settings, isSpeaking, card]);
+  }, [activeStudy, answerCurrentCard, revealAnswer, undoLastReview, buryCard, snoozeCard, settings, isSpeaking, card, t]);
 
   useEffect(() => { return () => { stopSpeaking(); if (ttsTimeoutRef.current) { clearTimeout(ttsTimeoutRef.current); ttsTimeoutRef.current = null; } }; }, [cardId]);
 
