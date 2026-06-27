@@ -325,7 +325,7 @@ describe("xp coverage", () => {
     });
 
     test("returns falsy (undefined) when matchMedia is undefined", () => {
-      // @ts-ignore
+      // @ts-expect-error testing matchMedia undefined
       window.matchMedia = undefined;
       expect(prefersReducedMotion()).toBeUndefined();
     });
