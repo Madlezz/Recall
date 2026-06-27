@@ -38,7 +38,7 @@ function RatingBar({ color, label, count, total }: { color: string; label: strin
 function MiniBarChart({ data, maxHeight = 64 }: { data: number[]; maxHeight?: number }): JSX.Element {
   const max = Math.max(1, ...data);
   return (
-    <div className="flex items-end gap-[2px]" style={{ height: maxHeight }}>
+    <div className="flex items-end gap-[2px]" style={{ height: maxHeight }} role="img" aria-label="Review volume chart">
       {data.map((val, i) => (
         <div
           key={i}
@@ -56,7 +56,7 @@ function MiniBarChart({ data, maxHeight = 64 }: { data: number[]; maxHeight?: nu
 function StackedBarChart({ data }: { data: { again: number; hard: number; good: number; easy: number }[] }): JSX.Element {
   const max = Math.max(1, ...data.map((d) => d.again + d.hard + d.good + d.easy));
   return (
-    <div className="flex items-end gap-[2px] h-20">
+    <div className="flex items-end gap-[2px] h-20" role="img" aria-label="Rating distribution chart">
       {data.map((d, i) => {
         const total = d.again + d.hard + d.good + d.easy;
         const pct = (total / max) * 100;
@@ -285,7 +285,7 @@ export function Stats(): JSX.Element {
           <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("stats.whenYouStudy")}</h3>
           <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
             <div className="space-y-1">
-              <div className="grid gap-[2px]" style={{ gridTemplateColumns: "repeat(24, minmax(0, 1fr))" }}>
+              <div className="grid gap-[2px]" style={{ gridTemplateColumns: "repeat(24, minmax(0, 1fr))" }} role="img" aria-label="Study activity by hour of day">
                 {byHour.map((count, h) => (
                   <div key={h} className="group relative">
                     <div
