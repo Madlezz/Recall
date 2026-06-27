@@ -1,5 +1,4 @@
-import { check, type DownloadEvent } from "@tauri-apps/plugin-updater";
-import { message } from "@tauri-apps/plugin-dialog";
+import type { DownloadEvent } from "@tauri-apps/plugin-updater";
 
 export interface UpdateInfo {
   version: string;
@@ -10,6 +9,7 @@ export interface UpdateInfo {
 
 export async function checkForUpdates(): Promise<UpdateInfo | null> {
   try {
+    const { check } = await import("@tauri-apps/plugin-updater");
     const update = await check();
     if (update) {
       return {
@@ -30,6 +30,9 @@ export async function downloadAndInstallUpdate(
   onProgress?: (event: DownloadEvent) => void
 ): Promise<void> {
   try {
+    const { check } = await import("@tauri-apps/plugin-updater");
+    const { message } = await import("@tauri-apps/plugin-dialog");
+
     const update = await check();
     if (!update) {
       await message("You are running the latest version.", {
@@ -47,6 +50,7 @@ export async function downloadAndInstallUpdate(
     );
   } catch (error) {
     console.error("Failed to download and install update:", error);
+    const { message } = await import("@tauri-apps/plugin-dialog");
     await message(
       `Failed to install update: ${error instanceof Error ? error.message : String(error)}`,
       { title: "Update Failed", kind: "error" }

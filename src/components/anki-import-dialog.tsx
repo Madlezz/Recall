@@ -1,4 +1,3 @@
-import { open } from "@tauri-apps/plugin-dialog";
 import { toast } from "sonner";
 import { parseAnkiApkg } from "@/services/anki-import";
 import type { AnkiCard } from "@/services/anki-import";
@@ -49,6 +48,7 @@ export function AnkiImportDialog(): JSX.Element {
   }
 
   async function handleFileSelect() {
+    const { open } = await import("@tauri-apps/plugin-dialog");
     const filePath = await open({
       title: t("ankiImport.dialogTitle"),
       filters: [{ name: t("ankiImport.ankiPackage"), extensions: ["apkg"] }],

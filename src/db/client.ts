@@ -1,5 +1,3 @@
-import { isTauri } from "@tauri-apps/api/core";
-
 export type SqlValue = string | number | null;
 
 export interface SqlExecutor {
@@ -13,7 +11,7 @@ const DB_URL = "sqlite:recall.db";
 let cachedExecutor: Promise<SqlExecutor | null> | null = null;
 
 export function isTauriRuntime(): boolean {
-  return typeof window !== "undefined" && (isTauri() || "__TAURI_INTERNALS__" in window);
+  return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 }
 
 export async function getTauriSqlExecutor(): Promise<SqlExecutor | null> {

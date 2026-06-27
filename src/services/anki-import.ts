@@ -1,5 +1,3 @@
-import { invoke } from "@tauri-apps/api/core";
-
 export interface AnkiCard {
   deck_name: string;
   front: string;
@@ -19,6 +17,7 @@ export interface AnkiImportReport {
 
 export async function parseAnkiApkg(filePath: string): Promise<AnkiImportReport> {
   try {
+    const { invoke } = await import("@tauri-apps/api/core");
     return await invoke<AnkiImportReport>("parse_anki_apkg", { filePath });
   } catch (error) {
     console.error("Failed to parse Anki .apkg:", error);
