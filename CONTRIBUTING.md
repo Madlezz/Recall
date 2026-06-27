@@ -47,6 +47,8 @@ src/
   stores/         # Zustand state management (split into slices)
   db/             # SQLite schema, TypeScript mappers, and query helpers
   lib/            # Pure utility functions (XP, cloze, deck health)
+  locales/        # i18n translation files (en.json, id.json)
+  data/           # Demo seed data and template decks
   types.ts        # Shared TypeScript types
 src-tauri/
   src/            # Rust backend (file ops, Anki .apkg parsing via zip)

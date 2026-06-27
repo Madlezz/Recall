@@ -68,10 +68,11 @@ Recall includes comprehensive ARIA labels and roles for screen reader compatibil
 
 ### High Contrast
 
-Recall supports both light and dark themes with high contrast ratios:
+Recall supports light, dark, and high-contrast themes:
 
 - Light mode: WCAG AA compliant (4.5:1 for text)
 - Dark mode: Optimized for reduced eye strain
+- High-contrast theme: Pure black/white with stronger borders for low-vision users (v1.0.13)
 
 ### Color Independence
 
@@ -121,7 +122,7 @@ If you encounter an accessibility barrier, please open an issue on GitHub with t
 Planned accessibility enhancements:
 
 - Customizable keyboard shortcuts
-- Dyslexia-friendly font option
+- Color-blind friendly UI
 - Voice input for card creation
 - Haptic feedback on mobile
 - Enhanced screen reader announcements for study progress

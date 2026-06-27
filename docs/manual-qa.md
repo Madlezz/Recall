@@ -1,12 +1,12 @@
 # Recall Manual QA Checklist
 
 ## First Launch
-- [ ] Fresh install shows onboarding with 4-step carousel
-- [ ] "Start Learning" button completes onboarding → Dashboard with seed data
-- [ ] "Skip to Dashboard" available from step 2+
+- [ ] Fresh install shows onboarding template gallery
+- [ ] "Import Selected" button imports chosen template decks → Dashboard with cards
+- [ ] "Start Fresh" available to skip with empty library
 
 ## Dashboard
-- [ ] Shows 3 seed decks: 🇯🇵 Japanese Basics, 🔬 Science Facts, 🏛️ World History
+- [ ] Shows seed decks: 🇯🇵 Japanese Basics, 🔬 Science Facts, 🏛️ World History, ⚕️ Medical Terminology
 - [ ] "Start Review" button begins study session with due cards
 - [ ] Sidebar shows deck count, card count, due count, XP level
 - [ ] Deck cards show retention %, leech count, overdue count
@@ -47,7 +47,7 @@
 - [ ] `3` = Good (card recalled correctly, normal interval)
 - [ ] `4` = Easy (card was trivial, longer interval)
 - [ ] `B` = Bury card (hide until next day)
-- [ ] `S` = Snooze card (hide for 10min / 1h / until tomorrow)
+- [ ] `S` = Snooze card (hide for 2 hours)
 - [ ] Elapsed timer visible during session
 - [ ] `?` shows keyboard shortcut help overlay
 

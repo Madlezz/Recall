@@ -46,14 +46,14 @@ This document outlines the planned features and improvements for Recall. Items a
 - [ ] Apple Pencil / stylus support for handwriting
 
 ### Performance & Scale
-- [ ] Database optimization for large decks (10,000+ cards) *(done: DB-side queries + pagination in v1.0.8, UI wired in v1.0.11)*
+- [x] Database optimization for large decks (10,000+ cards) *(done: DB-side queries + pagination in v1.0.8, UI wired in v1.0.11)*
 - [ ] Incremental search indexing
 - [ ] Lazy loading for card browser
 - [ ] Memory optimization for mobile devices
 
 ### Accessibility
 - [x] High contrast themes (v1.0.13)
-- [ ] Screen reader support (ARIA labels, focus management)
+- [x] Screen reader support (ARIA labels, focus management)
 - [ ] Customizable keyboard shortcuts
 - [x] Dyslexia-friendly font option (v1.0.13)
 - [ ] Color-blind friendly UI
