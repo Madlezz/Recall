@@ -7,7 +7,6 @@ import type {
   RecallStateSnapshot,
   ReviewLog,
   StudySession,
-  Theme,
 } from "@/types";
 
 // --- Tauri mocks ---
