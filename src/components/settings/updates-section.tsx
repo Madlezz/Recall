@@ -31,11 +31,20 @@ export function UpdatesSection(): JSX.Element {
     setProgress(0);
     try {
       const { downloadAndInstallUpdate } = await import("@/services/updater");
-      await downloadAndInstallUpdate((event) => {
-        if (event.event === "Progress") {
-          setProgress((prev) => prev + event.data.chunkLength);
+      await downloadAndInstallUpdate(
+        {
+          noUpdateTitle: t("settings.updateNoUpdateTitle"),
+          noUpdateBody: t("settings.updateNoUpdateBody"),
+          completeTitle: t("settings.updateCompleteTitle"),
+          completeBody: t("settings.updateCompleteBody"),
+          failedTitle: t("settings.updateFailedTitle"),
+        },
+        (event) => {
+          if (event.event === "Progress") {
+            setProgress((prev) => prev + event.data.chunkLength);
+          }
         }
-      });
+      );
     } catch (error) {
       toast.error(t("settings.updateInstallFailed"));
       console.error(error);

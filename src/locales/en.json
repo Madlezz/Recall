@@ -302,7 +302,12 @@
     "updateInstallFailed": "Failed to install update",
     "languageDescription": "Choose your preferred language for the interface.",
     "optimizeSuccess": "Analyzed {{reviewCount}} reviews. Your actual retention: {{actualRetention}}%. Suggested target: {{suggestedRetention}}%.",
-    "optimizeFailed": "Optimization failed"
+    "optimizeFailed": "Optimization failed",
+    "updateNoUpdateTitle": "No Update Available",
+    "updateNoUpdateBody": "You are running the latest version.",
+    "updateCompleteTitle": "Update Complete",
+    "updateCompleteBody": "Update installed. Please restart the application to apply changes.",
+    "updateFailedTitle": "Update Failed"
   },
   "stats": {
     "title": "Statistics",

@@ -7,6 +7,14 @@ export interface UpdateInfo {
   date?: string;
 }
 
+export interface UpdateMessages {
+  noUpdateTitle: string;
+  noUpdateBody: string;
+  completeTitle: string;
+  completeBody: string;
+  failedTitle: string;
+}
+
 export async function checkForUpdates(): Promise<UpdateInfo | null> {
   try {
     const { check } = await import("@tauri-apps/plugin-updater");
@@ -27,6 +35,7 @@ export async function checkForUpdates(): Promise<UpdateInfo | null> {
 }
 
 export async function downloadAndInstallUpdate(
+  messages: UpdateMessages,
   onProgress?: (event: DownloadEvent) => void
 ): Promise<void> {
   try {
@@ -35,25 +44,18 @@ export async function downloadAndInstallUpdate(
 
     const update = await check();
     if (!update) {
-      await message("You are running the latest version.", {
-        title: "No Update Available",
-        kind: "info",
-      });
+      await message(messages.noUpdateBody, { title: messages.noUpdateTitle, kind: "info" });
       return;
     }
 
     await update.downloadAndInstall(onProgress);
-
-    await message(
-      "Update installed. Please restart the application to apply changes.",
-      { title: "Update Complete", kind: "info" }
-    );
+    await message(messages.completeBody, { title: messages.completeTitle, kind: "info" });
   } catch (error) {
     console.error("Failed to download and install update:", error);
     const { message } = await import("@tauri-apps/plugin-dialog");
     await message(
-      `Failed to install update: ${error instanceof Error ? error.message : String(error)}`,
-      { title: "Update Failed", kind: "error" }
+      `${messages.failedTitle}: ${error instanceof Error ? error.message : String(error)}`,
+      { title: messages.failedTitle, kind: "error" }
     );
   }
 }

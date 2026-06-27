@@ -302,7 +302,12 @@
     "updateInstallFailed": "Gagal memasang pembaruan",
     "languageDescription": "Pilih bahasa antarmuka yang kamu inginkan.",
     "optimizeSuccess": "Menganalisis {{reviewCount}} ulasan. Retensi aktual: {{actualRetention}}%. Target disarankan: {{suggestedRetention}}%.",
-    "optimizeFailed": "Optimasi gagal"
+    "optimizeFailed": "Optimasi gagal",
+    "updateNoUpdateTitle": "Tidak Ada Pembaruan",
+    "updateNoUpdateBody": "Anda menjalankan versi terbaru.",
+    "updateCompleteTitle": "Pembaruan Selesai",
+    "updateCompleteBody": "Pembaruan terpasang. Silakan mulai ulang aplikasi untuk menerapkan perubahan.",
+    "updateFailedTitle": "Pembaruan Gagal"
   },
   "stats": {
     "title": "Statistik",
