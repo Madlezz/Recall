@@ -917,13 +917,15 @@
     "changeImage": "Change Image",
     "occlusions": "Occlusions ({{count}})",
     "drawHint": "Draw rectangles on the image to create occlusions. Each rectangle becomes a card.",
-    "removeShape": "Remove occlusion: {{label}}"
+    "removeShape": "Remove occlusion: {{label}}",
+    "canvasAria": "Image occlusion drawing canvas"
   },
   "imageOcclusionStudy": {
     "revealFirst": "Reveal First",
     "revealNext": "Reveal Next",
     "revealAll": "Reveal All",
-    "revealed": "Revealed {{current}} of {{total}}"
+    "revealed": "Revealed {{current}} of {{total}}",
+    "canvasAria": "Image with occlusion overlays"
   },
   "activityHeatmap": {
     "heatmapAria": "Study activity heatmap",

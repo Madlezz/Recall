@@ -193,6 +193,9 @@ export function ImageOcclusionEditor({ value, onChange }: Props) {
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
+              role="application"
+              aria-label={t("imageOcclusionEditor.canvasAria")}
+              tabIndex={0}
             />
             <button
               onClick={handleUploadImage}

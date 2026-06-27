@@ -120,6 +120,8 @@ export function ImageOcclusionStudy({ data, revealed }: Props) {
       <canvas
         ref={canvasRef}
         className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700"
+        role="img"
+        aria-label={t("imageOcclusionStudy.canvasAria")}
       />
 
       {!revealed && !allRevealed && (

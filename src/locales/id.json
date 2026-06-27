@@ -917,13 +917,15 @@
     "changeImage": "Ganti Gambar",
     "occlusions": "Oklusi ({{count}})",
     "drawHint": "Gambar persegi panjang pada gambar untuk membuat oklusi. Setiap persegi panjang menjadi kartu.",
-    "removeShape": "Hapus oklusi: {{label}}"
+    "removeShape": "Hapus oklusi: {{label}}",
+    "canvasAria": "Kanvas gambar oklusi gambar"
   },
   "imageOcclusionStudy": {
     "revealFirst": "Tampilkan Pertama",
     "revealNext": "Tampilkan Berikutnya",
     "revealAll": "Tampilkan Semua",
-    "revealed": "Ditampilkan {{current}} dari {{total}}"
+    "revealed": "Terbuka {{current}} dari {{total}}",
+        "canvasAria": "Gambar dengan lapisan oklusi"
   },
   "activityHeatmap": {
     "heatmapAria": "Peta aktivitas belajar",
