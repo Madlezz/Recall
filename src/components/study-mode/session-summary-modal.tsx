@@ -29,6 +29,15 @@ export function SessionSummaryModal({ summary, onContinue }: { summary: SessionS
     // eslint-disable-next-line react-hooks/exhaustive-deps -- fire confetti once on mount
         }, []);
 
+  // Close on Escape key
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent): void {
+      if (e.key === "Escape") onContinue();
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onContinue]);
+
   function ratingLabel(avg: number): string {
     if (avg >= 3.5) return t("study.easy");
     if (avg >= 2.5) return t("study.good");
@@ -101,7 +110,7 @@ export function SessionSummaryModal({ summary, onContinue }: { summary: SessionS
           </div>
         )}
 
-        <Button className="mt-6 w-full" onClick={onContinue}>{t("sessionSummary.continue")}</Button>
+        <Button className="mt-6 w-full" onClick={onContinue} autoFocus>{t("sessionSummary.continue")}</Button>
       </div>
     </div>
   );
