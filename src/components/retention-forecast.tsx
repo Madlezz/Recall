@@ -43,7 +43,7 @@ export function RetentionForecast({ cards }: RetentionForecastProps): JSX.Elemen
       </div>
 
       <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex items-end gap-[2px] h-28">
+        <div className="flex items-end gap-[2px] h-28" role="img" aria-label="Due forecast chart">
           {forecast.map((day, i) => {
             const height = maxCount > 0 ? (day.count / maxCount) * 100 : 0;
             const isWeekend = new Date(day.date + "T00:00:00").getDay() % 6 === 0;

@@ -58,7 +58,7 @@ export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): J
 
       <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
         {/* Chart */}
-        <div className="flex items-end gap-[2px] h-32">
+        <div className="flex items-end gap-[2px] h-32" role="img" aria-label="Workload forecast chart">
           {forecast.map((day, i) => {
             const total = day.due + day.newCount;
             const duePct = (day.due / maxVal) * 100;
