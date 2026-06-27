@@ -638,7 +638,8 @@
     "noValidCards": "Tidak ada kartu valid. Gunakan 'Q:' untuk pertanyaan dan 'A:' untuk jawaban, dipisahkan baris kosong",
     "imported_one": "Berhasil mengimpor {{count}} kartu",
     "imported_other": "Berhasil mengimpor {{count}} kartu",
-    "unknownError": "Kesalahan tidak diketahui",
+        "close": "Tutup",
+        "unknownError": "Kesalahan tidak diketahui",
     "importFailed": "Impor gagal: {{message}}",
     "title": "Tambah Kartu Massal",
     "instructionsPrefix": "Tempel kartu di bawah menggunakan",
@@ -914,7 +915,8 @@
     "clickToUpload": "Klik untuk mengunggah gambar",
     "changeImage": "Ganti Gambar",
     "occlusions": "Oklusi ({{count}})",
-    "drawHint": "Gambar persegi panjang pada gambar untuk membuat oklusi. Setiap persegi panjang menjadi kartu."
+    "drawHint": "Gambar persegi panjang pada gambar untuk membuat oklusi. Setiap persegi panjang menjadi kartu.",
+    "removeShape": "Hapus oklusi: {{label}}"
   },
   "imageOcclusionStudy": {
     "revealFirst": "Tampilkan Pertama",
@@ -987,7 +989,9 @@
     "collapse": "Lipat",
     "expand": "Bentangkan",
     "renameTag": "Ganti nama label",
-    "deleteTag": "Hapus label",
+        "deleteTag": "Hapus label",
+        "confirmRename": "Konfirmasi ganti nama",
+        "cancelRename": "Batal ganti nama",
     "noCardsWithTag": "Tidak ada kartu dengan label ini",
     "renamedTag": "Ganti nama \"{{oldTag}}\" → \"{{newTag}}\" ({{count}} kartu)",
     "confirmRemoveTag": "Hapus label \"{{tag}}\" dari {{count}} kartu?",

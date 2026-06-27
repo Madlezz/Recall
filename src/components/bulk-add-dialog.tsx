@@ -57,15 +57,15 @@ Tags: asia, capitals`;
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" role="dialog" aria-modal="true" aria-labelledby="bulk-add-title">
       <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg border bg-white dark:bg-zinc-900 p-6 shadow-sm animate-fade-in">
-        <button onClick={onClose} className="absolute right-4 top-4 rounded p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+        <button onClick={onClose} className="absolute right-4 top-4 rounded p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800" aria-label={t("bulkAdd.close")}>
           <X className="h-4 w-4" />
         </button>
 
         <div className="flex items-center gap-2 mb-2">
           <FileText className="h-5 w-5 text-zinc-900 dark:text-zinc-100" />
-          <h2 className="text-xl font-semibold">{t("bulkAdd.title")}</h2>
+          <h2 id="bulk-add-title" className="text-xl font-semibold">{t("bulkAdd.title")}</h2>
         </div>
 
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">

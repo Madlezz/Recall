@@ -83,12 +83,12 @@ function TreeNode({
               className="h-7 text-xs flex-1"
               autoFocus
             />
-            <button onClick={handleSubmitRename} className="p-1 text-emerald-600 hover:text-emerald-700">
-              <Check className="h-3.5 w-3.5" />
-            </button>
-            <button onClick={() => setEditing(false)} className="p-1 text-zinc-400 hover:text-zinc-600">
-              <X className="h-3.5 w-3.5" />
-            </button>
+            <button onClick={handleSubmitRename} className="p-1 text-emerald-600 hover:text-emerald-700" aria-label={t("tagManager.confirmRename")}>
+                          <Check className="h-3.5 w-3.5" />
+                        </button>
+                        <button onClick={() => setEditing(false)} className="p-1 text-zinc-400 hover:text-zinc-600" aria-label={t("tagManager.cancelRename")}>
+                          <X className="h-3.5 w-3.5" />
+                        </button>
           </div>
         ) : (
           <>

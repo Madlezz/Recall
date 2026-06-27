@@ -637,8 +637,9 @@
   "bulkAdd": {
     "noValidCards": "No valid cards found. Use 'Q:' for questions and 'A:' for answers, separated by blank lines",
     "imported_one": "Successfully imported {{count}} card",
-    "imported_other": "Successfully imported {{count}} cards",
-    "unknownError": "Unknown error",
+        "imported_other": "Successfully imported {{count}} cards",
+        "close": "Close",
+        "unknownError": "Unknown error",
     "importFailed": "Import failed: {{message}}",
     "title": "Bulk Add Cards",
     "instructionsPrefix": "Paste cards below using",
@@ -914,7 +915,8 @@
     "clickToUpload": "Click to upload image",
     "changeImage": "Change Image",
     "occlusions": "Occlusions ({{count}})",
-    "drawHint": "Draw rectangles on the image to create occlusions. Each rectangle becomes a card."
+    "drawHint": "Draw rectangles on the image to create occlusions. Each rectangle becomes a card.",
+    "removeShape": "Remove occlusion: {{label}}"
   },
   "imageOcclusionStudy": {
     "revealFirst": "Reveal First",
@@ -987,7 +989,9 @@
     "collapse": "Collapse",
     "expand": "Expand",
     "renameTag": "Rename tag",
-    "deleteTag": "Delete tag",
+        "deleteTag": "Delete tag",
+        "confirmRename": "Confirm rename",
+        "cancelRename": "Cancel rename",
     "noCardsWithTag": "No cards with this tag",
     "renamedTag": "Renamed \"{{oldTag}}\" → \"{{newTag}}\" ({{count}} cards)",
     "confirmRemoveTag": "Remove tag \"{{tag}}\" from {{count}} card(s)?",

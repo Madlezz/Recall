@@ -24,11 +24,20 @@ function SortHeader({ field, label, current, dir, onClick }: SortHeaderProps): J
   const active = current === field;
   return (
     <th
+      role="columnheader"
+      tabIndex={0}
+      aria-sort={active ? (dir === "asc" ? "ascending" : "descending") : "none"}
       className={cn(
         "cursor-pointer select-none px-3 py-2 text-left text-xs font-medium transition-colors hover:text-foreground",
         active ? "text-foreground" : "text-muted-foreground",
       )}
       onClick={() => onClick(field)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick(field);
+        }
+      }}
     >
       <span className="inline-flex items-center gap-1">
         {label}

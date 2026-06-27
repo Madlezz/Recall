@@ -218,6 +218,7 @@ export function ImageOcclusionEditor({ value, onChange }: Props) {
                   <button
                     onClick={() => handleRemoveShape(shape.id)}
                     className="rounded p-1 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                    aria-label={t("imageOcclusionEditor.removeShape", { label: shape.label })}
                   >
                     <X className="h-4 w-4" />
                   </button>
