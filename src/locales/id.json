@@ -869,6 +869,8 @@
     "decksCreatedCount": "Dek dibuat ({{count}})",
     "moreDecks": "+{{count}} lagi",
     "warnings": "Peringatan",
+    "schedulingPreserved": "Riwayat review disimpan",
+    "fsrsStateImported": "Status FSRS diimpor",
     "done": "Selesai"
   },
   "markdownImport": {

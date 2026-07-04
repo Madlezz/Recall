@@ -29,6 +29,15 @@ export interface CardInput {
   source: string;
   tags: string[];
   cardType?: CardType;
+  /** Optional scheduling data from Anki import (preserves review history). */
+  scheduling?: {
+    state: Card["state"];
+    stability: number;
+    difficulty: number;
+    reps: number;
+    lapses: number;
+    daysUntilNext: number;
+  };
 }
 
 export interface DeckCardSlice {
@@ -101,15 +110,27 @@ export const deckCardSlice = (
     ensureCardInput(input);
     const state = get();
     const now = new Date().toISOString();
+    const sched = input.scheduling;
     const card: Card = {
       id: createId("card"), deckId: input.deckId,
       front: input.front.trim(), back: input.back.trim(),
       hint: input.hint.trim(), source: input.source.trim(),
       tags: input.tags,
       cardType: input.cardType ?? (hasCloze(input.front) ? "cloze" : "basic"),
-      state: "new", lastReviewDate: null, nextReviewDate: now,
-      stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0,
-      reps: 0, lapses: 0, learningSteps: 0, createdAt: now, updatedAt: now,
+      // Use scheduling data from import if provided, otherwise new card defaults
+      state: sched?.state ?? "new",
+      lastReviewDate: sched && sched.reps > 0 ? now : null,
+      nextReviewDate: sched && sched.daysUntilNext > 0
+        ? new Date(Date.now() + sched.daysUntilNext * 86_400_000).toISOString()
+        : now,
+      stability: sched?.stability ?? 0,
+      difficulty: sched?.difficulty ?? 0,
+      elapsedDays: sched && sched.daysUntilNext > 0 ? sched.daysUntilNext : 0,
+      scheduledDays: sched?.daysUntilNext ?? 0,
+      reps: sched?.reps ?? 0,
+      lapses: sched?.lapses ?? 0,
+      learningSteps: 0,
+      createdAt: now, updatedAt: now,
     };
     const snapshot = {
       ...dataState(state),

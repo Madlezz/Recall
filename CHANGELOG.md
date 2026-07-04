@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ## [Unreleased]
 
 ### Added
+- **Anki import preserves scheduling history:** Cards imported from Anki `.apkg` files now retain their review state (new/learning/review), FSRS stability and difficulty, reps, lapses, and due interval. FSRS memory state (`s`/`d`) is read directly from Anki 23.10+ `data` column; for older decks, stability/difficulty is estimated from SM-2 ease factor and interval. Import report shows "Review history kept" and "FSRS state imported" counters.
 - **Onboarding rewrite:** Copy now explains spaced repetition in plain language instead of assuming the user knows what FSRS/SRS is. Three feature cards: "Never Cram Again" (how it works), "Just Press Space" (the workflow), "Yours Alone" (privacy). Both EN and ID locales rewritten.
 - **"How This Works" starter deck:** 5 interactive tutorial cards that teach spaced repetition through actual practice — first-timer friendly.
 - **"UTBK Indonesia" starter deck:** 5 Indonesian exam-relevant cards (sinonim, antonim, matematika, sains, sejarah) targeting the concrete ID market.

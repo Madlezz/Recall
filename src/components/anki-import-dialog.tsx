@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertTriangle, Check, FileWarning, Layers, Tag, Upload, X } from "lucide-react";
+import { AlertTriangle, BrainCircuit, CalendarClock, Check, FileWarning, Layers, Tag, Upload, X } from "lucide-react";
 
 interface ImportReport {
   deckName: string;
@@ -28,6 +28,8 @@ interface ImportReport {
   warnings: string[];
   decksCreated: string[];
   mediaImported: number;
+  schedulingPreserved: number;
+  fsrsStateImported: number;
 }
 
 export function AnkiImportDialog(): JSX.Element {
@@ -98,6 +100,8 @@ export function AnkiImportDialog(): JSX.Element {
       let failed = 0;
       let basicCount = 0;
       let clozeCount = 0;
+      let schedulingPreserved = 0;
+      let fsrsStateImported = 0;
       const tagSet = new Set<string>();
       const decksCreated: string[] = [];
 
@@ -116,6 +120,10 @@ export function AnkiImportDialog(): JSX.Element {
 
         for (const ankiCard of deckCards) {
           try {
+            // Validate state is one of our CardState values
+            const validStates = ["new", "learning", "review", "relearning"];
+            const cardState = validStates.includes(ankiCard.state) ? ankiCard.state as "new" | "learning" | "review" | "relearning" : "new" as const;
+
             await createCard({
               deckId: newDeckId,
               front: ankiCard.front.trim(),
@@ -123,8 +131,24 @@ export function AnkiImportDialog(): JSX.Element {
               hint: "",
               source: "",
               tags: ankiCard.tags.filter((tag) => tag.trim() !== ""),
+              scheduling: {
+                state: cardState,
+                stability: ankiCard.stability,
+                difficulty: ankiCard.difficulty,
+                reps: ankiCard.reps,
+                lapses: ankiCard.lapses,
+                daysUntilNext: ankiCard.days_until_next,
+              },
             });
             imported++;
+
+            // Track scheduling preservation
+            if (ankiCard.reps > 0 || ankiCard.state !== "new") {
+              schedulingPreserved++;
+            }
+            if (ankiCard.has_fsrs_state) {
+              fsrsStateImported++;
+            }
 
             if (/\{\{c\d+::[^}]+\}\}/.test(ankiCard.front)) {
               clozeCount++;
@@ -152,6 +176,8 @@ export function AnkiImportDialog(): JSX.Element {
         warnings: ankiReport.warnings,
         decksCreated,
         mediaImported: ankiReport.media_imported,
+        schedulingPreserved,
+        fsrsStateImported,
       });
     } catch (error) {
       console.error("Anki import failed:", error);
@@ -272,6 +298,25 @@ export function AnkiImportDialog(): JSX.Element {
                 />
               )}
             </div>
+
+            {report.schedulingPreserved > 0 && (
+              <div className="grid grid-cols-2 gap-2">
+                <ReportTile
+                  icon={CalendarClock}
+                  label={t("ankiImport.schedulingPreserved")}
+                  value={report.schedulingPreserved}
+                  color="text-blue-500"
+                />
+                {report.fsrsStateImported > 0 && (
+                  <ReportTile
+                    icon={BrainCircuit}
+                    label={t("ankiImport.fsrsStateImported")}
+                    value={report.fsrsStateImported}
+                    color="text-purple-500"
+                  />
+                )}
+              </div>
+            )}
 
             <div className="rounded-md bg-zinc-100/50 dark:bg-zinc-800/50 p-3 text-sm space-y-1">
               <div className="flex justify-between">

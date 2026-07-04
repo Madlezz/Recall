@@ -3,6 +3,14 @@ export interface AnkiCard {
   front: string;
   back: string;
   tags: string[];
+  // Scheduling fields (imported from Anki)
+  state: string;           // new, learning, review, relearning
+  stability: number;        // FSRS stability (from memory_state or estimated)
+  difficulty: number;       // FSRS difficulty (from memory_state or estimated)
+  reps: number;
+  lapses: number;
+  days_until_next: number;  // interval in days (from ivl)
+  has_fsrs_state: boolean;  // whether FSRS memory_state was present in Anki
 }
 
 export interface AnkiImportReport {

@@ -869,6 +869,8 @@
     "decksCreatedCount": "Decks created ({{count}})",
     "moreDecks": "+{{count}} more",
     "warnings": "Warnings",
+    "schedulingPreserved": "Review history kept",
+    "fsrsStateImported": "FSRS state imported",
     "done": "Done"
   },
   "markdownImport": {
