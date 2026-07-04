@@ -91,7 +91,7 @@ Recall is *not* trying to out-feature Anki for its existing power users. That's 
 - [x] Keyboard-first navigation
 - [x] Global hotkey for quick-add
 - [x] Multi-platform (Windows, macOS, Linux)
-- [x] Comprehensive test suite (734 tests)
+- [x] Comprehensive test suite (745 tests)
 - [x] CI/CD with automated releases
 - [x] Accessibility documentation and ARIA labels
 - [x] User-friendly error messages across all dialogs

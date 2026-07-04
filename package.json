@@ -3,6 +3,12 @@
   "private": true,
   "version": "1.0.16",
   "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "packageManager": "pnpm@10.18.2",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

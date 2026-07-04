@@ -24,3 +24,7 @@ gen-key.py
 # Audit documents (internal only)
 RECALL_AUDIT.md
 SESSION_HANDOFF.md
+recall-vision-and-roadmap-realignment.md
+
+# Tauri auto-generated schema files (regenerated on build, ~1MB bloat)
+src-tauri/gen/schemas/

@@ -23,13 +23,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - **Relearning state mapping bug (4a):** `relearning` was mapped to ts-fsrs `State.Learning` instead of `State.Relearning`, causing relearning cards to use learning steps instead of relearning steps and never graduate back to review. Fixed with proper `toFsrsState`/`fromFsrsState` mappers.
 - Added regression tests: sequential reviews now graduate cards, relearning cards return to review state, and the old bug is proven by a simulation test.
 
-### Added
-- Internationalization (i18n): full UI localization with react-i18next
-  - English (en) and Bahasa Indonesia (id) locales, 873 translation keys across 40 namespaces
-  - Language switcher in Settings → Appearance
-  - All user-facing strings wired: every component, dialog, toast, and aria-label
-  - Test environment initializes i18n to prevent assertion failures
-
 ## [1.0.16] - 2026-06-26
 
 ### Fixed

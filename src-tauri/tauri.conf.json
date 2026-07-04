@@ -34,6 +34,10 @@
       "appimage",
       "dmg"
     ],
+    "publisher": "Madlezz",
+    "category": "Education",
+    "shortDescription": "Recall — FSRS flashcard app",
+    "longDescription": "Recall is a desktop flashcard app built for focused learning. It uses FSRS-based scheduling for modern spaced repetition — but you just open it and start reviewing. Your data stays on your machine, always.",
     "icon": [
       "icons/icon.png",
       "icons/icon.ico",
