@@ -30,9 +30,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Build PWA
-        run: pnpm build -- --mode pages
-        env:
-          VITE_BASE_PATH: /Recall/
+        run: npx vite build --mode pages
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
