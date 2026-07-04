@@ -10,7 +10,7 @@ Recall is *not* trying to out-feature Anki for its existing power users. That's 
 
 ## In Progress
 
-- [ ] **Onboarding rewrite** — Explain what spaced repetition is and why review timing matters, in plain language, before naming the algorithm. Consider a "how this works" demo deck and/or Indonesian exam-relevant starter content (UTBK, CPNS).
+- [x] **Onboarding rewrite** — Explain what spaced repetition is and why review timing matters, in plain language, before naming the algorithm. Added "how this works" demo deck and UTBK Indonesia starter content. Fixed in [Unreleased].
 - [ ] **Mobile app** (iOS and Android) using Tauri's cross-platform capabilities
   - Reframed: not "feature parity" but "access" — desktop-only is a real barrier for a smartphone-primary target population.
   - [ ] PWA (Progressive Web App) as lightweight alternative to native mobile builds
@@ -22,7 +22,7 @@ Recall is *not* trying to out-feature Anki for its existing power users. That's 
 ### Core Fixes
 - [x] **FSRS graduation bug** — `learning_steps` was hardcoded to 0, cards never graduated past ~10-minute intervals. Fixed in [Unreleased].
 - [x] **Relearning state mapping** — `relearning` was mapped to `State.Learning` instead of `State.Relearning`. Fixed in [Unreleased].
-- [ ] **Anki import scheduling history** — Import currently discards all scheduling data (`ivl`, `factor`, `due`, `reps`, `lapses`). Should read FSRS `memory_state` when present, fall back to approximate stability/difficulty from SM-2 fields for legacy cards. Secondary priority — mainly blocks veteran Anki users, not the primary target audience.
+- [x] **Anki import scheduling history** — Import now reads FSRS `memory_state` (s/d) from Anki 23.10+ `data` column, falls back to SM-2 ease→difficulty estimation for legacy cards. State, stability, difficulty, reps, lapses, and due interval all preserved. Fixed in [Unreleased].
 
 ### Study Experience
 - [ ] **Voice input for card creation** (speech-to-text) — lowers the barrier for someone uncomfortable typing/using markdown
