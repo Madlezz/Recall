@@ -99,6 +99,7 @@ export interface RecallSettings {
   ttsAutoRead: boolean; // Auto-read cards when shown/revealed
   ttsSpeed: number; // 0.5-2.0, speech rate multiplier
   fsrsWeights: number[] | null; // Custom FSRS weights (null = use defaults)
+  voiceInputEnabled: boolean; // Show voice input button in card editors (default: true)
 }
 
 export type BackupSchedule = "daily" | "weekly" | "never";

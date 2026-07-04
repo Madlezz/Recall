@@ -110,6 +110,7 @@ function makeSnapshot(overrides: Partial<RecallStateSnapshot> = {}): RecallState
       ttsAutoRead: false,
       ttsSpeed: 1,
       fsrsWeights: null,
+      voiceInputEnabled: true,
     },
     ...overrides,
   };

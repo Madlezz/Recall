@@ -27,6 +27,7 @@ const defaultSettings: RecallSettings = {
       ttsAutoRead: false,
       ttsSpeed: 1,
       fsrsWeights: null,
+      voiceInputEnabled: true,
 };
 
 const defaultDeck: Deck = {

@@ -1,4 +1,4 @@
-import { ImageIcon, Plus } from "lucide-react";
+import { ImageIcon, Mic, MicOff, Plus } from "lucide-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -23,6 +23,7 @@ import { ImageOcclusionEditor } from "@/components/image-occlusion-editor";
 import { useRecallStore } from "@/stores/recall-store";
 import { insertImage } from "@/services/images";
 import type { Card, CardType, ImageOcclusionData } from "@/types";
+import { useVoiceInput } from "@/hooks/use-voice-input";
 
 interface CardDialogProps {
   card?: Card;
@@ -65,8 +66,16 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
   const decks = useRecallStore((state) => state.decks);
   const createCard = useRecallStore((state) => state.createCard);
   const updateCard = useRecallStore((state) => state.updateCard);
+  const voiceInputEnabled = useRecallStore((state) => state.settings.voiceInputEnabled);
   const frontRef = useRef<HTMLTextAreaElement>(null);
   const backRef = useRef<HTMLTextAreaElement>(null);
+
+  // Refs to track current front/back values for voice input (avoids stale closures)
+  const frontValueRef = useRef("");
+  const backValueRef = useRef("");
+
+  const frontVoice = useVoiceInput(frontValueRef, setFront);
+  const backVoice = useVoiceInput(backValueRef, setBack);
 
   useEffect(() => {
     if (open) {
@@ -77,6 +86,8 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
       setHint(card?.hint ?? "");
       setSource(card?.source ?? "");
       setTags(card?.tags ?? []);
+      frontValueRef.current = card?.front ?? "";
+      backValueRef.current = card?.back ?? "";
       
       // Parse occlusion data if this is an image-occlusion card
       if (card?.cardType === "image-occlusion" && card?.front) {
@@ -228,12 +239,25 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
                         <ImageIcon className="h-4 w-4 mr-1" />
                         {t("cardDialog.image")}
                       </Button>
+                      {voiceInputEnabled && frontVoice.supported && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={frontVoice.toggle}
+                          title={t("cardDialog.voiceInput")}
+                          className={`h-8 ${frontVoice.listening ? "text-red-500 hover:text-red-600 animate-pulse" : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800"}`}
+                        >
+                          {frontVoice.listening ? <MicOff className="h-4 w-4 mr-1" /> : <Mic className="h-4 w-4 mr-1" />}
+                          {frontVoice.listening ? t("cardDialog.stopListening") : t("cardDialog.voiceInput")}
+                        </Button>
+                      )}
                     </div>
                     <Textarea
                       id="front-input"
                       ref={frontRef}
                       value={front}
-                      onChange={(event) => setFront(event.target.value)}
+                      onChange={(event) => { setFront(event.target.value); frontValueRef.current = event.target.value; }}
                       placeholder="# Question\n\n```python\nprint('hello')\n```"
                       className="min-h-[200px] border-zinc-200 font-mono text-sm dark:border-zinc-800"
                     />
@@ -267,12 +291,25 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
                         <ImageIcon className="h-4 w-4 mr-1" />
                         {t("cardDialog.image")}
                       </Button>
+                      {voiceInputEnabled && backVoice.supported && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={backVoice.toggle}
+                          title={t("cardDialog.voiceInput")}
+                          className={`h-8 ${backVoice.listening ? "text-red-500 hover:text-red-600 animate-pulse" : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800"}`}
+                        >
+                          {backVoice.listening ? <MicOff className="h-4 w-4 mr-1" /> : <Mic className="h-4 w-4 mr-1" />}
+                          {backVoice.listening ? t("cardDialog.stopListening") : t("cardDialog.voiceInput")}
+                        </Button>
+                      )}
                     </div>
                     <Textarea
                       id="back-input"
                       ref={backRef}
                       value={back}
-                      onChange={(event) => setBack(event.target.value)}
+                      onChange={(event) => { setBack(event.target.value); backValueRef.current = event.target.value; }}
                       placeholder="## Answer\n\nThe solution is:\n\n$$E = mc^2$$"
                       className="min-h-[200px] border-zinc-200 font-mono text-sm dark:border-zinc-800"
                     />

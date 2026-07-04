@@ -1,4 +1,4 @@
-import { TrendingUp } from "lucide-react";
+import { Mic, TrendingUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SettingsCard } from "./settings-card";
 import { useRecallStore } from "@/stores/recall-store";
@@ -62,6 +62,23 @@ export function StudySection(): JSX.Element {
           </div>
         </SettingsCard>
       </section>
+
+      {/* Voice input toggle */}
+      <SettingsCard title={t("settings.voiceInput")} description={t("settings.voiceInputDescription")}>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => void updateSettings({ voiceInputEnabled: !settings.voiceInputEnabled })}
+            className={`flex items-center gap-2 rounded-md px-3.5 py-2 text-sm font-medium transition-colors ${
+              settings.voiceInputEnabled
+                ? "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200"
+                : "text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+            }`}
+          >
+            <Mic className="h-4 w-4" />
+            {settings.voiceInputEnabled ? t("settings.enabled") : t("settings.disabled")}
+          </button>
+        </div>
+      </SettingsCard>
 
       {/* Study settings */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

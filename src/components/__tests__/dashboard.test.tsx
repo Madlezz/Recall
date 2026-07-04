@@ -6,6 +6,7 @@ import React from "react";
 const mockStore: any = {
   decks: [], cards: [], reviewLogs: [], studySessions: [],
   settings: { xp: 0, leechThreshold: 5, dailyGoal: 20, dailyNewCardLimit: 20, theme: "light", accentColor: "zinc", dyslexiaFont: false, soundVolume: 100, desiredRetention: 0.9, onboardingComplete: true, seededAt: "", achievements: [], notificationsEnabled: false, allowHtml: false, backupFolder: null, backupSchedule: "never", lastBackupAt: null, syncFolder: null, syncEnabled: false, ttsEnabled: false, ttsAutoRead: false, ttsSpeed: 1, fsrsWeights: null },
+  voiceInputEnabled: true,
   isLoading: false, isInitialized: true, activeStudy: null, lastSessionSummary: null,
   error: null, view: "dashboard", selectedDeckId: null, savedSearches: [],
   showDashboard: vi.fn(), showSettings: vi.fn(), showDeck: vi.fn(), showStats: vi.fn(),

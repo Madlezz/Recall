@@ -346,6 +346,17 @@ fn migrations() -> Vec<Migration> {
             "#,
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 9,
+            description: "add_voice_input_setting",
+            sql: r#"
+                -- Voice input for card creation (speech-to-text via Web Speech API)
+                -- Default: true (enabled). The setting key uses "false" as opt-out.
+                INSERT OR IGNORE INTO settings (key, value) VALUES ('voice_input_enabled', 'true');
+                UPDATE settings SET value = '9' WHERE key = 'schema_version';
+            "#,
+            kind: MigrationKind::Up,
+        },
     ]
 }
 
@@ -467,7 +478,7 @@ mod tests {
                 |row| row.get(0),
             )
             .unwrap_or_else(|_| "not found".to_string());
-        assert_eq!(version, "8", "schema_version should be 8 after migrations");
+        assert_eq!(version, "9", "schema_version should be 9 after migrations");
     }
 
     /// Verify migrations work correctly on a populated database (data preserved across migrations).

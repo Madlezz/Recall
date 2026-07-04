@@ -94,13 +94,14 @@ desiredRetention: 0.9,
           ttsAutoRead: false,
           ttsSpeed: 1,
           fsrsWeights: null,
+          voiceInputEnabled: true,
     };
 
     expect(deckFromRow(deckToRow(deck) as DeckRow)).toEqual(deck);
     expect(studySessionFromRow(studySessionToRow(session) as StudySessionRow)).toEqual(session);
     expect(reviewLogFromRow(reviewLogToRow(reviewLog) as ReviewLogRow)).toEqual(reviewLog);
     expect(settingsFromRows(settingsToRows(settings))).toEqual(settings);
-    expect(settingsToRows(settings)).toContainEqual({ key: "schema_version", value: "8" });
+    expect(settingsToRows(settings)).toContainEqual({ key: "schema_version", value: "9" });
   });
 
   it("rejects invalid card state and review rating rows", () => {

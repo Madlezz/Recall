@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ## [Unreleased]
 
 ### Added
+- **Voice input for card creation:** Speak instead of type — uses the Web Speech API (browser's built-in speech recognition, fully offline, no cloud). Mic button appears in card editor (front + back) and quick-add dialog. Language auto-detected from app locale (en→en-US, id→id-ID). Toggle in Settings → Study. Vision-aligned: lowers the barrier for someone uncomfortable typing/using markdown.
 - **Anki import preserves scheduling history:** Cards imported from Anki `.apkg` files now retain their review state (new/learning/review), FSRS stability and difficulty, reps, lapses, and due interval. FSRS memory state (`s`/`d`) is read directly from Anki 23.10+ `data` column; for older decks, stability/difficulty is estimated from SM-2 ease factor and interval. Import report shows "Review history kept" and "FSRS state imported" counters.
 - **Onboarding rewrite:** Copy now explains spaced repetition in plain language instead of assuming the user knows what FSRS/SRS is. Three feature cards: "Never Cram Again" (how it works), "Just Press Space" (the workflow), "Yours Alone" (privacy). Both EN and ID locales rewritten.
 - **"How This Works" starter deck:** 5 interactive tutorial cards that teach spaced repetition through actual practice — first-timer friendly.

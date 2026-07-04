@@ -646,6 +646,7 @@ function migrateSettings(settings: Partial<RecallStateSnapshot["settings"]> & { 
     ttsAutoRead: typeof settings.ttsAutoRead === "boolean" ? settings.ttsAutoRead : false,
     ttsSpeed: typeof settings.ttsSpeed === "number" && settings.ttsSpeed >= 0.5 && settings.ttsSpeed <= 2.0 ? settings.ttsSpeed : 1.0,
     fsrsWeights: Array.isArray(settings.fsrsWeights) ? settings.fsrsWeights : null,
+    voiceInputEnabled: typeof settings.voiceInputEnabled === "boolean" ? settings.voiceInputEnabled : true,
       };
 }
 

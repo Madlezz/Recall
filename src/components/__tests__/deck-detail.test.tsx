@@ -11,6 +11,7 @@ const mockStore: any = {
   ],
   reviewLogs: [],
   settings: { desiredRetention: 0.9, fsrsWeights: null, ttsEnabled: false, ttsAutoRead: false, ttsSpeed: 1, allowHtml: false, soundVolume: 100, theme: "light", accentColor: "zinc", dyslexiaFont: false, xp: 0, dailyGoal: 20, dailyNewCardLimit: 20, leechThreshold: 5, onboardingComplete: true, seededAt: "", achievements: [], notificationsEnabled: false, backupFolder: null, backupSchedule: "never", lastBackupAt: null, syncFolder: null, syncEnabled: false },
+  voiceInputEnabled: true,
   showDashboard: vi.fn(),
   deleteDeck: vi.fn(),
   deleteCards: vi.fn(),
@@ -268,6 +269,7 @@ describe("DeckDetail", () => {
     expect(mockStore.updateSettings).toHaveBeenCalledWith({
       desiredRetention: 0.92,
       fsrsWeights: [1, 2, 3],
+      voiceInputEnabled: true,
     });
   });
 });

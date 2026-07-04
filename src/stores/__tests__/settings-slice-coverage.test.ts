@@ -27,6 +27,7 @@ vi.mock("@/stores/store-helpers", () => {
           backupFolder: null, backupSchedule: "never", lastBackupAt: null,
           syncFolder: null, syncEnabled: false, ttsEnabled: false,
           ttsAutoRead: false, ttsSpeed: 1, fsrsWeights: null,
+          voiceInputEnabled: true,
         },
       }),
     }),
@@ -85,6 +86,7 @@ function makeSettings(overrides: Record<string, unknown> = {}) {
     ttsAutoRead: false,
     ttsSpeed: 1,
     fsrsWeights: null,
+    voiceInputEnabled: true,
     ...overrides,
   };
 }

@@ -25,7 +25,7 @@ Recall is *not* trying to out-feature Anki for its existing power users. That's 
 - [x] **Anki import scheduling history** — Import now reads FSRS `memory_state` (s/d) from Anki 23.10+ `data` column, falls back to SM-2 ease→difficulty estimation for legacy cards. State, stability, difficulty, reps, lapses, and due interval all preserved. Fixed in [Unreleased].
 
 ### Study Experience
-- [ ] **Voice input for card creation** (speech-to-text) — lowers the barrier for someone uncomfortable typing/using markdown
+- [x] **Voice input for card creation** (speech-to-text) — lowers the barrier for someone uncomfortable typing/using markdown. Uses Web Speech API (offline, no cloud). Mic button in card editor + quick-add. Language auto-detected from app locale. Toggle in Settings → Study. Done in [Unreleased].
 - [ ] Handwriting recognition for handwritten notes
 - [ ] Spaced repetition for audio/video content
 - [ ] Adaptive difficulty (cards get harder/easier based on performance)

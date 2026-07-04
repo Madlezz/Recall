@@ -6,10 +6,12 @@ vi.mock("@/services/repository", () => ({
     loadAppData: vi.fn().mockResolvedValue({
       decks: [], cards: [], studySessions: [], reviewLogs: [],
       settings: { theme: "light", accentColor: "zinc", dyslexiaFont: false, seededAt: "", dailyNewCardLimit: 20, leechThreshold: 5, onboardingComplete: true, xp: 0, achievements: [], dailyGoal: 20, notificationsEnabled: false, soundVolume: 100, allowHtml: false, desiredRetention: 0.9, backupFolder: null, backupSchedule: "never", lastBackupAt: null, syncFolder: null, syncEnabled: false, ttsEnabled: false, ttsAutoRead: false, ttsSpeed: 1, fsrsWeights: null },
+      voiceInputEnabled: true,
     }),
     resetToSeedData: vi.fn().mockResolvedValue({
       decks: [], cards: [], studySessions: [], reviewLogs: [],
       settings: { theme: "light", accentColor: "zinc", dyslexiaFont: false, seededAt: "", dailyNewCardLimit: 20, leechThreshold: 5, onboardingComplete: true, xp: 0, achievements: [], dailyGoal: 20, notificationsEnabled: false, soundVolume: 100, allowHtml: false, desiredRetention: 0.9, backupFolder: null, backupSchedule: "never", lastBackupAt: null, syncFolder: null, syncEnabled: false, ttsEnabled: false, ttsAutoRead: false, ttsSpeed: 1, fsrsWeights: null },
+      voiceInputEnabled: true,
     }),
     replaceDataFromImport: vi.fn(),
     mergeDataFromImport: vi.fn(),
@@ -71,6 +73,7 @@ vi.mock("@/data/seed", () => ({
   createSeedSnapshot: () => ({
     decks: [], cards: [], studySessions: [], reviewLogs: [],
     settings: { theme: "light", accentColor: "zinc", dyslexiaFont: false, seededAt: "", dailyNewCardLimit: 20, leechThreshold: 5, onboardingComplete: true, xp: 0, achievements: [], dailyGoal: 20, notificationsEnabled: false, soundVolume: 100, allowHtml: false, desiredRetention: 0.9, backupFolder: null, backupSchedule: "never", lastBackupAt: null, syncFolder: null, syncEnabled: false, ttsEnabled: false, ttsAutoRead: false, ttsSpeed: 1, fsrsWeights: null },
+    voiceInputEnabled: true,
   }),
 }));
 
@@ -103,6 +106,7 @@ function setupStore(overrides: Record<string, unknown> = {}) {
     studySessions: [],
     reviewLogs: [],
     settings: { theme: "light", accentColor: "zinc", dyslexiaFont: false, seededAt: "", dailyNewCardLimit: 20, leechThreshold: 5, onboardingComplete: true, xp: 0, achievements: [], dailyGoal: 20, notificationsEnabled: false, soundVolume: 100, allowHtml: false, desiredRetention: 0.9, backupFolder: null, backupSchedule: "never", lastBackupAt: null, syncFolder: null, syncEnabled: false, ttsEnabled: false, ttsAutoRead: false, ttsSpeed: 1, fsrsWeights: null },
+    voiceInputEnabled: true,
     activeStudy: null,
     lastSessionSummary: null,
     view: "dashboard",
