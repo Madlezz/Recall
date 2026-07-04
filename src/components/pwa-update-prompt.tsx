@@ -1,6 +1,6 @@
 import { usePWA } from "@/hooks/use-pwa";
 import { useTranslation } from "react-i18next";
-import { RefreshCw, Download, X, WifiOff, CheckCircle } from "lucide-react";
+import { RefreshCw, Download, X, CheckCircle } from "lucide-react";
 import { useEffect } from "react";
 
 /**
