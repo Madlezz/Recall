@@ -15,8 +15,8 @@ test.describe("Recall Smoke Tests", () => {
     await expect(page.getByText("Remember things for good")).toBeVisible();
 
     // Wait for button to be visible (fade-in animation) before clicking
-    const skipBtn = page.getByRole("button", { name: /Skip for now/i });
-    const freshBtn = page.getByRole("button", { name: /Start Fresh|Start Empty/i });
+    const skipBtn = page.getByRole("button", { name: /Skip/i });
+    const freshBtn = page.getByRole("button", { name: /Start Empty|Start with empty/i });
     await expect(skipBtn).toBeVisible({ timeout: 15000 });
     await expect(freshBtn).toBeVisible({ timeout: 15000 });
 
@@ -39,8 +39,8 @@ test.describe("Recall Smoke Tests", () => {
     await expect(page.getByText("Remember things for good")).toBeVisible();
 
     // Wait for button fade-in, then click
-    await expect(page.getByRole("button", { name: /Start Fresh|Start Empty/i })).toBeVisible({ timeout: 15000 });
-    await page.getByRole("button", { name: /Start Fresh|Start Empty/i }).click();
+    await expect(page.getByRole("button", { name: /Start Empty|Start with empty/i })).toBeVisible({ timeout: 15000 });
+    await page.getByRole("button", { name: /Start Empty|Start with empty/i }).click();
 
     // Should land on dashboard
     await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible({ timeout: 10000 });

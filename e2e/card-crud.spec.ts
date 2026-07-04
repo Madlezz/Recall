@@ -6,7 +6,7 @@ async function goToDashboard(page: import("@playwright/test").Page) {
   await page.reload();
   await page.waitForSelector("[role='region'][aria-label='Welcome to Recall']", { timeout: 10000 });
   // Wait for button to be visible (fade-in animation) before clicking
-  const skipBtn = page.getByRole("button", { name: /Skip for now/i });
+  const skipBtn = page.getByRole("button", { name: /Skip/i });
   await expect(skipBtn).toBeVisible({ timeout: 15000 });
   await skipBtn.click();
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible({ timeout: 10000 });

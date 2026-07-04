@@ -8,8 +8,8 @@ test("empty dashboard shows friendly empty state", async ({ page }) => {
   await page.reload();
 
   await page.waitForSelector("[role='region'][aria-label='Welcome to Recall']", { timeout: 10000 });
-  await expect(page.getByRole("button", { name: /Start Fresh|Start Empty/i })).toBeVisible({ timeout: 15000 });
-  await page.getByRole("button", { name: /Start Fresh|Start Empty/i }).click();
+  await expect(page.getByRole("button", { name: /Start Empty|Start with empty/i })).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: /Start Empty|Start with empty/i }).click();
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible({ timeout: 10000 });
 
   await expect(page.getByText(/no decks|empty|create.*deck|get started/i).first()).toBeVisible({ timeout: 5000 });
