@@ -334,6 +334,18 @@ fn migrations() -> Vec<Migration> {
             "#,
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 8,
+            description: "add_learning_steps_to_cards",
+            sql: r#"
+                -- Required for FSRS graduation: ts-fsrs tracks per-card step progress
+                -- through learning/relearning steps. Without this, cards never graduate
+                -- past ~10-minute intervals.
+                ALTER TABLE cards ADD COLUMN learning_steps INTEGER NOT NULL DEFAULT 0;
+                UPDATE settings SET value = '8' WHERE key = 'schema_version';
+            "#,
+            kind: MigrationKind::Up,
+        },
     ]
 }
 
@@ -431,6 +443,7 @@ mod tests {
             "created_at",
             "updated_at",
             "source",
+            "learning_steps",
         ] {
             assert!(
                 card_cols.contains(&col.to_string()),
@@ -454,7 +467,7 @@ mod tests {
                 |row| row.get(0),
             )
             .unwrap_or_else(|_| "not found".to_string());
-        assert_eq!(version, "5", "schema_version should be 5 after migrations");
+        assert_eq!(version, "8", "schema_version should be 8 after migrations");
     }
 
     /// Verify migrations work correctly on a populated database (data preserved across migrations).

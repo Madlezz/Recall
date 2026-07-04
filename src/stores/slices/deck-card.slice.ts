@@ -109,7 +109,7 @@ export const deckCardSlice = (
       cardType: input.cardType ?? (hasCloze(input.front) ? "cloze" : "basic"),
       state: "new", lastReviewDate: null, nextReviewDate: now,
       stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0,
-      reps: 0, lapses: 0, createdAt: now, updatedAt: now,
+      reps: 0, lapses: 0, learningSteps: 0, createdAt: now, updatedAt: now,
     };
     const snapshot = {
       ...dataState(state),
@@ -171,7 +171,7 @@ export const deckCardSlice = (
     await persistSnapshot(set, {
       ...dataState(state),
       cards: state.cards.map((c: Card) =>
-        c.deckId === deckId ? { ...c, state: "new" as const, lastReviewDate: null, nextReviewDate: now, stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0, reps: 0, lapses: 0, updatedAt: now } : c,
+        c.deckId === deckId ? { ...c, state: "new" as const, lastReviewDate: null, nextReviewDate: now, stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0, reps: 0, lapses: 0, learningSteps: 0, updatedAt: now } : c,
       ),
       reviewLogs: state.reviewLogs.filter((r: ReviewLog) => !deckCardIds.has(r.cardId)),
       studySessions: state.studySessions.filter((s: StudySession) => s.deckId !== deckId),

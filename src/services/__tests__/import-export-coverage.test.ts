@@ -84,7 +84,7 @@ function makeCard(overrides: Partial<Card> = {}): Card {
     elapsedDays: 0,
     scheduledDays: 0,
     reps: 0,
-    lapses: 0,
+    lapses: 0, learningSteps: 0,
     lastReviewDate: null,
     nextReviewDate: "2026-06-01T00:00:00.000Z",
     createdAt: "2026-06-01T00:00:00.000Z",
@@ -219,7 +219,7 @@ describe("exportDeckToJson", () => {
       stability: 5.5,
       difficulty: 7.2,
       reps: 10,
-      lapses: 2,
+      lapses: 2, learningSteps: 0,
       elapsedDays: 3,
       scheduledDays: 5,
       lastReviewDate: "2026-05-30T00:00:00.000Z",
@@ -470,7 +470,7 @@ describe("exportDeckPackage", () => {
       stability: 10,
       difficulty: 8,
       reps: 15,
-      lapses: 3,
+      lapses: 3, learningSteps: 0,
     });
     const result = await exportDeckPackage(makeDeck(), [card]);
     const parsed = JSON.parse(result.json);

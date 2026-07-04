@@ -33,7 +33,7 @@ function makeCard(overrides: Partial<Card> = {}): Card {
     elapsedDays: 0,
     scheduledDays: 0,
     reps: 0,
-    lapses: 0,
+    lapses: 0, learningSteps: 0,
     createdAt: now,
     updatedAt: now,
     ...overrides,

@@ -29,7 +29,7 @@ const snapshot: RecallStateSnapshot = {
       elapsedDays: 0,
       scheduledDays: 0,
       reps: 0,
-      lapses: 0,
+      lapses: 0, learningSteps: 0,
       lastReviewDate: null,
       nextReviewDate: "2026-06-01T00:00:00.000Z",
       createdAt: "2026-06-01T00:00:00.000Z",

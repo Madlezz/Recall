@@ -29,6 +29,7 @@ export interface CardRow {
   scheduled_days: number;
   reps: number;
   lapses: number;
+  learning_steps: number;
   created_at: string;
   updated_at: string;
 }
@@ -111,6 +112,7 @@ export function cardFromRow(row: CardRow): Card {
     scheduledDays: row.scheduled_days,
     reps: row.reps,
     lapses: row.lapses,
+    learningSteps: row.learning_steps,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -135,6 +137,7 @@ export function cardToRow(card: Card): CardRow {
     scheduled_days: card.scheduledDays,
     reps: card.reps,
     lapses: card.lapses,
+    learning_steps: card.learningSteps,
     created_at: card.createdAt,
     updated_at: card.updatedAt,
   };

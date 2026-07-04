@@ -186,6 +186,7 @@ export function createCardsFromTemplate(template: TemplateDeck): { deck: Deck; c
     scheduledDays: 0,
     reps: 0,
     lapses: 0,
+    learningSteps: 0,
     createdAt: iso,
     updatedAt: iso,
   }));

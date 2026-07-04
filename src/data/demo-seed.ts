@@ -195,6 +195,7 @@ function createCardsAndLogs(today: Date): { cards: Card[]; reviewLogs: ReviewLog
         stability, difficulty, elapsedDays: reps > 0 ? (i % 10) : 0,
         scheduledDays: state === "review" ? ((i * 5) % 30) + 1 : 0,
         reps, lapses,
+        learningSteps: 0,
         createdAt: ISO(createdAt), updatedAt: ISO(createdAt),
       });
 

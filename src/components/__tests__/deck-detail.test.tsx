@@ -6,8 +6,8 @@ const mockStore: any = {
   selectedDeckId: "d1",
   decks: [{ id: "d1", name: "Japanese", description: "Vocab", color: "zinc", createdAt: "", updatedAt: "", examDeadline: null }],
   cards: [
-    { id: "c1", deckId: "d1", front: "Hello", back: "Konnichiwa", hint: "", source: "", tags: ["greeting"], cardType: "basic", state: "new", lastReviewDate: null, nextReviewDate: new Date().toISOString(), stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0, reps: 0, lapses: 0, createdAt: "", updatedAt: "" },
-    { id: "c2", deckId: "d1", front: "Thanks", back: "Arigato", hint: "", source: "", tags: ["greeting"], cardType: "basic", state: "review", lastReviewDate: null, nextReviewDate: new Date().toISOString(), stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0, reps: 1, lapses: 0, createdAt: "", updatedAt: "" },
+    { id: "c1", deckId: "d1", front: "Hello", back: "Konnichiwa", hint: "", source: "", tags: ["greeting"], cardType: "basic", state: "new", lastReviewDate: null, nextReviewDate: new Date().toISOString(), stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0, reps: 0, lapses: 0, learningSteps: 0, createdAt: "", updatedAt: "" },
+    { id: "c2", deckId: "d1", front: "Thanks", back: "Arigato", hint: "", source: "", tags: ["greeting"], cardType: "basic", state: "review", lastReviewDate: null, nextReviewDate: new Date().toISOString(), stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0, reps: 1, lapses: 0, learningSteps: 0, createdAt: "", updatedAt: "" },
   ],
   reviewLogs: [],
   settings: { desiredRetention: 0.9, fsrsWeights: null, ttsEnabled: false, ttsAutoRead: false, ttsSpeed: 1, allowHtml: false, soundVolume: 100, theme: "light", accentColor: "zinc", dyslexiaFont: false, xp: 0, dailyGoal: 20, dailyNewCardLimit: 20, leechThreshold: 5, onboardingComplete: true, seededAt: "", achievements: [], notificationsEnabled: false, backupFolder: null, backupSchedule: "never", lastBackupAt: null, syncFolder: null, syncEnabled: false },
@@ -113,7 +113,7 @@ describe("DeckDetail", () => {
     mockStore.selectedDeckId = "d1";
     mockStore.decks = [{ id: "d1", name: "Japanese", description: "Vocab", color: "zinc", createdAt: "", updatedAt: "", examDeadline: null }];
     mockStore.cards = [
-      { id: "c1", deckId: "d1", front: "Hello", back: "Konnichiwa", hint: "", source: "", tags: ["greeting"], cardType: "basic", state: "new", lastReviewDate: null, nextReviewDate: new Date().toISOString(), stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0, reps: 0, lapses: 0, createdAt: "", updatedAt: "" },
+      { id: "c1", deckId: "d1", front: "Hello", back: "Konnichiwa", hint: "", source: "", tags: ["greeting"], cardType: "basic", state: "new", lastReviewDate: null, nextReviewDate: new Date().toISOString(), stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0, reps: 0, lapses: 0, learningSteps: 0, createdAt: "", updatedAt: "" },
     ];
     mockStore.startReview = vi.fn(() => true);
   });

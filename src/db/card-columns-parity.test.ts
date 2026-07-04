@@ -48,6 +48,7 @@ describe("Card INSERT parity (A1 audit)", () => {
       "scheduled_days",
       "reps",
       "lapses",
+      "learning_steps",
       "created_at",
       "updated_at",
     ];

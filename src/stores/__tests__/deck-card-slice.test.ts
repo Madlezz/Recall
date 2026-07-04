@@ -49,7 +49,7 @@ function makeCard(overrides: Partial<Card> = {}): Card {
     id: "card-1", deckId: "deck-1", front: "Q", back: "A", hint: "", source: "",
     tags: [], cardType: "basic", state: "new", lastReviewDate: null,
     nextReviewDate: "2026-06-24T00:00:00.000Z", stability: 0, difficulty: 0,
-    elapsedDays: 0, scheduledDays: 0, reps: 0, lapses: 0,
+    elapsedDays: 0, scheduledDays: 0, reps: 0, lapses: 0, learningSteps: 0,
     createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z",
     ...overrides,
   };
@@ -235,7 +235,7 @@ describe("deckCardSlice", () => {
       const { slice, getState } = createSliceWithState({
         decks: [makeDeck({ id: "d1" })],
         cards: [
-          makeCard({ id: "c1", deckId: "d1", state: "review", reps: 5, lapses: 2, stability: 10 }),
+          makeCard({ id: "c1", deckId: "d1", state: "review", reps: 5, lapses: 2, learningSteps: 0, stability: 10 }),
           makeCard({ id: "c2", deckId: "d1", state: "learning", reps: 3 }),
           makeCard({ id: "c3", deckId: "other", state: "review", reps: 1 }),
         ],

@@ -1,41 +1,42 @@
 # Roadmap
 
-This document outlines the planned features and improvements for Recall. Items are grouped by priority, not by release timeline.
+## Vision
+
+Recall exists for people who have a real, external reason to memorize things — an exam, a language, a licensing test — but who have never used a spaced-repetition tool and find Anki/Mochi/RemNote intimidating to even start. It gives them an on-ramp that just works, with zero paradigm literacy required.
+
+Recall is *not* trying to out-feature Anki for its existing power users. That's a 20-year ecosystem battle a solo developer cannot win, and it isn't the point.
+
+**Target audience:** access-gap non-users — people with real memorization needs (UTBK, CPNS, medical/pharmacy board exams, language learning) who would benefit from SRS but never got a friendly enough introduction. The Indonesian market is a concrete target: no competitor offers real Bahasa Indonesia localization.
 
 ## In Progress
 
-- [ ] Mobile app (iOS and Android) using Tauri's cross-platform capabilities
+- [ ] **Onboarding rewrite** — Explain what spaced repetition is and why review timing matters, in plain language, before naming the algorithm. Consider a "how this works" demo deck and/or Indonesian exam-relevant starter content (UTBK, CPNS).
+- [ ] **Mobile app** (iOS and Android) using Tauri's cross-platform capabilities
+  - Reframed: not "feature parity" but "access" — desktop-only is a real barrier for a smartphone-primary target population.
   - [ ] PWA (Progressive Web App) as lightweight alternative to native mobile builds
 - [ ] Sync protocol for optional cloud backup (privacy-preserving, end-to-end encrypted)
   - [ ] Auto-detect iCloud Drive / OneDrive folders for one-click "painless cloud sync"
-- [ ] Spaced repetition algorithm options (switch between FSRS variants)
 
 ## Planned
 
-### Internationalization
-- [ ] Additional languages: Spanish (es), Portuguese (pt), Chinese Simplified (zh-CN), Japanese (ja)
-  - **Trigger:** Implement after core feature development slows down (post-v1.1 stable). During active development, new UI strings are added frequently — each new language adds maintenance overhead per string change. Starting too early means constant catch-up translation work.
-  - **Approach:** Generate initial translations from en.json (873 keys) using LLM, then community review/refine. Zero code changes needed per language — just add a JSON file to `src/locales/`.
-  - **CJK note:** Verify font rendering on all target platforms before release.
-  - **Future:** Arabic (ar) requires RTL layout support (CSS `dir="rtl"`), defer to separate milestone.
-
-### Core Features
-- [ ] Deck sharing and marketplace (community card decks)
-- [ ] Collaborative deck editing (multi-user real-time)
-- [ ] Advanced statistics (retention curves, forgetting curves, optimal review timing)
-  - [ ] FSRS-specific metrics: Stability (S), Difficulty (D) visualization
-  - [ ] Desired Retention target overlay on retention curve
-  - [ ] Forgetting curve prediction graph with actual vs predicted comparison
-- [ ] Custom scheduling algorithms (user-defined intervals)
-- [ ] Plugin system for extensions (themes, card types, import/export formats)
-  - [ ] Local API / Webhook system for third-party integrations (like AnkiConnect)
+### Core Fixes
+- [x] **FSRS graduation bug** — `learning_steps` was hardcoded to 0, cards never graduated past ~10-minute intervals. Fixed in [Unreleased].
+- [x] **Relearning state mapping** — `relearning` was mapped to `State.Learning` instead of `State.Relearning`. Fixed in [Unreleased].
+- [ ] **Anki import scheduling history** — Import currently discards all scheduling data (`ivl`, `factor`, `due`, `reps`, `lapses`). Should read FSRS `memory_state` when present, fall back to approximate stability/difficulty from SM-2 fields for legacy cards. Secondary priority — mainly blocks veteran Anki users, not the primary target audience.
 
 ### Study Experience
-- [ ] Voice input for card creation (speech-to-text)
+- [ ] **Voice input for card creation** (speech-to-text) — lowers the barrier for someone uncomfortable typing/using markdown
 - [ ] Handwriting recognition for handwritten notes
 - [ ] Spaced repetition for audio/video content
 - [ ] Adaptive difficulty (cards get harder/easier based on performance)
 - [ ] Study streaks with social sharing (optional, privacy-preserving)
+
+### Internationalization
+- [ ] Additional languages: Spanish (es), Portuguese (pt), Chinese Simplified (zh-CN), Japanese (ja)
+  - **Trigger:** Implement after core feature development slows down (post-v1.1 stable). During active development, new UI strings are added frequently — each new language adds maintenance overhead per string change.
+  - **Approach:** Generate initial translations from en.json (873 keys) using LLM, then community review/refine. Zero code changes needed per language — just add a JSON file to `src/locales/`.
+  - **CJK note:** Verify font rendering on all target platforms before release.
+  - **Future:** Arabic (ar) requires RTL layout support (CSS `dir="rtl"`), defer to separate milestone.
 
 ### Mobile App
 - [ ] Native iOS and Android apps using Tauri
@@ -57,6 +58,16 @@ This document outlines the planned features and improvements for Recall. Items a
 - [ ] Customizable keyboard shortcuts
 - [x] Dyslexia-friendly font option (v1.0.13)
 - [ ] Color-blind friendly UI
+
+## Someday / Not a Current Priority
+
+*These items chase Anki's 20-year power-user ecosystem or are only legible to someone who already knows SRS/FSRS terminology. Not deleted — deferred until there's a user base that actually asks for them.*
+
+- [ ] Plugin system / Local API / Webhook system (like AnkiConnect)
+- [ ] Custom scheduling algorithms (user-defined intervals)
+- [ ] Advanced statistics: FSRS Stability (S) / Difficulty (D) visualization, forgetting-curve prediction
+- [ ] Deck sharing / marketplace, collaborative real-time editing
+- [ ] Spaced repetition algorithm options (switch between FSRS variants)
 
 ## Completed (v1.0.x)
 
@@ -80,7 +91,7 @@ This document outlines the planned features and improvements for Recall. Items a
 - [x] Keyboard-first navigation
 - [x] Global hotkey for quick-add
 - [x] Multi-platform (Windows, macOS, Linux)
-- [x] Comprehensive test suite (731 tests)
+- [x] Comprehensive test suite (734 tests)
 - [x] CI/CD with automated releases
 - [x] Accessibility documentation and ARIA labels
 - [x] User-friendly error messages across all dialogs

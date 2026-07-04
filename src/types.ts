@@ -48,6 +48,7 @@ export interface Card {
   scheduledDays: number;
   reps: number;
   lapses: number;
+  learningSteps: number;
 
   createdAt: string;
   updatedAt: string;

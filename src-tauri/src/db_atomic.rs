@@ -49,6 +49,7 @@ pub struct CardRowData {
     pub scheduled_days: i64,
     pub reps: i64,
     pub lapses: i64,
+    pub learning_steps: i64,
     pub created_at: String,
     pub updated_at: String,
 }
@@ -93,6 +94,7 @@ pub struct RecordReviewData {
     pub scheduled_days: i64,
     pub reps: i64,
     pub lapses: i64,
+    pub learning_steps: i64,
     pub updated_at: String,
     pub review_log_id: String,
     pub review_card_id: String,
@@ -175,13 +177,14 @@ pub async fn save_snapshot_atomic(app: tauri::AppHandle, data: SnapshotRows) -> 
         if let Err(e) = conn.execute(
             "INSERT INTO cards (id, deck_id, front, back, hint, source, tags, card_type, state,
              last_review_date, next_review_date, stability, difficulty, elapsed_days,
-             scheduled_days, reps, lapses, created_at, updated_at)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19)",
+             scheduled_days, reps, lapses, learning_steps, created_at, updated_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20)",
             rusqlite::params![
                 card.id, card.deck_id, card.front, card.back, card.hint, card.source,
                 card.tags, card.card_type, card.state, card.last_review_date,
                 card.next_review_date, card.stability, card.difficulty, card.elapsed_days,
-                card.scheduled_days, card.reps, card.lapses, card.created_at, card.updated_at,
+                card.scheduled_days, card.reps, card.lapses, card.learning_steps,
+                card.created_at, card.updated_at,
             ],
         ) {
             let _ = conn.execute_batch("ROLLBACK");
@@ -255,7 +258,7 @@ pub async fn record_review_atomic(
     if let Err(e) = conn.execute(
         "UPDATE cards SET state=?1, last_review_date=?2, next_review_date=?3,
          stability=?4, difficulty=?5, elapsed_days=?6, scheduled_days=?7,
-         reps=?8, lapses=?9, updated_at=?10 WHERE id=?11",
+         reps=?8, lapses=?9, learning_steps=?10, updated_at=?11 WHERE id=?12",
         rusqlite::params![
             data.state,
             data.last_review_date,
@@ -266,6 +269,7 @@ pub async fn record_review_atomic(
             data.scheduled_days,
             data.reps,
             data.lapses,
+            data.learning_steps,
             data.updated_at,
             data.card_id,
         ],
@@ -416,20 +420,21 @@ pub async fn upsert_card_atomic(app: tauri::AppHandle, card: CardRowData) -> Res
     if let Err(e) = conn.execute(
         "INSERT INTO cards (id, deck_id, front, back, hint, source, tags, card_type, state,
          last_review_date, next_review_date, stability, difficulty, elapsed_days,
-         scheduled_days, reps, lapses, created_at, updated_at)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19)
+         scheduled_days, reps, lapses, learning_steps, created_at, updated_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20)
          ON CONFLICT(id) DO UPDATE SET
            deck_id=excluded.deck_id, front=excluded.front, back=excluded.back, hint=excluded.hint,
            source=excluded.source, tags=excluded.tags, card_type=excluded.card_type, state=excluded.state,
            last_review_date=excluded.last_review_date, next_review_date=excluded.next_review_date,
            stability=excluded.stability, difficulty=excluded.difficulty, elapsed_days=excluded.elapsed_days,
            scheduled_days=excluded.scheduled_days, reps=excluded.reps, lapses=excluded.lapses,
-           updated_at=excluded.updated_at",
+           learning_steps=excluded.learning_steps, updated_at=excluded.updated_at",
         rusqlite::params![
             card.id, card.deck_id, card.front, card.back, card.hint, card.source,
             card.tags, card.card_type, card.state, card.last_review_date,
             card.next_review_date, card.stability, card.difficulty, card.elapsed_days,
-            card.scheduled_days, card.reps, card.lapses, card.created_at, card.updated_at,
+            card.scheduled_days, card.reps, card.lapses, card.learning_steps,
+            card.created_at, card.updated_at,
         ],
     ) {
         let _ = conn.execute_batch("ROLLBACK");
@@ -620,7 +625,7 @@ pub async fn query_cards(
 
     // Get paginated results
     let query_sql = format!(
-        "SELECT id, deck_id, front, back, hint, source, tags, card_type, state, last_review_date, next_review_date, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at FROM cards {} ORDER BY {} {} LIMIT ? OFFSET ?",
+        "SELECT id, deck_id, front, back, hint, source, tags, card_type, state, last_review_date, next_review_date, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, learning_steps, created_at, updated_at FROM cards {} ORDER BY {} {} LIMIT ? OFFSET ?",
         where_sql, sort_col, dir
     );
 
@@ -650,8 +655,9 @@ pub async fn query_cards(
                 scheduled_days: row.get(14)?,
                 reps: row.get(15)?,
                 lapses: row.get(16)?,
-                created_at: row.get(17)?,
-                updated_at: row.get(18)?,
+                learning_steps: row.get(17)?,
+                created_at: row.get(18)?,
+                updated_at: row.get(19)?,
             })
         })
         .map_err(|e| format!("Query failed: {}", e))?

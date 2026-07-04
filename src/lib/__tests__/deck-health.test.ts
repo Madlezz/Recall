@@ -23,7 +23,7 @@ function card(overrides: Partial<Card> = {}): Card {
     elapsedDays: 5,
     scheduledDays: 10,
     reps: 5,
-    lapses: 0,
+    lapses: 0, learningSteps: 0,
     createdAt: "2025-01-01T00:00:00.000Z",
     updatedAt: "2025-06-10T00:00:00.000Z",
     ...overrides,

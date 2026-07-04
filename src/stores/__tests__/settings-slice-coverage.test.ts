@@ -562,8 +562,8 @@ describe("settingsSlice coverage tests", () => {
       { id: "td1", name: "Template Deck", description: "", color: "blue" as any, createdAt: "2026-01-01", updatedAt: "2026-01-01" },
     ];
     const templateCards: Card[] = [
-      { id: "tc1", deckId: "td1", front: "Q1", back: "A1", hint: "", source: "", tags: [], cardType: "basic" as any, state: "new" as any, lastReviewDate: null, nextReviewDate: "2026-01-01", stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0, reps: 0, lapses: 0, createdAt: "2026-01-01", updatedAt: "2026-01-01" } as Card,
-      { id: "tc2", deckId: "td1", front: "Q2", back: "A2", hint: "", source: "", tags: [], cardType: "basic" as any, state: "new" as any, lastReviewDate: null, nextReviewDate: "2026-01-01", stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0, reps: 0, lapses: 0, createdAt: "2026-01-01", updatedAt: "2026-01-01" } as Card,
+      { id: "tc1", deckId: "td1", front: "Q1", back: "A1", hint: "", source: "", tags: [], cardType: "basic" as any, state: "new" as any, lastReviewDate: null, nextReviewDate: "2026-01-01", stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0, reps: 0, lapses: 0, learningSteps: 0, createdAt: "2026-01-01", updatedAt: "2026-01-01" } as Card,
+      { id: "tc2", deckId: "td1", front: "Q2", back: "A2", hint: "", source: "", tags: [], cardType: "basic" as any, state: "new" as any, lastReviewDate: null, nextReviewDate: "2026-01-01", stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0, reps: 0, lapses: 0, learningSteps: 0, createdAt: "2026-01-01", updatedAt: "2026-01-01" } as Card,
     ];
 
     it("saves settings with onboardingComplete true and template data", async () => {

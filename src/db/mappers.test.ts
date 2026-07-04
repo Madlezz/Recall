@@ -31,7 +31,7 @@ describe("database mappers", () => {
       elapsedDays: 0,
       scheduledDays: 0,
       reps: 0,
-      lapses: 0,
+      lapses: 0, learningSteps: 0,
       lastReviewDate: null,
       nextReviewDate: "2026-06-01T00:00:00.000Z",
       createdAt: "2026-06-01T00:00:00.000Z",
@@ -100,7 +100,7 @@ desiredRetention: 0.9,
     expect(studySessionFromRow(studySessionToRow(session) as StudySessionRow)).toEqual(session);
     expect(reviewLogFromRow(reviewLogToRow(reviewLog) as ReviewLogRow)).toEqual(reviewLog);
     expect(settingsFromRows(settingsToRows(settings))).toEqual(settings);
-    expect(settingsToRows(settings)).toContainEqual({ key: "schema_version", value: "4" });
+    expect(settingsToRows(settings)).toContainEqual({ key: "schema_version", value: "8" });
   });
 
   it("rejects invalid card state and review rating rows", () => {
@@ -119,7 +119,7 @@ desiredRetention: 0.9,
       elapsed_days: 0,
       scheduled_days: 0,
       reps: 0,
-      lapses: 0,
+      lapses: 0, learning_steps: 0,
       last_review_date: null,
       next_review_date: "2026-06-01T00:00:00.000Z",
       created_at: "2026-06-01T00:00:00.000Z",

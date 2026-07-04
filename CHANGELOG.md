@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Fixed
+- **Critical FSRS graduation bug (4a):** Cards never graduated past ~10-minute learning intervals because `learning_steps` was hardcoded to `0` on every review call. Added `learningSteps` field to Card type, DB schema (migration v8), and all Rust/TS data layers. Cards now correctly progress through learning steps and graduate to day/week/month intervals.
+- **Relearning state mapping bug (4a):** `relearning` was mapped to ts-fsrs `State.Learning` instead of `State.Relearning`, causing relearning cards to use learning steps instead of relearning steps and never graduate back to review. Fixed with proper `toFsrsState`/`fromFsrsState` mappers.
+- Added regression tests: sequential reviews now graduate cards, relearning cards return to review state, and the old bug is proven by a simulation test.
+
 ### Added
 - Internationalization (i18n): full UI localization with react-i18next
   - English (en) and Bahasa Indonesia (id) locales, 873 translation keys across 40 namespaces

@@ -83,7 +83,7 @@ function makeCard(overrides: Partial<Card> = {}): Card {
     tags: [], cardType: "basic", state: "new", lastReviewDate: null,
     nextReviewDate: new Date().toISOString(), // Due now
     stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0,
-    reps: 0, lapses: 0, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z",
+    reps: 0, lapses: 0, learningSteps: 0, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z",
     ...overrides,
   };
 }

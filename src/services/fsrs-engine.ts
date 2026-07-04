@@ -5,6 +5,31 @@ const DEFAULT_RETENTION = 0.9;
 
 let _customWeights: number[] | null = null;
 
+/**
+ * Map our CardState string to ts-fsrs State enum.
+ * Critical: "relearning" must map to State.Relearning (3), NOT State.Learning (1).
+ * Mapping relearning → Learning causes ts-fsrs to use learning_steps instead of
+ * relearning_steps, and prevents the card from ever graduating back to Review.
+ */
+function toFsrsState(state: CardState): State {
+  switch (state) {
+    case "new": return State.New;
+    case "learning": return State.Learning;
+    case "review": return State.Review;
+    case "relearning": return State.Relearning;
+  }
+}
+
+/** Reverse: ts-fsrs State enum → our CardState string. */
+function fromFsrsState(state: State): CardState {
+  switch (state) {
+    case State.New: return "new";
+    case State.Learning: return "learning";
+    case State.Review: return "review";
+    case State.Relearning: return "relearning";
+  }
+}
+
 /** Set custom FSRS weights (null = use defaults). */
 export function setCustomWeights(weights: number[] | null): void {
   _customWeights = weights;
@@ -39,12 +64,7 @@ export function previewIntervals(
 ): { again: string; hard: string; good: string; easy: string } {
   const f = fsrs({ request_retention: desiredRetention, w: _customWeights ?? undefined });
 
-  const fsrsState =
-    card.state === "new"
-      ? State.New
-      : card.state === "learning" || card.state === "relearning"
-        ? State.Learning
-        : State.Review;
+  const fsrsState = toFsrsState(card.state);
 
   const schedulingCard: FSRSCard = {
     due: new Date(card.nextReviewDate),
@@ -54,7 +74,7 @@ export function previewIntervals(
     scheduled_days: card.scheduledDays,
     reps: card.reps,
     lapses: card.lapses,
-    learning_steps: 0,
+    learning_steps: card.learningSteps,
     state: fsrsState,
     last_review: card.lastReviewDate
       ? new Date(card.lastReviewDate)
@@ -97,12 +117,7 @@ export function applyReview(card: Card, rating: ReviewRating, reviewedAt: Date, 
           ? Rating.Good
           : Rating.Easy;
 
-  const fsrsState =
-    card.state === "new"
-      ? State.New
-      : card.state === "learning" || card.state === "relearning"
-        ? State.Learning
-        : State.Review;
+  const fsrsState = toFsrsState(card.state);
 
   const schedulingCard: FSRSCard = {
     due: new Date(card.nextReviewDate),
@@ -112,7 +127,7 @@ export function applyReview(card: Card, rating: ReviewRating, reviewedAt: Date, 
     scheduled_days: card.scheduledDays,
     reps: card.reps,
     lapses: card.lapses,
-    learning_steps: 0,
+    learning_steps: card.learningSteps,
     state: fsrsState,
     last_review: card.lastReviewDate
       ? new Date(card.lastReviewDate)
@@ -122,14 +137,7 @@ export function applyReview(card: Card, rating: ReviewRating, reviewedAt: Date, 
   const recordLog = f.repeat(schedulingCard, reviewedAt);
   const s = recordLog[fsrsRating].card;
 
-  const newState: CardState =
-    s.state === State.New
-      ? "new"
-      : s.state === State.Learning
-        ? "learning"
-        : s.state === State.Review
-          ? "review"
-          : "relearning";
+  const newState: CardState = fromFsrsState(s.state);
 
   return {
     ...card,
@@ -142,6 +150,7 @@ export function applyReview(card: Card, rating: ReviewRating, reviewedAt: Date, 
     scheduledDays: s.scheduled_days,
     reps: s.reps,
     lapses: s.lapses,
+    learningSteps: s.learning_steps,
     updatedAt: reviewedAt.toISOString(),
   };
 }
@@ -182,6 +191,7 @@ export function createNewCard(
     scheduledDays: 0,
     reps: 0,
     lapses: 0,
+    learningSteps: 0,
     createdAt: now,
     updatedAt: now,
   };

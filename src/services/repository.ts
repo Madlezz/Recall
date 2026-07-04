@@ -266,7 +266,7 @@ class SqliteRecallRepository implements RecallRepository {
 
         for (const card of snapshot.cards.map(cardToRow)) {
           await tx.execute(
-            "INSERT INTO cards (id, deck_id, front, back, hint, source, tags, card_type, state, last_review_date, next_review_date, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO cards (id, deck_id, front, back, hint, source, tags, card_type, state, last_review_date, next_review_date, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, learning_steps, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             [
               card.id,
               card.deck_id,
@@ -285,6 +285,7 @@ class SqliteRecallRepository implements RecallRepository {
               card.scheduled_days,
               card.reps,
               card.lapses,
+              card.learning_steps,
               card.created_at,
               card.updated_at,
             ],
@@ -337,6 +338,7 @@ class SqliteRecallRepository implements RecallRepository {
             scheduled_days: cardRow.scheduled_days,
             reps: cardRow.reps,
             lapses: cardRow.lapses,
+            learning_steps: cardRow.learning_steps,
             updated_at: cardRow.updated_at,
             review_log_id: logRow.id,
             review_card_id: logRow.card_id,
@@ -357,11 +359,11 @@ class SqliteRecallRepository implements RecallRepository {
         await tx.execute(
           `UPDATE cards SET state=?, last_review_date=?, next_review_date=?,
            stability=?, difficulty=?, elapsed_days=?, scheduled_days=?,
-           reps=?, lapses=?, updated_at=? WHERE id=?`,
+           reps=?, lapses=?, learning_steps=?, updated_at=? WHERE id=?`,
           [cardRow.state, cardRow.last_review_date, cardRow.next_review_date,
            cardRow.stability, cardRow.difficulty, cardRow.elapsed_days,
            cardRow.scheduled_days, cardRow.reps, cardRow.lapses,
-           cardRow.updated_at, cardRow.id],
+           cardRow.learning_steps, cardRow.updated_at, cardRow.id],
         );
         await tx.execute(
           `INSERT INTO review_logs (id, card_id, rating, review_date,

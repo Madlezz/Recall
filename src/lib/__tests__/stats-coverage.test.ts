@@ -38,7 +38,7 @@ function makeCard(overrides: Partial<Card>): Card {
     elapsedDays: 5,
     scheduledDays: 5,
     reps: 10,
-    lapses: 0,
+    lapses: 0, learningSteps: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     ...overrides,

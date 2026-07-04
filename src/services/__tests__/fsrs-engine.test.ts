@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { calculateNextReview, createNewCard, previewIntervals, formatInterval } from "../fsrs-engine";
+import { calculateNextReview, createNewCard, previewIntervals, formatInterval, applyReview } from "../fsrs-engine";
 import type { Card } from "@/types";
 
 describe("FSRS Engine", () => {
@@ -31,6 +31,7 @@ describe("FSRS Engine", () => {
       scheduledDays: 5,
       reps: 10,
       lapses: 0,
+      learningSteps: 0,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -41,7 +42,6 @@ describe("FSRS Engine", () => {
     expect(result.state).toBe("relearning");
   });
 });
-
 describe("formatInterval", () => {
   it("formats sub-minute", () => {
     expect(formatInterval(0)).toBe("<1m");
@@ -93,7 +93,7 @@ describe("previewIntervals", () => {
       elapsedDays: 5,
       scheduledDays: 5,
       reps: 10,
-      lapses: 0,
+      lapses: 0, learningSteps: 0,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -113,5 +113,84 @@ describe("previewIntervals", () => {
 
     expect(toMs(result.easy)).toBeGreaterThanOrEqual(toMs(result.good));
     expect(toMs(result.good)).toBeGreaterThanOrEqual(toMs(result.hard));
+  });
+});
+
+describe("FSRS graduation regression (bug 4a)", () => {
+  // Bug: learning_steps was hardcoded to 0 on every call, so cards never
+  // graduated past ~10-minute intervals. Also, "relearning" was mapped to
+  // State.Learning instead of State.Relearning, preventing graduation back to Review.
+
+  it("card rated 'good' twice graduates from learning to review state", () => {
+    let card = createNewCard("deck-1", "front", "back", "", []);
+    const t0 = new Date("2026-01-01T10:00:00Z");
+
+    // Review 1: New -> Learning (step 1, ~10 min)
+    card = applyReview(card, "good", t0, 0.9);
+    expect(card.state).toBe("learning");
+    expect(card.learningSteps).toBe(1);
+
+    // Review 2: Learning -> Review (graduated, multi-day interval)
+    const t1 = new Date(t0.getTime() + 10 * 60_000); // 10 min later
+    card = applyReview(card, "good", t1, 0.9);
+    expect(card.state).toBe("review");
+    // After graduation, the interval should be in days, not minutes
+    const intervalMs = new Date(card.nextReviewDate).getTime() - t1.getTime();
+    expect(intervalMs).toBeGreaterThan(60 * 60_000); // > 1 hour (should be days)
+  });
+
+  it("card stuck at learning if learning_steps never persisted (simulating old bug)", () => {
+    // This test proves the bug exists when learning_steps is always 0.
+    // We simulate the old behavior by zeroing learningSteps before each call.
+    let card = createNewCard("deck-1", "front", "back", "", []);
+    const t0 = new Date("2026-01-01T10:00:00Z");
+
+    for (let i = 0; i < 5; i++) {
+      // Simulate bug: reset learningSteps to 0 before each review
+      card = { ...card, learningSteps: 0 };
+      const t = new Date(t0.getTime() + i * 10 * 60_000);
+      card = applyReview(card, "good", t, 0.9);
+    }
+    // With the bug, card stays in learning state forever
+    expect(card.state).toBe("learning");
+  });
+
+  it("relearning card graduates back to review when rated 'good'", () => {
+    // Start with a review card that lapses (Again -> Relearning)
+    const reviewCard: Card = {
+      id: "test-relearn",
+      deckId: "deck-1",
+      front: "front",
+      back: "back",
+      hint: "",
+      source: "",
+      tags: [],
+      cardType: "basic",
+      state: "review",
+      lastReviewDate: new Date("2025-12-27T10:00:00Z").toISOString(),
+      nextReviewDate: new Date("2026-01-01T10:00:00Z").toISOString(),
+      stability: 5.0,
+      difficulty: 4.0,
+      elapsedDays: 5,
+      scheduledDays: 5,
+      reps: 10,
+      lapses: 0,
+      learningSteps: 0,
+      createdAt: new Date("2025-12-20T10:00:00Z").toISOString(),
+      updatedAt: new Date("2025-12-27T10:00:00Z").toISOString(),
+    };
+
+    const t0 = new Date("2026-01-01T10:00:00Z");
+
+    // Rate Again: Review -> Relearning
+    let card = applyReview(reviewCard, "again", t0, 0.9);
+    expect(card.state).toBe("relearning");
+    expect(card.lapses).toBe(1);
+
+    // Rate Good: Relearning should graduate back to Review
+    // With the old bug (mapping relearning->Learning), this would stay in learning
+    const t1 = new Date(t0.getTime() + 10 * 60_000);
+    card = applyReview(card, "good", t1, 0.9);
+    expect(card.state).toBe("review");
   });
 });

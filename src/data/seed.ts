@@ -111,6 +111,7 @@ function card(
       lastReviewDate: lastReviewDate ? ISO(lastReviewDate) : null,
     nextReviewDate: ISO(nextReviewDate),
     stability, difficulty, elapsedDays, scheduledDays, reps, lapses,
+    learningSteps: 0,
     createdAt: ISO(createdAt), updatedAt: ISO(createdAt),
   };
 }
