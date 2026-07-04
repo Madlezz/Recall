@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-04
+
 ### Added
 - **Voice input for card creation:** Speak instead of type — uses the Web Speech API (browser's built-in speech recognition, fully offline, no cloud). Mic button appears in card editor (front + back) and quick-add dialog. Language auto-detected from app locale (en→en-US, id→id-ID). Toggle in Settings → Study. Vision-aligned: lowers the barrier for someone uncomfortable typing/using markdown.
 - **Anki import preserves scheduling history:** Cards imported from Anki `.apkg` files now retain their review state (new/learning/review), FSRS stability and difficulty, reps, lapses, and due interval. FSRS memory state (`s`/`d`) is read directly from Anki 23.10+ `data` column; for older decks, stability/difficulty is estimated from SM-2 ease factor and interval. Import report shows "Review history kept" and "FSRS state imported" counters.
