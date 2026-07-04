@@ -21,6 +21,86 @@ const iso = today.toISOString();
 
 export const TEMPLATE_DECKS: TemplateDeck[] = [
   {
+    id: "template_how_it_works",
+    name: "How This Works",
+    description: "Learn spaced repetition by doing it — 5 quick cards",
+    icon: "👋",
+    color: "slate",
+    tags: ["getting-started", "tutorial"],
+    cards: [
+      {
+        front: "Welcome! This is a flashcard. The question is on the front, the answer is on the back. Press Space to reveal the answer.",
+        back: "That's it! You just read a flashcard. In Recall, you rate how well you remembered it — and the app decides when to show it again.",
+        type: "basic",
+        tags: ["tutorial", "welcome"],
+      },
+      {
+        front: "Spaced repetition is simple: instead of reviewing everything every day, you review things right before you'd forget them. Recall schedules this for you automatically. What do you need to do?",
+        back: "Just rate each card: Again (forgot), Hard, Good, or Easy. Recall handles all the timing.",
+        type: "basic",
+        tags: ["tutorial", "how-it-works"],
+      },
+      {
+        front: "If you rate a card 'Again' (you forgot it), when will Recall show it again?",
+        back: "Soon — within minutes, so you get another chance while it's fresh. As you get it right more often, the gap grows to hours, then days, then weeks.",
+        type: "basic",
+        tags: ["tutorial", "intervals"],
+      },
+      {
+        front: "If you rate a card 'Good' several times, the review interval gets {{c1::longer}}. This is called {{c2::spaced repetition}} — the gap grows so you review less often as you master it.",
+        back: "",
+        type: "cloze",
+        tags: ["tutorial", "graduation"],
+      },
+      {
+        front: "The best way to use Recall: create cards about things you're actually studying. Keep each card short — one fact per card. How many facts should each card test?",
+        back: "One. One fact per card. \"What year did WWII end?\" → 1945. Not \"List all WWII events and dates.\"",
+        type: "basic",
+        tags: ["tutorial", "best-practices"],
+      },
+    ],
+  },
+  {
+    id: "template_utbk",
+    name: "UTBK Indonesia",
+    description: "Soal latihan UTBK/SNBT — Tes Potensi Skolastik",
+    icon: "🇮🇩",
+    color: "rose",
+    tags: ["utbk", "snbt", "indonesia"],
+    cards: [
+      {
+        front: "Sinonim dari kata 'Hemat' adalah...",
+        back: "Hemat = irit, boros (antonim), cermat dalam pengeluaran",
+        type: "basic",
+        tags: ["tps", "kosakata", "sinonim"],
+      },
+      {
+        front: "Antonim dari kata 'Generous' (dermawan) adalah...",
+        back: "Pelit / kikir / bakhil",
+        type: "basic",
+        tags: ["tps", "kosakata", "antonim"],
+      },
+      {
+        front: "Jika 2x + 5 = 17, maka nilai x adalah {{c1::6}}",
+        back: "",
+        type: "cloze",
+        tags: ["tps", "matematika", "aljabar"],
+      },
+      {
+        front: "Penyebab utama terjadinya hujan asam adalah polutan gas {{c1::SO₂}} dan {{c2::NOₓ}} yang bereaksi dengan uap air di atmosfer.",
+        back: "",
+        type: "cloze",
+        tags: ["tps", "sains", "lingkungan"],
+      },
+      {
+        front: "Pancasila sebagai dasar negara Indonesia disahkan pada tanggal...",
+        back: "18 Agustus 1945 (saat PPKI sidang pertama)",
+        type: "basic",
+        tags: ["tps", "pengetahuan-umum", "sejarah"],
+      },
+    ],
+  },
+  {
     id: "template_languages",
     name: "Languages",
     description: "Common phrases and vocabulary for language learning",
@@ -127,7 +207,7 @@ export const TEMPLATE_DECKS: TemplateDeck[] = [
     name: "Medical",
     description: "Anatomy, pharmacology, and clinical concepts",
     icon: "⚕️",
-    color: "rose",
+    color: "violet",
     tags: ["medical", "anatomy", "pharmacology"],
     cards: [
       {

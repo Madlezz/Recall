@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+- **Onboarding rewrite:** Copy now explains spaced repetition in plain language instead of assuming the user knows what FSRS/SRS is. Three feature cards: "Never Cram Again" (how it works), "Just Press Space" (the workflow), "Yours Alone" (privacy). Both EN and ID locales rewritten.
+- **"How This Works" starter deck:** 5 interactive tutorial cards that teach spaced repetition through actual practice — first-timer friendly.
+- **"UTBK Indonesia" starter deck:** 5 Indonesian exam-relevant cards (sinonim, antonim, matematika, sains, sejarah) targeting the concrete ID market.
+- Internationalization (i18n): full UI localization with react-i18next
+  - English (en) and Bahasa Indonesia (id) locales, 873 translation keys across 40 namespaces
+  - Language switcher in Settings → Appearance
+  - All user-facing strings wired: every component, dialog, toast, and aria-label
+  - Test environment initializes i18n to prevent assertion failures
+
 ### Fixed
 - **Critical FSRS graduation bug (4a):** Cards never graduated past ~10-minute learning intervals because `learning_steps` was hardcoded to `0` on every review call. Added `learningSteps` field to Card type, DB schema (migration v8), and all Rust/TS data layers. Cards now correctly progress through learning steps and graduate to day/week/month intervals.
 - **Relearning state mapping bug (4a):** `relearning` was mapped to ts-fsrs `State.Learning` instead of `State.Relearning`, causing relearning cards to use learning steps instead of relearning steps and never graduate back to review. Fixed with proper `toFsrsState`/`fromFsrsState` mappers.

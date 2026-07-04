@@ -1,4 +1,4 @@
-import { BookCheck, Brain, Sparkles, Zap } from "lucide-react";
+import { BookCheck, Brain, Shield, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRecallStore } from "@/stores/recall-store";
 import { useEffect, useState } from "react";
@@ -120,6 +120,16 @@ export function Onboarding(): JSX.Element {
             </div>
             <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
               {t("onboarding.feature2Desc")}
+            </p>
+          </div>
+
+          <div className="space-y-2 rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex items-center gap-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+              <Shield className="h-4 w-4 text-zinc-600 dark:text-zinc-400" aria-hidden="true" />
+              {t("onboarding.feature3Title")}
+            </div>
+            <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+              {t("onboarding.feature3Desc")}
             </p>
           </div>
         </div>
