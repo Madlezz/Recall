@@ -13,7 +13,7 @@ Recall is *not* trying to out-feature Anki for its existing power users. That's 
 - [x] **Onboarding rewrite** — Explain what spaced repetition is and why review timing matters, in plain language, before naming the algorithm. Added "how this works" demo deck and UTBK Indonesia starter content. Done in v1.1.0.
 - [ ] **Mobile app** (iOS and Android) using Tauri's cross-platform capabilities
   - Reframed: not "feature parity" but "access" — desktop-only is a real barrier for a smartphone-primary target population.
-  - [ ] PWA (Progressive Web App) as lightweight alternative to native mobile builds
+  - [x] PWA (Progressive Web App) as lightweight alternative to native mobile builds (v1.1.0 — live at madlezz.github.io/Recall)
 - [ ] Sync protocol for optional cloud backup (privacy-preserving, end-to-end encrypted)
   - [ ] Auto-detect iCloud Drive / OneDrive folders for one-click "painless cloud sync"
 
