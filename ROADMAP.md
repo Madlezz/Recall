@@ -10,7 +10,7 @@ Recall is *not* trying to out-feature Anki for its existing power users. That's 
 
 ## In Progress
 
-- [x] **Onboarding rewrite** — Explain what spaced repetition is and why review timing matters, in plain language, before naming the algorithm. Added "how this works" demo deck and UTBK Indonesia starter content. Fixed in [Unreleased].
+- [x] **Onboarding rewrite** — Explain what spaced repetition is and why review timing matters, in plain language, before naming the algorithm. Added "how this works" demo deck and UTBK Indonesia starter content. Done in v1.1.0.
 - [ ] **Mobile app** (iOS and Android) using Tauri's cross-platform capabilities
   - Reframed: not "feature parity" but "access" — desktop-only is a real barrier for a smartphone-primary target population.
   - [ ] PWA (Progressive Web App) as lightweight alternative to native mobile builds
@@ -20,12 +20,12 @@ Recall is *not* trying to out-feature Anki for its existing power users. That's 
 ## Planned
 
 ### Core Fixes
-- [x] **FSRS graduation bug** — `learning_steps` was hardcoded to 0, cards never graduated past ~10-minute intervals. Fixed in [Unreleased].
-- [x] **Relearning state mapping** — `relearning` was mapped to `State.Learning` instead of `State.Relearning`. Fixed in [Unreleased].
-- [x] **Anki import scheduling history** — Import now reads FSRS `memory_state` (s/d) from Anki 23.10+ `data` column, falls back to SM-2 ease→difficulty estimation for legacy cards. State, stability, difficulty, reps, lapses, and due interval all preserved. Fixed in [Unreleased].
+- [x] **FSRS graduation bug** — `learning_steps` was hardcoded to 0, cards never graduated past ~10-minute intervals. Fixed in v1.1.0.
+- [x] **Relearning state mapping** — `relearning` was mapped to `State.Learning` instead of `State.Relearning`. Fixed in v1.1.0.
+- [x] **Anki import scheduling history** — Import now reads FSRS `memory_state` (s/d) from Anki 23.10+ `data` column, falls back to SM-2 ease→difficulty estimation for legacy cards. State, stability, difficulty, reps, lapses, and due interval all preserved. Fixed in v1.1.0.
 
 ### Study Experience
-- [x] **Voice input for card creation** (speech-to-text) — lowers the barrier for someone uncomfortable typing/using markdown. Uses Web Speech API (offline, no cloud). Mic button in card editor + quick-add. Language auto-detected from app locale. Toggle in Settings → Study. Done in [Unreleased].
+- [x] **Voice input for card creation** (speech-to-text) — lowers the barrier for someone uncomfortable typing/using markdown. Uses Web Speech API (offline, no cloud). Mic button in card editor + quick-add. Language auto-detected from app locale. Toggle in Settings → Study. Done in v1.1.0.
 - [ ] Handwriting recognition for handwritten notes
 - [ ] Spaced repetition for audio/video content
 - [ ] Adaptive difficulty (cards get harder/easier based on performance)
@@ -108,20 +108,20 @@ Recall is *not* trying to out-feature Anki for its existing power users. That's 
 - [x] Cargo-audit ignore justification file (v1.0.11)
 - [x] Anki media import warning (v1.0.11)
 - [x] Card browser UI wired to DB queries (v1.0.11)
-- [x] Card editor: paste (Ctrl+V) and drag-drop image support (Unreleased)
-- [x] Text-to-Speech: auto-read cards in study mode with configurable speed (Unreleased)
-- [x] FSRS optimizer: analyze review history to auto-tune spacing weights (Unreleased)
-- [x] Workload forecast: 30-day due card chart with new vs review breakdown (Unreleased)
-- [x] Command palette: Ctrl+K quick navigation (Unreleased)
-- [x] FSRS interval preview: rating buttons show predicted intervals (Unreleased)
-- [x] Retention curve: rolling 7-day retention visualization on stats dashboard (Unreleased)
+- [x] Card editor: paste (Ctrl+V) and drag-drop image support (v1.1.0)
+- [x] Text-to-Speech: auto-read cards in study mode with configurable speed (v1.1.0)
+- [x] FSRS optimizer: analyze review history to auto-tune spacing weights (v1.1.0)
+- [x] Workload forecast: 30-day due card chart with new vs review breakdown (v1.1.0)
+- [x] Command palette: Ctrl+K quick navigation (v1.1.0)
+- [x] FSRS interval preview: rating buttons show predicted intervals (v1.1.0)
+- [x] Retention curve: rolling 7-day retention visualization on stats dashboard (v1.1.0)
 - [x] Tags as first-class citizens: hierarchical tag tree, saved searches, tag autocomplete (v1.0.13)
 - [x] Onboarding template deck gallery: 4 starter decks (Languages, Coding, GRE, Med) (v1.0.13)
 - [x] Theming depth: 6 accent colors + dyslexia-friendly font (v1.0.13)
 - [x] Folder-based cloud sync: merge-on-import to Dropbox/Google Drive/etc. (v1.0.13)
-- [x] Image Occlusion cards: draw rectangles on images, reveal during study (Unreleased)
-- [x] Richer Anki import: media extraction (images from .apkg) with recall:// URLs (Unreleased)
-- [x] Internationalization (i18n): react-i18next with English + Bahasa Indonesia, 40 namespaces / 873 keys, language switcher in Settings (Unreleased)
+- [x] Image Occlusion cards: draw rectangles on images, reveal during study (v1.1.0)
+- [x] Richer Anki import: media extraction (images from .apkg) with recall:// URLs (v1.1.0)
+- [x] Internationalization (i18n): react-i18next with English + Bahasa Indonesia, 40 namespaces / 873 keys, language switcher in Settings (v1.1.0)
 
 ## Contributing
 
