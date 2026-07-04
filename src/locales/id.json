@@ -1022,5 +1022,15 @@
     "achievementUnlocked": "Pencapaian Dibuka",
     "continue": "Lanjut",
     "againHeavy": "Didominasi Again"
+  },
+  "pwa": {
+    "updateAvailable": "Pembaruan tersedia",
+    "updateDescription": "Versi baru Recall sudah siap.",
+    "update": "Perbarui",
+    "offlineReady": "Siap digunakan offline",
+    "offlineReadyDescription": "Recall sudah tersimpan dan bisa digunakan tanpa internet.",
+    "installApp": "Pasang Recall",
+    "installDescription": "Tambahkan ke layar utama untuk akses cepat.",
+    "install": "Pasang"
   }
 }

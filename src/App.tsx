@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Toaster } from "sonner";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { PWAUpdatePrompt } from "@/components/pwa-update-prompt";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Dashboard } from "@/components/dashboard";
@@ -164,6 +165,7 @@ export function App(): JSX.Element {
         <Toaster richColors closeButton position="top-right" />
         <QuickAddDialog open={showQuickAdd} onClose={() => setShowQuickAdd(false)} />
         <ShortcutHelp open={showShortcuts} onClose={() => setShowShortcuts(false)} />
+        <PWAUpdatePrompt />
 
         {/* Screen reader announcements for view changes */}
         <div aria-live="polite" aria-atomic="true" className="sr-only">

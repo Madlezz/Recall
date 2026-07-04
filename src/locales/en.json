@@ -1022,5 +1022,15 @@
     "achievementUnlocked": "Achievement Unlocked",
     "continue": "Continue",
     "againHeavy": "Again-heavy"
+  },
+  "pwa": {
+    "updateAvailable": "Update available",
+    "updateDescription": "A new version of Recall is ready.",
+    "update": "Update",
+    "offlineReady": "Ready for offline use",
+    "offlineReadyDescription": "Recall is cached and works without internet.",
+    "installApp": "Install Recall",
+    "installDescription": "Add to your home screen for quick access.",
+    "install": "Install"
   }
 }

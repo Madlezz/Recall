@@ -1,9 +1,57 @@
 import path from "node:path";
 import react from "@vitejs/plugin-react";
+import { VitePWA } from "vite-plugin-pwa";
 import { defineConfig } from "vite";
 
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(({ mode }) => ({
+  base: mode === "pages" ? "/Recall/" : "/",
+  plugins: [
+    react(),
+    VitePWA({
+      strategies: "generateSW",
+      registerType: "prompt",
+      includeAssets: ["favicon.svg", "icons/icon-192.png", "icons/icon-512.png"],
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,svg,png,woff,woff2}"],
+        // Don't cache KaTeX CSS from CDN — let browser handle it
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        navigateFallbackDenylist: [/^\/api/],
+      },
+      manifest: {
+        name: "Recall — Spaced Repetition Flashcards",
+        short_name: "Recall",
+        description: "FSRS-based flashcard app for focused learning. Your data stays on your device, always.",
+        theme_color: "#0f172a",
+        background_color: "#0f172a",
+        display: "standalone",
+        orientation: "portrait",
+        scope: "/",
+        start_url: "/",
+        lang: "en",
+        categories: ["education", "productivity"],
+        icons: [
+          {
+            src: "/icons/icon-192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any",
+          },
+          {
+            src: "/icons/icon-512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any",
+          },
+          {
+            src: "/icons/icon-maskable-512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
+          },
+        ],
+      },
+    }),
+  ],
   build: {
     target: "es2021",
     rollupOptions: {
@@ -25,4 +73,4 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-});
+}));
