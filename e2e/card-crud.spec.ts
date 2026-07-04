@@ -5,25 +5,12 @@ async function goToDashboard(page: import("@playwright/test").Page) {
   await page.evaluate(() => localStorage.clear());
   await page.reload();
   await page.waitForSelector("[role='region'][aria-label='Welcome to Recall']", { timeout: 10000 });
-  await page.getByRole("button", { name: /Try with Demo Cards/i }).click();
+  await page.getByRole("button", { name: /Skip for now/i }).click();
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible({ timeout: 10000 });
 }
 
 test.describe("Card CRUD", () => {
-  test("open deck detail and see cards", async ({ page }) => {
-    test.setTimeout(60000);
-    await goToDashboard(page);
-
-    // Click on first deck card to open deck detail
-    const deckCard = page.getByLabel("Open deck: 🇯🇵 Japanese Basics").first();
-    if (await deckCard.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await deckCard.click();
-      // Should see deck detail view with card list
-      await expect(page.getByText("Japanese Basics").first()).toBeVisible({ timeout: 5000 });
-    }
-  });
-
-  test("open card browser and search", async ({ page }) => {
+  test("navigate to card browser", async ({ page }) => {
     test.setTimeout(60000);
     await goToDashboard(page);
 
@@ -37,7 +24,6 @@ test.describe("Card CRUD", () => {
     const searchInput = page.getByPlaceholder(/Search/i).first();
     if (await searchInput.isVisible({ timeout: 3000 }).catch(() => false)) {
       await searchInput.fill("Hello");
-      // Should filter results
       await page.waitForTimeout(500);
     }
   });

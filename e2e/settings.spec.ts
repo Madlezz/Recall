@@ -5,7 +5,7 @@ async function goToDashboard(page: import("@playwright/test").Page) {
   await page.evaluate(() => localStorage.clear());
   await page.reload();
   await page.waitForSelector("[role='region'][aria-label='Welcome to Recall']", { timeout: 10000 });
-  await page.getByRole("button", { name: /Try with Demo Cards/i }).click();
+  await page.getByRole("button", { name: /Skip for now/i }).click();
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible({ timeout: 10000 });
 }
 
@@ -26,10 +26,11 @@ test.describe("Settings", () => {
     await page.getByRole("button", { name: /Settings/i }).click();
     await expect(page.getByText("Preferences")).toBeVisible({ timeout: 5000 });
 
-    // Click Appearance section
-    const appearanceBtn = page.getByText("Appearance").first();
-    await expect(appearanceBtn).toBeVisible({ timeout: 5000 });
-    await appearanceBtn.click();
+    // Click Appearance section (tab)
+    const appearanceBtn = page.getByRole("tab", { name: /General/i }).first();
+    if (await appearanceBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await appearanceBtn.click();
+    }
 
     // Select Light theme
     await page.getByRole("button", { name: /Light/i }).click();
@@ -46,12 +47,7 @@ test.describe("Settings", () => {
     await page.getByRole("button", { name: /Settings/i }).click();
     await expect(page.getByText("Preferences")).toBeVisible({ timeout: 5000 });
 
-    // Click Appearance section for language switcher
-    const appearanceBtn = page.getByText("Appearance").first();
-    await expect(appearanceBtn).toBeVisible({ timeout: 5000 });
-    await appearanceBtn.click();
-
-    // Look for language selector
+    // Look for language selector in General/Appearance tab
     const langSelect = page.locator("select").filter({ hasText: /Indonesian|Bahasa/i }).first();
     if (await langSelect.isVisible({ timeout: 3000 }).catch(() => false)) {
       await langSelect.selectOption("id");

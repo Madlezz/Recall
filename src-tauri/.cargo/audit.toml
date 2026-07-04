@@ -33,4 +33,9 @@ ignore = [
   "RUSTSEC-2025-0081", # openssl — system lib, not bundled
   "RUSTSEC-2025-0098", # webpki — Tauri uses rustls/system TLS
   "RUSTSEC-2025-0100", # h2 — not in Tauri dep tree at runtime
+
+  # ── 2026 advisories (Tauri transitive, no upstream fix yet) ──
+  "RUSTSEC-2026-0190", # anyhow unsoundness in downcast_mut — Tauri transitive, not in error-handling hot path
+  "RUSTSEC-2026-0194", # quick-xml quadratic runtime on duplicate attrs — Tauri transitive (updater), only parses trusted XML
+  "RUSTSEC-2026-0195", # quick-xml unbounded ns-decl allocation — same, only parses trusted updater XML
 ]

@@ -5,8 +5,7 @@ import React from "react";
 // Mock the store
 const mockStore: any = {
   decks: [], cards: [],
-  settings: { xp: 0, leechThreshold: 5, dailyGoal: 20, dailyNewCardLimit: 20, theme: "light", accentColor: "zinc", dyslexiaFont: false, soundVolume: 100, desiredRetention: 0.9, onboardingComplete: true, seededAt: "", achievements: [], notificationsEnabled: false, allowHtml: false, backupFolder: null, backupSchedule: "never", lastBackupAt: null, syncFolder: null, syncEnabled: false, ttsEnabled: false, ttsAutoRead: false, ttsSpeed: 1, fsrsWeights: null },
-  voiceInputEnabled: true,
+  settings: { xp: 0, leechThreshold: 5, dailyGoal: 20, dailyNewCardLimit: 20, theme: "light", accentColor: "zinc", dyslexiaFont: false, soundVolume: 100, desiredRetention: 0.9, onboardingComplete: true, seededAt: "", achievements: [], notificationsEnabled: false, allowHtml: false, backupFolder: null, backupSchedule: "never", lastBackupAt: null, syncFolder: null, syncEnabled: false, ttsEnabled: false, ttsAutoRead: false, ttsSpeed: 1, fsrsWeights: null, voiceInputEnabled: true },
   view: "dashboard",
   showDashboard: vi.fn(), showSettings: vi.fn(), showStats: vi.fn(),
   showBrowser: vi.fn(), showTags: vi.fn(), startReview: vi.fn(), startMatch: vi.fn(),

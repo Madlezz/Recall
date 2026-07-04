@@ -14,13 +14,13 @@ pub struct AnkiCard {
     pub back: String,
     pub tags: Vec<String>,
     // Scheduling fields (imported from Anki cards table)
-    pub state: String,           // new, learning, review, relearning
-    pub stability: f64,          // FSRS stability (from memory_state or estimated)
-    pub difficulty: f64,         // FSRS difficulty (from memory_state or estimated)
-    pub reps: i64,               // total reviews
-    pub lapses: i64,             // times card lapsed
-    pub days_until_next: i64,    // interval in days (from ivl)
-    pub has_fsrs_state: bool,    // whether memory_state was present in Anki
+    pub state: String,        // new, learning, review, relearning
+    pub stability: f64,       // FSRS stability (from memory_state or estimated)
+    pub difficulty: f64,      // FSRS difficulty (from memory_state or estimated)
+    pub reps: i64,            // total reviews
+    pub lapses: i64,          // times card lapsed
+    pub days_until_next: i64, // interval in days (from ivl)
+    pub has_fsrs_state: bool, // whether memory_state was present in Anki
 }
 
 #[derive(Serialize)]
@@ -66,7 +66,7 @@ fn anki_to_state(queue: i32, ctype: i32) -> &'static str {
         0 => "new",
         1 => "learning",
         2 => "review",
-        3 => "learning", // day-learn reuses learning state
+        3 => "learning",  // day-learn reuses learning state
         -1 | -2 => "new", // suspended/buried → treat as new
         _ => match ctype {
             0 => "new",
@@ -627,7 +627,7 @@ mod tests {
         assert_eq!(cards[0].deck_name, "Default"); // Falls back to Default
         assert_eq!(cards[0].state, "review");
         assert!(!cards[0].has_fsrs_state); // No data column value
-        // Estimated stability = ivl = 5
+                                           // Estimated stability = ivl = 5
         assert!((cards[0].stability - 5.0).abs() < 0.01);
     }
 
