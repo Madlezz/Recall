@@ -14,7 +14,7 @@ test.describe("Recall Smoke Tests", () => {
     await expect(page.locator("h1")).toContainText("Recall");
     await expect(page.getByText("Remember things for good")).toBeVisible();
 
-    // Two options should be visible (wait for fade-in animation)
+    // Wait for button to be visible (fade-in animation) before clicking
     const skipBtn = page.getByRole("button", { name: /Skip for now/i });
     const freshBtn = page.getByRole("button", { name: /Start Fresh|Start Empty/i });
     await expect(skipBtn).toBeVisible({ timeout: 15000 });
