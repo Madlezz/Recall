@@ -28,3 +28,8 @@ recall-vision-and-roadmap-realignment.md
 
 # Tauri auto-generated schema files (regenerated on build, ~1MB bloat)
 src-tauri/gen/schemas/
+
+# Sync relay (separate Cloudflare Worker project, deployed independently)
+sync-relay/node_modules
+sync-relay/.wrangler
+sync-relay/.dev.vars
