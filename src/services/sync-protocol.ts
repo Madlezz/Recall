@@ -16,7 +16,7 @@
 
 import type { RecallStateSnapshot, RecallExportPayload } from "@/types";
 import { buildExportPayload, mergeImportPayload } from "./import-export";
-import { encryptData, decryptData } from "./crypto";
+import { encryptData, decryptData, type EncryptedPayload } from "./crypto";
 
 /**
  * Sync relay URL.
