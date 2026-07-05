@@ -42,7 +42,7 @@ Recall is *not* trying to out-feature Anki for its existing power users. That's 
 
 ### Mobile App
 - [ ] Native iOS and Android apps using Tauri
-- [ ] Touch-optimized UI with swipe gestures
+- [x] Touch-optimized UI with swipe gestures (v1.1.0 — PWA)
 - [ ] Offline-first with background sync
 - [ ] Biometric authentication (Face ID, fingerprint)
 - [ ] Widgets for quick review sessions
@@ -93,7 +93,7 @@ Recall is *not* trying to out-feature Anki for its existing power users. That's 
 - [x] Keyboard-first navigation
 - [x] Global hotkey for quick-add
 - [x] Multi-platform (Windows, macOS, Linux)
-- [x] Comprehensive test suite (745 tests)
+- [x] Comprehensive test suite (761 tests)
 - [x] CI/CD with automated releases
 - [x] Accessibility documentation and ARIA labels
 - [x] User-friendly error messages across all dialogs
@@ -124,6 +124,7 @@ Recall is *not* trying to out-feature Anki for its existing power users. That's 
 - [x] Image Occlusion cards: draw rectangles on images, reveal during study (v1.1.0)
 - [x] Richer Anki import: media extraction (images from .apkg) with recall:// URLs (v1.1.0)
 - [x] Internationalization (i18n): react-i18next with English + Bahasa Indonesia, 40 namespaces / 873 keys, language switcher in Settings (v1.1.0)
+- [x] Swipe gestures: swipe to reveal and rate cards on mobile — left=again, right=good, up=easy, down=hard, with visual feedback (v1.1.0)
 
 ## Contributing
 

@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+- **Swipe gestures for mobile study mode:** Swipe to reveal cards and rate answers on touch devices. Left=Again, Right=Good, Up=Easy, Down=Hard. Card follows finger with colored shadow tint for visual feedback. Configurable in Settings → Study (default: on). Swipe hint shown on mobile when revealed.
+
+### Changed
+- **README overhaul:** Updated feature comparison table (added mobile access, E2E encrypted sync, swipe gestures rows), PWA section with live URL, test count corrected to 761, tech stack table updated with PWA + sync entries.
+- **Line ending normalization:** Added `.gitattributes` with `* text=auto eol=lf` to prevent phantom "modified" status from `core.autocrlf=true` on Windows. All text files now use LF consistently.
+
+### Removed
+- **Untracked internal audit doc:** `recall-vision-and-roadmap-realignment.md` was tracked despite being in `.gitignore` — now removed from the repo.
+- **Tauri auto-generated schemas:** `src-tauri/gen/schemas/*.json` (~950KB) were tracked despite being in `.gitignore` — now removed. These are regenerated on every build.
+
 ## [1.1.0] - 2026-07-04
 
 ### Added

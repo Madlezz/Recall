@@ -3,9 +3,9 @@
 [![CI](https://github.com/Madlezz/Recall/actions/workflows/ci.yml/badge.svg)](https://github.com/Madlezz/Recall/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/Madlezz/Recall)](https://github.com/Madlezz/Recall/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)](https://github.com/Madlezz/Recall/releases/latest)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20PWA-blue)](https://github.com/Madlezz/Recall/releases/latest)
 
-**Recall** is a desktop flashcard app built for focused learning. It uses FSRS-based scheduling for modern spaced repetition, but you just open it and start reviewing. Your data stays on your machine, always.
+**Recall** is a local-first flashcard app built for focused learning. It uses FSRS-based scheduling for modern spaced repetition — but you just open it and start reviewing. Your data stays on your machine, always. Available as a desktop app (Windows/macOS/Linux) and a PWA on mobile.
 
 ## 📚 Documentation
 
@@ -28,10 +28,13 @@
 | Add-on ecosystem | Growing | **Massive** (20+ years) | Plugins | Limited |
 | Built-in gamification | **Yes** (XP, levels, achievements) | Via add-ons | Basic | No |
 | Native desktop | **Yes** (Tauri, Rust) | Yes (Qt, Python) | Yes (Electron) | Yes (Electron) |
+| Mobile access | **PWA** (installable) | AnkiDroid (separate) | Yes | Yes |
+| End-to-end encrypted sync | **Yes** (AES-256-GCM) | Via add-on (third-party) | Yes (cloud) | No |
+| Swipe gestures | **Yes** | Yes (AnkiDroid) | No | No |
 | Stack | **React + TypeScript** | Python + Qt | React | ClojureScript |
 
 Anki pioneered spaced repetition and has an enormous add-on ecosystem built over two decades.
-Recall takes a different approach: a **modern, privacy-first** desktop app that implements FSRS
+Recall takes a different approach: a **modern, privacy-first** app that implements FSRS
 as the default algorithm on a contributor-friendly TypeScript stack, with built-in gamification,
 focus tools, and a polished UX that doesn't require hunting for add-ons.
 
@@ -53,11 +56,13 @@ focus tools, and a polished UX that doesn't require hunting for add-ons.
 - **FSRS scheduling** - Again / Hard / Good / Easy, the algorithm handles the rest
 - **Cloze deletion** - `{{c1::hidden text}}` fill-in-the-blank cards
 - **Rich cards** - Markdown, LaTeX, syntax-highlighted code blocks
-- **Anki import** - bring your `.apkg` decks
+- **Anki import** - bring your `.apkg` decks (preserves review history & FSRS state)
 - **CSV import** - upload a spreadsheet, map columns
 - **Custom study** - deck, count, tag filter, new-only
 - **Card browser** - search, filter, sort, bulk tag/delete/move
 - **Tags** - hierarchical tag tree, saved searches, tag autocomplete
+- **FSRS interval preview** - rating buttons show predicted next intervals
+- **FSRS optimizer** - auto-tune scheduling from your review history
 - Keyboard-first: `Space` reveal, `1`-`4` rate, `R` to start review, `Ctrl+N` quick-add
 
 ### 🎮 Stay Motivated
@@ -73,16 +78,23 @@ focus tools, and a polished UX that doesn't require hunting for add-ons.
 - **Match game** - turn cards into a tile-matching puzzle
 - **Review calendar** - month grid showing study activity heatmap
 - **Sound effects** - card flip, correct/incorrect feedback, level-up fanfares
+- **Text-to-speech** - auto-read cards in study mode, configurable speed
+- **Swipe gestures** - swipe to reveal and rate cards on mobile (left=again, right=good, up=easy, down=hard)
+- **Voice input** - speak instead of type in card editor (Web Speech API, offline)
+- **Command palette** - `Ctrl+K` quick navigation
 
 ### 📊 Analytics
 - **Stats dashboard** - review volume, rating distribution, time-of-day patterns
 - **Deck health** - retention %, leeches, overdue per deck
 - **Activity heatmap** - GitHub-style contribution graph
+- **Retention curve** - rolling 7-day retention visualization
+- **Workload forecast** - 30-day due card chart with new vs review breakdown
 
 ### 🔒 Privacy First
 - No account, no cloud, no telemetry
 - 100% offline, SQLite database on your machine
 - JSON export/import, portable and human-readable
+- **End-to-end encrypted sync** - AES-256-GCM + PBKDF2, sync code pairing, self-hostable Cloudflare Worker relay
 - Optional cloud sync, point to any folder (Dropbox, Google Drive, etc.)
 
 ### 🎨 Customization
@@ -110,10 +122,18 @@ pnpm tauri dev       # Full desktop app
 pnpm dev             # Browser-only preview (no Rust needed)
 ```
 
+### PWA (Mobile)
+
+Recall is also available as an installable PWA. Visit the live site, tap "Add to Home Screen":
+
+**https://madlezz.github.io/Recall**
+
+Swipe gestures work natively — swipe left/right/up/down to rate cards after revealing.
+
 ### Testing
 
 ```bash
-pnpm test            # Unit tests (745 tests)
+pnpm test            # Unit tests (761 tests)
 pnpm lint            # ESLint
 pnpm build           # Production build
 pnpm test:e2e        # Playwright E2E (requires `pnpm dev` running first)
@@ -183,11 +203,13 @@ project structure, and code style guidelines.
 | What | With |
 |------|------|
 | Desktop | Tauri 2 |
+| Mobile | PWA (vite-plugin-pwa) |
 | UI | React 19 + TypeScript (strict) |
 | Styling | Tailwind CSS + shadcn/ui |
 | Storage | SQLite |
 | State | Zustand |
 | Algorithm | FSRS (ts-fsrs) |
+| Sync | E2E encrypted (AES-256-GCM + PBKDF2), Cloudflare Worker relay |
 | i18n | react-i18next |
 | Icons | Lucide |
 
