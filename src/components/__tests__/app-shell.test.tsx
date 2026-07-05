@@ -70,12 +70,12 @@ describe("AppShell", () => {
 
   it("renders sidebar nav buttons", () => {
     render(React.createElement(AppShell, null, "content"));
-    expect(screen.getByText("Dashboard")).toBeTruthy();
-    expect(screen.getByText("Review")).toBeTruthy();
-    expect(screen.getByText("Browser")).toBeTruthy();
-    expect(screen.getByText("Tags")).toBeTruthy();
-    expect(screen.getByText("Stats")).toBeTruthy();
-    expect(screen.getByText("Settings")).toBeTruthy();
+    expect(screen.getAllByText("Dashboard").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Review").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Browser").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Tags").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Stats").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Settings").length).toBeGreaterThan(0);
   });
 
   it("renders Tools section with Focus Timer and Match Game", () => {
@@ -85,27 +85,29 @@ describe("AppShell", () => {
     expect(screen.getByText("Match Game")).toBeTruthy();
   });
 
-  it("renders due-count badge on Review", () => {
+  it("renders due-count badge on Review (desktop sidebar)", () => {
     mockStore.cards = [makeCard({ id: "c1" }), makeCard({ id: "c2" }), makeCard({ id: "c3" })];
     render(React.createElement(AppShell, null, "content"));
-    const reviewButton = screen.getByText("Review").closest("button")!;
-    expect(within(reviewButton).getByText("3")).toBeTruthy();
+    // Desktop sidebar Review button has badge
+    const reviewButtons = screen.getAllByText("Review").map((el) => el.closest("button")!);
+    const badges = reviewButtons.flatMap((btn) => within(btn).queryAllByText("3"));
+    expect(badges.length).toBeGreaterThan(0);
   });
 
   it("does not show badge on Review when no due cards", () => {
     mockStore.cards = [];
     render(React.createElement(AppShell, null, "content"));
-    const reviewButton = screen.getByText("Review").closest("button")!;
-    // No badge span inside the Review button
-    const spans = within(reviewButton).queryAllByText(/\d+/);
-    expect(spans.length).toBe(0);
+    const reviewButtons = screen.getAllByText("Review").map((el) => el.closest("button")!);
+    // No numeric badge spans inside any Review button
+    for (const btn of reviewButtons) {
+      const spans = within(btn).queryAllByText(/^\d+$/);
+      expect(spans.length).toBe(0);
+    }
   });
 
   it("renders LevelWidget", () => {
     mockStore.settings.xp = 150;
     render(React.createElement(AppShell, null, "content"));
-    // getLevel(150) = 1, getLevelTitle(1) = "Level 1"
-    // "Level 1" appears in both the level label and the title text
     expect(screen.getAllByText("Level 1").length).toBeGreaterThan(0);
     expect(screen.getByText("150 XP")).toBeTruthy();
   });
@@ -118,9 +120,10 @@ describe("AppShell", () => {
     expect(progressbar.getAttribute("aria-label")).toBe("Level 1 progress: 150 XP");
   });
 
-  it("renders mobile header with hamburger", () => {
+  it("renders mobile header with quick review button", () => {
     render(React.createElement(AppShell, null, "content"));
-    expect(screen.getByLabelText("Open navigation")).toBeTruthy();
+    // Mobile header now has a Review aria-label button instead of hamburger
+    expect(screen.getAllByLabelText("Review").length).toBeGreaterThan(0);
   });
 
   it("renders 'Press ? for shortcuts' hint", () => {
@@ -139,41 +142,41 @@ describe("AppShell", () => {
     expect(true).toBe(true);
   });
 
-  // ── Nav button click actions ──
+  // ── Nav button click actions (desktop sidebar) ──
 
   it("calls showDashboard when Dashboard clicked", () => {
     render(React.createElement(AppShell, null, "content"));
-    screen.getByText("Dashboard").click();
+    screen.getAllByText("Dashboard")[0].click();
     expect(mockStore.showDashboard).toHaveBeenCalled();
   });
 
   it("calls startReview when Review clicked", () => {
     render(React.createElement(AppShell, null, "content"));
-    screen.getByText("Review").click();
+    screen.getAllByText("Review")[0].click();
     expect(mockStore.startReview).toHaveBeenCalledWith(null);
   });
 
   it("calls showBrowser when Browser clicked", () => {
     render(React.createElement(AppShell, null, "content"));
-    screen.getByText("Browser").click();
+    screen.getAllByText("Browser")[0].click();
     expect(mockStore.showBrowser).toHaveBeenCalled();
   });
 
   it("calls showTags when Tags clicked", () => {
     render(React.createElement(AppShell, null, "content"));
-    screen.getByText("Tags").click();
+    screen.getAllByText("Tags")[0].click();
     expect(mockStore.showTags).toHaveBeenCalled();
   });
 
   it("calls showStats when Stats clicked", () => {
     render(React.createElement(AppShell, null, "content"));
-    screen.getByText("Stats").click();
+    screen.getAllByText("Stats")[0].click();
     expect(mockStore.showStats).toHaveBeenCalled();
   });
 
   it("calls showSettings when Settings clicked", () => {
     render(React.createElement(AppShell, null, "content"));
-    screen.getByText("Settings").click();
+    screen.getAllByText("Settings")[0].click();
     expect(mockStore.showSettings).toHaveBeenCalled();
   });
 

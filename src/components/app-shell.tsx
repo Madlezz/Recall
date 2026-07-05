@@ -1,5 +1,5 @@
-import { BookOpen, Home, LayoutGrid, Menu, Play, Settings, Shield, Star, Tag, Timer, TrendingUp, X, Zap } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { BookOpen, Home, LayoutGrid, Play, Settings, Shield, Star, Tag, Timer, TrendingUp, Zap } from "lucide-react";
+import { type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { CommandPalette } from "@/components/command-palette";
 import { Button } from "@/components/ui/button";
@@ -24,18 +24,8 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
   const showTags = useRecallStore((state) => state.showTags);
   const startReview = useRecallStore((state) => state.startReview);
   const startMatch = useRecallStore((state) => state.startMatch);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const dueCount = getDueTodayCount(cards);
-
-  function closeMobileNav(): void {
-    setMobileNavOpen(false);
-  }
-
-  function handleNavClick(action: () => void): void {
-    action();
-    closeMobileNav();
-  }
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
@@ -44,10 +34,10 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-zinc-900 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:shadow-lg dark:focus:bg-white dark:focus:text-zinc-900"
       >
-        Skip to main content
+        {t("nav.skipToMain")}
       </a>
 
-      {/* ── Sidebar ── */}
+      {/* ── Desktop Sidebar ── */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-56 flex-col border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 lg:flex">
         {/* Logo */}
         <button
@@ -64,10 +54,10 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         {/* Nav */}
         <nav className="flex-1 px-3 py-3 space-y-1" aria-label={t("nav.mainNav")}>
           <NavButton active={view === "dashboard"} icon={Home} label={t("nav.dashboard")} onClick={showDashboard} />
-          <NavButton 
-            active={view === "study"} 
-            icon={Play} 
-            label={t("nav.review")} 
+          <NavButton
+            active={view === "study"}
+            icon={Play}
+            label={t("nav.review")}
             onClick={() => startReview(null)}
             badge={dueCount > 0 ? dueCount : undefined}
           />
@@ -75,7 +65,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
           <NavButton active={view === "tags"} icon={Tag} label={t("nav.tags")} onClick={showTags} />
           <NavButton active={view === "stats"} icon={TrendingUp} label={t("nav.stats")} onClick={showStats} />
           <NavButton active={view === "settings"} icon={Settings} label={t("nav.settings")} onClick={showSettings} />
-          
+
           {/* Tools section */}
           <div className="pt-3 pb-1 px-3">
             <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">{t("nav.tools")}</span>
@@ -132,79 +122,107 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
       </aside>
 
       {/* ── Mobile header ── */}
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-200 bg-white/90 px-4 py-3 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/90 lg:hidden">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setMobileNavOpen(true)} aria-label={t("nav.openNav")}>
-            <Menu className="h-5 w-5" />
+      <header
+        className="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-200 bg-white/90 px-4 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/90 lg:hidden"
+        style={{ minHeight: "calc(env(safe-area-inset-top) + 3.5rem)" }}
+      >
+        <button className="flex items-center gap-2 font-semibold text-sm" onClick={showDashboard}>
+          <BookOpen className="h-5 w-5" />
+          Recall
+        </button>
+        <div className="flex items-center gap-1">
+          {/* Quick review button — primary action, thumb-reachable */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => startReview(null)}
+            className="gap-1.5"
+            aria-label={t("nav.review")}
+          >
+            <Play className="h-4 w-4" />
+            {dueCount > 0 && (
+              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-semibold text-white">
+                {dueCount}
+              </span>
+            )}
           </Button>
-          <button className="flex items-center gap-2 font-semibold text-sm" onClick={showDashboard}>
-            <BookOpen className="h-5 w-5" />
-            Recall
-          </button>
+          <Button variant="ghost" size="icon" onClick={showSettings} aria-label={t("nav.openSettings")}>
+            <Settings className="h-4 w-4" />
+          </Button>
         </div>
-        <Button variant="ghost" size="icon" onClick={showSettings} aria-label={t("nav.openSettings")}>
-          <Settings className="h-4 w-4" />
-        </Button>
       </header>
-
-      {/* ── Mobile nav drawer ── */}
-      {mobileNavOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={closeMobileNav}
-            aria-hidden="true"
-          />
-          <div className="absolute inset-y-0 left-0 w-64 bg-white dark:bg-zinc-900 shadow-xl flex flex-col">
-            <div className="flex items-center justify-between px-4 h-14 border-b border-zinc-200 dark:border-zinc-800">
-              <span className="font-semibold text-sm">{t("nav.navigation")}</span>
-              <Button variant="ghost" size="icon" onClick={closeMobileNav} aria-label={t("nav.closeNav")}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            <nav className="flex-1 px-3 py-3 space-y-1" aria-label={t("nav.mobileNav")}>
-              <NavButton active={view === "dashboard"} icon={Home} label={t("nav.dashboard")} onClick={() => handleNavClick(showDashboard)} />
-              <NavButton 
-                active={view === "study"} 
-                icon={Play} 
-                label={t("nav.review")} 
-                onClick={() => handleNavClick(() => startReview(null))}
-                badge={dueCount > 0 ? dueCount : undefined}
-              />
-              <NavButton active={view === "browser"} icon={LayoutGrid} label={t("nav.browser")} onClick={() => handleNavClick(showBrowser)} />
-              <NavButton active={view === "tags"} icon={Tag} label={t("nav.tags")} onClick={() => handleNavClick(showTags)} />
-              <NavButton active={view === "stats"} icon={TrendingUp} label={t("nav.stats")} onClick={() => handleNavClick(showStats)} />
-              <NavButton active={view === "settings"} icon={Settings} label={t("nav.settings")} onClick={() => handleNavClick(showSettings)} />
-              <div className="pt-3 pb-1 px-3">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">{t("nav.tools")}</span>
-              </div>
-              <NavButton active={false} icon={Timer} label={t("nav.focusTimer")} onClick={() => handleNavClick(showDashboard)} />
-              <NavButton
-                active={view === "match"}
-                icon={Zap}
-                label={t("nav.matchGame")}
-                onClick={() => handleNavClick(() => {
-                  const firstDeck = decks[0];
-                  if (firstDeck) startMatch(firstDeck.id);
-                  else showDashboard();
-                })}
-              />
-            </nav>
-            <div className="px-5 py-3 border-t border-zinc-200 dark:border-zinc-800">
-              <LevelWidget />
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── Main content ── */}
       <main id="main-content" className="lg:pl-56" tabIndex={-1}>
-        <div className="mx-auto w-full max-w-6xl px-6 py-8 lg:px-10">{children}</div>
+        <div className="mx-auto w-full max-w-6xl px-4 py-6 pb-28 lg:px-10 lg:py-8 lg:pb-8">
+          {children}
+        </div>
       </main>
+
+      {/* ── Mobile Bottom Tab Bar ── */}
+      <nav
+        className="fixed inset-x-0 bottom-0 z-40 flex items-stretch border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 lg:hidden"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        aria-label={t("nav.mobileNav")}
+      >
+        <BottomTab active={view === "dashboard"} icon={Home} label={t("nav.dashboard")} onClick={showDashboard} />
+        <BottomTab
+          active={view === "study" || view === "match"}
+          icon={Play}
+          label={t("nav.review")}
+          onClick={() => startReview(null)}
+          badge={dueCount > 0 ? dueCount : undefined}
+        />
+        <BottomTab active={view === "browser"} icon={LayoutGrid} label={t("nav.browser")} onClick={showBrowser} />
+        <BottomTab active={view === "tags"} icon={Tag} label={t("nav.tags")} onClick={showTags} />
+        <BottomTab active={view === "stats"} icon={TrendingUp} label={t("nav.stats")} onClick={showStats} />
+      </nav>
 
       {/* ── Command Palette ── */}
       <CommandPalette />
     </div>
+  );
+}
+
+// ── BottomTab (mobile bottom navigation) ──
+
+interface BottomTabProps {
+  active: boolean;
+  icon: typeof Home;
+  label: string;
+  onClick: () => void;
+  badge?: number;
+}
+
+function BottomTab({ active, icon: Icon, label, onClick, badge }: BottomTabProps): JSX.Element {
+  return (
+    <button
+      onClick={onClick}
+      aria-current={active ? "page" : undefined}
+      className="relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-colors"
+    >
+      <span className="relative">
+        <Icon
+          className={cn(
+            "h-5 w-5 shrink-0 transition-colors",
+            active ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-400 dark:text-zinc-500",
+          )}
+        />
+        {badge !== undefined && badge > 0 && (
+          <span className="absolute -right-2 -top-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-bold text-white">
+            {badge}
+          </span>
+        )}
+      </span>
+      <span
+        className={cn(
+          "text-[10px] font-medium transition-colors",
+          active ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-400 dark:text-zinc-500",
+        )}
+      >
+        {label}
+      </span>
+    </button>
   );
 }
 

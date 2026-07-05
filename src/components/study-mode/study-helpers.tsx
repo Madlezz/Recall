@@ -19,7 +19,7 @@ export function AnswerButton({ label, keyHint, variant, interval, onClick }: { l
     <button
       onClick={onClick}
       aria-label={variantDescriptions[variant]}
-      className={`flex flex-col items-center gap-0.5 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${answerStyles[variant]}`}
+      className={`flex flex-col items-center gap-0.5 rounded-lg border px-4 py-3 min-h-[56px] text-sm font-semibold transition-colors sm:py-2 sm:min-h-0 ${answerStyles[variant]}`}
     >
       <span className="flex items-center gap-2">
         <span className="text-[10px] font-medium opacity-60 w-4" aria-hidden="true">{keyHint}</span>

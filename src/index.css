@@ -63,6 +63,25 @@ body {
     "cv03",
     "cv04",
     "cv11";
+  /* Prevent rubber-band overscroll on mobile for native feel */
+  overscroll-behavior-y: none;
+  /* Prevent text size adjust on orientation change */
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Touch target minimum — applies to all interactive elements on mobile */
+@media (max-width: 1023px) {
+  button,
+  a[role="button"],
+  [data-touch-target] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  /* Exclude inline text links and small badges */
+  .no-touch-min {
+    min-height: 0;
+    min-width: 0;
+  }
 }
 
 button,

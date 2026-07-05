@@ -233,13 +233,32 @@ export function StudyMode(): JSX.Element {
         {activeStudy.revealed ? t("study.answerRevealedSr") : t("study.pressSpaceSr")}
       </div>
 
-      {/* Top bar */}
-      <header className="flex items-center justify-between py-2">
-        <Button variant="ghost" size="sm" onClick={exitStudy} className="gap-1.5" aria-label={t("study.exitStudyMode")}>
-          <ArrowLeft className="h-4 w-4" /> {t("study.exit")}
+      {/* Top bar — compact on mobile */}
+      <header className="flex items-center justify-between py-2 gap-2">
+        <Button variant="ghost" size="sm" onClick={exitStudy} className="gap-1.5 shrink-0" aria-label={t("study.exitStudyMode")}>
+          <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">{t("study.exit")}</span>
         </Button>
 
-        <div className="flex items-center gap-4">
+        {/* Center: progress — takes available space */}
+        <div className="flex-1 min-w-0 max-w-[200px] mx-auto">
+          <div className="flex items-center justify-center gap-2 text-sm tabular-nums text-zinc-600 dark:text-zinc-400">
+            <span className="flex items-center gap-1">
+              <Timer className="h-3.5 w-3.5" />
+              {formatElapsed(elapsed)}
+            </span>
+            <span className="text-zinc-300 dark:text-zinc-600">·</span>
+            <span>{activeStudy.currentIndex + 1} / {total}</span>
+          </div>
+          <div className="mt-1.5 h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100} aria-label={t("study.studyProgress", { current: activeStudy.currentIndex, total })}>
+            <div
+              className="h-full rounded-full bg-zinc-500 transition-[width] duration-300 dark:bg-zinc-400"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Right: TTS toggle */}
+        <div className="flex items-center shrink-0">
           {isTTSSupported() && settings?.ttsEnabled && (
             <button
               aria-label={isSpeaking ? t("study.stopReading") : t("study.readAloud")}
@@ -251,7 +270,7 @@ export function StudyMode(): JSX.Element {
                   speakText(text, "en-US", settings.ttsSpeed);
                 }
               }}
-              className={`rounded-md p-1.5 transition-colors ${
+              className={`min-h-[44px] min-w-[44px] rounded-md p-1.5 transition-colors ${
                 isSpeaking
                   ? "text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 animate-pulse"
                   : "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 dark:hover:text-zinc-300 dark:hover:bg-zinc-800"
@@ -261,21 +280,6 @@ export function StudyMode(): JSX.Element {
               {isSpeaking ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
             </button>
           )}
-          <span className="flex items-center gap-1.5 text-sm tabular-nums text-zinc-400">
-            <Timer className="h-4 w-4" /> {formatElapsed(elapsed)}
-          </span>
-        </div>
-
-        <div className="text-right min-w-[160px]">
-          <div className="text-sm font-medium tabular-nums text-zinc-600 dark:text-zinc-400">
-            {activeStudy.currentIndex + 1} / {total}
-          </div>
-          <div className="mt-1.5 h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100} aria-label={t("study.studyProgress", { current: activeStudy.currentIndex, total })}>
-            <div
-              className="h-full rounded-full bg-zinc-500 transition-[width] duration-300 dark:bg-zinc-400"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
         </div>
       </header>
 
@@ -301,23 +305,23 @@ export function StudyMode(): JSX.Element {
       })() : null}
 
       {/* Card */}
-      <section className="flex flex-1 items-center justify-center py-6">
+      <section className="flex flex-1 items-center justify-center py-4 sm:py-6">
         <div className="w-full max-w-3xl" style={{ perspective: "1400px" }}>
-          <div className="study-card relative min-h-[380px]" data-revealed={activeStudy.revealed}>
+          <div className="study-card relative min-h-[300px] sm:min-h-[380px]" data-revealed={activeStudy.revealed}>
             {/* Front */}
-            <div className="study-card-face absolute inset-0 flex flex-col justify-center rounded-xl border border-zinc-200 bg-white p-10 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+            <div className="study-card-face absolute inset-0 flex flex-col justify-center rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-10">
               <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{deck?.name ?? t("study.review")}</p>
-              <div className="mt-5 text-balance text-xl font-semibold leading-relaxed text-zinc-800 dark:text-zinc-200 sm:text-2xl">
+              <div className="mt-4 text-balance text-lg font-semibold leading-relaxed text-zinc-800 dark:text-zinc-200 sm:mt-5 sm:text-2xl">
                 <RichCard content={card.front} cardType={card.cardType} revealed={activeStudy.revealed} allowHtml={settings?.allowHtml} />
               </div>
               {card.hint && (
-                <p className="mt-6 text-sm text-zinc-400">{t("study.hint")}: {card.hint}</p>
+                <p className="mt-4 text-sm text-zinc-400 sm:mt-6">{t("study.hint")}: {card.hint}</p>
               )}
             </div>
             {/* Back */}
-            <div className="study-card-face study-card-back absolute inset-0 flex flex-col justify-center rounded-xl border border-zinc-200 bg-white p-10 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+            <div className="study-card-face study-card-back absolute inset-0 flex flex-col justify-center rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-10">
               <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{t("study.answer")}</p>
-              <div className="mt-5 text-balance text-xl font-semibold leading-relaxed text-zinc-800 dark:text-zinc-200 sm:text-2xl">
+              <div className="mt-4 text-balance text-lg font-semibold leading-relaxed text-zinc-800 dark:text-zinc-200 sm:mt-5 sm:text-2xl">
                 <RichCard content={card.back} isBack allowHtml={settings?.allowHtml} />
               </div>
             </div>
@@ -325,29 +329,30 @@ export function StudyMode(): JSX.Element {
         </div>
       </section>
 
-      {/* Answer footer */}
-      <footer className="flex flex-wrap items-center justify-center gap-2 pb-4">
+      {/* Answer footer — full-width grid on mobile */}
+      <footer className="flex flex-col gap-2 pb-4 lg:flex-wrap lg:flex-row lg:items-center lg:justify-center">
         {!activeStudy.revealed && activeStudy.currentIndex > 0 && (
           <Button
             variant="ghost" size="sm"
             onClick={() => void undoLastReview().then((didUndo) => { if (didUndo) toast.info(t("study.reviewUndone")); else toast.info(t("study.nothingToUndo")); })}
-            className="gap-1.5"
+            className="gap-1.5 self-start lg:self-auto"
           >
             <RotateCcw className="h-3.5 w-3.5" /> {t("study.undo")}
           </Button>
         )}
 
         {!activeStudy.revealed ? (
-          <Button size="lg" onClick={() => { playFlipSound(); revealAnswer(); }} className="gap-2 min-w-[140px]">
+          <Button size="lg" onClick={() => { playFlipSound(); revealAnswer(); }} className="gap-2 min-h-[48px] w-full sm:w-auto sm:min-w-[140px]">
             <RotateCw className="h-4 w-4" /> {t("study.reveal")}
           </Button>
         ) : (
-          <>
+          /* 2x2 grid on mobile, inline row on desktop */
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center">
             <AnswerButton label={t("study.again")} keyHint="1" variant="again" interval={intervals?.again} onClick={() => { playAgainSound(); setRatingFlash("again"); void answerCurrentCard("again"); }} />
             <AnswerButton label={t("study.hard")} keyHint="2" variant="hard" interval={intervals?.hard} onClick={() => { playHardSound(); setRatingFlash("hard"); void answerCurrentCard("hard"); }} />
             <AnswerButton label={t("study.good")} keyHint="3" variant="good" interval={intervals?.good} onClick={() => { playCorrectSound(); setRatingFlash("good"); void answerCurrentCard("good"); }} />
             <AnswerButton label={t("study.easy")} keyHint="4" variant="easy" interval={intervals?.easy} onClick={() => { playCorrectSound(); setRatingFlash("easy"); void answerCurrentCard("easy"); }} />
-          </>
+          </div>
         )}
 
         {/* Edit card mid-review */}
@@ -356,7 +361,7 @@ export function StudyMode(): JSX.Element {
             card={card}
             deckId={card.deckId}
             trigger={
-              <Button variant="ghost" size="sm" className="gap-1.5" title={t("study.editCardTitle")}>
+              <Button variant="ghost" size="sm" className="gap-1.5 self-start lg:self-auto" title={t("study.editCardTitle")}>
                 <Edit3 className="h-3.5 w-3.5" /> {t("study.edit")}
               </Button>
             }
@@ -364,14 +369,14 @@ export function StudyMode(): JSX.Element {
         )}
 
         {!activeStudy.revealed && (
-          <>
-            <Button variant="ghost" size="sm" onClick={buryCard} className="gap-1.5">
-              <EyeOff className="h-3.5 w-3.5" /> {t("study.bury")}
+          <div className="flex gap-2 self-start">
+            <Button variant="ghost" size="sm" onClick={buryCard} className="gap-1.5 min-h-[44px]">
+              <EyeOff className="h-3.5 w-3.5" /> <span className="hidden sm:inline">{t("study.bury")}</span>
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => { void snoozeCard(120); toast.info(t("study.snoozed")); }} className="gap-1.5">
-              <Clock className="h-3.5 w-3.5" /> {t("study.snooze")}
+            <Button variant="ghost" size="sm" onClick={() => { void snoozeCard(120); toast.info(t("study.snoozed")); }} className="gap-1.5 min-h-[44px]">
+              <Clock className="h-3.5 w-3.5" /> <span className="hidden sm:inline">{t("study.snooze")}</span>
             </Button>
-          </>
+          </div>
         )}
       </footer>
     </div>

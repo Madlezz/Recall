@@ -59,12 +59,12 @@ export function Dashboard(): JSX.Element {
   const hasAnyContent = decks.length > 0;
 
   return (
-    <div className="animate-fade-in space-y-12">
+    <div className="animate-fade-in space-y-8 sm:space-y-12">
       {/* ── Hero ── */}
       <section className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">{t("dashboard.subtitle")}</p>
-          <h1 className="mt-2 text-[1.75rem] font-bold leading-tight tracking-tight text-zinc-900 dark:text-zinc-100">
+          <h1 className="mt-2 text-[1.5rem] font-bold leading-tight tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-[1.75rem]">
             {t("dashboard.title")}
           </h1>
           <p className="mt-2 max-w-lg text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
@@ -72,25 +72,25 @@ export function Dashboard(): JSX.Element {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button onClick={handleStartReview} className="gap-2" aria-label={t("deck.startReview")}>
+          <Button onClick={handleStartReview} className="gap-2 min-h-[44px]" aria-label={t("deck.startReview")}>
             <RotateCw className="h-4 w-4" aria-hidden="true" />
             {t("dashboard.startReview")}
           </Button>
           <DeckDialog
             trigger={
-              <Button variant="outline" className="gap-2" aria-label={t("deck.createNewDeck")}>
+              <Button variant="outline" className="gap-2 min-h-[44px]" aria-label={t("deck.createNewDeck")}>
                 <Plus className="h-4 w-4" aria-hidden="true" />
                 {t("dashboard.newDeck")}
               </Button>
             }
           />
           <AnkiImportDialog />
-          <Button variant="outline" size="icon" onClick={() => setShowCsvImport(true)} title={t("dashboard.csvImport")} aria-label={t("deck.importFromCsv")}>
+          <Button variant="outline" size="icon" onClick={() => setShowCsvImport(true)} title={t("dashboard.csvImport")} aria-label={t("deck.importFromCsv")} className="min-h-[44px] min-w-[44px]">
             <FileSpreadsheet className="h-4 w-4" />
           </Button>
           <MarkdownImportDialog />
           <RecallImportDialog />
-          <Button variant="outline" size="icon" onClick={() => setShowCustomStudy(true)} title={t("dashboard.customStudy")} aria-label={t("deck.customStudySession")}>
+          <Button variant="outline" size="icon" onClick={() => setShowCustomStudy(true)} title={t("dashboard.customStudy")} aria-label={t("deck.customStudySession")} className="min-h-[44px] min-w-[44px]">
             <Beaker className="h-4 w-4" />
           </Button>
         </div>
@@ -174,7 +174,7 @@ export function Dashboard(): JSX.Element {
             ))}
           </div>
         ) : !hasAnyContent ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="flex flex-col items-center justify-center py-16 text-center sm:py-24">
             <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
               <Library className="h-8 w-8 text-zinc-400" />
             </div>
@@ -183,11 +183,11 @@ export function Dashboard(): JSX.Element {
               {t("dashboard.emptyDescription")}
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Button size="lg" onClick={() => setShowCreateDeck(true)} className="gap-2">
+              <Button size="lg" onClick={() => setShowCreateDeck(true)} className="gap-2 min-h-[48px]">
                 <Plus className="h-4 w-4" />
                 {t("dashboard.createDeck")}
               </Button>
-              <Button size="lg" variant="outline" onClick={() => setShowCsvImport(true)} className="gap-2">
+              <Button size="lg" variant="outline" onClick={() => setShowCsvImport(true)} className="gap-2 min-h-[48px]">
                 <ArrowRight className="h-4 w-4" />
                 {t("dashboard.importCards")}
               </Button>
@@ -419,24 +419,24 @@ interface TodayBandProps {
 function TodayBand({ dueCount, newCount, reviewedToday, onStartReview }: TodayBandProps): JSX.Element {
   const { t } = useTranslation();
   return (
-    <section className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-center gap-6">
+    <section className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+      <div className="flex items-center gap-4 sm:gap-6">
         <div className="flex flex-col">
-          <span className="text-3xl font-bold tabular-nums text-zinc-800 dark:text-zinc-100">
+          <span className="text-2xl font-bold tabular-nums text-zinc-800 dark:text-zinc-100 sm:text-3xl">
             {dueCount}
           </span>
           <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">{t("todayBand.due")}</span>
         </div>
         <div className="h-10 w-px bg-zinc-100 dark:bg-zinc-800" />
         <div className="flex flex-col">
-          <span className="text-3xl font-bold tabular-nums text-zinc-400 dark:text-zinc-500">
+          <span className="text-2xl font-bold tabular-nums text-zinc-400 dark:text-zinc-500 sm:text-3xl">
             {newCount}
           </span>
           <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">{t("todayBand.new")}</span>
         </div>
         <div className="h-10 w-px bg-zinc-100 dark:bg-zinc-800" />
         <div className="flex flex-col">
-          <span className="text-3xl font-bold tabular-nums text-zinc-400 dark:text-zinc-500">
+          <span className="text-2xl font-bold tabular-nums text-zinc-400 dark:text-zinc-500 sm:text-3xl">
             {reviewedToday}
           </span>
           <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">{t("todayBand.reviewed")}</span>
@@ -445,7 +445,7 @@ function TodayBand({ dueCount, newCount, reviewedToday, onStartReview }: TodayBa
       <Button
         size="lg"
         onClick={onStartReview}
-        className="gap-2"
+        className="gap-2 min-h-[48px] w-full sm:w-auto"
         disabled={dueCount === 0}
         aria-label={t("deck.startReview")}
       >
