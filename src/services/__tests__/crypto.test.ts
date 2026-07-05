@@ -8,7 +8,6 @@ import {
   extractSaltFromCode,
   bytesToBase64,
   base64ToBytes,
-  type EncryptedPayload,
 } from "../crypto";
 
 describe("crypto", () => {
