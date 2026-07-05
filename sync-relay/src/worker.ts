@@ -22,7 +22,9 @@ export interface Env {
   RECALL_SYNC: R2Bucket;
 }
 
-const BLOB_TTL_SECONDS = 90 * 24 * 60 * 60; // 90 days
+/** Blob TTL: 90 days since last update (documented in README, R2 lifecycle rule enforces this) */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const BLOB_TTL_SECONDS = 90 * 24 * 60 * 60;
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {

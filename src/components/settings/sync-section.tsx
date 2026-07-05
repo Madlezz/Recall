@@ -5,9 +5,9 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useRecallStore } from "@/stores/recall-store";
 import { generateSyncCode, formatSyncCodeInput, isValidSyncCode } from "@/services/crypto";
-import { performEncryptedSync, testSyncRelay, type SyncConfig } from "@/services/sync-protocol";
+import { performEncryptedSync, testSyncRelay, getDefaultRelayUrl, type SyncConfig } from "@/services/sync-protocol";
 
-const DEFAULT_RELAY_URL = "https://sync.recall.app";
+const DEFAULT_RELAY_URL = getDefaultRelayUrl();
 
 export function SyncSection(): JSX.Element {
   const { t } = useTranslation();

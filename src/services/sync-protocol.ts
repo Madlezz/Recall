@@ -16,14 +16,16 @@
 
 import type { RecallStateSnapshot, RecallExportPayload } from "@/types";
 import { buildExportPayload, mergeImportPayload } from "./import-export";
-import { encryptData, decryptData, type EncryptedPayload } from "./crypto";
+import { encryptData, decryptData } from "./crypto";
 
 /**
- * Default sync relay URL.
- * This is a Cloudflare Worker that stores encrypted blobs in R2.
- * Users can self-host their own relay by changing this URL in settings.
+ * Sync relay URL.
+ * Default is the official Recall relay. Users can self-host by setting syncRelayUrl in settings.
+ * The official relay is deployed as a Cloudflare Worker — see sync-relay/ directory.
  */
-const DEFAULT_SYNC_RELAY_URL = "https://sync.recall.app";
+export function getDefaultRelayUrl(): string {
+  return "https://sync.recall.app";
+}
 
 export interface SyncConfig {
   /** The sync relay URL */
