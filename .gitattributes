@@ -1,0 +1,17 @@
+# Normalize line endings to LF in the repo
+# Prevents phantom "modified" status from autocrlf=true on Windows
+* text=auto eol=lf
+
+# Binary files — never touch
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.mp3 binary
+*.wav binary
