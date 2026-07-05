@@ -105,6 +105,7 @@ export interface RecallSettings {
   ttsSpeed: number; // 0.5-2.0, speech rate multiplier
   fsrsWeights: number[] | null; // Custom FSRS weights (null = use defaults)
   voiceInputEnabled: boolean; // Show voice input button in card editors (default: true)
+  swipeGestures: boolean; // Swipe to rate cards in study mode on mobile (default: true)
 }
 
 export type BackupSchedule = "daily" | "weekly" | "never";

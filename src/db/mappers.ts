@@ -235,6 +235,7 @@ export function settingsFromRows(rows: SettingRow[]): RecallSettings {
             ttsSpeed: Number(values.get("tts_speed")) || 1.0,
             fsrsWeights: values.get("fsrs_weights") ? JSON.parse(values.get("fsrs_weights")!) : null,
           voiceInputEnabled: values.get("voice_input_enabled") !== "false",
+          swipeGestures: values.get("swipe_gestures") !== "false",
           };
 }
 
@@ -269,6 +270,7 @@ export function settingsToRows(settings: RecallSettings): SettingRow[] {
     { key: "tts_speed", value: String(settings.ttsSpeed) },
     { key: "fsrs_weights", value: settings.fsrsWeights ? JSON.stringify(settings.fsrsWeights) : "" },
     { key: "voice_input_enabled", value: String(settings.voiceInputEnabled) },
+    { key: "swipe_gestures", value: String(settings.swipeGestures) },
       ];
 }
 

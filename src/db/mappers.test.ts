@@ -94,7 +94,7 @@ desiredRetention: 0.9,
           ttsAutoRead: false,
           ttsSpeed: 1,
           fsrsWeights: null,
-          voiceInputEnabled: true,
+          voiceInputEnabled: true, swipeGestures: true,
     };
 
     expect(deckFromRow(deckToRow(deck) as DeckRow)).toEqual(deck);

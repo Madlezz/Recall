@@ -80,6 +80,27 @@ export function StudySection(): JSX.Element {
         </div>
       </SettingsCard>
 
+      {/* Swipe gestures toggle */}
+      <SettingsCard title={t("settings.swipeGestures")} description={t("settings.swipeGesturesDescription")}>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => void updateSettings({ swipeGestures: !settings.swipeGestures })}
+            className={`flex items-center gap-2 rounded-md px-3.5 py-2 text-sm font-medium transition-colors ${
+              settings.swipeGestures
+                ? "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200"
+                : "text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+            }`}
+          >
+            {settings.swipeGestures ? t("settings.enabled") : t("settings.disabled")}
+          </button>
+          {settings.swipeGestures && (
+            <span className="text-xs text-zinc-400">
+              ← {t("study.again")} · → {t("study.good")} · ↑ {t("study.easy")} · ↓ {t("study.hard")}
+            </span>
+          )}
+        </div>
+      </SettingsCard>
+
       {/* Study settings */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <SettingsCard title={t("settings.dailyNewCards")}>

@@ -63,7 +63,7 @@ function makeValidSnapshot(): RecallStateSnapshot {
       ttsAutoRead: false,
       ttsSpeed: 1,
       fsrsWeights: null,
-      voiceInputEnabled: true,
+      voiceInputEnabled: true, swipeGestures: true,
     },
   };
 }

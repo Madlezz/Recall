@@ -268,7 +268,7 @@ describe("DeckDetail", () => {
     expect(mockStore.updateSettings).toHaveBeenCalledWith({
       desiredRetention: 0.92,
       fsrsWeights: [1, 2, 3],
-      voiceInputEnabled: true,
+      voiceInputEnabled: true, swipeGestures: true,
     });
   });
 });

@@ -237,6 +237,8 @@
     "desiredRetentionDescription": "FSRS target retention (0.70–0.99). Higher = more frequent reviews.",
     "voiceInput": "Voice input",
     "voiceInputDescription": "Speak instead of type — uses your device's built-in speech recognition. No cloud, no account needed.",
+    "swipeGestures": "Swipe gestures",
+    "swipeGesturesDescription": "Swipe on the study card to rate your answer. Left = Again, Right = Good, Up = Easy, Down = Hard. Tap anywhere to reveal.",
     "defaultWeights": "Default weights",
     "customWeights": "Custom weights",
     "importExport": "Import / Export",

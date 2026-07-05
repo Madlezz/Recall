@@ -158,7 +158,7 @@ export function DeckDetail(): JSX.Element {
       void updateSettings({
         desiredRetention: result.suggestedRetention,
         fsrsWeights: result.weights,
-        voiceInputEnabled: true,
+        voiceInputEnabled: true, swipeGestures: true,
       });
       toast.success(t("deckDetail.optimizedFor", { name: d.name, result: formatOptimizationResult(result) }));
     } else {

@@ -64,7 +64,7 @@ function makeSettings() {
     desiredRetention: 0.9, backupFolder: null, backupSchedule: "never" as const,
     lastBackupAt: null, syncFolder: null, syncEnabled: false, syncCode: null, syncRelayUrl: null, syncLastAt: null, syncAutoInterval: 0,
     ttsEnabled: false, ttsAutoRead: false, ttsSpeed: 1, fsrsWeights: null,
-    voiceInputEnabled: true,
+    voiceInputEnabled: true, swipeGestures: true,
   };
 }
 

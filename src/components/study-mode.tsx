@@ -1,11 +1,12 @@
 import { AlertCircle, ArrowLeft, BookOpen, Check, Clock, Edit3, EyeOff, RotateCcw, RotateCw, Timer, Volume2, VolumeX } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { RichCard } from "@/components/RichCard";
 import { Button } from "@/components/ui/button";
 import { CardDialog } from "@/components/card-dialog";
 import { useRecallStore } from "@/stores/recall-store";
+import { useSwipeGesture, type SwipeDirection } from "@/hooks/use-swipe-gesture";
 import { speakText, stopSpeaking, isTTSSupported, setSpeakingCallback } from "@/services/tts";
 import { playFlipSound, playCorrectSound, playAgainSound, playHardSound } from "@/services/audio";
 import { previewIntervals } from "@/services/fsrs-engine";
@@ -126,6 +127,50 @@ export function StudyMode(): JSX.Element {
     return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
   }
 
+  // ── Swipe gesture handling ──
+  // Must be before early returns — hooks can't be conditional
+  const handleSwipe = useCallback((direction: SwipeDirection) => {
+    if (!activeStudy) return;
+
+    // Before reveal: tap/swipe any direction = reveal
+    if (!activeStudy.revealed) {
+      playFlipSound();
+      revealAnswer();
+      return;
+    }
+
+    // After reveal: swipe to rate
+    // left = again, right = good, up = easy, down = hard
+    switch (direction) {
+      case "left":
+        playAgainSound();
+        setRatingFlash("again");
+        void answerCurrentCard("again");
+        break;
+      case "right":
+        playCorrectSound();
+        setRatingFlash("good");
+        void answerCurrentCard("good");
+        break;
+      case "up":
+        playCorrectSound();
+        setRatingFlash("easy");
+        void answerCurrentCard("easy");
+        break;
+      case "down":
+        playHardSound();
+        setRatingFlash("hard");
+        void answerCurrentCard("hard");
+        break;
+    }
+  }, [activeStudy, revealAnswer, answerCurrentCard]);
+
+  const swipeEnabled = settings?.swipeGestures ?? true;
+  const { offset: swipeOffset, isSwiping, touchHandlers } = useSwipeGesture(
+    { onSwipe: handleSwipe },
+    swipeEnabled,
+  );
+
   // ── Session complete (no summary) ──
   if (!activeStudy && lastSessionSummary) {
     return (
@@ -210,6 +255,22 @@ export function StudyMode(): JSX.Element {
   const intervals = activeStudy.revealed && card
     ? previewIntervals(card, settings?.desiredRetention)
     : null;
+
+  // Compute card transform for visual feedback during swipe
+  const cardTransform = isSwiping
+    ? `translate(${swipeOffset.x * 0.5}px, ${swipeOffset.y * 0.5}px)`
+    : "translate(0, 0)";
+
+  // Tint color based on swipe direction
+  const swipeTint = isSwiping
+    ? Math.abs(swipeOffset.x) > Math.abs(swipeOffset.y)
+      ? swipeOffset.x < 0
+        ? "shadow-red-200/50 dark:shadow-red-900/30"
+        : "shadow-emerald-200/50 dark:shadow-emerald-900/30"
+      : swipeOffset.y < 0
+        ? "shadow-blue-200/50 dark:shadow-blue-900/30"
+        : "shadow-amber-200/50 dark:shadow-amber-900/30"
+    : "";
 
   // ── Active study ──
   return (
@@ -306,8 +367,19 @@ export function StudyMode(): JSX.Element {
 
       {/* Card */}
       <section className="flex flex-1 items-center justify-center py-4 sm:py-6">
-        <div className="w-full max-w-3xl" style={{ perspective: "1400px" }}>
-          <div className="study-card relative min-h-[300px] sm:min-h-[380px]" data-revealed={activeStudy.revealed}>
+        <div
+          className="w-full max-w-3xl"
+          style={{ perspective: "1400px" }}
+          {...(swipeEnabled ? touchHandlers : {})}
+        >
+          <div
+            className={cn("study-card relative min-h-[300px] sm:min-h-[380px] transition-transform", swipeTint)}
+            data-revealed={activeStudy.revealed}
+            style={{
+              transform: cardTransform,
+              transitionDuration: isSwiping ? "0ms" : "320ms",
+            }}
+          >
             {/* Front */}
             <div className="study-card-face absolute inset-0 flex flex-col justify-center rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-10">
               <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{deck?.name ?? t("study.review")}</p>
@@ -353,6 +425,13 @@ export function StudyMode(): JSX.Element {
             <AnswerButton label={t("study.good")} keyHint="3" variant="good" interval={intervals?.good} onClick={() => { playCorrectSound(); setRatingFlash("good"); void answerCurrentCard("good"); }} />
             <AnswerButton label={t("study.easy")} keyHint="4" variant="easy" interval={intervals?.easy} onClick={() => { playCorrectSound(); setRatingFlash("easy"); void answerCurrentCard("easy"); }} />
           </div>
+        )}
+
+        {/* Swipe hint — mobile only, shown when revealed and swipe enabled */}
+        {activeStudy.revealed && swipeEnabled && (
+          <p className="text-center text-[10px] text-zinc-400 lg:hidden">
+            ← {t("study.again")} · → {t("study.good")} · ↑ {t("study.easy")} · ↓ {t("study.hard")}
+          </p>
         )}
 
         {/* Edit card mid-review */}

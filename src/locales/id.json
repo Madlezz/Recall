@@ -237,6 +237,8 @@
     "desiredRetentionDescription": "Target retensi FSRS (0.70–0.99). Lebih tinggi = ulangan lebih sering.",
     "voiceInput": "Input suara",
     "voiceInputDescription": "Bicara daripada mengetik — menggunakan pengenalan suara bawaan perangkat. Tanpa cloud, tanpa akun.",
+    "swipeGestures": "Gesekan",
+    "swipeGesturesDescription": "Geses kartu belajar untuk menilai jawaban. Kiri = Lagi, Kanan = Baik, Atas = Mudah, Bawah = Sulit. Ketuk untuk buka jawaban.",
     "defaultWeights": "Bobot default",
     "customWeights": "Bobot kustom",
     "importExport": "Impor / Ekspor",

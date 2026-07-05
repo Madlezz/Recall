@@ -61,7 +61,7 @@ function makeSettings(overrides: Record<string, unknown> = {}) {
     ttsAutoRead: false,
     ttsSpeed: 1,
     fsrsWeights: null,
-    voiceInputEnabled: true,
+    voiceInputEnabled: true, swipeGestures: true,
     ...overrides,
   };
 }
