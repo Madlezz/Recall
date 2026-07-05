@@ -20,6 +20,7 @@ import { StudySection } from "./settings/study-section";
 import { NotificationsSection } from "./settings/notifications-section";
 import { ImportExportSection } from "./settings/import-export-section";
 import { DataSection } from "./settings/data-section";
+import { SyncSection } from "./settings/sync-section";
 import { UpdatesSection } from "./settings/updates-section";
 
 type ImportMode = "merge" | "replace";
@@ -75,7 +76,7 @@ export function Settings(): JSX.Element {
           <StudySection />
         </TabsContent>
 
-        {/* Data: Import/Export + Danger Zone */}
+        {/* Data: Import/Export + Sync + Danger Zone */}
         <TabsContent value="data" className="space-y-6">
           <ImportExportSection
             importMode={importMode}
@@ -84,6 +85,7 @@ export function Settings(): JSX.Element {
             lastAction={lastAction}
             setLastAction={setLastAction}
           />
+          <SyncSection />
           <DataSection />
         </TabsContent>
 

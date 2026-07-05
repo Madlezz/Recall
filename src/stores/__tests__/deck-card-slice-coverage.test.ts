@@ -62,7 +62,7 @@ function makeSettings() {
     onboardingComplete: true, xp: 0, achievements: [] as any[], dailyGoal: 20,
     notificationsEnabled: false, soundVolume: 100, allowHtml: false,
     desiredRetention: 0.9, backupFolder: null, backupSchedule: "never" as const,
-    lastBackupAt: null, syncFolder: null, syncEnabled: false,
+    lastBackupAt: null, syncFolder: null, syncEnabled: false, syncCode: null, syncRelayUrl: null, syncLastAt: null, syncAutoInterval: 0,
     ttsEnabled: false, ttsAutoRead: false, ttsSpeed: 1, fsrsWeights: null,
     voiceInputEnabled: true,
   };

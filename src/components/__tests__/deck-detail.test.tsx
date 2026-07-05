@@ -10,7 +10,7 @@ const mockStore: any = {
     { id: "c2", deckId: "d1", front: "Thanks", back: "Arigato", hint: "", source: "", tags: ["greeting"], cardType: "basic", state: "review", lastReviewDate: null, nextReviewDate: new Date().toISOString(), stability: 0, difficulty: 0, elapsedDays: 0, scheduledDays: 0, reps: 1, lapses: 0, learningSteps: 0, createdAt: "", updatedAt: "" },
   ],
   reviewLogs: [],
-  settings: { desiredRetention: 0.9, fsrsWeights: null, ttsEnabled: false, ttsAutoRead: false, ttsSpeed: 1, allowHtml: false, soundVolume: 100, theme: "light", accentColor: "zinc", dyslexiaFont: false, xp: 0, dailyGoal: 20, dailyNewCardLimit: 20, leechThreshold: 5, onboardingComplete: true, seededAt: "", achievements: [], notificationsEnabled: false, backupFolder: null, backupSchedule: "never", lastBackupAt: null, syncFolder: null, syncEnabled: false, voiceInputEnabled: true },
+  settings: { desiredRetention: 0.9, fsrsWeights: null, ttsEnabled: false, ttsAutoRead: false, ttsSpeed: 1, allowHtml: false, soundVolume: 100, theme: "light", accentColor: "zinc", dyslexiaFont: false, xp: 0, dailyGoal: 20, dailyNewCardLimit: 20, leechThreshold: 5, onboardingComplete: true, seededAt: "", achievements: [], notificationsEnabled: false, backupFolder: null, backupSchedule: "never", lastBackupAt: null, syncFolder: null, syncEnabled: false, syncCode: null, syncRelayUrl: null, syncLastAt: null, syncAutoInterval: 0, voiceInputEnabled: true },
   showDashboard: vi.fn(),
   deleteDeck: vi.fn(),
   deleteCards: vi.fn(),

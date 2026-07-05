@@ -1,0 +1,10 @@
+name = "recall-sync-relay"
+main = "src/worker.ts"
+compatibility_date = "2024-09-01"
+
+[vars]
+ENVIRONMENT = "production"
+
+[[r2_buckets]]
+binding = "RECALL_SYNC"
+bucket_name = "recall-sync-blobs"
