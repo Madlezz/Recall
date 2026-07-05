@@ -15,6 +15,7 @@ Recall is *not* trying to out-feature Anki for its existing power users. That's 
   - Reframed: not "feature parity" but "access" — desktop-only is a real barrier for a smartphone-primary target population.
   - [x] PWA (Progressive Web App) as lightweight alternative to native mobile builds (v1.1.0 — live at madlezz.github.io/Recall)
   - [x] Mobile-first responsive layout — bottom tab bar, compact study UI, safe-area insets, 44px touch targets (v1.1.0)
+  - [x] E2E encrypted sync protocol — AES-256-GCM + PBKDF2, sync code pairing, Cloudflare Worker relay (v1.1.0)
 - [ ] Sync protocol for optional cloud backup (privacy-preserving, end-to-end encrypted)
   - [ ] Auto-detect iCloud Drive / OneDrive folders for one-click "painless cloud sync"
 
