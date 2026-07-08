@@ -5,7 +5,7 @@ import { SettingsCard } from "./settings-card";
 import { useRecallStore } from "@/stores/recall-store";
 import { toast } from "sonner";
 import { optimizeFromHistory } from "@/services/fsrs-optimizer";
-import { DEFAULT_SHORTCUTS, REBINDABLE_ACTIONS, shortcutLabel, normalizeShortcut, type ShortcutAction, type ShortcutMap } from "@/lib/shortcuts";
+import { DEFAULT_SHORTCUTS, REBINDABLE_ACTIONS, shortcutLabel, type ShortcutAction, type ShortcutMap } from "@/lib/shortcuts";
 
 export function StudySection(): JSX.Element {
   const { t } = useTranslation();
