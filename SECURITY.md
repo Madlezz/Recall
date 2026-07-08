@@ -2,9 +2,10 @@
 
 ## Supported Versions
 
-| Version | Supported |
-|---------|-----------|
-| 1.0.x   | ✅        |
+| Version | Supported          |
+|---------|-----------         |
+| 1.1.x   | ✅                 |
+| 1.0.x   | ✅ Security fixes  |
 
 ## Reporting a Vulnerability
 
@@ -17,9 +18,10 @@ as soon as possible and you'll be credited in the changelog.
 
 ## Scope
 
-Recall is a local desktop application. Network access is limited to:
+Recall is a local-first application. Network access is limited to:
 - Auto-update checks via GitHub Releases (signed ed25519, optional)
 - Optional desktop notifications
+- **E2E encrypted sync relay** (opt-in): pushes/pulls AES-256-GCM encrypted blobs to a Cloudflare Worker. The relay never sees plaintext or encryption keys. Users can self-host the relay. See [sync-relay/README.md](sync-relay/README.md).
 
 ## Automated Auditing
 
@@ -42,8 +44,8 @@ Some transitive dependencies may have advisories flagged by `cargo audit` or `pn
 ## Release Verification
 
 Every release includes:
-- **SHA256SUMS** — verify download integrity with `sha256sum -c SHA256SUMS`
-- **Signed updater bundles** — Tauri updater verifies ed25519 signatures before installing
+- **SHA256SUMS** - verify download integrity with `sha256sum -c SHA256SUMS`
+- **Signed updater bundles** - Tauri updater verifies ed25519 signatures before installing
 
 ## Code Signing Status
 

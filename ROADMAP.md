@@ -2,32 +2,32 @@
 
 ## Vision
 
-Recall exists for people who have a real, external reason to memorize things — an exam, a language, a licensing test — but who have never used a spaced-repetition tool and find Anki/Mochi/RemNote intimidating to even start. It gives them an on-ramp that just works, with zero paradigm literacy required.
+Recall exists for people who have a real, external reason to memorize things - an exam, a language, a licensing test - but who have never used a spaced-repetition tool and find Anki/Mochi/RemNote intimidating to even start. It gives them an on-ramp that just works, with zero paradigm literacy required.
 
 Recall is *not* trying to out-feature Anki for its existing power users. That's a 20-year ecosystem battle a solo developer cannot win, and it isn't the point.
 
-**Target audience:** access-gap non-users — people with real memorization needs (UTBK, CPNS, medical/pharmacy board exams, language learning) who would benefit from SRS but never got a friendly enough introduction. The Indonesian market is a concrete target: no competitor offers real Bahasa Indonesia localization.
+**Target audience:** access-gap non-users - people with real memorization needs (UTBK, CPNS, medical/pharmacy board exams, language learning) who would benefit from SRS but never got a friendly enough introduction. The Indonesian market is a concrete target: no competitor offers real Bahasa Indonesia localization.
 
 ## In Progress
 
-- [x] **Onboarding rewrite** — Explain what spaced repetition is and why review timing matters, in plain language, before naming the algorithm. Added "how this works" demo deck and UTBK Indonesia starter content. Done in v1.1.0.
+- [x] **Onboarding rewrite** - Explain what spaced repetition is and why review timing matters, in plain language, before naming the algorithm. Added "how this works" demo deck and UTBK Indonesia starter content. Done in v1.1.0.
 - [ ] **Mobile app** (iOS and Android) using Tauri's cross-platform capabilities
-  - Reframed: not "feature parity" but "access" — desktop-only is a real barrier for a smartphone-primary target population.
-  - [x] PWA (Progressive Web App) as lightweight alternative to native mobile builds (v1.1.0 — live at madlezz.github.io/Recall)
-  - [x] Mobile-first responsive layout — bottom tab bar, compact study UI, safe-area insets, 44px touch targets (v1.1.0)
-  - [x] E2E encrypted sync protocol — AES-256-GCM + PBKDF2, sync code pairing, Cloudflare Worker relay (v1.1.0)
-- [ ] Sync protocol for optional cloud backup (privacy-preserving, end-to-end encrypted)
+  - Reframed: not "feature parity" but "access" - desktop-only is a real barrier for a smartphone-primary target population.
+  - [x] PWA (Progressive Web App) as lightweight alternative to native mobile builds (v1.1.0 - live at madlezz.github.io/Recall)
+  - [x] Mobile-first responsive layout - bottom tab bar, compact study UI, safe-area insets, 44px touch targets (v1.1.0)
+  - [x] E2E encrypted sync protocol - AES-256-GCM + PBKDF2, sync code pairing, Cloudflare Worker relay (v1.1.0)
+- [x] Sync protocol for optional cloud backup (privacy-preserving, end-to-end encrypted) — shipped in v1.1.0
   - [ ] Auto-detect iCloud Drive / OneDrive folders for one-click "painless cloud sync"
 
 ## Planned
 
 ### Core Fixes
-- [x] **FSRS graduation bug** — `learning_steps` was hardcoded to 0, cards never graduated past ~10-minute intervals. Fixed in v1.1.0.
-- [x] **Relearning state mapping** — `relearning` was mapped to `State.Learning` instead of `State.Relearning`. Fixed in v1.1.0.
-- [x] **Anki import scheduling history** — Import now reads FSRS `memory_state` (s/d) from Anki 23.10+ `data` column, falls back to SM-2 ease→difficulty estimation for legacy cards. State, stability, difficulty, reps, lapses, and due interval all preserved. Fixed in v1.1.0.
+- [x] **FSRS graduation bug** - `learning_steps` was hardcoded to 0, cards never graduated past ~10-minute intervals. Fixed in v1.1.0.
+- [x] **Relearning state mapping** - `relearning` was mapped to `State.Learning` instead of `State.Relearning`. Fixed in v1.1.0.
+- [x] **Anki import scheduling history** - Import now reads FSRS `memory_state` (s/d) from Anki 23.10+ `data` column, falls back to SM-2 ease→difficulty estimation for legacy cards. State, stability, difficulty, reps, lapses, and due interval all preserved. Fixed in v1.1.0.
 
 ### Study Experience
-- [x] **Voice input for card creation** (speech-to-text) — lowers the barrier for someone uncomfortable typing/using markdown. Uses Web Speech API (offline, no cloud). Mic button in card editor + quick-add. Language auto-detected from app locale. Toggle in Settings → Study. Done in v1.1.0.
+- [x] **Voice input for card creation** (speech-to-text) - lowers the barrier for someone uncomfortable typing/using markdown. Uses Web Speech API (offline, no cloud). Mic button in card editor + quick-add. Language auto-detected from app locale. Toggle in Settings → Study. Done in v1.1.0.
 - [ ] Handwriting recognition for handwritten notes
 - [ ] Spaced repetition for audio/video content
 - [ ] Adaptive difficulty (cards get harder/easier based on performance)
@@ -35,14 +35,14 @@ Recall is *not* trying to out-feature Anki for its existing power users. That's 
 
 ### Internationalization
 - [ ] Additional languages: Spanish (es), Portuguese (pt), Chinese Simplified (zh-CN), Japanese (ja)
-  - **Trigger:** Implement after core feature development slows down (post-v1.1 stable). During active development, new UI strings are added frequently — each new language adds maintenance overhead per string change.
-  - **Approach:** Generate initial translations from en.json (873 keys) using LLM, then community review/refine. Zero code changes needed per language — just add a JSON file to `src/locales/`.
+  - **Trigger:** Implement after core feature development slows down (post-v1.1 stable). During active development, new UI strings are added frequently - each new language adds maintenance overhead per string change.
+  - **Approach:** Generate initial translations from en.json (873 keys) using LLM, then community review/refine. Zero code changes needed per language - just add a JSON file to `src/locales/`.
   - **CJK note:** Verify font rendering on all target platforms before release.
   - **Future:** Arabic (ar) requires RTL layout support (CSS `dir="rtl"`), defer to separate milestone.
 
 ### Mobile App
 - [ ] Native iOS and Android apps using Tauri
-- [x] Touch-optimized UI with swipe gestures (v1.1.0 — PWA)
+- [x] Touch-optimized UI with swipe gestures (v1.1.0 - PWA)
 - [ ] Offline-first with background sync
 - [ ] Biometric authentication (Face ID, fingerprint)
 - [ ] Widgets for quick review sessions
@@ -63,7 +63,7 @@ Recall is *not* trying to out-feature Anki for its existing power users. That's 
 
 ## Someday / Not a Current Priority
 
-*These items chase Anki's 20-year power-user ecosystem or are only legible to someone who already knows SRS/FSRS terminology. Not deleted — deferred until there's a user base that actually asks for them.*
+*These items chase Anki's 20-year power-user ecosystem or are only legible to someone who already knows SRS/FSRS terminology. Not deleted - deferred until there's a user base that actually asks for them.*
 
 - [ ] Plugin system / Local API / Webhook system (like AnkiConnect)
 - [ ] Custom scheduling algorithms (user-defined intervals)
@@ -124,7 +124,7 @@ Recall is *not* trying to out-feature Anki for its existing power users. That's 
 - [x] Image Occlusion cards: draw rectangles on images, reveal during study (v1.1.0)
 - [x] Richer Anki import: media extraction (images from .apkg) with recall:// URLs (v1.1.0)
 - [x] Internationalization (i18n): react-i18next with English + Bahasa Indonesia, 40 namespaces / 873 keys, language switcher in Settings (v1.1.0)
-- [x] Swipe gestures: swipe to reveal and rate cards on mobile — left=again, right=good, up=easy, down=hard, with visual feedback (v1.1.0)
+- [x] Swipe gestures: swipe to reveal and rate cards on mobile - left=again, right=good, up=easy, down=hard, with visual feedback (v1.1.0)
 
 ## Contributing
 

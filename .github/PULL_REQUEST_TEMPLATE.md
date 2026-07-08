@@ -1,3 +1,7 @@
+## Description
+
+<!-- What does this PR do? Why is it needed? -->
+
 ## Type of change
 
 - [ ] Bug fix
@@ -9,6 +13,7 @@
 ## Testing
 
 - [ ] Unit tests pass (`pnpm test`)
+- [ ] Linting passes (`pnpm lint`)
 - [ ] Build succeeds (`pnpm build`)
 - [ ] Tested on:
   - [ ] Windows

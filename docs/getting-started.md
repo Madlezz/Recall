@@ -35,7 +35,7 @@ pnpm tauri build
 
 When you launch Recall for the first time, you'll see the onboarding template gallery:
 
-1. **Choose Starter Decks**: Select from 4 template decks (Languages, Coding, GRE, Medical) — each includes pre-made cards to jumpstart your learning
+1. **Choose Starter Decks**: Select from 6 template decks (How This Works, UTBK Indonesia, Languages, Coding, GRE, Medical) - each includes pre-made cards to jumpstart your learning
 2. **Or Start Fresh**: Begin with an empty library and create your own content
 
 We recommend importing at least one template deck to explore the interface before creating your own cards.
@@ -206,6 +206,27 @@ For large decks (10,000+ cards):
 - Export and re-import if the database becomes slow
 - Keep regular backups
 
+## PWA (Mobile)
+
+Recall is also available as an installable Progressive Web App at **https://madlezz.github.io/Recall**.
+
+1. Open the URL on your phone’s browser
+2. Tap **"Add to Home Screen"** (or the install prompt)
+3. Recall is now installed — works offline, swipe gestures enabled
+
+Swipe left/right/up/down to rate cards after revealing. Configurable in Settings → Study.
+
+## E2E Encrypted Sync
+
+Sync your data between devices with end-to-end encryption:
+
+1. Go to **Settings → Sync**
+2. Generate a **sync code** on your primary device
+3. Enter the sync code on your other device
+4. Push/pull to sync — data is encrypted with AES-256-GCM before leaving your device
+
+The sync relay never sees your plaintext data. You can self-host the relay — see [sync-relay/README.md](../sync-relay/README.md).
+
 ## Next Steps
 
 - Explore **Statistics** to track your learning patterns
@@ -215,7 +236,7 @@ For large decks (10,000+ cards):
 
 ## Getting Help
 
-- **Documentation**: Check the [docs folder](../docs/) for detailed guides
+- **Documentation**: Check the [Card Formatting Guide](card-formatting.md) and [Accessibility Guide](../ACCESSIBILITY.md)
 - **Issues**: Report bugs on [GitHub Issues](https://github.com/Madlezz/Recall/issues)
 - **Discussions**: Ask questions in [GitHub Discussions](https://github.com/Madlezz/Recall/discussions)
 

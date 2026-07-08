@@ -8,7 +8,7 @@ built with Tauri + React + TypeScript.
 **Prerequisites:**
 - Node.js 22+
 - pnpm 10+
-- Rust (stable) — install via https://rustup.rs
+- Rust (stable) - install via https://rustup.rs
 - For Linux: `libwebkit2gtk-4.1-dev` and `libappindicator3-dev`
 
 **Setup:**
@@ -46,17 +46,20 @@ src/
   services/       # Business logic (FSRS engine, import/export, audio)
   stores/         # Zustand state management (split into slices)
   db/             # SQLite schema, TypeScript mappers, and query helpers
+  hooks/          # Custom React hooks (swipe gestures, voice input, PWA)
   lib/            # Pure utility functions (XP, cloze, deck health)
   locales/        # i18n translation files (en.json, id.json)
   data/           # Demo seed data and template decks
   types.ts        # Shared TypeScript types
 src-tauri/
   src/            # Rust backend (file ops, Anki .apkg parsing via zip)
+sync-relay/
+  src/            # Cloudflare Worker for E2E encrypted sync relay
 ```
 
 ## Code Style
 
-- TypeScript strict mode — no `any`, no type assertions without comment
+- TypeScript strict mode - no `any`, no type assertions without comment
 - Prefer pure functions in `src/lib/` and `src/services/`
 - UI state → Zustand slices in `src/stores/slices/`
 - Database access only through `src/services/repository.ts`

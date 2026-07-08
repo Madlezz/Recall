@@ -24,6 +24,7 @@ Recall is designed to be accessible to all users. This guide covers keyboard nav
 | `S` | Snooze card (review in 2 hours) |
 | `Ctrl+Z` | Undo last review |
 | `R` | Start review |
+| `T` | Toggle text-to-speech |
 
 ### Dashboard & Focus Timer
 
@@ -32,6 +33,12 @@ Recall is designed to be accessible to all users. This guide covers keyboard nav
 | `F` | Start/pause focus timer |
 | `Tab` | Navigate between elements |
 | `Enter` | Activate focused element |
+
+### Command Palette
+
+| Keys | Action |
+|------|--------|
+| `Ctrl+K` / `Cmd+K` | Open command palette |
 
 ### Card Browser
 
@@ -123,6 +130,5 @@ Planned accessibility enhancements:
 
 - Customizable keyboard shortcuts
 - Color-blind friendly UI
-- Voice input for card creation
 - Haptic feedback on mobile
 - Enhanced screen reader announcements for study progress

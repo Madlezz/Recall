@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20PWA-blue)](https://github.com/Madlezz/Recall/releases/latest)
 
-**Recall** is a local-first flashcard app built for focused learning. It uses FSRS-based scheduling for modern spaced repetition — but you just open it and start reviewing. Your data stays on your machine, always. Available as a desktop app (Windows/macOS/Linux) and a PWA on mobile.
+**Recall** is a local-first flashcard app built for focused learning. It uses FSRS-based scheduling for modern spaced repetition - but you just open it and start reviewing. Your data stays on your machine, always. Available as a desktop app (Windows/macOS/Linux) and a PWA on mobile.
 
 ## 📚 Documentation
 
@@ -25,7 +25,7 @@
 | Storage | **Local SQLite** | Local SQLite | Cloud-first (offline cache) | Local files |
 | Account required | **No** | No | Yes | No (offline free) |
 | Open source | **Yes** (MIT) | Yes (AGPL) | No | No |
-| Add-on ecosystem | Growing | **Massive** (20+ years) | Plugins | Limited |
+| Add-on ecosystem | None (planned) | **Massive** (20+ years) | Plugins | Limited |
 | Built-in gamification | **Yes** (XP, levels, achievements) | Via add-ons | Basic | No |
 | Native desktop | **Yes** (Tauri, Rust) | Yes (Qt, Python) | Yes (Electron) | Yes (Electron) |
 | Mobile access | **PWA** (installable) | AnkiDroid (separate) | Yes | Yes |
@@ -46,7 +46,15 @@ focus tools, and a polished UX that doesn't require hunting for add-ons.
 
 ![Study Mode](docs/screenshots/study.png)
 
+![Study — Answer Revealed](docs/screenshots/study-revealed.png)
+
 ![Stats](docs/screenshots/stats.png)
+
+![Card Browser](docs/screenshots/deck-browser.png)
+
+![Tags](docs/screenshots/tags.png)
+
+![Settings](docs/screenshots/settings.png)
 
 ---
 
@@ -70,7 +78,7 @@ focus tools, and a polished UX that doesn't require hunting for add-ons.
 - **Achievements** - 14 milestones (streaks, volume, accuracy, time-based)
 - **Daily goal** - set a target, watch the progress bar, confetti on completion
 - **Session summaries** - ratings breakdown, XP earned, achievement unlocks
-- **Onboarding gallery** - choose from 4 starter decks (Languages, Coding, GRE, Medical)
+- **Onboarding gallery** - choose from 6 starter decks (How This Works, UTBK Indonesia, Languages, Coding, GRE, Medical)
 
 ### 🧘 Study Tools
 - **Focus timer** - Pomodoro with 15/25/45m presets
@@ -128,7 +136,7 @@ Recall is also available as an installable PWA. Visit the live site, tap "Add to
 
 **https://madlezz.github.io/Recall**
 
-Swipe gestures work natively — swipe left/right/up/down to rate cards after revealing.
+Swipe gestures work natively - swipe left/right/up/down to rate cards after revealing.
 
 ### Testing
 
@@ -182,6 +190,8 @@ For known transitive vulnerabilities in upstream dependencies, see [SECURITY.md]
 | `Ctrl+N` | Quick-add card (in-app) |
 | `Ctrl+Shift+N` | Quick-add card (global, works when minimized) |
 | `Ctrl+Z` | Undo last review |
+| `Ctrl+K` | Command palette |
+| `T` | Toggle text-to-speech |
 | `?` | Show all shortcuts |
 
 ---
