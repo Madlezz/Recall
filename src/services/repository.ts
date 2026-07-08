@@ -20,6 +20,7 @@ import { createSeedSnapshot } from "@/data/seed";
 import { isCardState, isCardType, isDeckColor, isReviewRating } from "@/lib/domain";
 import { normalizeName } from "@/lib/utils";
 import { mergeImportPayload } from "@/services/import-export";
+import { DEFAULT_SHORTCUTS } from "@/lib/shortcuts";
 import type { Card, Deck, RecallExportPayload, RecallStateSnapshot, ReviewLog, StudySession, Theme } from "@/types";
 
 const STORAGE_KEY = "recall.snapshot.v1";
@@ -652,6 +653,8 @@ function migrateSettings(settings: Partial<RecallStateSnapshot["settings"]> & { 
     fsrsWeights: Array.isArray(settings.fsrsWeights) ? settings.fsrsWeights : null,
     voiceInputEnabled: typeof settings.voiceInputEnabled === "boolean" ? settings.voiceInputEnabled : true,
     swipeGestures: typeof settings.swipeGestures === "boolean" ? settings.swipeGestures : true,
+    colorBlindMode: typeof settings.colorBlindMode === "boolean" ? settings.colorBlindMode : false,
+    shortcuts: settings.shortcuts && typeof settings.shortcuts === "object" ? { ...DEFAULT_SHORTCUTS, ...settings.shortcuts } : { ...DEFAULT_SHORTCUTS },
       };
 }
 

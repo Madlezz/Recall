@@ -54,6 +54,8 @@ desiredRetention: 0.9,
                         ttsSpeed: 1,
                         fsrsWeights: null,
                         voiceInputEnabled: true, swipeGestures: true,
+                        colorBlindMode: false,
+                        shortcuts: undefined,
                   },
                 };
                 return JSON.stringify(payload, null, 2);

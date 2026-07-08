@@ -265,10 +265,13 @@ describe("DeckDetail", () => {
   it("calls updateSettings with optimization result", () => {
     render(React.createElement(DeckDetail));
     screen.getByText("Optimize").click();
-    expect(mockStore.updateSettings).toHaveBeenCalledWith({
-      desiredRetention: 0.92,
-      fsrsWeights: [1, 2, 3],
-      voiceInputEnabled: true, swipeGestures: true,
-    });
+    expect(mockStore.updateSettings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        desiredRetention: 0.92,
+        fsrsWeights: [1, 2, 3],
+        voiceInputEnabled: true,
+        swipeGestures: true,
+      }),
+    );
   });
 });

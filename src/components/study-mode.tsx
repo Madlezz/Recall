@@ -11,6 +11,7 @@ import { speakText, stopSpeaking, isTTSSupported, setSpeakingCallback } from "@/
 import { playFlipSound, playCorrectSound, playAgainSound, playHardSound } from "@/services/audio";
 import { previewIntervals } from "@/services/fsrs-engine";
 import { cn } from "@/lib/utils";
+import { matchesShortcut, shortcutLabel, DEFAULT_SHORTCUTS } from "@/lib/shortcuts";
 import { SessionSummaryModal } from "./study-mode/session-summary-modal";
 import { AnswerButton, CompletionStat } from "./study-mode/study-helpers";
 
@@ -77,7 +78,9 @@ export function StudyMode(): JSX.Element {
       const target = event.target as HTMLElement | null;
       if (target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) return;
 
-      if (event.ctrlKey && event.key === "z" && !activeStudy.revealed && activeStudy.currentIndex > 0) {
+      const sc = settings?.shortcuts ?? DEFAULT_SHORTCUTS;
+
+      if (matchesShortcut(event, sc.undo) && !activeStudy.revealed && activeStudy.currentIndex > 0) {
         event.preventDefault();
         void undoLastReview().then((didUndo) => {
           if (didUndo) toast.info(t("study.reviewUndone"));
@@ -87,22 +90,22 @@ export function StudyMode(): JSX.Element {
       }
 
       if (!activeStudy.revealed) {
-        if (event.key.toLowerCase() === "b") { event.preventDefault(); buryCard(); return; }
-        if (event.key.toLowerCase() === "s") { event.preventDefault(); void snoozeCard(120); toast.info(t("study.snoozed")); return; }
-        if (event.key.toLowerCase() === "t" && settings?.ttsEnabled) {
+        if (matchesShortcut(event, sc.bury)) { event.preventDefault(); buryCard(); return; }
+        if (matchesShortcut(event, sc.snooze)) { event.preventDefault(); void snoozeCard(120); toast.info(t("study.snoozed")); return; }
+        if (matchesShortcut(event, sc.tts) && settings?.ttsEnabled) {
           event.preventDefault();
           if (isSpeaking) { stopSpeaking(); } else { speakText(card!.front, "en-US", settings.ttsSpeed); }
           return;
         }
       }
 
-      if (event.code === "Space" && !activeStudy.revealed) { event.preventDefault(); revealAnswer(); }
+      if (matchesShortcut(event, sc.reveal) && !activeStudy.revealed) { event.preventDefault(); revealAnswer(); }
 
       if (!activeStudy.revealed) return;
-      if (event.key === "1") { event.preventDefault(); void answerCurrentCard("again"); }
-      if (event.key === "2") { event.preventDefault(); void answerCurrentCard("hard"); }
-      if (event.key === "3") { event.preventDefault(); void answerCurrentCard("good"); }
-      if (event.key === "4") { event.preventDefault(); void answerCurrentCard("easy"); }
+      if (matchesShortcut(event, sc.rateAgain)) { event.preventDefault(); void answerCurrentCard("again"); }
+      if (matchesShortcut(event, sc.rateHard)) { event.preventDefault(); void answerCurrentCard("hard"); }
+      if (matchesShortcut(event, sc.rateGood)) { event.preventDefault(); void answerCurrentCard("good"); }
+      if (matchesShortcut(event, sc.rateEasy)) { event.preventDefault(); void answerCurrentCard("easy"); }
     }
 
     window.addEventListener("keydown", handleKeyDown);
@@ -420,10 +423,10 @@ export function StudyMode(): JSX.Element {
         ) : (
           /* 2x2 grid on mobile, inline row on desktop */
           <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center">
-            <AnswerButton label={t("study.again")} keyHint="1" variant="again" interval={intervals?.again} onClick={() => { playAgainSound(); setRatingFlash("again"); void answerCurrentCard("again"); }} />
-            <AnswerButton label={t("study.hard")} keyHint="2" variant="hard" interval={intervals?.hard} onClick={() => { playHardSound(); setRatingFlash("hard"); void answerCurrentCard("hard"); }} />
-            <AnswerButton label={t("study.good")} keyHint="3" variant="good" interval={intervals?.good} onClick={() => { playCorrectSound(); setRatingFlash("good"); void answerCurrentCard("good"); }} />
-            <AnswerButton label={t("study.easy")} keyHint="4" variant="easy" interval={intervals?.easy} onClick={() => { playCorrectSound(); setRatingFlash("easy"); void answerCurrentCard("easy"); }} />
+            <AnswerButton label={t("study.again")} keyHint={shortcutLabel(settings?.shortcuts?.rateAgain ?? DEFAULT_SHORTCUTS.rateAgain)} variant="again" interval={intervals?.again} colorBlind={settings?.colorBlindMode} onClick={() => { playAgainSound(); setRatingFlash("again"); void answerCurrentCard("again"); }} />
+            <AnswerButton label={t("study.hard")} keyHint={shortcutLabel(settings?.shortcuts?.rateHard ?? DEFAULT_SHORTCUTS.rateHard)} variant="hard" interval={intervals?.hard} colorBlind={settings?.colorBlindMode} onClick={() => { playHardSound(); setRatingFlash("hard"); void answerCurrentCard("hard"); }} />
+            <AnswerButton label={t("study.good")} keyHint={shortcutLabel(settings?.shortcuts?.rateGood ?? DEFAULT_SHORTCUTS.rateGood)} variant="good" interval={intervals?.good} colorBlind={settings?.colorBlindMode} onClick={() => { playCorrectSound(); setRatingFlash("good"); void answerCurrentCard("good"); }} />
+            <AnswerButton label={t("study.easy")} keyHint={shortcutLabel(settings?.shortcuts?.rateEasy ?? DEFAULT_SHORTCUTS.rateEasy)} variant="easy" interval={intervals?.easy} colorBlind={settings?.colorBlindMode} onClick={() => { playCorrectSound(); setRatingFlash("easy"); void answerCurrentCard("easy"); }} />
           </div>
         )}
 

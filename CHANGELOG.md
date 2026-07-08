@@ -7,7 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ## [Unreleased]
 
 ### Added
-- **Swipe gestures for mobile study mode:** Swipe to reveal cards and rate answers on touch devices. Left=Again, Right=Good, Up=Easy, Down=Hard. Card follows finger with colored shadow tint for visual feedback. Configurable in Settings → Study (default: on). Swipe hint shown on mobile when revealed.
+- **Color-blind friendly UI:** Settings → Study toggle swaps rating buttons for an Okabe-Ito color-blind-safe palette and adds a distinct shape + text glyph (✕ ◑ ✓ ★) per rating, so ratings are never conveyed by color alone (WCAG 1.4.1). The stats rating-distribution chart and legend follow the same palette.
+- **Customizable keyboard shortcuts:** Rebindable study shortcuts (reveal, rate Again/Hard/Good/Easy, bury, snooze, read aloud, undo) with live conflict detection. Shortcuts persist in settings; a single source of truth in `src/lib/shortcuts.ts` drives both the study handler and the help dialog. Reset-to-defaults button included.
 
 ### Changed
 - **README overhaul:** Updated feature comparison table (added mobile access, E2E encrypted sync, swipe gestures rows), PWA section with live URL, test count corrected to 761, tech stack table updated with PWA + sync entries.

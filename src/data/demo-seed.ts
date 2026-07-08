@@ -291,5 +291,7 @@ function createSettings(today: Date): RecallSettings {
     ttsSpeed: 1,
     fsrsWeights: null,
     voiceInputEnabled: true, swipeGestures: true,
+    colorBlindMode: false,
+    shortcuts: undefined,
   };
 }

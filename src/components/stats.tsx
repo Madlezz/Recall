@@ -53,7 +53,11 @@ function MiniBarChart({ data, maxHeight = 64 }: { data: number[]; maxHeight?: nu
 
 // ── StackedBarChart ──
 
-function StackedBarChart({ data }: { data: { again: number; hard: number; good: number; easy: number }[] }): JSX.Element {
+function StackedBarChart({ data, colorBlind = false }: { data: { again: number; hard: number; good: number; easy: number }[]; colorBlind?: boolean }): JSX.Element {
+  // Standard palette vs Okabe-Ito color-blind-safe palette.
+  const c = colorBlind
+    ? { easy: "bg-fuchsia-500/70", good: "bg-teal-500/70", hard: "bg-orange-500/70", again: "bg-sky-500/70" }
+    : { easy: "bg-blue-500/70", good: "bg-emerald-500/70", hard: "bg-amber-500/70", again: "bg-red-500/70" };
   const max = Math.max(1, ...data.map((d) => d.again + d.hard + d.good + d.easy));
   return (
     <div className="flex items-end gap-[2px] h-20" role="img" aria-label="Rating distribution chart">
@@ -62,10 +66,10 @@ function StackedBarChart({ data }: { data: { again: number; hard: number; good: 
         const pct = (total / max) * 100;
         return (
           <div key={i} className="flex-1 flex flex-col justify-end" style={{ height: `${Math.max(2, pct)}%` }}>
-            {d.easy > 0 && <div className="w-full bg-blue-500/70 rounded-t-sm" style={{ height: `${(d.easy / total) * 100}%` }} title={`Easy: ${d.easy}`} />}
-            {d.good > 0 && <div className="w-full bg-emerald-500/70" style={{ height: `${(d.good / total) * 100}%` }} title={`Good: ${d.good}`} />}
-            {d.hard > 0 && <div className="w-full bg-amber-500/70" style={{ height: `${(d.hard / total) * 100}%` }} title={`Hard: ${d.hard}`} />}
-            {d.again > 0 && <div className="w-full bg-red-500/70 rounded-b-sm" style={{ height: `${(d.again / total) * 100}%` }} title={`Again: ${d.again}`} />}
+            {d.easy > 0 && <div className={`w-full ${c.easy} rounded-t-sm`} style={{ height: `${(d.easy / total) * 100}%` }} title={`Easy: ${d.easy}`} />}
+            {d.good > 0 && <div className={`w-full ${c.good}`} style={{ height: `${(d.good / total) * 100}%` }} title={`Good: ${d.good}`} />}
+            {d.hard > 0 && <div className={`w-full ${c.hard}`} style={{ height: `${(d.hard / total) * 100}%` }} title={`Hard: ${d.hard}`} />}
+            {d.again > 0 && <div className={`w-full ${c.again} rounded-b-sm`} style={{ height: `${(d.again / total) * 100}%` }} title={`Again: ${d.again}`} />}
           </div>
         );
       })}
@@ -252,12 +256,12 @@ export function Stats(): JSX.Element {
         <section>
           <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("stats.dailyRatingBreakdown")}</h3>
           <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-            <StackedBarChart data={dayRatingData} />
+            <StackedBarChart data={dayRatingData} colorBlind={settings.colorBlindMode} />
             <div className="flex items-center gap-4 mt-4 text-xs text-zinc-500">
-              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-red-500/70" /> {t("study.again")}</span>
-              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-amber-500/70" /> {t("study.hard")}</span>
-              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-emerald-500/70" /> {t("study.good")}</span>
-              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-blue-500/70" /> {t("study.easy")}</span>
+              <span className="flex items-center gap-1"><span className={`h-2.5 w-2.5 rounded-sm ${settings.colorBlindMode ? "bg-sky-500/70" : "bg-red-500/70"}`} /> {t("study.again")}</span>
+              <span className="flex items-center gap-1"><span className={`h-2.5 w-2.5 rounded-sm ${settings.colorBlindMode ? "bg-orange-500/70" : "bg-amber-500/70"}`} /> {t("study.hard")}</span>
+              <span className="flex items-center gap-1"><span className={`h-2.5 w-2.5 rounded-sm ${settings.colorBlindMode ? "bg-teal-500/70" : "bg-emerald-500/70"}`} /> {t("study.good")}</span>
+              <span className="flex items-center gap-1"><span className={`h-2.5 w-2.5 rounded-sm ${settings.colorBlindMode ? "bg-fuchsia-500/70" : "bg-blue-500/70"}`} /> {t("study.easy")}</span>
             </div>
           </div>
         </section>

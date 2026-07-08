@@ -1,5 +1,6 @@
 type AnswerVariant = "again" | "hard" | "good" | "easy";
 
+// Default palette (red/amber/emerald/blue) used in normal mode.
 const answerStyles: Record<AnswerVariant, string> = {
   again: "bg-red-50 text-red-700 border-red-200 hover:bg-red-100 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900",
   hard: "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900",
@@ -7,7 +8,37 @@ const answerStyles: Record<AnswerVariant, string> = {
   easy: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900",
 };
 
-export function AnswerButton({ label, keyHint, variant, interval, onClick }: { label: string; keyHint: string; variant: AnswerVariant; interval?: string; onClick: () => void }): JSX.Element {
+// Color-blind-safe palette (Okabe-Ito) + a distinct glyph so ratings are never
+// conveyed by color alone (WCAG 1.4.1 - use of color).
+const answerStylesColorBlind: Record<AnswerVariant, string> = {
+  again: "bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-100 dark:bg-sky-950/30 dark:text-sky-400 dark:border-sky-900",
+  hard: "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-900",
+  good: "bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100 dark:bg-teal-950/30 dark:text-teal-400 dark:border-teal-900",
+  easy: "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200 hover:bg-fuchsia-100 dark:bg-fuchsia-950/30 dark:text-fuchsia-400 dark:border-fuchsia-900",
+};
+
+const answerGlyphs: Record<AnswerVariant, string> = {
+  again: "✕",
+  hard: "◑",
+  good: "✓",
+  easy: "★",
+};
+
+export function AnswerButton({
+  label,
+  keyHint,
+  variant,
+  interval,
+  onClick,
+  colorBlind = false,
+}: {
+  label: string;
+  keyHint: string;
+  variant: AnswerVariant;
+  interval?: string;
+  onClick: () => void;
+  colorBlind?: boolean;
+}): JSX.Element {
   const variantDescriptions: Record<AnswerVariant, string> = {
     again: "Rate as Again - forgot completely",
     hard: "Rate as Hard - remembered with difficulty",
@@ -15,13 +46,18 @@ export function AnswerButton({ label, keyHint, variant, interval, onClick }: { l
     easy: "Rate as Easy - remembered easily",
   };
 
+  const styles = colorBlind ? answerStylesColorBlind[variant] : answerStyles[variant];
+
   return (
     <button
       onClick={onClick}
       aria-label={variantDescriptions[variant]}
-      className={`flex flex-col items-center gap-0.5 rounded-lg border px-4 py-3 min-h-[56px] text-sm font-semibold transition-colors sm:py-2 sm:min-h-0 ${answerStyles[variant]}`}
+      className={`flex flex-col items-center gap-0.5 rounded-lg border px-4 py-3 min-h-[56px] text-sm font-semibold transition-colors sm:py-2 sm:min-h-0 ${styles}`}
     >
       <span className="flex items-center gap-2">
+        {colorBlind && (
+          <span className="text-base leading-none" aria-hidden="true">{answerGlyphs[variant]}</span>
+        )}
         <span className="text-[10px] font-medium opacity-60 w-4" aria-hidden="true">{keyHint}</span>
         {label}
       </span>

@@ -236,6 +236,8 @@ export function settingsFromRows(rows: SettingRow[]): RecallSettings {
             fsrsWeights: values.get("fsrs_weights") ? JSON.parse(values.get("fsrs_weights")!) : null,
           voiceInputEnabled: values.get("voice_input_enabled") !== "false",
           swipeGestures: values.get("swipe_gestures") !== "false",
+          colorBlindMode: values.get("color_blind_mode") === "true",
+          shortcuts: values.get("shortcuts") ? JSON.parse(values.get("shortcuts")!) : null,
           };
 }
 
@@ -271,6 +273,8 @@ export function settingsToRows(settings: RecallSettings): SettingRow[] {
     { key: "fsrs_weights", value: settings.fsrsWeights ? JSON.stringify(settings.fsrsWeights) : "" },
     { key: "voice_input_enabled", value: String(settings.voiceInputEnabled) },
     { key: "swipe_gestures", value: String(settings.swipeGestures) },
+    { key: "color_blind_mode", value: String(settings.colorBlindMode) },
+    { key: "shortcuts", value: settings.shortcuts ? JSON.stringify(settings.shortcuts) : "" },
       ];
 }
 

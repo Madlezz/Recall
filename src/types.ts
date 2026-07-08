@@ -106,6 +106,8 @@ export interface RecallSettings {
   fsrsWeights: number[] | null; // Custom FSRS weights (null = use defaults)
   voiceInputEnabled: boolean; // Show voice input button in card editors (default: true)
   swipeGestures: boolean; // Swipe to rate cards in study mode on mobile (default: true)
+  colorBlindMode?: boolean; // Use color-blind-safe palette + shape/text labels for ratings (default: false)
+  shortcuts?: import("@/lib/shortcuts").ShortcutMap | null; // Customizable keyboard shortcuts (null/undefined = defaults)
 }
 
 export type BackupSchedule = "daily" | "weekly" | "never";

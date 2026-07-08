@@ -54,12 +54,13 @@ Recall is *not* trying to out-feature Anki for its existing power users. That's 
 - [ ] Lazy loading for card browser
 - [ ] Memory optimization for mobile devices
 
-### Accessibility
+- [ ] Customizable keyboard shortcuts
+  - [x] Rebindable study shortcuts with conflict detection, persisted in settings, single source of truth in `src/lib/shortcuts.ts` (v1.2.0)
 - [x] High contrast themes (v1.0.13)
 - [x] Screen reader support (ARIA labels, focus management)
-- [ ] Customizable keyboard shortcuts
-- [x] Dyslexia-friendly font option (v1.0.13)
 - [ ] Color-blind friendly UI
+  - [x] Color-blind-safe palette (Okabe-Ito) + shape/text labels on rating buttons and stats chart, toggle in Settings (v1.2.0)
+- [x] Dyslexia-friendly font option (v1.0.13)
 
 ## Someday / Not a Current Priority
 

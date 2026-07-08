@@ -1,31 +1,34 @@
 import { X } from "lucide-react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useRecallStore } from "@/stores/recall-store";
+import { DEFAULT_SHORTCUTS, shortcutLabel, type ShortcutAction } from "@/lib/shortcuts";
 
 interface ShortcutHelpProps {
   open: boolean;
   onClose: () => void;
 }
 
-const SHORTCUTS = [
-  { keys: ["Ctrl", "K"], descKey: "shortcutHelp.commandPalette" },
-  { keys: ["Space"], descKey: "shortcutHelp.revealAnswer" },
-  { keys: ["1"], descKey: "shortcutHelp.rateAgain" },
-  { keys: ["2"], descKey: "shortcutHelp.rateHard" },
-  { keys: ["3"], descKey: "shortcutHelp.rateGood" },
-  { keys: ["4"], descKey: "shortcutHelp.rateEasy" },
-  { keys: ["B"], descKey: "shortcutHelp.buryCard" },
-  { keys: ["S"], descKey: "shortcutHelp.snoozeCard" },
-  { keys: ["R"], descKey: "shortcutHelp.startReview" },
-  { keys: ["F"], descKey: "shortcutHelp.focusTimer" },
-  { keys: ["Ctrl", "N"], descKey: "shortcutHelp.quickAddCard" },
-  { keys: ["Ctrl", "Z"], descKey: "shortcutHelp.undoReview" },
-  { keys: ["?"], descKey: "shortcutHelp.showHelp" },
-  { keys: ["Esc"], descKey: "shortcutHelp.closeDialog" },
+// Actions to show in the help dialog, in display order.
+const HELP_ACTIONS: { action: ShortcutAction; descKey: string }[] = [
+  { action: "commandPalette", descKey: "shortcutHelp.commandPalette" },
+  { action: "reveal", descKey: "shortcutHelp.revealAnswer" },
+  { action: "rateAgain", descKey: "shortcutHelp.rateAgain" },
+  { action: "rateHard", descKey: "shortcutHelp.rateHard" },
+  { action: "rateGood", descKey: "shortcutHelp.rateGood" },
+  { action: "rateEasy", descKey: "shortcutHelp.rateEasy" },
+  { action: "bury", descKey: "shortcutHelp.buryCard" },
+  { action: "snooze", descKey: "shortcutHelp.snoozeCard" },
+  { action: "tts", descKey: "shortcutHelp.startReview" },
+  { action: "quickAdd", descKey: "shortcutHelp.quickAddCard" },
+  { action: "undo", descKey: "shortcutHelp.undoReview" },
+  { action: "showHelp", descKey: "shortcutHelp.showHelp" },
+  { action: "closeDialog", descKey: "shortcutHelp.closeDialog" },
 ];
 
 export function ShortcutHelp({ open, onClose }: ShortcutHelpProps): JSX.Element {
   const { t } = useTranslation();
+  const shortcuts = useRecallStore((state) => state.settings.shortcuts) ?? DEFAULT_SHORTCUTS;
   useEffect(() => {
     if (!open) return;
     function handleKeyDown(event: KeyboardEvent): void {
@@ -64,19 +67,14 @@ export function ShortcutHelp({ open, onClose }: ShortcutHelpProps): JSX.Element 
         </div>
 
         <div className="space-y-2">
-          {SHORTCUTS.map((s, i) => (
-            <div key={i} className="flex items-center justify-between text-sm">
-              <span className="text-zinc-500 dark:text-zinc-400">{t(s.descKey)}</span>
-              <span className="flex items-center gap-1">
-                {s.keys.map((k, j) => (
-                  <kbd
-                    key={j}
-                    className="rounded border bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 text-xs font-mono font-medium"
-                  >
-                    {k}
-                  </kbd>
-                ))}
-              </span>
+          {HELP_ACTIONS.map(({ action, descKey }) => (
+            <div key={action} className="flex items-center justify-between text-sm">
+              <span className="text-zinc-500 dark:text-zinc-400">{t(descKey)}</span>
+              <kbd
+                className="rounded border bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 text-xs font-mono font-medium"
+              >
+                {shortcutLabel(shortcuts[action])}
+              </kbd>
             </div>
           ))}
         </div>
