@@ -56,7 +56,7 @@ export async function importFromSyncFolder(
 
     return data;
   } catch {
-    // File doesn't exist or can't be read — not an error
+    // File doesn't exist or can't be read - not an error
     return null;
   }
 }
@@ -89,7 +89,7 @@ export async function performSync(
       result.exported = exported;
       result.success = exported;
     } else {
-      // No remote data — just export local state
+      // No remote data - just export local state
       const exported = await exportToSyncFolder(state, syncFolder);
       result.exported = exported;
       result.success = exported;

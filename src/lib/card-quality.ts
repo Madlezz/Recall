@@ -15,14 +15,14 @@ interface CardQualityResult {
 
 /**
  * Check a single card for quality issues.
- * Returns an array of warnings — empty array means healthy card.
+ * Returns an array of warnings - empty array means healthy card.
  */
 export function checkCardQuality(card: Card): CardQualityWarning[] {
   const warnings: CardQualityWarning[] = [];
   const front = card.front.trim();
   const back = card.back.trim();
 
-  // 1. Too long — hard to memorize
+  // 1. Too long - hard to memorize
   if (front.length > 500 || back.length > 500) {
     warnings.push({
       cardId: card.id,
@@ -32,19 +32,19 @@ export function checkCardQuality(card: Card): CardQualityWarning[] {
     });
   }
 
-  // 2. Too short — likely too vague
+  // 2. Too short - likely too vague
   const strippedFront = front.replace(/[#*_`~[\](){}|>\\-]/g, "").trim();
   const strippedBack = back.replace(/[#*_`~[\](){}|>\\-]/g, "").trim();
   if (strippedFront.length < 10 && strippedBack.length < 10) {
     warnings.push({
       cardId: card.id,
       front: front.slice(0, 60) + (front.length > 60 ? "…" : ""),
-      message: "Card is very short — make sure it's specific enough to be useful.",
+      message: "Card is very short - make sure it's specific enough to be useful.",
       severity: "medium",
     });
   }
 
-  // 3. No hint — harder to recall
+  // 3. No hint - harder to recall
   if (!card.hint.trim()) {
     warnings.push({
       cardId: card.id,
@@ -54,7 +54,7 @@ export function checkCardQuality(card: Card): CardQualityWarning[] {
     });
   }
 
-  // 4. Stale — not reviewed in 60+ days
+  // 4. Stale - not reviewed in 60+ days
   if (card.lastReviewDate) {
     const daysSinceReview = Math.ceil(
       (Date.now() - new Date(card.lastReviewDate).getTime()) / (1000 * 60 * 60 * 24),
@@ -69,7 +69,7 @@ export function checkCardQuality(card: Card): CardQualityWarning[] {
     }
   }
 
-  // 5. One-sided — front and back too similar
+  // 5. One-sided - front and back too similar
   if (front.length > 10 && back.length > 10) {
     const similarity = diceSimilarity(front.toLowerCase(), back.toLowerCase());
     if (similarity > 0.8) {

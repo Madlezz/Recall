@@ -128,7 +128,7 @@ export function StudyMode(): JSX.Element {
   }
 
   // ── Swipe gesture handling ──
-  // Must be before early returns — hooks can't be conditional
+  // Must be before early returns - hooks can't be conditional
   const handleSwipe = useCallback((direction: SwipeDirection) => {
     if (!activeStudy) return;
 
@@ -294,13 +294,13 @@ export function StudyMode(): JSX.Element {
         {activeStudy.revealed ? t("study.answerRevealedSr") : t("study.pressSpaceSr")}
       </div>
 
-      {/* Top bar — compact on mobile */}
+      {/* Top bar - compact on mobile */}
       <header className="flex items-center justify-between py-2 gap-2">
         <Button variant="ghost" size="sm" onClick={exitStudy} className="gap-1.5 shrink-0" aria-label={t("study.exitStudyMode")}>
           <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">{t("study.exit")}</span>
         </Button>
 
-        {/* Center: progress — takes available space */}
+        {/* Center: progress - takes available space */}
         <div className="flex-1 min-w-0 max-w-[200px] mx-auto">
           <div className="flex items-center justify-center gap-2 text-sm tabular-nums text-zinc-600 dark:text-zinc-400">
             <span className="flex items-center gap-1">
@@ -401,7 +401,7 @@ export function StudyMode(): JSX.Element {
         </div>
       </section>
 
-      {/* Answer footer — full-width grid on mobile */}
+      {/* Answer footer - full-width grid on mobile */}
       <footer className="flex flex-col gap-2 pb-4 lg:flex-wrap lg:flex-row lg:items-center lg:justify-center">
         {!activeStudy.revealed && activeStudy.currentIndex > 0 && (
           <Button
@@ -427,7 +427,7 @@ export function StudyMode(): JSX.Element {
           </div>
         )}
 
-        {/* Swipe hint — mobile only, shown when revealed and swipe enabled */}
+        {/* Swipe hint - mobile only, shown when revealed and swipe enabled */}
         {activeStudy.revealed && swipeEnabled && (
           <p className="text-center text-[10px] text-zinc-400 lg:hidden">
             ← {t("study.again")} · → {t("study.good")} · ↑ {t("study.easy")} · ↓ {t("study.hard")}

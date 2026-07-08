@@ -18,7 +18,7 @@ const RECALL_DB: &str = "sqlite:recall.db";
 #[tauri::command]
 fn update_tray_tooltip(app: tauri::AppHandle, due_count: u32) {
     if let Some(tray) = app.tray_by_id("recall-tray") {
-        let _ = tray.set_tooltip(Some(&format!("Recall — {} card(s) due", due_count)));
+        let _ = tray.set_tooltip(Some(&format!("Recall - {} card(s) due", due_count)));
     }
 }
 
@@ -156,7 +156,7 @@ pub fn run() {
 
             // Tray icon: fail-soft (app works without it)
             match TrayIconBuilder::with_id("recall-tray")
-                .tooltip("Recall — your flashcards, local-first")
+                .tooltip("Recall - your flashcards, local-first")
                 .icon(icon)
                 .on_tray_icon_event(|tray, event| {
                     if let TrayIconEvent::Click { .. } = event {
@@ -426,7 +426,7 @@ mod tests {
             );
         }
 
-        // cards columns — must include all 19 from the parity test + source
+        // cards columns - must include all 19 from the parity test + source
         let card_cols: Vec<String> = conn
             .prepare("PRAGMA table_info(cards)")
             .unwrap()

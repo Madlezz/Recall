@@ -19,7 +19,7 @@ export interface SessionSummaryResult {
 }
 
 /**
- * Pure function — computes session summary, XP, level-up, and achievements.
+ * Pure function - computes session summary, XP, level-up, and achievements.
  * Does NOT trigger confetti or persist to DB (those are caller's responsibility).
  */
 export function buildSessionSummary(

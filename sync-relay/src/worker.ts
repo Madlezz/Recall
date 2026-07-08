@@ -1,5 +1,5 @@
 /**
- * Recall Sync Relay — Cloudflare Worker + R2
+ * Recall Sync Relay - Cloudflare Worker + R2
  *
  * This relay stores ONLY encrypted blobs. It never sees:
  * - The encryption key (derived from sync code via PBKDF2)
@@ -9,10 +9,10 @@
  * can't reverse it to get the key either.
  *
  * Endpoints:
- *   GET    /health         — health check
- *   GET    /sync/:key      — download encrypted blob
- *   PUT    /sync/:key      — upload encrypted blob
- *   DELETE /sync/:key      — delete blob (unlink device)
+ *   GET    /health         - health check
+ *   GET    /sync/:key      - download encrypted blob
+ *   PUT    /sync/:key      - upload encrypted blob
+ *   DELETE /sync/:key      - delete blob (unlink device)
  *
  * Rate limiting: 60 requests per minute per IP (Cloudflare built-in).
  * Blob TTL: 90 days since last update (auto-expired if not synced).

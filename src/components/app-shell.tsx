@@ -131,7 +131,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
           Recall
         </button>
         <div className="flex items-center gap-1">
-          {/* Quick review button — primary action, thumb-reachable */}
+          {/* Quick review button - primary action, thumb-reachable */}
           <Button
             variant="ghost"
             size="sm"

@@ -23,14 +23,14 @@ export const TEMPLATE_DECKS: TemplateDeck[] = [
   {
     id: "template_how_it_works",
     name: "How This Works",
-    description: "Learn spaced repetition by doing it — 5 quick cards",
+    description: "Learn spaced repetition by doing it - 5 quick cards",
     icon: "👋",
     color: "slate",
     tags: ["getting-started", "tutorial"],
     cards: [
       {
         front: "Welcome! This is a flashcard. The question is on the front, the answer is on the back. Press Space to reveal the answer.",
-        back: "That's it! You just read a flashcard. In Recall, you rate how well you remembered it — and the app decides when to show it again.",
+        back: "That's it! You just read a flashcard. In Recall, you rate how well you remembered it - and the app decides when to show it again.",
         type: "basic",
         tags: ["tutorial", "welcome"],
       },
@@ -42,18 +42,18 @@ export const TEMPLATE_DECKS: TemplateDeck[] = [
       },
       {
         front: "If you rate a card 'Again' (you forgot it), when will Recall show it again?",
-        back: "Soon — within minutes, so you get another chance while it's fresh. As you get it right more often, the gap grows to hours, then days, then weeks.",
+        back: "Soon - within minutes, so you get another chance while it's fresh. As you get it right more often, the gap grows to hours, then days, then weeks.",
         type: "basic",
         tags: ["tutorial", "intervals"],
       },
       {
-        front: "If you rate a card 'Good' several times, the review interval gets {{c1::longer}}. This is called {{c2::spaced repetition}} — the gap grows so you review less often as you master it.",
+        front: "If you rate a card 'Good' several times, the review interval gets {{c1::longer}}. This is called {{c2::spaced repetition}} - the gap grows so you review less often as you master it.",
         back: "",
         type: "cloze",
         tags: ["tutorial", "graduation"],
       },
       {
-        front: "The best way to use Recall: create cards about things you're actually studying. Keep each card short — one fact per card. How many facts should each card test?",
+        front: "The best way to use Recall: create cards about things you're actually studying. Keep each card short - one fact per card. How many facts should each card test?",
         back: "One. One fact per card. \"What year did WWII end?\" → 1945. Not \"List all WWII events and dates.\"",
         type: "basic",
         tags: ["tutorial", "best-practices"],
@@ -63,7 +63,7 @@ export const TEMPLATE_DECKS: TemplateDeck[] = [
   {
     id: "template_utbk",
     name: "UTBK Indonesia",
-    description: "Soal latihan UTBK/SNBT — Tes Potensi Skolastik",
+    description: "Soal latihan UTBK/SNBT - Tes Potensi Skolastik",
     icon: "🇮🇩",
     color: "rose",
     tags: ["utbk", "snbt", "indonesia"],

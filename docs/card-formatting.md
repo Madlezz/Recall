@@ -113,7 +113,7 @@ $$
 ![Alt text](image-url.png)
 ```
 
-Recall supports both web URLs and local images. Paste or drag-drop an image into the card editor — it's stored locally via the `recall://` protocol and stays on your machine. Web URLs (`![alt](https://...)`) also work but are blocked in high-security mode for privacy.
+Recall supports both web URLs and local images. Paste or drag-drop an image into the card editor - it's stored locally via the `recall://` protocol and stays on your machine. Web URLs (`![alt](https://...)`) also work but are blocked in high-security mode for privacy.
 
 ## Blockquotes
 
@@ -235,7 +235,7 @@ When importing from other formats:
 ## Limitations
 
 - Images: paste/drag-drop into editor (stored locally via `recall://` protocol) or use web URLs
-- HTML tags: opt-in via "Raw HTML" toggle in card editor (default off — Markdown is the recommended path)
+- HTML tags: opt-in via "Raw HTML" toggle in card editor (default off - Markdown is the recommended path)
 - Custom CSS is not supported
 - Embedded videos are not supported
 

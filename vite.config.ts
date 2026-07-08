@@ -13,12 +13,12 @@ export default defineConfig(({ mode }) => ({
       includeAssets: ["favicon.svg", "icons/icon-192.png", "icons/icon-512.png"],
       workbox: {
         globPatterns: ["**/*.{js,css,html,svg,png,woff,woff2}"],
-        // Don't cache KaTeX CSS from CDN — let browser handle it
+        // Don't cache KaTeX CSS from CDN - let browser handle it
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         navigateFallbackDenylist: [/^\/api/],
       },
       manifest: {
-        name: "Recall — Spaced Repetition Flashcards",
+        name: "Recall - Spaced Repetition Flashcards",
         short_name: "Recall",
         description: "FSRS-based flashcard app for focused learning. Your data stays on your device, always.",
         theme_color: "#0f172a",

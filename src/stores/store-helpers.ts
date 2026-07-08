@@ -177,7 +177,7 @@ export async function runBackupIfDue(state: RecallStateSnapshot): Promise<string
   if (!due) return null;
 
   try {
-    // Dynamic import — only works in Tauri runtime
+    // Dynamic import - only works in Tauri runtime
     const payload = buildExportPayload(state);
     const filename = `recall-backup-${now.toISOString().slice(0, 10)}.json`;
     const { writeTextFile } = await import("@tauri-apps/plugin-fs");
@@ -185,7 +185,7 @@ export async function runBackupIfDue(state: RecallStateSnapshot): Promise<string
     await writeTextFile(await join(backupFolder, filename), JSON.stringify(payload, null, 2));
     return now.toISOString();
   } catch {
-    // Silently fail — backup is non-critical; user will see missing backup date in settings
+    // Silently fail - backup is non-critical; user will see missing backup date in settings
     return null;
   }
 }

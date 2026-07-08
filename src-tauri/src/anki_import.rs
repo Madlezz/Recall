@@ -96,7 +96,7 @@ fn extract_fsrs_state(data_json: Option<&str>) -> (f64, f64, bool) {
 
 /// Estimate FSRS stability/difficulty from SM-2 fields when memory_state is absent.
 /// This is the same approach Anki's own codebase uses internally:
-/// - stability ≈ interval (days) scaled by ease — rough but preserves relative spacing
+/// - stability ≈ interval (days) scaled by ease - rough but preserves relative spacing
 /// - difficulty ≈ ease factor mapped to 1-10 range (factor 1300→10, 4000→1)
 fn estimate_fsrs_from_sm2(ivl: i32, factor: i32, lapses: i32) -> (f64, f64) {
     // Stability: use interval as a proxy (days). If ivl <= 0, stability ≈ 0.

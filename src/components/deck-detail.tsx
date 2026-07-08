@@ -289,7 +289,7 @@ export function DeckDetail(): JSX.Element {
                     : "bg-blue-500/10 text-blue-400 border border-blue-500/20",
               )}
             >
-              <span className="font-medium">&quot;{warning.front}&quot;</span> — {warning.message}
+              <span className="font-medium">&quot;{warning.front}&quot;</span> - {warning.message}
             </div>
           ))}
         </section>

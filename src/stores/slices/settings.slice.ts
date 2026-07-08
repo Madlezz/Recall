@@ -121,7 +121,7 @@ export const settingsSlice = (
     const repo = await getRepository();
     const settings = { ...dataState(get()).settings, onboardingComplete: true };
     // Use saveSnapshot (not saveSettings) so ALL tables are atomically cleared.
-    // saveSettings only upserts setting rows — decks/cards/reviews would survive in DB.
+    // saveSettings only upserts setting rows - decks/cards/reviews would survive in DB.
     const snapshot: RecallStateSnapshot = {
       decks: [],
       cards: [],

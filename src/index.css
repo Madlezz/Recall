@@ -69,7 +69,7 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
-/* Touch target minimum — applies to all interactive elements on mobile */
+/* Touch target minimum - applies to all interactive elements on mobile */
 @media (max-width: 1023px) {
   button,
   a[role="button"],

@@ -183,7 +183,7 @@ describe("fsrs-optimizer coverage boost", () => {
     });
 
     it("skips weight adjustments when fewer than 10 unique cards have first reviews", () => {
-      // Only 5 unique cards — analyzeFirstReviews returns hasData=false
+      // Only 5 unique cards - analyzeFirstReviews returns hasData=false
       const cards: Card[] = [];
       const logs: ReviewLog[] = [];
       for (let i = 0; i < 5; i++) {
@@ -219,7 +219,7 @@ describe("fsrs-optimizer coverage boost", () => {
     });
   });
 
-  describe("analyzeFirstReviews — counts (lines 164-172)", () => {
+  describe("analyzeFirstReviews - counts (lines 164-172)", () => {
     it("correctly counts rating distribution from first reviews", () => {
       // Create 12 unique cards with known first-review ratings
       // 3 again, 2 hard, 5 good, 2 easy
@@ -428,7 +428,7 @@ describe("fsrs-optimizer coverage boost", () => {
 
   describe("edge cases for first review date comparison", () => {
     it("picks the earliest review as first review for each card", () => {
-      // Card with multiple reviews — the earliest should be counted as first
+      // Card with multiple reviews - the earliest should be counted as first
       const cards: Card[] = [];
       const logs: ReviewLog[] = [];
 
@@ -448,7 +448,7 @@ describe("fsrs-optimizer coverage boost", () => {
             reviewDate: "2026-07-15T00:00:00.000Z",
           }),
         );
-        // Earlier review (again) — this should be the "first"
+        // Earlier review (again) - this should be the "first"
         logs.push(
           makeReviewLog({
             id: `earlier-${i}`,
@@ -478,7 +478,7 @@ describe("fsrs-optimizer coverage boost", () => {
     });
   });
 
-  describe("no deckId filter — uses all cards and logs", () => {
+  describe("no deckId filter - uses all cards and logs", () => {
     it("processes all logs when no deckId is given", () => {
       const cards = [
         makeCard({ id: "c1", deckId: "deck-A" }),

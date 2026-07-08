@@ -14,16 +14,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - **Line ending normalization:** Added `.gitattributes` with `* text=auto eol=lf` to prevent phantom "modified" status from `core.autocrlf=true` on Windows. All text files now use LF consistently.
 
 ### Removed
-- **Untracked internal audit doc:** `recall-vision-and-roadmap-realignment.md` was tracked despite being in `.gitignore` — now removed from the repo.
-- **Tauri auto-generated schemas:** `src-tauri/gen/schemas/*.json` (~950KB) were tracked despite being in `.gitignore` — now removed. These are regenerated on every build.
+- **Untracked internal audit doc:** `recall-vision-and-roadmap-realignment.md` was tracked despite being in `.gitignore` - now removed from the repo.
+- **Tauri auto-generated schemas:** `src-tauri/gen/schemas/*.json` (~950KB) were tracked despite being in `.gitignore` - now removed. These are regenerated on every build.
 
 ## [1.1.0] - 2026-07-04
 
 ### Added
-- **Voice input for card creation:** Speak instead of type — uses the Web Speech API (browser's built-in speech recognition, fully offline, no cloud). Mic button appears in card editor (front + back) and quick-add dialog. Language auto-detected from app locale (en→en-US, id→id-ID). Toggle in Settings → Study. Vision-aligned: lowers the barrier for someone uncomfortable typing/using markdown.
+- **Voice input for card creation:** Speak instead of type - uses the Web Speech API (browser's built-in speech recognition, fully offline, no cloud). Mic button appears in card editor (front + back) and quick-add dialog. Language auto-detected from app locale (en→en-US, id→id-ID). Toggle in Settings → Study. Vision-aligned: lowers the barrier for someone uncomfortable typing/using markdown.
 - **Anki import preserves scheduling history:** Cards imported from Anki `.apkg` files now retain their review state (new/learning/review), FSRS stability and difficulty, reps, lapses, and due interval. FSRS memory state (`s`/`d`) is read directly from Anki 23.10+ `data` column; for older decks, stability/difficulty is estimated from SM-2 ease factor and interval. Import report shows "Review history kept" and "FSRS state imported" counters.
 - **Onboarding rewrite:** Copy now explains spaced repetition in plain language instead of assuming the user knows what FSRS/SRS is. Three feature cards: "Never Cram Again" (how it works), "Just Press Space" (the workflow), "Yours Alone" (privacy). Both EN and ID locales rewritten.
-- **"How This Works" starter deck:** 5 interactive tutorial cards that teach spaced repetition through actual practice — first-timer friendly.
+- **"How This Works" starter deck:** 5 interactive tutorial cards that teach spaced repetition through actual practice - first-timer friendly.
 - **"UTBK Indonesia" starter deck:** 5 Indonesian exam-relevant cards (sinonim, antonim, matematika, sains, sejarah) targeting the concrete ID market.
 - Internationalization (i18n): full UI localization with react-i18next
   - English (en) and Bahasa Indonesia (id) locales, 873 translation keys across 40 namespaces
@@ -42,7 +42,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Double-answer race: `answerCurrentCard` now sets `revealed=false` synchronously before async persist, preventing duplicate review logs from rapid taps
 - LocalStorage data loss: `LocalStorageRecallRepository` targeted ops (upsertCard/upsertDeck/delete*) were no-ops; now read-modify-write full snapshot (browser/dev mode only, Tauri unaffected)
 - XP/achievement loss on nav: sidebar navigation now auto-calls `exitStudy()` when leaving a completed study session
-- Image-occlusion card type hidden from UI (WIP — createCard ignores cardType, mappers lose it on SQLite reload)
+- Image-occlusion card type hidden from UI (WIP - createCard ignores cardType, mappers lose it on SQLite reload)
 
 ## [1.0.15] - 2026-06-25
 
@@ -115,7 +115,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - High-contrast theme: pure black/white with stronger borders for accessibility
 - Retention curve: rolling 7-day retention rate visualization on stats dashboard
 - FSRS optimizer: analyze review history to auto-tune spacing weights and suggest optimal retention target
-- Text-to-Speech: enable TTS in settings for auto-read cards, adjustable speed (0.5x–2x), press T to toggle read aloud
+- Text-to-Speech: enable TTS in settings for auto-read cards, adjustable speed (0.5x-2x), press T to toggle read aloud
 - Workload forecast: see cards due each day for the next 30 days, with new vs review breakdown, 7-day average, and heaviest day highlight
 - Command palette: press `Ctrl+K` (or `Cmd+K` on Mac) to quickly access navigation and actions
 - FSRS interval preview: rating buttons show predicted next interval (e.g. `<1m | 8m | 3d | 12d`)
@@ -123,18 +123,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ## [1.0.11] - 2026-06-21
 
 ### Added
-- R2: `bundle.createUpdaterArtifacts: true` — auto-generates `latest.json` + `.sig` files for updater
-- R4: CodeQL Rust analysis — separate job for Rust security scanning alongside JS/TS
+- R2: `bundle.createUpdaterArtifacts: true` - auto-generates `latest.json` + `.sig` files for updater
+- R4: CodeQL Rust analysis - separate job for Rust security scanning alongside JS/TS
 - A5: Anki import now warns when media files (images/audio) are detected but not transferred
 
 ### Changed
-- A2: Wired `query_cards` into card browser UI — DB-side pagination instead of loading all cards
+- A2: Wired `query_cards` into card browser UI - DB-side pagination instead of loading all cards
 - A7: `chrono_lite_timestamp()` uses milliseconds + atomic counter (collision-proof)
 - R1: Cargo-audit ignores moved to `src-tauri/.cargo/audit.toml` with per-line justification
 
 ### Fixed
 - R9: Download table in README corrected (msi/AppImage only, removed .exe/.deb)
-- Lint: 0 warnings — disabled `react-refresh/only-export-components` for UI primitives
+- Lint: 0 warnings - disabled `react-refresh/only-export-components` for UI primitives
 - Rust: Fixed borrow checker issue in Anki import with explicit `drop()` calls
 
 ## [1.0.9] - 2026-06-20

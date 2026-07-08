@@ -15,7 +15,7 @@ interface TouchPoint {
 }
 
 const SWIPE_THRESHOLD = 80; // min pixels to register a swipe
-const SWIPE_VELOCITY_THRESHOLD = 0.5; // px/ms — fast flick counts even if short
+const SWIPE_VELOCITY_THRESHOLD = 0.5; // px/ms - fast flick counts even if short
 const SWIPE_MAX_OFF_AXIS = 60; // max perpendicular drift to still count as directional
 
 /**

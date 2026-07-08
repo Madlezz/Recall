@@ -79,7 +79,7 @@ export async function downloadFile(filename: string, content: string): Promise<b
       return true;
     }
   } catch {
-    // Not in Tauri — fall through to browser download
+    // Not in Tauri - fall through to browser download
   }
 
   const blob = new Blob([content], { type: "application/json" });
@@ -237,11 +237,11 @@ export function parseRecallPackage(raw: string): RecallPackage {
   try {
     parsed = JSON.parse(raw);
   } catch {
-    throw new Error("Invalid .recall file — not valid JSON");
+    throw new Error("Invalid .recall file - not valid JSON");
   }
 
   if (!isRecallPackage(parsed)) {
-    throw new Error("Invalid .recall file — wrong format");
+    throw new Error("Invalid .recall file - wrong format");
   }
 
   return parsed;

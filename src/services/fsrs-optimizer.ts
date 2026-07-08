@@ -1,5 +1,5 @@
 /**
- * FSRS Optimizer — learns optimal parameters from review history.
+ * FSRS Optimizer - learns optimal parameters from review history.
  *
  * This implements a practical optimization approach:
  * 1. Computes actual retention rate from review logs

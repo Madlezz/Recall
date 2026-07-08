@@ -68,7 +68,7 @@ function makeValidSnapshot(): RecallStateSnapshot {
   };
 }
 
-describe("validateImportSnapshot — deck validation", () => {
+describe("validateImportSnapshot - deck validation", () => {
   it("accepts a valid snapshot", () => {
     expect(() => validateImportSnapshot(makeValidSnapshot())).not.toThrow();
   });
@@ -104,7 +104,7 @@ describe("validateImportSnapshot — deck validation", () => {
   });
 });
 
-describe("validateImportSnapshot — card validation", () => {
+describe("validateImportSnapshot - card validation", () => {
   it("rejects card referencing missing deck", () => {
     const snap = makeValidSnapshot();
     snap.cards = [{ ...snap.cards[0], deckId: "missing-deck" }];
@@ -245,7 +245,7 @@ describe("validateImportSnapshot — card validation", () => {
   });
 });
 
-describe("validateImportSnapshot — session validation", () => {
+describe("validateImportSnapshot - session validation", () => {
   it("rejects session referencing missing deck", () => {
     const snap = makeValidSnapshot();
     snap.studySessions = [
@@ -290,7 +290,7 @@ describe("validateImportSnapshot — session validation", () => {
   });
 });
 
-describe("validateImportSnapshot — review log validation", () => {
+describe("validateImportSnapshot - review log validation", () => {
   it("rejects review log referencing missing card", () => {
     const snap = makeValidSnapshot();
     snap.reviewLogs = [
@@ -328,7 +328,7 @@ describe("validateImportSnapshot — review log validation", () => {
   });
 });
 
-describe("validateImportSnapshot — size validation", () => {
+describe("validateImportSnapshot - size validation", () => {
   it("rejects import exceeding 10MB", () => {
     const snap = makeValidSnapshot();
     // Add a deck with a huge name to push size over 10MB

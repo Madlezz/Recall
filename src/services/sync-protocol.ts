@@ -21,7 +21,7 @@ import { encryptData, decryptData, type EncryptedPayload } from "./crypto";
 /**
  * Sync relay URL.
  * Default is the official Recall relay. Users can self-host by setting syncRelayUrl in settings.
- * The official relay is deployed as a Cloudflare Worker — see sync-relay/ directory.
+ * The official relay is deployed as a Cloudflare Worker - see sync-relay/ directory.
  */
 export function getDefaultRelayUrl(): string {
   return "https://sync.recall.app";
@@ -176,7 +176,7 @@ export async function performEncryptedSync(
       result.uploaded = uploaded;
       result.success = uploaded;
     } else {
-      // No remote data — first sync, just upload local state
+      // No remote data - first sync, just upload local state
       const exportPayload = buildExportPayload(localState);
       const encrypted = await encryptData(JSON.stringify(exportPayload), config.syncCode);
       const uploaded = await uploadEncrypted(encrypted, blobKey, config.relayUrl, deviceId);

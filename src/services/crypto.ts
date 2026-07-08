@@ -3,11 +3,11 @@
  *
  * Uses Web Crypto API (available in browsers and Tauri WebView):
  * - AES-GCM 256-bit for symmetric encryption
- * - PBKDF2 with SHA-256 for key derivation (600k iterations — OWASP 2023 recommendation)
+ * - PBKDF2 with SHA-256 for key derivation (600k iterations - OWASP 2023 recommendation)
  * - Random 16-byte salt + 12-byte IV per encryption
  *
  * The sync code is a human-readable encoding of (salt + key material).
- * The server NEVER sees the plaintext key — only encrypted blobs.
+ * The server NEVER sees the plaintext key - only encrypted blobs.
  */
 
 const PBKDF2_ITERATIONS = 600_000;
@@ -29,7 +29,7 @@ export interface EncryptedPayload {
 export interface SyncCode {
   /** The human-readable sync code (share with other device) */
   code: string;
-  /** The raw salt bytes (base64) — needed for decryption */
+  /** The raw salt bytes (base64) - needed for decryption */
   salt: string;
 }
 

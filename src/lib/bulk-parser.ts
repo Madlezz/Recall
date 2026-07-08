@@ -30,7 +30,7 @@ export function parseBulkCards(text: string): BulkCardInput[] {
   let currentDeckName: string | undefined;
 
   for (const block of blocks) {
-    // Check for deck-switch directive — may be in the same block as a card
+    // Check for deck-switch directive - may be in the same block as a card
     const deckMatch = block.match(/^---next deck:\s*(.+?)\s*---\s*$/m);
     if (deckMatch) {
       currentDeckName = normalizeName(deckMatch[1]);
@@ -117,7 +117,7 @@ function parseBlock(block: string): Omit<BulkCardInput, "nextDeckName"> | null {
           break;
       }
     } else {
-      // No section marker found — treat first line as front if it has content
+      // No section marker found - treat first line as front if it has content
       if (!front) {
         front = line;
         currentSection = "q";

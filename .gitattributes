@@ -2,7 +2,7 @@
 # Prevents phantom "modified" status from autocrlf=true on Windows
 * text=auto eol=lf
 
-# Binary files — never touch
+# Binary files - never touch
 *.png binary
 *.jpg binary
 *.jpeg binary

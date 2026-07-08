@@ -1,6 +1,6 @@
 /**
  * Voice input service using Web Speech API (SpeechRecognition).
- * Fully offline — uses the browser/engine's built-in speech recognition.
+ * Fully offline - uses the browser/engine's built-in speech recognition.
  * No cloud dependency, no API keys, no telemetry.
  *
  * Falls back gracefully if the browser/Tauri runtime doesn't support it.

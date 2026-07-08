@@ -132,13 +132,13 @@ describe("fsrs-optimizer", () => {
       );
       const allLogs = [...deck1Logs, ...deck2Logs];
 
-      // Optimize for deck-1 only — should see high retention
+      // Optimize for deck-1 only - should see high retention
       const result = optimizeFromHistory(allLogs, allCards, 0.9, "deck-1");
       expect(result.success).toBe(true);
       expect(result.reviewCount).toBe(60);
       expect(result.actualRetention).toBeCloseTo(1.0, 1);
 
-      // Optimize for deck-2 only — should see low retention
+      // Optimize for deck-2 only - should see low retention
       const result2 = optimizeFromHistory(allLogs, allCards, 0.9, "deck-2");
       expect(result2.success).toBe(true);
       expect(result2.reviewCount).toBe(60);

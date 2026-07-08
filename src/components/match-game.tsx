@@ -167,11 +167,11 @@ export function MatchGame(): JSX.Element {
           });
         }
 
-        // Award XP — only once per game
+        // Award XP - only once per game
         if (!xpAwarded.current) {
           xpAwarded.current = true;
           const pairCount = tiles.length / 2;
-          // moves is stale after setMoves call — use +1
+          // moves is stale after setMoves call - use +1
           const actualMoves = moves + 1;
           const perfectGame = actualMoves === pairCount;
           const xp = getMatchGameXp({
@@ -192,7 +192,7 @@ export function MatchGame(): JSX.Element {
         }
       }
     } else {
-      // No match — shake
+      // No match - shake
       playMismatchSound();
       setFeedback("mismatch");
       setAnnouncement(t("matchGame.notAMatch"));

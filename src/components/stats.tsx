@@ -298,7 +298,7 @@ export function Stats(): JSX.Element {
                       }}
                     />
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-white border border-zinc-200 rounded px-2 py-1 text-xs whitespace-nowrap z-10 shadow-sm dark:bg-zinc-800 dark:border-zinc-700">
-                      {h}:00 — {t("stats.reviewCount", { count })}
+                      {h}:00 - {t("stats.reviewCount", { count })}
                     </div>
                   </div>
                 ))}

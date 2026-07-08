@@ -5,37 +5,37 @@
 [advisories]
 ignore = [
   # ── rsa / crypto (unused by Tauri which uses ed25519 only) ──
-  "RUSTSEC-2023-0071", # rsa: Marvin Attack — not in Tauri dep chain
+  "RUSTSEC-2023-0071", # rsa: Marvin Attack - not in Tauri dep chain
 
   # ── build-time only, no runtime impact ──
-  "RUSTSEC-2024-0370", # proc-macro-error unsoundness — build-time only
+  "RUSTSEC-2024-0370", # proc-macro-error unsoundness - build-time only
 
   # ── idna / url parsing (Tauri transitive, no upstream fix) ──
-  "RUSTSEC-2024-0411", # idna — Tauri transitive
-  "RUSTSEC-2024-0412", # idna — same
-  "RUSTSEC-2024-0413", # idna — same
-  "RUSTSEC-2024-0414", # idna — same
-  "RUSTSEC-2024-0415", # idna — same
-  "RUSTSEC-2024-0416", # idna — same
-  "RUSTSEC-2024-0417", # idna — same
-  "RUSTSEC-2024-0418", # idna — same
-  "RUSTSEC-2024-0419", # idna — same
-  "RUSTSEC-2024-0420", # idna — same
+  "RUSTSEC-2024-0411", # idna - Tauri transitive
+  "RUSTSEC-2024-0412", # idna - same
+  "RUSTSEC-2024-0413", # idna - same
+  "RUSTSEC-2024-0414", # idna - same
+  "RUSTSEC-2024-0415", # idna - same
+  "RUSTSEC-2024-0416", # idna - same
+  "RUSTSEC-2024-0417", # idna - same
+  "RUSTSEC-2024-0418", # idna - same
+  "RUSTSEC-2024-0419", # idna - same
+  "RUSTSEC-2024-0420", # idna - same
 
   # ── not used at runtime ──
-  "RUSTSEC-2024-0363", # binary-search vulnerability — not in hot path
-  "RUSTSEC-2024-0429", # gix — not used at runtime
-  "RUSTSEC-2024-0436", # async-graphql — not used
+  "RUSTSEC-2024-0363", # binary-search vulnerability - not in hot path
+  "RUSTSEC-2024-0429", # gix - not used at runtime
+  "RUSTSEC-2024-0436", # async-graphql - not used
 
   # ── 2025 advisories ──
-  "RUSTSEC-2025-0075", # quinn-proto — not used by Tauri
-  "RUSTSEC-2025-0080", # tokio — fixed in tokio 1.44, waiting for Tauri bump
-  "RUSTSEC-2025-0081", # openssl — system lib, not bundled
-  "RUSTSEC-2025-0098", # webpki — Tauri uses rustls/system TLS
-  "RUSTSEC-2025-0100", # h2 — not in Tauri dep tree at runtime
+  "RUSTSEC-2025-0075", # quinn-proto - not used by Tauri
+  "RUSTSEC-2025-0080", # tokio - fixed in tokio 1.44, waiting for Tauri bump
+  "RUSTSEC-2025-0081", # openssl - system lib, not bundled
+  "RUSTSEC-2025-0098", # webpki - Tauri uses rustls/system TLS
+  "RUSTSEC-2025-0100", # h2 - not in Tauri dep tree at runtime
 
   # ── 2026 advisories (Tauri transitive, no upstream fix yet) ──
-  "RUSTSEC-2026-0190", # anyhow unsoundness in downcast_mut — Tauri transitive, not in error-handling hot path
-  "RUSTSEC-2026-0194", # quick-xml quadratic runtime on duplicate attrs — Tauri transitive (updater), only parses trusted XML
-  "RUSTSEC-2026-0195", # quick-xml unbounded ns-decl allocation — same, only parses trusted updater XML
+  "RUSTSEC-2026-0190", # anyhow unsoundness in downcast_mut - Tauri transitive, not in error-handling hot path
+  "RUSTSEC-2026-0194", # quick-xml quadratic runtime on duplicate attrs - Tauri transitive (updater), only parses trusted XML
+  "RUSTSEC-2026-0195", # quick-xml unbounded ns-decl allocation - same, only parses trusted updater XML
 ]

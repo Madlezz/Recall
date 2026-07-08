@@ -360,28 +360,28 @@ describe("parseRecallPackage", () => {
 
   it("throws for invalid JSON", () => {
     expect(() => parseRecallPackage("not json at all")).toThrow(
-      "Invalid .recall file — not valid JSON",
+      "Invalid .recall file - not valid JSON",
     );
   });
 
   it("throws for wrong version number", () => {
     const pkg = { ...makeValidRecallPackage(), version: 2 };
     expect(() => parseRecallPackage(JSON.stringify(pkg))).toThrow(
-      "Invalid .recall file — wrong format",
+      "Invalid .recall file - wrong format",
     );
   });
 
   it("throws when metadata is missing", () => {
     const pkg = { ...makeValidRecallPackage(), metadata: undefined };
     expect(() => parseRecallPackage(JSON.stringify(pkg))).toThrow(
-      "Invalid .recall file — wrong format",
+      "Invalid .recall file - wrong format",
     );
   });
 
   it("throws when metadata.deckName is not a string", () => {
     const pkg = { ...makeValidRecallPackage(), metadata: { deckName: 123, cardCount: 1 } };
     expect(() => parseRecallPackage(JSON.stringify(pkg))).toThrow(
-      "Invalid .recall file — wrong format",
+      "Invalid .recall file - wrong format",
     );
   });
 
@@ -391,14 +391,14 @@ describe("parseRecallPackage", () => {
       metadata: { deckName: "X", cardCount: "one" },
     };
     expect(() => parseRecallPackage(JSON.stringify(pkg))).toThrow(
-      "Invalid .recall file — wrong format",
+      "Invalid .recall file - wrong format",
     );
   });
 
   it("throws when payload is missing", () => {
     const pkg = { ...makeValidRecallPackage(), payload: undefined };
     expect(() => parseRecallPackage(JSON.stringify(pkg))).toThrow(
-      "Invalid .recall file — wrong format",
+      "Invalid .recall file - wrong format",
     );
   });
 
@@ -408,7 +408,7 @@ describe("parseRecallPackage", () => {
       payload: { decks: "nope", cards: [], studySessions: [], reviewLogs: [] },
     };
     expect(() => parseRecallPackage(JSON.stringify(pkg))).toThrow(
-      "Invalid .recall file — wrong format",
+      "Invalid .recall file - wrong format",
     );
   });
 
@@ -418,30 +418,30 @@ describe("parseRecallPackage", () => {
       payload: { decks: [], cards: "nope", studySessions: [], reviewLogs: [] },
     };
     expect(() => parseRecallPackage(JSON.stringify(pkg))).toThrow(
-      "Invalid .recall file — wrong format",
+      "Invalid .recall file - wrong format",
     );
   });
 
   it("throws when images is missing", () => {
     const pkg = { ...makeValidRecallPackage(), images: undefined };
     expect(() => parseRecallPackage(JSON.stringify(pkg))).toThrow(
-      "Invalid .recall file — wrong format",
+      "Invalid .recall file - wrong format",
     );
   });
 
   it("throws when exportedAt is not a string", () => {
     const pkg = { ...makeValidRecallPackage(), exportedAt: 12345 };
     expect(() => parseRecallPackage(JSON.stringify(pkg))).toThrow(
-      "Invalid .recall file — wrong format",
+      "Invalid .recall file - wrong format",
     );
   });
 
   it("throws for null input", () => {
-    expect(() => parseRecallPackage("null")).toThrow("Invalid .recall file — wrong format");
+    expect(() => parseRecallPackage("null")).toThrow("Invalid .recall file - wrong format");
   });
 
   it("throws for array input", () => {
-    expect(() => parseRecallPackage("[]")).toThrow("Invalid .recall file — wrong format");
+    expect(() => parseRecallPackage("[]")).toThrow("Invalid .recall file - wrong format");
   });
 });
 
@@ -787,7 +787,7 @@ describe("restorePackageImages", () => {
     const base64 = btoa("data");
     const result = await restorePackageImages({ "test.png": base64 });
 
-    // Browser fallback — no images processed
+    // Browser fallback - no images processed
     expect(result.processed).toBe(0);
     expect(result.failed).toEqual([]);
   });

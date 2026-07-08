@@ -83,7 +83,7 @@ function createSliceWithState(initialState?: Partial<RecallStateSnapshot>) {
   return { slice, getState: () => state as any };
 }
 
-describe("deckCardSlice – coverage tests", () => {
+describe("deckCardSlice - coverage tests", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -123,7 +123,7 @@ describe("deckCardSlice – coverage tests", () => {
         decks: [makeDeck({ id: "d1", name: "MyDeck" })],
       });
 
-      // Should not throw – same name is fine when updating itself
+      // Should not throw - same name is fine when updating itself
       await expect(
         slice.updateDeck("d1", { name: "MyDeck", description: "desc", color: "slate" })
       ).resolves.toBeUndefined();

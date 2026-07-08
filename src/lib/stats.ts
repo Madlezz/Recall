@@ -203,7 +203,7 @@ export function getDeckHealth(
 
     for (const card of cards) {
       if (card.state === "new") {
-        // Brand-new cards don't have a scheduled date — count in day 0
+        // Brand-new cards don't have a scheduled date - count in day 0
         const first = dayKeys[0];
         const bucket = buckets.get(first);
         if (bucket) bucket.newCount += 1;

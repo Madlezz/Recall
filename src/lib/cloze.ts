@@ -1,8 +1,8 @@
 /**
  * Cloze deletion parser and renderer.
  * 
- * Syntax: {{c1::hidden text}} — standard Anki cloze format.
- * Syntax: {{c1::hidden text::hint}} — Anki cloze with hint (shown as placeholder).
+ * Syntax: {{c1::hidden text}} - standard Anki cloze format.
+ * Syntax: {{c1::hidden text::hint}} - Anki cloze with hint (shown as placeholder).
  * Multiple cloze markers in one card: {{c1::answer1}}, {{c2::answer2}}, etc.
  * 
  * In unrevealed mode, markers are replaced with [hint] or [...]

@@ -1,5 +1,5 @@
 /**
- * Synthesized sound effects via Web Audio API — no external files needed.
+ * Synthesized sound effects via Web Audio API - no external files needed.
  * All sounds are generated programmatically for zero-footprint bundling.
  */
 
@@ -67,7 +67,7 @@ export function playCorrectSound(): void {
   setTimeout(() => playTone(659, 0.2, "sine", 0.1), 80); // E5
 }
 
-/** Soft low buzz for "again" — not harsh, just informative */
+/** Soft low buzz for "again" - not harsh, just informative */
 export function playAgainSound(): void {
   playTone(220, 0.25, "triangle", 0.08);
 }
@@ -103,7 +103,7 @@ export function playSessionStartSound(): void {
 
 export type Soundscape = "rain" | "cafe" | "lofi" | "none";
 
-/** Anything with a disconnect() method — AudioNode or a cleanup wrapper */
+/** Anything with a disconnect() method - AudioNode or a cleanup wrapper */
 interface Disconnectable {
   disconnect(): void;
 }

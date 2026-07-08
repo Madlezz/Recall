@@ -223,10 +223,10 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
                         <td className="max-w-[120px] truncate px-2 py-1">{row.front}</td>
                         <td className="max-w-[120px] truncate px-2 py-1">{row.back}</td>
                         <td className="max-w-[80px] truncate px-2 py-1 text-zinc-500 dark:text-zinc-400">
-                          {row.hint || "—"}
+                          {row.hint || "-"}
                         </td>
                         <td className="max-w-[80px] truncate px-2 py-1 text-zinc-500 dark:text-zinc-400">
-                          {row.tags || "—"}
+                          {row.tags || "-"}
                         </td>
                       </tr>
                     ))}

@@ -176,7 +176,7 @@ class SqliteRecallRepository implements RecallRepository {
   constructor(private readonly executor: SqlExecutor) {}
 
   async loadAppData(): Promise<RecallStateSnapshot> {
-      // Load ALL review logs — pruning older logs causes silent data loss
+      // Load ALL review logs - pruning older logs causes silent data loss
       // when saveSnapshot() re-inserts only what's in memory.
       const [deckRows, cardRows, sessionRows, reviewLogRows, settingRows] = await Promise.all([
         this.executor.select<DeckRow>("SELECT * FROM decks ORDER BY created_at ASC"),
@@ -618,7 +618,7 @@ function exportPayloadToSnapshot(payload: RecallExportPayload): RecallStateSnaps
 
 function migrateSettings(settings: Partial<RecallStateSnapshot["settings"]> & { theme: string; seededAt: string }): RecallStateSnapshot["settings"] {
   // If user has existing data (seededAt exists) but no onboardingComplete field,
-  // they're an existing user upgrading — don't show onboarding again
+  // they're an existing user upgrading - don't show onboarding again
   const hasExistingData = !!settings.seededAt;
   const defaultOnboardingComplete = hasExistingData ? true : false;
 

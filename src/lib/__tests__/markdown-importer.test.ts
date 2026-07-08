@@ -93,14 +93,14 @@ Precipitation: water falls as rain.`;
 
   it("combines hint, tags, and answer in heading format", () => {
     const md = `## What is JSON?
-JavaScript Object Notation — a lightweight data format.
+JavaScript Object Notation - a lightweight data format.
 > Think: JavaScript object syntax
 tags: programming, web, data`;
 
     const cards = parseMarkdownCards(md);
     expect(cards).toHaveLength(1);
     expect(cards[0].front).toBe("What is JSON?");
-    expect(cards[0].back).toBe("JavaScript Object Notation — a lightweight data format.");
+    expect(cards[0].back).toBe("JavaScript Object Notation - a lightweight data format.");
     expect(cards[0].hint).toBe("Think: JavaScript object syntax");
     expect(cards[0].tags).toEqual(["programming", "web", "data"]);
   });

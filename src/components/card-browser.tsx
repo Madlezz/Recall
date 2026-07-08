@@ -369,7 +369,7 @@ export function CardBrowser(): JSX.Element {
                           {deck.name}
                         </button>
                       ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
+                        <span className="text-xs text-muted-foreground">-</span>
                       )}
                     </td>
                     <td className="px-3 py-2 whitespace-nowrap"><Badge tone="warning" className={cn("text-xs", STATE_COLORS[card.state])}>{stateLabel(card.state)}</Badge></td>

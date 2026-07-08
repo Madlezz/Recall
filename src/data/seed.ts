@@ -39,13 +39,13 @@ export function createSeedSnapshot(now = new Date()): RecallStateSnapshot {
   const cards: Card[] = [
     card("card_jp_1", "deck_languages", "basic", "Hello / Good afternoon", "こんにちは (Konnichiwa)", "Said during daytime", ["greetings"], "review", yesterday, addDays(today, 10), 12.0, 0.8, 4, 12, 5, 1, lastWeek),
     card("card_jp_2", "deck_languages", "basic", "Thank you", "ありがとう (Arigatou)", "Casual form", ["greetings"], "learning", yesterday, today, 2.0, 1.1, 2, 3, 3, 1, lastWeek),
-    card("card_jp_3", "deck_languages", "cloze", "Excuse me, I'm {{c1::sorry}} — {{c2::すみません}} (Sumimasen)", "", "Cloze: remember the Japanese phrase", ["phrases", "cloze"], "new", null, today, 0, 0, 0, 0, 0, 0, yesterday),
+    card("card_jp_3", "deck_languages", "cloze", "Excuse me, I'm {{c1::sorry}} - {{c2::すみません}} (Sumimasen)", "", "Cloze: remember the Japanese phrase", ["phrases", "cloze"], "new", null, today, 0, 0, 0, 0, 0, 0, yesterday),
     card("card_sci_1", "deck_science", "basic", "What is the speed of light?", "~300,000 km/s in a vacuum", "That's about 7.5 laps around Earth per second!", ["physics"], "review", subDays(today, 2), addDays(today, 20), 18.0, 0.5, 6, 18, 7, 1, subDays(today, 6)),
     card("card_sci_2", "deck_science", "basic", "How many bones in the human body?", "206 bones in an adult", "Babies have ~300, they fuse together", ["biology"], "learning", yesterday, today, 1.5, 1.0, 2, 2, 3, 1, subDays(today, 4)),
-    card("card_sci_3", "deck_science", "cloze", "DNA stands for {{c1::Deoxyribonucleic}} Acid — the {{c2::blueprint of life}}", "", "Fill in the missing terms", ["biology", "cloze"], "new", null, today, 0, 0, 0, 0, 0, 0, subDays(today, 2)),
-    card("card_his_1", "deck_history", "basic", "When did World War II end?", "1945", "September 2, 1945 — Japan surrendered", ["dates"], "review", yesterday, addDays(today, 5), 8.0, 0.9, 5, 10, 6, 0, subDays(today, 5)),
+    card("card_sci_3", "deck_science", "cloze", "DNA stands for {{c1::Deoxyribonucleic}} Acid - the {{c2::blueprint of life}}", "", "Fill in the missing terms", ["biology", "cloze"], "new", null, today, 0, 0, 0, 0, 0, 0, subDays(today, 2)),
+    card("card_his_1", "deck_history", "basic", "When did World War II end?", "1945", "September 2, 1945 - Japan surrendered", ["dates"], "review", yesterday, addDays(today, 5), 8.0, 0.9, 5, 10, 6, 0, subDays(today, 5)),
     card("card_his_2", "deck_history", "basic", "Who was the first person on the moon?", "Neil Armstrong", "Apollo 11, July 20, 1969", ["people"], "learning", yesterday, today, 1.0, 1.3, 1, 1, 2, 1, subDays(today, 3)),
-    card("card_his_3", "deck_history", "cloze", "The {{c1::Berlin Wall}} fell on {{c2::November 9, 1989}}", "", "Key Cold War event — fill in the blanks", ["dates", "cloze"], "new", null, today, 0, 0, 0, 0, 0, 0, subDays(today, 1)),
+    card("card_his_3", "deck_history", "cloze", "The {{c1::Berlin Wall}} fell on {{c2::November 9, 1989}}", "", "Key Cold War event - fill in the blanks", ["dates", "cloze"], "new", null, today, 0, 0, 0, 0, 0, 0, subDays(today, 1)),
   ];
 
   const sessionId = "session_seed_1";

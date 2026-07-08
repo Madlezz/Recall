@@ -1,5 +1,5 @@
 /**
- * Desktop notification service — Tauri-native notifications.
+ * Desktop notification service - Tauri-native notifications.
  * Falls back gracefully in browser dev mode.
  */
 
@@ -19,7 +19,7 @@ async function initPlugin(): Promise<void> {
       sendNotification: mod.sendNotification,
     };
   } catch {
-    // Browser mode — notifications not available, fail silently
+    // Browser mode - notifications not available, fail silently
   }
 }
 
@@ -46,7 +46,7 @@ export async function sendDueReminder(dueCount: number): Promise<void> {
   });
 }
 
-/** Test notification — used from settings to verify it works */
+/** Test notification - used from settings to verify it works */
 export async function sendTestNotification(): Promise<boolean> {
   const ok = await ensurePermission();
   if (!ok) return false;

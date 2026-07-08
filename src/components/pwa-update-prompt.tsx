@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 /**
  * Renders PWA install prompt, update-available prompt, and offline-ready toast.
- * Only visible in browser/PWA mode — hidden in Tauri.
+ * Only visible in browser/PWA mode - hidden in Tauri.
  */
 export function PWAUpdatePrompt() {
   const {
