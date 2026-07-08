@@ -12,6 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Changed
 - **README overhaul:** Updated feature comparison table (added mobile access, E2E encrypted sync, swipe gestures rows), PWA section with live URL, test count corrected to 761, tech stack table updated with PWA + sync entries.
+
+### Maintenance
+- Bumped GitHub Actions (`all-actions` group) and production dependencies (radix-ui, i18next, lucide-react, virtua) via Dependabot. Closes #42. Closes #44.
 - **Line ending normalization:** Added `.gitattributes` with `* text=auto eol=lf` to prevent phantom "modified" status from `core.autocrlf=true` on Windows. All text files now use LF consistently.
 
 ### Removed
