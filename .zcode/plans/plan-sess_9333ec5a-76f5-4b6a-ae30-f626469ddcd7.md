@@ -1,20 +1,43 @@
-## Onboarding "How It Works" Step — Plan
+## Stitch UI/UX Overhaul — Remaining Screens
 
-### Architecture
-Add a "concept" step to the existing multi-step onboarding. Order: Welcome → **How It Works** → Templates → Goal (4 steps).
+### 1. Achievement Detail (NEW — `src/components/achievement-detail.tsx`)
+Full-screen modal triggered when achievement unlocks. Matches Stitch `recall_achievement_detail`:
+- Blurred background with decorative circles
+- Confetti canvas (reuse existing `triggerAchievementConfetti`)
+- Gradient amber title, description, unlock date
+- Next-level progress bar ("Next Badge: X")
+- Share button + Continue button
+- Tip card with contextual advice
+- Card glow + float animations
+- Close button (top-right)
+- Trigger from `session-summary-modal.tsx` when `newAchievements.length > 0`
 
-### Files to modify
-1. **`src/components/onboarding.tsx`** — add `"concept"` to Step type, add concept step UI (simplified timeline illustration + FSRS badge), update step array
-2. **`src/locales/en.json` + `id.json`** — add `onboarding.concept*` keys
+### 2. Session Summary Polish (`session-summary-modal.tsx`)
+Enhance existing modal to match Stitch `recall_session_summary`:
+- Celebration icon with ping animation ring
+- 3 stat cards: Cards Reviewed, Study Time, Accuracy %
+- Animated rating distribution bars (4 rows with bar-grow)
+- XP earned card with daily goal progress
+- Dual buttons: "Continue Studying" + "Back to Dashboard"
+- Staggered fade-in animations
+- Background decorative blur circles
 
-### Concept step design (from Stitch reference)
-- **Visual**: simplified CSS timeline — horizontal line with 3 dots (Day 0, Day 3, Day 10), dashed forgetting curve above, floating card with clock icon
-- **Headline**: "Learn at the right time"
-- **Body**: "Recall brings cards back just before you forget them, so you can remember more with less effort."
-- **Badge**: "Based on Spaced Repetition (FSRS)" with verified/brain icon
-- **Buttons**: Back + Next (to templates)
+### 3. Onboarding "How to Rate" Step (`onboarding.tsx`)
+Add "system" step between Concept and Templates:
+- "It's simple to rate" headline + body
+- 4 rating button previews (Again/Hard/Good/Easy) with time labels
+- 3 explanation cards (Optimal timing, FSRS Algorithm, Trust yourself)
+- No SVG — CSS-only layout
+- Step order: Welcome → Concept → System → Templates → Goal (5 steps)
 
-### Skipped
-- Full SVG animation (draw-on-scroll, float animation) — ponytail: add when onboarding gets micro-interaction polish
-- Second concept screen ("It's simple to rate") — ponytail: add as step 3 if user research shows rating confusion
-- 3D perspective card flip — YAGNI for concept intro
+### Files
+- NEW: `src/components/achievement-detail.tsx`
+- MODIFY: `src/components/study-mode/session-summary-modal.tsx`
+- MODIFY: `src/components/onboarding.tsx`
+- MODIFY: `src/locales/en.json`, `id.json`
+- MODIFY: e2e tests (5-step flow)
+
+### Priority order
+1. Achievement detail (most impactful new feature)
+2. Session summary polish (enhancement)
+3. Onboarding system step (5th step, nice-to-have)

@@ -1,4 +1,4 @@
-import { ImageIcon, Mic, MicOff, Plus } from "lucide-react";
+import { ImageIcon, Mic, MicOff, Plus, Zap } from "lucide-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -24,7 +24,6 @@ import { useRecallStore } from "@/stores/recall-store";
 import { insertImage } from "@/services/images";
 import type { Card, CardType, ImageOcclusionData } from "@/types";
 import { useVoiceInput } from "@/hooks/use-voice-input";
-import { cardSurface } from "@/lib/surface";
 
 interface CardDialogProps {
   card?: Card;
@@ -181,6 +180,12 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
             </DialogDescription>
           </DialogHeader>
 
+          {/* Quick Add info banner */}
+          <div className="bg-primary-soft rounded-2xl border border-primary/10 p-4 mb-4 text-sm text-on-primary-fixed-variant flex items-center gap-3">
+            <Zap className="h-5 w-5 text-primary shrink-0" />
+            <span>{t("cardDialog.markdownHelp")} {t("cardDialog.clozeAutoDetect")}</span>
+          </div>
+
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="deck-select" className="text-sm font-medium text-text-secondary dark:text-text-secondary">{t("cardDialog.deck")}</Label>
@@ -260,7 +265,7 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
                       value={front}
                       onChange={(event) => { setFront(event.target.value); frontValueRef.current = event.target.value; }}
                       placeholder="# Question\n\n```python\nprint('hello')\n```"
-                      className="min-h-[200px] border-outline-variant font-mono text-sm dark:border-outline-variant"
+                      className="min-h-[200px] border-outline-variant border-l-4 border-l-primary font-mono text-sm dark:border-outline-variant"
                     />
                   </div>
                   <div className="space-y-2">
@@ -312,7 +317,7 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
                       value={back}
                       onChange={(event) => { setBack(event.target.value); backValueRef.current = event.target.value; }}
                       placeholder="## Answer\n\nThe solution is:\n\n$$E = mc^2$$"
-                      className="min-h-[200px] border-outline-variant font-mono text-sm dark:border-outline-variant"
+                      className="min-h-[200px] border-outline-variant border-l-4 border-l-secondary font-mono text-sm dark:border-outline-variant"
                     />
                   </div>
                   <div className="space-y-2">

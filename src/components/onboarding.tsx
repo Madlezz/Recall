@@ -1,22 +1,18 @@
-import { BookCheck, Brain, ChevronLeft, ChevronRight, Shield, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, BookCheck, Brain, ChevronLeft, ChevronRight, Shield, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRecallStore } from "@/stores/recall-store";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { TEMPLATE_DECKS, createCardsFromTemplate, type TemplateDeck } from "@/data/templates";
-import { Mascot } from "@/components/mascot";
-import { cardSurface } from "@/lib/surface";
+import { RecallLogo } from "@/components/recall-logo";
 import { cn } from "@/lib/utils";
 
 type Step = "welcome" | "concept" | "system" | "templates" | "goal";
 
-const GOAL_OPTIONS = [5, 10, 20, 30, 50];
-
 export function Onboarding(): JSX.Element {
   const { t } = useTranslation();
   const completeOnboarding = useRecallStore((state) => state.completeOnboarding);
-  const startFresh = useRecallStore((state) => state.startFresh);
   const importTemplateDecks = useRecallStore((state) => state.importTemplateDecks);
   const updateSettings = useRecallStore((state) => state.updateSettings);
   const [step, setStep] = useState<Step>("welcome");
@@ -62,29 +58,32 @@ export function Onboarding(): JSX.Element {
     }
   }
 
-  async function handleStartFresh(): Promise<void> {
-    try {
-      await startFresh();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.error("Failed to start fresh:", error);
-      toast.error(t("onboarding.resetDataFailed", { message }));
-    }
-  }
-
   const steps: Step[] = ["welcome", "concept", "system", "templates", "goal"];
   const stepIndex = steps.indexOf(step);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-background px-4 text-text-primary">
-      <div
-        className={cn(
-          "w-full max-w-lg space-y-8 text-center transition-all duration-500",
-          visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0",
-        )}
-        role="region"
-        aria-label={t("onboarding.welcomeAria")}
-      >
+    <main className="flex min-h-screen flex-col bg-background text-text-primary">
+      {/* ── Header ── */}
+      {step !== "welcome" && (
+        <header className="flex items-center justify-between px-gutter-mobile h-14 shrink-0">
+          <div className="flex items-center gap-2">
+            <RecallLogo className="h-8 w-8 object-contain" />
+          </div>
+          <Button variant="ghost" size="sm" className="text-on-surface-variant" onClick={() => setStep("templates")}>
+            {t("onboarding.skip")}
+          </Button>
+        </header>
+      )}
+
+      <div className="flex flex-1 flex-col items-center justify-center px-4">
+        <div
+          className={cn(
+            "w-full max-w-lg space-y-8 text-center transition-all duration-500",
+            visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0",
+          )}
+          role="region"
+          aria-label={t("onboarding.welcomeAria")}
+        >
         {/* ── Step indicator ── */}
         <div className="flex items-center justify-center gap-2" aria-label={t("onboarding.stepIndicator", { step: stepIndex + 1, total: steps.length })}>
           {steps.map((s, i) => (
@@ -101,7 +100,9 @@ export function Onboarding(): JSX.Element {
         {/* ── Step 1: Welcome ── */}
         {step === "welcome" && (
           <div className="space-y-6">
-            <Mascot className="mx-auto h-20 w-20" />
+            <div className="flex items-center justify-center">
+              <RecallLogo className="h-16 w-16 object-contain" />
+            </div>
             <div className="space-y-2">
               <h1 className="font-display text-3xl font-bold tracking-tight text-text-primary">
                 {t("onboarding.welcomeTitle")}
@@ -110,29 +111,20 @@ export function Onboarding(): JSX.Element {
                 {t("onboarding.welcomeTagline")}
               </p>
             </div>
-            <div className="space-y-3 text-left" role="group" aria-label={t("onboarding.featuresAria")}>
-              {[
-                { icon: Zap, title: t("onboarding.feature1Title"), desc: t("onboarding.feature1Desc") },
-                { icon: BookCheck, title: t("onboarding.feature2Title"), desc: t("onboarding.feature2Desc") },
-                { icon: Shield, title: t("onboarding.feature3Title"), desc: t("onboarding.feature3Desc") },
-              ].map((f, i) => (
-                <div key={i} className={cardSurface("space-y-1 rounded-lg p-3")}>
-                  <div className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-                    <f.icon className="h-4 w-4 text-on-surface-variant" aria-hidden="true" />
-                    {f.title}
-                  </div>
-                  <p className="text-xs leading-relaxed text-on-surface-variant">{f.desc}</p>
-                </div>
-              ))}
-            </div>
             <div className="space-y-3">
-              <Button size="lg" className="w-full" onClick={() => setStep("concept")}>
+              <Button size="lg" className="w-full rounded-xl shadow-lg hover:shadow-xl active:scale-95 transition-all" onClick={() => setStep("concept")}>
                 {t("onboarding.getStarted")}
-                <ChevronRight className="ml-2 h-4 w-4" />
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="sm" className="w-full text-on-surface-variant" onClick={handleStartFresh}>
-                {t("onboarding.startFresh")}
-              </Button>
+              <p className="text-xs text-on-surface-variant">
+                {t("onboarding.privacyNote")}
+              </p>
+              <button
+                className="text-sm text-on-surface-variant underline underline-offset-4 hover:text-primary transition-colors"
+                onClick={() => setStep("templates")}
+              >
+                {t("onboarding.alreadyHaveAccount")}
+              </button>
             </div>
           </div>
         )}
@@ -332,25 +324,48 @@ export function Onboarding(): JSX.Element {
                 {t("onboarding.setGoalDesc")}
               </p>
             </div>
-            <div className="flex flex-wrap justify-center gap-2">
-              {GOAL_OPTIONS.map((g) => (
-                <button
-                  key={g}
-                  onClick={() => setGoal(g)}
-                  className={cn(
-                    "rounded-xl px-5 py-3 text-lg font-bold tabular-nums transition-all",
-                    goal === g
-                      ? "bg-primary text-on-primary shadow-sm"
-                      : "bg-surface-container text-text-primary hover:bg-surface-container-high",
-                  )}
-                >
-                  {g}
-                </button>
-              ))}
+
+            {/* Large number display */}
+            <div className="py-4">
+              <span className="font-display text-[4.5rem] font-bold leading-none tracking-tight text-text-primary tabular-nums">
+                {goal}
+              </span>
+              <span className="font-body-lg text-base text-on-surface-variant ml-1">
+                {t("onboarding.cardsPerDay")}
+              </span>
             </div>
-            <p className="text-xs text-on-surface-variant">
-              {t("onboarding.goalHint", { count: goal })}
+
+            {/* Slider */}
+            <div className="space-y-2">
+              <input
+                type="range"
+                min={5}
+                max={100}
+                step={5}
+                value={goal}
+                onChange={(e) => setGoal(Number(e.target.value))}
+                className="w-full h-2 bg-surface-container rounded-full appearance-none cursor-pointer accent-primary"
+                aria-label={t("onboarding.goalSliderAria")}
+              />
+              <div className="flex justify-between text-xs text-outline">
+                <span>5</span>
+                <span>100</span>
+              </div>
+            </div>
+
+            {/* Progress bar */}
+            <div className="w-full bg-surface-container rounded-full h-2 overflow-hidden" role="progressbar" aria-valuenow={75} aria-valuemin={0} aria-valuemax={100}>
+              <div className="bg-primary h-full rounded-full w-3/4" />
+            </div>
+
+            <p className="text-xs text-on-surface-variant italic">
+              {goal <= 10
+                ? t("onboarding.goalMotivation_low")
+                : goal >= 50
+                  ? t("onboarding.goalMotivation_high")
+                  : t("onboarding.goalMotivation_mid")}
             </p>
+
             <div className="flex gap-3">
               <Button variant="outline" size="lg" className="flex-1" onClick={() => setStep("templates")}>
                 <ChevronLeft className="mr-1 h-4 w-4" />
@@ -363,6 +378,7 @@ export function Onboarding(): JSX.Element {
             </div>
           </div>
         )}
+      </div>
       </div>
     </main>
   );

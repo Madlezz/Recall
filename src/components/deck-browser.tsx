@@ -26,7 +26,7 @@ export function DeckBrowser(): JSX.Element {
     return new Map(
       decks.map((deck) => {
         const total = cards.filter((c) => c.deckId === deck.id).length;
-        const due = getDueTodayCount(deck.id, cards);
+        const due = getDueTodayCount(cards.filter((c) => c.deckId === deck.id));
         const mastered = cards.filter((c) => c.deckId === deck.id && c.state === "review" && !isCardDueToday(c)).length;
         return [deck.id, { total, due, mastered }] as const;
       }),

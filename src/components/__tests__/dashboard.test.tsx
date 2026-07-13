@@ -10,6 +10,7 @@ const mockStore: any = {
   error: null, view: "dashboard", selectedDeckId: null, savedSearches: [],
   showDashboard: vi.fn(), showSettings: vi.fn(), showDeck: vi.fn(), showStats: vi.fn(),
   showBrowser: vi.fn(), showTags: vi.fn(), startMatch: vi.fn(), startReview: vi.fn(() => true),
+  showDeckBrowser: vi.fn(),
   createDeck: vi.fn(), updateDeck: vi.fn(), deleteDeck: vi.fn(), setExamDeadline: vi.fn(),
   createCard: vi.fn(), updateCard: vi.fn(), deleteCard: vi.fn(), deleteCards: vi.fn(),
   moveCard: vi.fn(), resetDeckProgress: vi.fn(), revealAnswer: vi.fn(), buryCard: vi.fn(),
@@ -26,20 +27,11 @@ vi.mock("@/stores/recall-store", () => ({
   useRecallStore: vi.fn((selector?: (s: any) => any) => selector ? selector(mockStore) : mockStore),
 }));
 
-// Stub all child components
-vi.mock("@/components/anki-import-dialog", () => ({ AnkiImportDialog: () => null }));
-vi.mock("@/components/review-inbox", () => ({ ReviewInbox: () => null }));
-vi.mock("@/components/activity-heatmap", () => ({ ActivityHeatmap: () => null }));
+// Stub child components
 vi.mock("@/components/daily-goal", () => ({ DailyGoal: () => null }));
-vi.mock("@/components/focus-timer", () => ({ FocusTimer: () => null }));
-vi.mock("@/components/review-calendar", () => ({ ReviewCalendar: () => null }));
 vi.mock("@/components/deck-dialog", () => ({
   DeckDialog: ({ trigger }: any) => trigger ?? null,
 }));
-vi.mock("@/components/custom-study-dialog", () => ({ CustomStudyDialog: () => null }));
-vi.mock("@/components/csv-import-dialog", () => ({ CsvImportDialog: () => null }));
-vi.mock("@/components/markdown-import-dialog", () => ({ MarkdownImportDialog: () => null }));
-vi.mock("@/components/recall-import-dialog", () => ({ RecallImportDialog: () => null }));
 
 vi.mock("@/components/ui/button", () => ({
   Button: ({ children, onClick, disabled, ...props }: any) =>
@@ -51,7 +43,7 @@ vi.mock("@/components/ui/progress", () => ({
 }));
 
 vi.mock("@/lib/stats", () => ({
-  getDeckStats: () => ({ total: 10, mastered: 5, due: 3, accuracy: 85, newCards: 2 }),
+  getDeckStats: () => ({ total: 10, mastered: 5, due: 3, accuracy: 85, newCards: 2, learning: 1, review: 3 }),
   getDeckHealth: () => ({ retention: 80, leeches: 0, overdue: 0 }),
   getStudyStreak: () => 3,
   isCardDueToday: () => true,
@@ -90,9 +82,9 @@ describe("Dashboard", () => {
   });
   afterEach(() => cleanup());
 
-  it("renders dashboard heading", () => {
+  it("renders greeting", () => {
     render(React.createElement(Dashboard));
-    expect(screen.getByText("Spaced Repetition")).toBeTruthy();
+    expect(screen.getByText(/Good/)).toBeTruthy();
   });
 
   it("renders empty state when no decks", () => {
@@ -116,53 +108,20 @@ describe("Dashboard", () => {
     expect(screen.getByText("Math")).toBeTruthy();
   });
 
-  it("renders total deck count", () => {
-    mockStore.decks = [makeDeck({ id: "d1" }), makeDeck({ id: "d2" }), makeDeck({ id: "d3" })];
-    mockStore.cards = [];
-    render(React.createElement(Dashboard));
-    expect(screen.getByText("3 total")).toBeTruthy();
-  });
-
-  it("sorts decks by name (Alpha before Zebra)", () => {
-    mockStore.decks = [makeDeck({ id: "d2", name: "Zebra" }), makeDeck({ id: "d1", name: "Alpha" })];
-    mockStore.cards = [];
-    render(React.createElement(Dashboard));
-    const names = screen.getAllByText(/Alpha|Zebra/);
-    expect(names[0].textContent).toBe("Alpha");
-    expect(names[1].textContent).toBe("Zebra");
-  });
-
   it("renders Start Review button", () => {
     render(React.createElement(Dashboard));
     const btns = screen.getAllByText("Start Review");
     expect(btns.length).toBeGreaterThan(0);
   });
 
-  it("renders New Deck button", () => {
+  it("renders View All decks link", () => {
     render(React.createElement(Dashboard));
-    expect(screen.getByText("New Deck")).toBeTruthy();
+    expect(screen.getByText("View All")).toBeTruthy();
   });
 
-  it("renders sort buttons", () => {
+  it("renders Create New Deck button", () => {
     render(React.createElement(Dashboard));
-    expect(screen.getByText("Name")).toBeTruthy();
-    // "Due" and "Cards" appear in multiple places
-    expect(screen.getAllByText("Due").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Cards").length).toBeGreaterThan(0);
-  });
-
-  it("renders deck with description", () => {
-    mockStore.decks = [makeDeck({ description: "My custom description" })];
-    mockStore.cards = [];
-    render(React.createElement(Dashboard));
-    expect(screen.getByText("My custom description")).toBeTruthy();
-  });
-
-  it("renders 'No description' fallback", () => {
-    mockStore.decks = [makeDeck({ description: "" })];
-    mockStore.cards = [];
-    render(React.createElement(Dashboard));
-    expect(screen.getByText("No description")).toBeTruthy();
+    expect(screen.getByText("Create a new deck")).toBeTruthy();
   });
 
   it("shows toast when startReview returns false", () => {
@@ -173,18 +132,21 @@ describe("Dashboard", () => {
     expect(mockToastInfo).toHaveBeenCalledWith("No cards due right now");
   });
 
-  it("renders retention percentage in DeckCard", () => {
+  it("renders strek widget", () => {
     render(React.createElement(Dashboard));
-    expect(screen.getAllByText(/80% retention/).length).toBeGreaterThan(0);
+    expect(screen.getByText("Streak")).toBeTruthy();
   });
 
-  it("renders mastered progress text", () => {
+  it("renders Recent Activity section when review logs exist", () => {
+    mockStore.reviewLogs = [{ id: "r1", cardId: "c1", rating: "good", reviewDate: "2026-07-12", stability: 1, difficulty: 0.5, elapsedDays: 0, scheduledDays: 1 }];
     render(React.createElement(Dashboard));
-    expect(screen.getByText("5/10 mastered")).toBeTruthy();
+    expect(screen.getByText("Recent Activity")).toBeTruthy();
   });
 
-  it("renders accuracy stat", () => {
+  it("shows create deck prompt when decks exist", () => {
+    mockStore.decks = [makeDeck(), makeDeck()];
+    mockStore.cards = [makeCard(), makeCard()];
     render(React.createElement(Dashboard));
-    expect(screen.getByText("85%")).toBeTruthy();
+    expect(screen.getByText("Create a new deck")).toBeTruthy();
   });
 });

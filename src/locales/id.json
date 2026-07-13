@@ -73,7 +73,8 @@
     "greetingEvening": "Selamat malam, Pembelajar",
     "cardsReady": "Kamu punya {{count}} kartu siap direview hari ini.",
     "cardsReady_one": "Kamu punya 1 kartu siap direview hari ini.",
-    "searchDecks": "Cari deck kamu..."
+    "searchDecks": "Cari deck kamu...",
+    "viewAll": "Lihat Semua"
   },
   "todayBand": {
     "due": "Jatuh tempo",
@@ -118,7 +119,10 @@
     "startReview": "Mulai ulangan kartu jatuh tempo di semua dek",
     "createNewDeck": "Buat dek baru",
     "importFromCsv": "Impor kartu dari CSV",
-    "customStudySession": "Sesi belajar kustom"
+    "customStudySession": "Sesi belajar kustom",
+    "newCardsLabel": "Baru",
+    "learningLabel": "Belajar",
+    "duePill": "{{count}} Jatuh Tempo"
   },
   "streak": {
     "title": "Streak",
@@ -408,7 +412,19 @@
     "reviewCount_one": "{{count}} ulasan",
     "reviewCount_other": "{{count}} ulasan",
     "topDecks": "Dek Teratas",
-    "notEnoughData": "Data belum cukup"
+    "notEnoughData": "Data belum cukup",
+    "reviewActivity": "Aktivitas Review",
+    "today": "Hari Ini",
+    "retention": "Retensi",
+    "retentionBreakdown": "Rincian Retensi",
+    "easy": "Mudah",
+    "good": "Baik",
+    "hard": "Sulit",
+    "again": "Lagi",
+    "cardsMastered": "{{mastered}}/{{total}} dikuasai",
+    "deckMastery": "Penguasaan Dek",
+    "reviewForecast": "Prakiraan Review",
+    "close": "Tutup"
   },
   "common": {
     "save": "Simpan",
@@ -743,6 +759,11 @@
     "setGoal": "Tentukan Target Harian",
     "setGoalDesc": "Berapa kartu yang ingin kamu review setiap hari? Mulai dari yang kecil.",
     "goalHint": "Kamu bisa ubah ini kapan saja di Pengaturan.",
+    "goalSliderAria": "Target kartu harian",
+    "goalMotivation_low": "Mulai dari yang kecil dan bangun kebiasaan. Konsistensi lebih penting dari intensitas.",
+    "goalMotivation_mid": "Target yang solid. Kamu akan membuat kemajuan besar dengan ritme ini.",
+    "goalMotivation_high": "Ambisius! Tetap konsisten dan kamu akan menguasai apa pun.",
+    "alreadyHaveAccount": "Saya sudah punya deck di aplikasi lain",
     "startLearning": "Mulai Belajar",
     "stepIndicator": "Langkah {{step}} dari {{total}}",
     "conceptTitle": "Belajar di waktu yang tepat",
@@ -855,7 +876,19 @@
     "cardsToday": "{{count}} kartu hari ini",
     "mascotStart": "Mulai dari yang kecil. Setiap kartu berarti!",
     "mascotHalfway": "Kerja bagus! Teruskan momentumnya.",
-    "mascotDone": "Kamu berhasil! Konsistensi yang luar biasa."
+    "mascotDone": "Kamu berhasil! Konsistensi yang luar biasa.",
+    "countLabel": "{{done}} dari {{goal}} kartu direview"
+  },
+  "activity": {
+    "title": "Aktivitas Terbaru",
+    "completedReview": "Sesi Review Selesai",
+    "cardsReviewed": "{{name}} • {{count}} kartu direview",
+    "cardsReviewedFallback": "{{count}} kartu direview",
+    "justNow": "Baru saja",
+    "minutesAgo": "{{count}}m lalu",
+    "hoursAgo": "{{count}}j lalu",
+    "yesterday": "Kemarin",
+    "daysAgo": "{{count}}h lalu"
   },
   "errorBoundary": {
     "title": "Terjadi kesalahan",
@@ -1108,6 +1141,23 @@
     "installApp": "Pasang Recall",
     "installDescription": "Tambahkan ke layar utama untuk akses cepat.",
     "install": "Pasang"
+  },
+  "importHub": {
+    "title": "Impor Dek",
+    "description": "Bawa flashcard yang sudah ada ke Recall. Data tetap lokal.",
+    "dropTitle": "Letakkan file di sini",
+    "dropHint": "Mendukung file .apkg, .csv, .md, dan .recall",
+    "anki": "Anki (.apkg)",
+    "ankiDesc": "Impor dari Anki dengan penjadwalan dan media tersimpan.",
+    "csv": "CSV",
+    "csvDesc": "Impor kartu dari spreadsheet atau ekspor CSV.",
+    "markdown": "Markdown",
+    "markdownDesc": "Urai flashcard dari file Markdown.",
+    "manual": "Entri Manual",
+    "manualDesc": "Tempel atau ketik banyak kartu sekaligus.",
+    "recall": "Recall (.recall)",
+    "recallDesc": "Impor paket dek Recall yang dapat dibagikan.",
+    "privacyNote": "Semua impor terjadi secara lokal. Tidak ada yang diunggah ke server."
   },
   "sync": {
     "encryptedSync": "Sinkronisasi Terenkripsi",

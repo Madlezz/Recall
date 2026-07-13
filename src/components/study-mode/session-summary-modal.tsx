@@ -21,22 +21,12 @@ export function SessionSummaryModal({ summary, onContinue }: { summary: SessionS
   const showDashboard = useRecallStore((s) => s.showDashboard);
   const accuracy = total > 0 ? Math.round(((summary.goodCount + summary.easyCount) / total) * 100) : 0;
 
-  // Show achievement detail if there are unlocked achievements
-  if (newAchievements.length > 0 && achievementIndex < newAchievements.length) {
-    return (
-      <AchievementDetail
-        achievement={newAchievements[achievementIndex]}
-        onContinue={() => setAchievementIndex((i) => i + 1)}
-      />
-    );
-  }
-
   useEffect(() => {
       const goodScore = summary.goodCount + summary.easyCount;
-      const accuracy = goodScore / (total || 1);
-      if (accuracy >= 0.6 && !prefersReducedMotion()) {
+      const acc = goodScore / (total || 1);
+      if (acc >= 0.6 && !prefersReducedMotion()) {
         confetti({
-          particleCount: accuracy >= 0.9 ? 100 : 50,
+          particleCount: acc >= 0.9 ? 100 : 50,
           spread: 70,
           origin: { y: 0.6 },
           colors: [...CONFETTI_COLORS.celebration.slice(0, 4)],
@@ -53,6 +43,16 @@ export function SessionSummaryModal({ summary, onContinue }: { summary: SessionS
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onContinue]);
+
+  // Show achievement detail if there are unlocked achievements
+  if (newAchievements.length > 0 && achievementIndex < newAchievements.length) {
+    return (
+      <AchievementDetail
+        achievement={newAchievements[achievementIndex]}
+        onContinue={() => setAchievementIndex((i) => i + 1)}
+      />
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="session-summary-title">

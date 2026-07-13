@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { useRecallStore } from "@/stores/recall-store";
 import { cn } from "@/lib/utils";
 import type { Theme } from "@/types";

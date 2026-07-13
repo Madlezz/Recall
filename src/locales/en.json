@@ -73,7 +73,8 @@
     "greetingEvening": "Good evening, Learner",
     "cardsReady": "You have {{count}} cards ready today.",
     "cardsReady_one": "You have 1 card ready today.",
-    "searchDecks": "Search your decks..."
+    "searchDecks": "Search your decks...",
+    "viewAll": "View All"
   },
   "todayBand": {
     "due": "Due",
@@ -119,7 +120,10 @@
     "startReview": "Start reviewing due cards across all decks",
     "createNewDeck": "Create a new deck",
     "importFromCsv": "Import cards from CSV",
-    "customStudySession": "Custom study session"
+    "customStudySession": "Custom study session",
+    "newCardsLabel": "New",
+    "learningLabel": "Learning",
+    "duePill": "{{count}} Due"
   },
   "streak": {
     "title": "Streak",
@@ -409,7 +413,19 @@
     "reviewCount_one": "{{count}} review",
     "reviewCount_other": "{{count}} reviews",
     "topDecks": "Top Decks",
-    "notEnoughData": "Not enough data yet"
+    "notEnoughData": "Not enough data yet",
+    "reviewActivity": "Review Activity",
+    "today": "Today",
+    "retention": "Retention",
+    "retentionBreakdown": "Retention Breakdown",
+    "easy": "Easy",
+    "good": "Good",
+    "hard": "Hard",
+    "again": "Again",
+    "cardsMastered": "{{mastered}}/{{total}} mastered",
+    "deckMastery": "Deck Mastery",
+    "reviewForecast": "Review Forecast",
+    "close": "Close"
   },
   "common": {
     "save": "Save",
@@ -744,6 +760,11 @@
     "setGoal": "Set a Daily Goal",
     "setGoalDesc": "How many cards do you want to review each day? Start small.",
     "goalHint": "You can change this anytime in Settings.",
+    "goalSliderAria": "Daily card goal",
+    "goalMotivation_low": "Start small and build a habit. Consistency beats intensity.",
+    "goalMotivation_mid": "A solid goal. You'll make great progress with this pace.",
+    "goalMotivation_high": "Ambitious! Stay consistent and you'll master anything.",
+    "alreadyHaveAccount": "I already have decks in another app",
     "startLearning": "Start Learning",
     "stepIndicator": "Step {{step}} of {{total}}",
     "conceptTitle": "Learn at the right time",
@@ -856,7 +877,19 @@
     "cardsToday": "{{count}} cards today",
     "mascotStart": "Start small today. Every card counts!",
     "mascotHalfway": "Nice work! Keep that momentum going.",
-    "mascotDone": "You crushed it! Amazing consistency."
+    "mascotDone": "You crushed it! Amazing consistency.",
+    "countLabel": "{{done}} of {{goal}} cards reviewed"
+  },
+  "activity": {
+    "title": "Recent Activity",
+    "completedReview": "Completed Review Session",
+    "cardsReviewed": "{{name}} • {{count}} cards reviewed",
+    "cardsReviewedFallback": "{{count}} cards reviewed",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{count}}d ago"
   },
   "errorBoundary": {
     "title": "Something went wrong",
@@ -1109,6 +1142,23 @@
     "installApp": "Install Recall",
     "installDescription": "Add to your home screen for quick access.",
     "install": "Install"
+  },
+  "importHub": {
+    "title": "Import Decks",
+    "description": "Bring your existing flashcards into Recall. Your data stays local.",
+    "dropTitle": "Drop your file here",
+    "dropHint": "Supports .apkg, .csv, .md, and .recall files",
+    "anki": "Anki (.apkg)",
+    "ankiDesc": "Import from Anki with scheduling and media preserved.",
+    "csv": "CSV",
+    "csvDesc": "Import cards from a spreadsheet or CSV export.",
+    "markdown": "Markdown",
+    "markdownDesc": "Parse flashcards from Markdown files.",
+    "manual": "Manual Entry",
+    "manualDesc": "Paste or type multiple cards at once.",
+    "recall": "Recall (.recall)",
+    "recallDesc": "Import a shareable Recall deck package.",
+    "privacyNote": "All imports happen locally. Nothing is uploaded to any server."
   },
   "sync": {
     "encryptedSync": "Encrypted Sync",
