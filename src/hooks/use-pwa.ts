@@ -31,14 +31,14 @@ export function usePWA() {
   useEffect(() => {
     if (isTauri) return;
 
-    // @ts-ignore standalone is not in Navigator type
+    // @ts-expect-error standalone is not in Navigator type
     const standalone = window.navigator.standalone;
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       standalone === true;
     setIsInstalled(isStandalone);
 
-    // @ts-ignore parameter type
+    // @ts-expect-error parameter type
     function handleBeforeInstallPrompt(e) {
       e.preventDefault();
       setInstallPromptEvent(e);
