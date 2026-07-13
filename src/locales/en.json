@@ -739,7 +739,11 @@
     "setGoalDesc": "How many cards do you want to review each day? Start small.",
     "goalHint": "You can change this anytime in Settings.",
     "startLearning": "Start Learning",
-    "stepIndicator": "Step {{step}} of {{total}}"
+    "stepIndicator": "Step {{step}} of {{total}}",
+    "conceptTitle": "Learn at the right time",
+    "conceptDesc": "Recall brings cards back just before you forget them, so you can remember more with less effort.",
+    "conceptBadge": "Based on Spaced Repetition (FSRS)",
+    "conceptNext": "Continue"
   },
   "focusTimer": {
     "title": "Focus Timer",

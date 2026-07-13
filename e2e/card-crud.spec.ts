@@ -6,16 +6,20 @@ async function goToDashboard(page: import("@playwright/test").Page) {
   await page.reload();
   await page.waitForSelector("[role='region'][aria-label='Welcome to Recall']", { timeout: 10000 });
 
-  // Multi-step onboarding: Welcome → Templates → Goal
+  // Multi-step onboarding: Welcome → Concept → Templates → Goal
   // Step 1: Welcome
   await expect(page.getByRole("button", { name: /Get Started/i })).toBeVisible({ timeout: 15000 });
   await page.getByRole("button", { name: /Get Started/i }).click();
 
-  // Step 2: Templates — skip without selecting
+  // Step 2: How It Works — continue
+  await expect(page.getByRole("button", { name: /Continue/i })).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: /Continue/i }).click();
+
+  // Step 3: Templates — skip without selecting
   await expect(page.getByRole("button", { name: /^Skip$/i })).toBeVisible({ timeout: 15000 });
   await page.getByRole("button", { name: /^Skip$/i }).click();
 
-  // Step 3: Daily Goal — accept default
+  // Step 4: Daily Goal — accept default
   await expect(page.getByRole("button", { name: /Start Learning/i })).toBeVisible({ timeout: 15000 });
   await page.getByRole("button", { name: /Start Learning/i }).click();
 

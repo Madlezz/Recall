@@ -738,7 +738,11 @@
     "setGoalDesc": "Berapa kartu yang ingin kamu review setiap hari? Mulai dari yang kecil.",
     "goalHint": "Kamu bisa ubah ini kapan saja di Pengaturan.",
     "startLearning": "Mulai Belajar",
-    "stepIndicator": "Langkah {{step}} dari {{total}}"
+    "stepIndicator": "Langkah {{step}} dari {{total}}",
+    "conceptTitle": "Belajar di waktu yang tepat",
+    "conceptDesc": "Recall menampilkan kartu tepat sebelum kamu lupa, sehingga kamu bisa mengingat lebih banyak dengan usaha lebih sedikit.",
+    "conceptBadge": "Didukung Spaced Repetition (FSRS)",
+    "conceptNext": "Lanjut"
   },
   "focusTimer": {
     "title": "Timer Fokus",

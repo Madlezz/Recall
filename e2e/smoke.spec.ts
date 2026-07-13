@@ -14,15 +14,19 @@ test.describe("Recall Smoke Tests", () => {
     await expect(page.locator("h1")).toContainText("Welcome");
     await expect(page.getByText("Focused learning, without the setup friction.")).toBeVisible();
 
-    // Click "Get Started" to go to templates
+    // Click "Get Started" to go to concept
     await expect(page.getByRole("button", { name: /Get Started/i })).toBeVisible({ timeout: 15000 });
     await page.getByRole("button", { name: /Get Started/i }).click();
 
-    // Step 2: Templates — skip without selecting
+    // Step 2: How It Works — continue
+    await expect(page.getByRole("button", { name: /Continue/i })).toBeVisible({ timeout: 15000 });
+    await page.getByRole("button", { name: /Continue/i }).click();
+
+    // Step 3: Templates — skip without selecting
     await expect(page.getByRole("button", { name: /^Skip$/i })).toBeVisible({ timeout: 15000 });
     await page.getByRole("button", { name: /^Skip$/i }).click();
 
-    // Step 3: Daily Goal — accept default
+    // Step 4: Daily Goal — accept default
     await expect(page.getByRole("button", { name: /Start Learning/i })).toBeVisible({ timeout: 15000 });
     await page.getByRole("button", { name: /Start Learning/i }).click();
 

@@ -9,7 +9,7 @@ import { Mascot } from "@/components/mascot";
 import { cardSurface } from "@/lib/surface";
 import { cn } from "@/lib/utils";
 
-type Step = "welcome" | "templates" | "goal";
+type Step = "welcome" | "concept" | "templates" | "goal";
 
 const GOAL_OPTIONS = [5, 10, 20, 30, 50];
 
@@ -72,7 +72,7 @@ export function Onboarding(): JSX.Element {
     }
   }
 
-  const steps: Step[] = ["welcome", "templates", "goal"];
+  const steps: Step[] = ["welcome", "concept", "templates", "goal"];
   const stepIndex = steps.indexOf(step);
 
   return (
@@ -126,7 +126,7 @@ export function Onboarding(): JSX.Element {
               ))}
             </div>
             <div className="space-y-3">
-              <Button size="lg" className="w-full" onClick={() => setStep("templates")}>
+              <Button size="lg" className="w-full" onClick={() => setStep("concept")}>
                 {t("onboarding.getStarted")}
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
@@ -137,7 +137,83 @@ export function Onboarding(): JSX.Element {
           </div>
         )}
 
-        {/* ── Step 2: Templates ── */}
+        {/* ── Step 2: How It Works ── */}
+        {step === "concept" && (
+          <div className="space-y-6">
+            <div className="space-y-6 rounded-2xl border border-outline-variant bg-surface p-6">
+              {/* Timeline illustration */}
+              <div className="relative mx-auto aspect-[21/9] w-full max-w-md overflow-hidden rounded-xl bg-surface-container-lowest">
+                {/* Forgetting curve (dashed) */}
+                <svg className="absolute inset-0 h-full w-full" viewBox="0 0 400 160" aria-hidden="true">
+                  <path
+                    d="M 40 140 C 80 140 120 40 180 40 C 240 40 280 130 360 130"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeDasharray="6 6"
+                    fill="none"
+                    className="text-outline-variant"
+                  />
+                  {/* Timeline */}
+                  <line x1="20" y1="140" x2="380" y2="140" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="text-primary" />
+                  {/* Dots */}
+                  <circle cx="60" cy="140" r="5" className="fill-primary" />
+                  <circle cx="180" cy="140" r="5" className="fill-primary" />
+                  <circle cx="300" cy="140" r="5" className="fill-primary" />
+                  {/* Labels */}
+                  <text x="60" y="154" textAnchor="middle" className="fill-on-surface-variant text-[10px]">Day 0</text>
+                  <text x="180" y="154" textAnchor="middle" className="fill-on-surface-variant text-[10px]">Day 3</text>
+                  <text x="300" y="154" textAnchor="middle" className="fill-on-surface-variant text-[10px]">Day 10</text>
+                </svg>
+                {/* Floating card */}
+                <div className="absolute left-[44%] top-[20%] z-10 flex h-16 w-24 flex-col justify-between rounded-lg border-2 border-primary-soft bg-surface p-2 shadow-md">
+                  <div className="flex items-center gap-1">
+                    <div className="h-1.5 w-6 rounded-full bg-primary-soft" />
+                    <div className="h-1.5 w-3 rounded-full bg-surface-variant" />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="h-1 w-full rounded-full bg-surface-container-highest" />
+                    <div className="h-1 w-3/4 rounded-full bg-surface-container-highest" />
+                  </div>
+                </div>
+                {/* Pulse highlight */}
+                <div className="absolute left-[44%] top-[75%] h-8 w-8 animate-ping rounded-full bg-primary/10" />
+                <div className="absolute left-[44%] top-[75%] flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
+                  <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
+                </div>
+              </div>
+
+              {/* Text */}
+              <div className="space-y-2 text-center">
+                <h2 className="font-headline text-xl font-bold tracking-tight text-primary">
+                  {t("onboarding.conceptTitle")}
+                </h2>
+                <p className="text-sm text-on-surface-variant">
+                  {t("onboarding.conceptDesc")}
+                </p>
+              </div>
+
+              {/* Badge */}
+              <div className="flex items-center justify-center gap-2 rounded-full bg-secondary-container/10 px-4 py-1.5">
+                <BookCheck className="h-4 w-4 text-secondary" aria-hidden="true" />
+                <span className="text-xs font-semibold text-secondary">{t("onboarding.conceptBadge")}</span>
+              </div>
+            </div>
+
+            {/* Navigation */}
+            <div className="flex gap-3">
+              <Button variant="outline" size="lg" className="flex-1" onClick={() => setStep("welcome")}>
+                <ChevronLeft className="mr-1 h-4 w-4" aria-hidden="true" />
+                {t("onboarding.back")}
+              </Button>
+              <Button size="lg" className="flex-1" onClick={() => setStep("templates")}>
+                {t("onboarding.conceptNext")}
+                <ChevronRight className="ml-1 h-4 w-4" aria-hidden="true" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Step 3: Templates ── */}
         {step === "templates" && (
           <div className="space-y-6">
             <div className="space-y-2">
@@ -174,7 +250,7 @@ export function Onboarding(): JSX.Element {
           </div>
         )}
 
-        {/* ── Step 3: Daily Goal ── */}
+        {/* ── Step 4: Daily Goal ── */}
         {step === "goal" && (
           <div className="space-y-6">
             <div className="space-y-2">
