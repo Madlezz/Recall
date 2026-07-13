@@ -30,7 +30,7 @@ export function usePWA() {
   useEffect(() => {
     if (isTauri) return;
 
-    const nav = window.navigator as { standalone?: boolean };
+    const nav = window.navigator as any;
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       nav.standalone === true;
