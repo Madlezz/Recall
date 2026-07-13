@@ -21,7 +21,7 @@ export function Mascot({
   const isHC = theme === "high-contrast";
   return (
     <img
-      src="/Lettermark_transparent.png"
+      src={`${import.meta.env.BASE_URL}Lettermark_transparent.png`}
       alt="Recall mascot"
       aria-hidden="true"
       className={cn(

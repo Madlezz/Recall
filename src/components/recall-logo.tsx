@@ -27,7 +27,7 @@ export function RecallLogo({
 
   return (
     <img
-      src={`/${resolved}`}
+      src={`${import.meta.env.BASE_URL}${resolved}`}
       alt="Recall"
       className={className ?? "h-8 w-8 object-contain"}
       draggable={false}
