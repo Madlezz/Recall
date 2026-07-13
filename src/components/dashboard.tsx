@@ -116,10 +116,12 @@ export function Dashboard(): JSX.Element {
       {/* ── Review Inbox ── */}
       <ReviewInbox />
 
-      {/* ── Stats row: Level + Streak + Daily Goal ── */}
+      {/* ── Bento grid: Level + Streak + Daily Goal ── */}
       <section className="grid gap-4 sm:grid-cols-3">
-        <LevelTile />
-        <StreakWidget />
+        <div className="flex flex-col gap-4">
+          <LevelTile />
+          <StreakWidget />
+        </div>
         <DailyGoal />
       </section>
 

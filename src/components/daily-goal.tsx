@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useRecallStore } from "@/stores/recall-store";
 import { prefersReducedMotion, CONFETTI_COLORS } from "@/lib/xp";
 import { cardSurface } from "@/lib/surface";
+import { Mascot } from "@/components/mascot";
 
 function localDateStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -65,6 +66,13 @@ export function DailyGoal(): JSX.Element {
       <p className="mt-1.5 text-xs text-on-surface-variant">
         {achieved ? t("dailyGoal.goalCrushed") : progress > 0.5 ? t("dailyGoal.moreToGo", { count: goal - done }) : t("dailyGoal.cardsToday", { count: goal - done })}
       </p>
+
+      <div className="mt-4 flex items-center gap-2 border-t border-outline-variant pt-3">
+        <Mascot className="h-6 w-6" />
+        <p className="text-xs italic text-on-surface-variant">
+          {achieved ? t("dailyGoal.mascotDone") : progress > 0.5 ? t("dailyGoal.mascotHalfway") : t("dailyGoal.mascotStart")}
+        </p>
+      </div>
     </div>
   );
 }

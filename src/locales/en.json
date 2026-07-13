@@ -799,7 +799,10 @@
     "progressAria": "Daily goal progress: {{done}} of {{goal}} reviews",
     "goalCrushed": "Goal crushed! 🎉",
     "moreToGo": "{{count}} more to go",
-    "cardsToday": "{{count}} cards today"
+    "cardsToday": "{{count}} cards today",
+    "mascotStart": "Start small today. Every card counts!",
+    "mascotHalfway": "Nice work! Keep that momentum going.",
+    "mascotDone": "You crushed it! Amazing consistency."
   },
   "errorBoundary": {
     "title": "Something went wrong",

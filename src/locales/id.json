@@ -799,7 +799,10 @@
     "progressAria": "Kemajuan target harian: {{done}} dari {{goal}} ulangan",
     "goalCrushed": "Target tercapai! 🎉",
     "moreToGo": "{{count}} lagi untuk mencapai target",
-    "cardsToday": "{{count}} kartu hari ini"
+    "cardsToday": "{{count}} kartu hari ini",
+    "mascotStart": "Mulai dari yang kecil. Setiap kartu berarti!",
+    "mascotHalfway": "Kerja bagus! Teruskan momentumnya.",
+    "mascotDone": "Kamu berhasil! Konsistensi yang luar biasa."
   },
   "errorBoundary": {
     "title": "Terjadi kesalahan",
