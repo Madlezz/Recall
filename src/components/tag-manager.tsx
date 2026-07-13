@@ -113,7 +113,7 @@ function TreeNode({
               </button>
               <button
                 onClick={() => onDelete(node.fullPath)}
-                className="p-1 rounded text-on-surface-variant hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                className="p-1 rounded text-on-surface-variant hover:text-destructive hover:bg-destructive/10"
                 aria-label={t("tagManager.deleteTag")}
               >
                 <Trash2 className="h-3 w-3" />
@@ -329,14 +329,14 @@ export function TagManager(): JSX.Element {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleStudySavedSearch(search)}
-                    className="rounded p-1.5 text-on-surface-variant hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-950"
+                    className="rounded p-1.5 text-on-surface-variant hover:bg-review-easy/10 hover:text-review-easy"
                     aria-label={t("tagManager.startStudy")}
                   >
                     <Play className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() => handleDeleteSavedSearch(search)}
-                    className="rounded p-1.5 text-on-surface-variant hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+                    className="rounded p-1.5 text-on-surface-variant hover:bg-destructive/10 hover:text-destructive"
                     aria-label={t("tagManager.deleteSavedSearch")}
                   >
                     <Trash2 className="h-3.5 w-3.5" />

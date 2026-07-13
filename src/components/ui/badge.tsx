@@ -12,8 +12,8 @@ export function Badge({ tone = "default", className, ...props }: BadgeProps): JS
         "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium",
         tone === "default" && "bg-primary/12 text-primary",
         tone === "muted" && "bg-muted text-muted-foreground",
-        tone === "success" && "bg-emerald-500/12 text-emerald-400 dark:text-emerald-300",
-        tone === "warning" && "bg-amber-500/12 text-amber-500 dark:text-amber-300",
+        tone === "success" && "bg-review-easy/15 text-review-easy",
+        tone === "warning" && "bg-review-hard/15 text-review-hard",
         className,
       )}
       {...props}

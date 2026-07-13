@@ -364,7 +364,7 @@ export function AnkiImportDialog(): JSX.Element {
                 </div>
                 <div className="flex flex-wrap gap-1">
                   {report.decksCreated.slice(0, 8).map((d) => (
-                    <span key={d} className="rounded bg-blue-50 dark:bg-blue-950/30 px-2 py-0.5 text-xs text-blue-700 dark:text-blue-400">
+                    <span key={d} className="rounded bg-primary-soft px-2 py-0.5 text-xs text-primary">
                       {d}
                     </span>
                   ))}
@@ -378,7 +378,7 @@ export function AnkiImportDialog(): JSX.Element {
             )}
 
             {report.warnings.length > 0 && (
-              <div className="rounded-md bg-amber-50 border border-amber-200 p-3 dark:bg-amber-950/20 dark:border-amber-900">
+              <div className="rounded-md bg-secondary-container border border-secondary-container p-3">
                 <div className="flex items-center gap-1 text-xs font-semibold text-amber-700 dark:text-amber-400 mb-2">
                   <AlertTriangle className="h-3 w-3" />
                   {t("ankiImport.warnings")}

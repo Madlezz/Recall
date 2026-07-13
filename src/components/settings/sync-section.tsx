@@ -140,7 +140,7 @@ export function SyncSection(): JSX.Element {
         </p>
 
         {/* Security badge */}
-        <div className="mb-4 flex items-center gap-2 rounded-md bg-emerald-50 dark:bg-emerald-950/30 px-3 py-2">
+        <div className="mb-4 flex items-center gap-2 rounded-md bg-review-easy/10 px-3 py-2">
           <Shield className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
           <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
             {t("sync.e2eEncrypted")}

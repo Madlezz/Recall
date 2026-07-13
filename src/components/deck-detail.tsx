@@ -285,10 +285,10 @@ export function DeckDetail(): JSX.Element {
               className={cn(
                 "rounded-md px-3 py-2 text-sm",
                 warning.severity === "high"
-                  ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                  ? "bg-review-again/10 text-review-again border border-review-again/20"
                   : warning.severity === "medium"
-                    ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                    : "bg-blue-500/10 text-blue-400 border border-blue-500/20",
+                    ? "bg-review-hard/10 text-review-hard border border-review-hard/20"
+                    : "bg-primary-soft text-primary border border-primary/20",
               )}
             >
               <span className="font-medium">&quot;{warning.front}&quot;</span> - {warning.message}

@@ -108,7 +108,7 @@ export function ImportExportSection({
       </div>
       <input ref={fileInputRef} type="file" accept="application/json,.json" className="hidden" onChange={handleImport} />
       {lastAction && (
-        <div className="mt-3 flex items-center gap-2 rounded-md bg-emerald-50 px-3 py-2 text-xs text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
+        <div className="mt-3 flex items-center gap-2 rounded-md bg-review-easy/10 px-3 py-2 text-xs text-review-easy">
           <Check className="h-3.5 w-3.5" />
           <span>{lastAction.type} {t("settings.at")} {lastAction.time}</span>
         </div>

@@ -78,7 +78,7 @@ export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): J
                       className={cn(
                         "w-full transition-colors rounded-t-sm",
                         isHeaviest
-                          ? "bg-amber-500 dark:bg-amber-400"
+                          ? "bg-review-hard"
                           : "bg-primary hover:bg-primary-hover dark:bg-surface-container dark:hover:bg-surface-container-high",
                       )}
                       style={{ height: `${Math.max(duePct, 2)}%` }}
@@ -91,8 +91,8 @@ export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): J
                         "w-full transition-colors",
                         day.due > 0 ? "" : "rounded-t-sm",
                         isHeaviest
-                          ? "bg-amber-400/70 dark:bg-amber-300/70"
-                          : "bg-emerald-500/70 hover:bg-emerald-500 dark:bg-emerald-400/70 dark:hover:bg-emerald-400",
+                          ? "bg-review-hard/70"
+                          : "bg-review-easy/70 hover:bg-review-easy",
                       )}
                       style={{ height: `${Math.max(newPct, 2)}%` }}
                     />
@@ -124,11 +124,11 @@ export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): J
               <span className="h-2.5 w-2.5 rounded-sm bg-primary dark:bg-surface-container" /> {t("workloadForecast.review")}
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-sm bg-emerald-500/70" /> {t("workloadForecast.new")}
+              <span className="h-2.5 w-2.5 rounded-sm bg-review-easy/70" /> {t("workloadForecast.new")}
             </span>
             {heaviestIdx >= 0 && maxVal > 0 && (
               <span className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-sm bg-amber-500" /> {t("workloadForecast.heaviest")}
+                <span className="h-2.5 w-2.5 rounded-sm bg-review-hard" /> {t("workloadForecast.heaviest")}
               </span>
             )}
           </div>

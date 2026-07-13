@@ -337,7 +337,7 @@ export function StudyMode(): JSX.Element {
               }}
               className={`min-h-[44px] min-w-[44px] rounded-md p-1.5 transition-colors ${
                 isSpeaking
-                  ? "text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 animate-pulse"
+                  ? "text-primary hover:text-primary-hover hover:bg-primary-soft dark:hover:bg-primary-container animate-pulse"
                   : "text-on-surface-variant hover:text-on-surface-variant hover:bg-surface-container-high dark:hover:text-text-secondary dark:hover:bg-surface-container"
               }`}
               title={t("study.readAloudTitle")}
