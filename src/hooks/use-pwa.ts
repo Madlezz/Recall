@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useRegisterSW } from "virtual:pwa-register/react";
 import { useState, useEffect } from "react";
 
@@ -25,17 +24,21 @@ export function usePWA() {
   });
 
   // iOS install prompt detection
-  const [installPromptEvent, setInstallPromptEvent] = useState(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [installPromptEvent, setInstallPromptEvent] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
     if (isTauri) return;
 
+    // @ts-ignore standalone is not in Navigator type
+    const standalone = window.navigator.standalone;
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
-      window.navigator.standalone === true;
+      standalone === true;
     setIsInstalled(isStandalone);
 
+    // @ts-ignore parameter type
     function handleBeforeInstallPrompt(e) {
       e.preventDefault();
       setInstallPromptEvent(e);
