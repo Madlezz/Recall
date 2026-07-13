@@ -49,9 +49,9 @@ export function ConfirmAction({
       <AlertDialogTrigger asChild>
         <Button
           variant={destructive ? "destructive" : "outline"}
-          className={destructive
-            ? "bg-red-600 text-white hover:bg-red-700"
-            : "border-outline-variant text-text-secondary hover:bg-surface-container-high hover:text-text-primary dark:border-outline-variant dark:text-text-secondary dark:hover:bg-surface-container dark:hover:text-text-primary"
+className={destructive
+	            ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+	            : "border-outline-variant text-text-secondary hover:bg-surface-container-high hover:text-text-primary dark:border-outline-variant dark:text-text-secondary dark:hover:bg-surface-container dark:hover:text-text-primary"
           }
         >
           {triggerLabel}

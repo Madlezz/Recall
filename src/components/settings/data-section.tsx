@@ -173,7 +173,7 @@ export function DataSection(): JSX.Element {
                     toast.error(error instanceof Error ? error.message : t("settings.syncFailed"), { id: "sync" });
                   }
                 }}
-                className="flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-700"
+                className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-on-primary hover:bg-primary-hover"
               >
                 <RefreshCw className="h-3.5 w-3.5" />
                 {t("settings.syncNow")}
@@ -190,8 +190,8 @@ export function DataSection(): JSX.Element {
 
       {/* Danger Zone */}
       <section>
-        <h3 className="mb-4 text-sm font-bold text-red-600 dark:text-red-400">{t("settings.dangerZone")}</h3>
-        <div className="rounded-lg border border-red-200 bg-red-50/30 p-5 dark:border-red-900 dark:bg-red-950/20 space-y-5">
+        <h3 className="mb-4 text-sm font-bold text-destructive">{t("settings.dangerZone")}</h3>
+        <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-5 space-y-5">
           <div>
             <p className="text-sm font-medium text-text-secondary dark:text-text-secondary mb-1">{t("settings.deleteAllData")}</p>
             <p className="text-sm text-on-surface-variant dark:text-on-surface-variant mb-3">
@@ -199,7 +199,7 @@ export function DataSection(): JSX.Element {
             </p>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <button className="flex items-center gap-1.5 rounded-md bg-red-600 px-3.5 py-2 text-sm font-semibold text-white hover:bg-red-700">
+                <button className="flex items-center gap-1.5 rounded-md bg-destructive px-3.5 py-2 text-sm font-semibold text-destructive-foreground hover:bg-destructive/90">
                   <Trash2 className="h-4 w-4" /> {t("settings.deleteAllData")}
                 </button>
               </AlertDialogTrigger>
@@ -226,7 +226,7 @@ export function DataSection(): JSX.Element {
             </p>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <button className="flex items-center gap-1.5 rounded-md bg-red-600 px-3.5 py-2 text-sm font-semibold text-white hover:bg-red-700">
+                <button className="flex items-center gap-1.5 rounded-md bg-destructive px-3.5 py-2 text-sm font-semibold text-destructive-foreground hover:bg-destructive/90">
                   <RotateCcw className="h-4 w-4" /> {t("settings.restoreDemoDecks")}
                 </button>
               </AlertDialogTrigger>

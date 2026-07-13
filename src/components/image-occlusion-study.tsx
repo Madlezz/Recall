@@ -128,7 +128,7 @@ export function ImageOcclusionStudy({ data, revealed }: Props) {
         <div className="flex gap-2">
           <button
             onClick={handleRevealNext}
-            className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+            className="flex-1 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary hover:bg-primary-hover"
           >
             {revealedIndex === null ? t("imageOcclusionStudy.revealFirst") : t("imageOcclusionStudy.revealNext")}
           </button>
