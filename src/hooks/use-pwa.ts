@@ -15,10 +15,10 @@ export function usePWA() {
     offlineReady: [offlineReady, setOfflineReady],
     updateServiceWorker,
   } = useRegisterSW({
-    onRegisteredSW(url: string) {
+    onRegisteredSW(url) {
       console.log("SW registered:", url);
     },
-    onRegisterError(error: unknown) {
+    onRegisterError(error) {
       console.error("SW registration failed:", error);
     },
   });
