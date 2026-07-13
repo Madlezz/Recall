@@ -20,14 +20,14 @@ async function goToDashboard(page: import("@playwright/test").Page) {
   await page.getByRole("button", { name: /^Next$/i }).click();
 
   // Step 4: Templates — skip without selecting
-  await expect(page.getByRole("button", { name: /^Skip$/i })).toBeVisible({ timeout: 15000 });
-  await page.getByRole("button", { name: /^Skip$/i }).click();
+  await expect(page.getByRole("button", { name: /^Skip$/i }).first()).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: /^Skip$/i }).first().click();
 
   // Step 5: Daily Goal — accept default
   await expect(page.getByRole("button", { name: /Start Learning/i })).toBeVisible({ timeout: 15000 });
   await page.getByRole("button", { name: /Start Learning/i }).click();
 
-  await expect(page.getByText("Spaced Repetition")).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText("Your Decks")).toBeVisible({ timeout: 10000 });
 }
 
 test.describe("Card CRUD", () => {

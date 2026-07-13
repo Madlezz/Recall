@@ -27,15 +27,15 @@ test.describe("Recall Smoke Tests", () => {
     await page.getByRole("button", { name: /^Next$/i }).click();
 
     // Step 4: Templates — skip without selecting
-    await expect(page.getByRole("button", { name: /^Skip$/i })).toBeVisible({ timeout: 15000 });
-    await page.getByRole("button", { name: /^Skip$/i }).click();
+    await expect(page.getByRole("button", { name: /^Skip$/i }).first()).toBeVisible({ timeout: 15000 });
+    await page.getByRole("button", { name: /^Skip$/i }).first().click();
 
     // Step 5: Daily Goal — accept default
     await expect(page.getByRole("button", { name: /Start Learning/i })).toBeVisible({ timeout: 15000 });
     await page.getByRole("button", { name: /Start Learning/i }).click();
 
     // Should land on dashboard
-    await expect(page.getByText("Spaced Repetition")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("Your Decks")).toBeVisible({ timeout: 10000 });
   });
 
   test("start fresh leads to empty dashboard", async ({ page }) => {
@@ -49,12 +49,20 @@ test.describe("Recall Smoke Tests", () => {
 
     await expect(page.getByText("Focused learning, without the setup friction.")).toBeVisible();
 
-    // Wait for button fade-in, then click
-    await expect(page.getByRole("button", { name: /Start Empty|Start with empty/i })).toBeVisible({ timeout: 15000 });
-    await page.getByRole("button", { name: /Start Empty|Start with empty/i }).click();
+    // Click "I already have decks" link to skip to templates
+    await expect(page.getByRole("button", { name: /I already have/i })).toBeVisible({ timeout: 15000 });
+    await page.getByRole("button", { name: /I already have/i }).click();
+
+    // Templates step — skip without selecting
+    await expect(page.getByRole("button", { name: /^Skip$/i }).first()).toBeVisible({ timeout: 15000 });
+    await page.getByRole("button", { name: /^Skip$/i }).first().click();
+
+    // Goal step — accept default
+    await expect(page.getByRole("button", { name: /Start Learning/i })).toBeVisible({ timeout: 15000 });
+    await page.getByRole("button", { name: /Start Learning/i }).click();
 
     // Should land on dashboard
-    await expect(page.getByText("Spaced Repetition")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("Your Decks")).toBeVisible({ timeout: 10000 });
 
     // No decks should be visible
     await expect(page.getByText("Japanese Basics")).not.toBeVisible({ timeout: 5000 });
