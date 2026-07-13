@@ -54,8 +54,8 @@ test.describe("Recall Smoke Tests", () => {
     await page.getByRole("button", { name: /I already have/i }).click();
 
     // Templates step — skip without selecting
-    await expect(page.getByRole("button", { name: /^Skip$/i }).first()).toBeVisible({ timeout: 15000 });
-    await page.getByRole("button", { name: /^Skip$/i }).first().click();
+    await expect(page.getByRole("button", { name: /^Skip$/i }).last()).toBeVisible({ timeout: 15000 });
+    await page.getByRole("button", { name: /^Skip$/i }).last().click();
 
     // Goal step — accept default
     await expect(page.getByRole("button", { name: /Start Learning/i })).toBeVisible({ timeout: 15000 });
