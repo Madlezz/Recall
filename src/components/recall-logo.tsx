@@ -21,7 +21,7 @@ export function RecallLogo({
     if (variant === "transparent") return "Lettermark_transparent.png";
     // auto: pick based on current theme
     return theme === "dark" || theme === "high-contrast"
-      ? "Lettermark_darkmode.png"
+      ? "Lettermark_transparent.png"
       : "Lettermark_lightmode.png";
   }, [variant, theme]);
 
