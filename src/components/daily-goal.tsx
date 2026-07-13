@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRecallStore } from "@/stores/recall-store";
 import { prefersReducedMotion, CONFETTI_COLORS } from "@/lib/xp";
+import { cardSurface } from "@/lib/surface";
 
 function localDateStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -41,22 +42,22 @@ export function DailyGoal(): JSX.Element {
   }, [achieved, celebrated, done]);
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white px-4 py-5 dark:border-zinc-800 dark:bg-zinc-900">
-      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">{t("dailyGoal.title")}</span>
+    <div className={cardSurface("px-4 py-5")}>
+      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-on-surface-variant">{t("dailyGoal.title")}</span>
 
       <div className="mt-2 flex items-baseline gap-1.5">
         <span
-          className={achieved ? "text-3xl font-bold tabular-nums text-emerald-600" : "text-3xl font-bold tabular-nums text-zinc-800 dark:text-zinc-200"}
+          className={achieved ? "text-3xl font-bold tabular-nums text-review-easy" : "text-3xl font-bold tabular-nums text-on-surface"}
         >
           {done}
         </span>
-        <span className="text-lg text-zinc-300 dark:text-zinc-600">/</span>
-        <span className="text-lg text-zinc-400 tabular-nums">{goal}</span>
+        <span className="text-lg text-outline dark:text-outline-variant">/</span>
+        <span className="text-lg text-on-surface-variant tabular-nums">{goal}</span>
       </div>
 
-      <div className="mt-3 h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label={t("dailyGoal.progressAria", { done, goal })}>
+      <div className="mt-3 h-1.5 w-full rounded-full bg-surface-container-high overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label={t("dailyGoal.progressAria", { done, goal })}>
         <div
-          className={achieved ? "h-full rounded-full bg-emerald-500 transition-[width] duration-700 ease-out" : "h-full rounded-full bg-zinc-700 transition-[width] duration-700 ease-out dark:bg-zinc-300"}
+          className={achieved ? "h-full rounded-full bg-review-easy transition-[width] duration-700 ease-out" : "h-full rounded-full bg-primary transition-[width] duration-700 ease-out dark:bg-primary"}
           style={{ width: `${Math.round(progress * 100)}%` }}
         />
       </div>

@@ -143,12 +143,12 @@ export function FocusTimer(): JSX.Element {
   const circumference = 2 * Math.PI * 72;
 
   return (
-    <div className={`rounded-lg border bg-white px-5 py-5 dark:bg-zinc-900 transition-all duration-500 ${
+    <div className={`rounded-2xl border bg-surface px-5 py-5 dark:bg-surface-container transition-all duration-500 ${
       showCompletionFlash
-        ? "border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.4)] dark:border-emerald-500 dark:shadow-[0_0_20px_rgba(52,211,153,0.3)]"
-        : "border-zinc-200 dark:border-zinc-800"
+        ? "border-tertiary shadow-[0_0_20px_rgba(0,114,67,0.4)] dark:border-tertiary"
+        : "border-outline-variant"
     }`}>
-      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">{t("focusTimer.title")}</span>
+      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-on-surface-variant">{t("focusTimer.title")}</span>
 
       {/* Screen reader announcement for timer completion */}
       {showCompletionFlash && (
@@ -161,7 +161,7 @@ export function FocusTimer(): JSX.Element {
       <div className="flex justify-center mt-4">
         <div className="relative">
           <svg width="160" height="160" className="-rotate-90" role="img" aria-label={t("focusTimer.timerAria", { remaining: formatTime(remaining), progress: Math.round(progress * 100) })}>
-            <circle cx="80" cy="80" r="72" fill="none" stroke="currentColor" strokeWidth="5" className="text-zinc-100 dark:text-zinc-800" />
+            <circle cx="80" cy="80" r="72" fill="none" stroke="currentColor" strokeWidth="5" className="text-surface-container-high" />
             <circle
               cx="80" cy="80" r="72"
               fill="none" stroke="currentColor" strokeWidth="5"
@@ -169,18 +169,18 @@ export function FocusTimer(): JSX.Element {
               strokeDashoffset={circumference * (1 - progress)}
               strokeLinecap="round"
               className={`transition-[stroke-dashoffset] duration-1000 ease-linear ${
-                showCompletionFlash ? "text-emerald-500" : "text-zinc-700 dark:text-zinc-300"
+                showCompletionFlash ? "text-tertiary" : "text-primary dark:text-primary"
               }`}
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className={`text-3xl font-bold tabular-nums tracking-tight transition-colors duration-500 ${
-              showCompletionFlash ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-800 dark:text-zinc-200"
+              showCompletionFlash ? "text-tertiary" : "text-on-surface"
             }`}>
               {formatTime(remaining)}
             </span>
             <span className={`mt-0.5 text-[11px] font-semibold transition-colors duration-500 ${
-              showCompletionFlash ? "text-emerald-500" : "text-zinc-400"
+              showCompletionFlash ? "text-tertiary" : "text-on-surface-variant"
             }`}>
               {running ? t("focusTimer.focusing") : completed ? t("focusTimer.done") : t("focusTimer.ready")}
             </span>
@@ -198,8 +198,8 @@ export function FocusTimer(): JSX.Element {
             aria-pressed={duration === m * 60}
             className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
               duration === m * 60
-                ? "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200"
-                : "text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                ? "bg-surface-container-high text-on-surface"
+                : "text-on-surface-variant hover:bg-surface-container-low"
             }`}
           >
             {t("focusTimer.presetMinutes", { count: m })}
@@ -223,8 +223,8 @@ export function FocusTimer(): JSX.Element {
         </Button>
       </div>
 
-      <p className="mt-2 text-center text-[10px] text-zinc-400">
-        {t("focusTimer.pressPrefix")} <kbd className="rounded border bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 text-[10px] font-mono">F</kbd> {t(running ? "focusTimer.toPause" : "focusTimer.toStart")}
+      <p className="mt-2 text-center text-[10px] text-on-surface-variant">
+        {t("focusTimer.pressPrefix")} <kbd className="rounded border border-outline-variant bg-surface-container-low px-1 py-0.5 text-[10px] font-mono">F</kbd> {t(running ? "focusTimer.toPause" : "focusTimer.toStart")}
       </p>
 
       {/* Soundscapes */}
@@ -233,7 +233,7 @@ export function FocusTimer(): JSX.Element {
           onClick={() => toggleSoundscape("none")}
           aria-pressed={sc === "none"}
           className={`px-2 py-1.5 rounded text-[10px] font-medium transition-colors ${
-            sc === "none" ? "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200" : "text-zinc-400 hover:text-zinc-600"
+            sc === "none" ? "bg-surface-container-high text-on-surface" : "text-on-surface-variant hover:text-on-surface"
           }`}
         >
           <VolumeX className="h-3 w-3 inline mr-0.5" />
@@ -245,7 +245,7 @@ export function FocusTimer(): JSX.Element {
             onClick={() => toggleSoundscape(id)}
             aria-pressed={sc === id}
             className={`px-2 py-1.5 rounded text-[10px] font-medium transition-colors ${
-              sc === id ? "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200" : "text-zinc-400 hover:text-zinc-600"
+              sc === id ? "bg-surface-container-high text-on-surface" : "text-on-surface-variant hover:text-on-surface"
             }`}
           >
             <Icon className="h-3 w-3 inline mr-0.5" />

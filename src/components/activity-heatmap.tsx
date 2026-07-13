@@ -16,10 +16,10 @@ function getLevel(count: number): 0 | 1 | 2 | 3 {
 }
 
 const LEVEL_COLORS: Record<number, string> = {
-  0: "bg-zinc-100 dark:bg-zinc-800",
-  1: "bg-emerald-200 dark:bg-emerald-900/60",
-  2: "bg-emerald-400 dark:bg-emerald-700",
-  3: "bg-emerald-600 dark:bg-emerald-500",
+  0: "bg-surface-container-high",
+  1: "bg-tertiary-container/60",
+  2: "bg-tertiary-container",
+  3: "bg-tertiary",
 };
 
 // Opacity-based differentiation for colorblind users (works regardless of hue perception)
@@ -91,16 +91,16 @@ export function ActivityHeatmap(): JSX.Element {
   return (
     <div role="region" aria-label={t("activityHeatmap.heatmapAria")}>
       <div className="flex items-center justify-between mb-3">
-        <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("activityHeatmap.studyActivity")}</span>
-        <div className="flex items-center gap-3 text-xs tabular-nums text-zinc-400">
-          {longestStreak > 0 && (
-            <span className="text-zinc-500 dark:text-zinc-300">
-              {t("activityHeatmap.dayStreak", { count: longestStreak })}
-            </span>
-          )}
-          <span>
-            {t("activityHeatmap.reviewCount", { count: totalReviews })}
+        <span className="text-sm font-bold text-on-surface">{t("activityHeatmap.studyActivity")}</span>
+        <div className="flex items-center gap-3 text-xs tabular-nums text-on-surface-variant">
+        {longestStreak > 0 && (
+          <span className="text-on-surface-variant">
+            {t("activityHeatmap.dayStreak", { count: longestStreak })}
           </span>
+        )}
+        <span>
+          {t("activityHeatmap.reviewCount", { count: totalReviews })}
+        </span>
         </div>
       </div>
 

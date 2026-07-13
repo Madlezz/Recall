@@ -1,7 +1,8 @@
-import { BookOpen, Home, LayoutGrid, Play, Settings, Shield, Star, Tag, Timer, TrendingUp, Zap } from "lucide-react";
+import { Home, LayoutGrid, Play, Settings, Shield, Star, Tag, Timer, TrendingUp, Zap } from "lucide-react";
 import { type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { CommandPalette } from "@/components/command-palette";
+import { RecallLogo } from "@/components/recall-logo";
 import { Button } from "@/components/ui/button";
 import { getDueTodayCount } from "@/lib/stats";
 import { cn } from "@/lib/utils";
@@ -28,27 +29,25 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
   const dueCount = getDueTodayCount(cards);
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+    <div className="min-h-screen bg-background text-on-surface">
       {/* ── Skip navigation ── */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-zinc-900 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:shadow-lg dark:focus:bg-white dark:focus:text-zinc-900"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-inverse-surface focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-inverse-on-surface focus:shadow-lg"
       >
         {t("nav.skipToMain")}
       </a>
 
       {/* ── Desktop Sidebar ── */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-56 flex-col border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-56 flex-col border-r border-outline-variant bg-surface dark:bg-surface-container lg:flex">
         {/* Logo */}
         <button
           aria-label={t("nav.goToDashboard")}
           onClick={showDashboard}
           className="flex items-center gap-2.5 px-5 h-14 shrink-0"
         >
-          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-zinc-900 text-white dark:bg-white dark:text-zinc-900">
-            <BookOpen className="h-3.5 w-3.5" />
-          </span>
-          <span className="font-semibold text-sm tracking-tight">Recall</span>
+          <RecallLogo className="h-7 w-7 object-contain" />
+          <span className="font-display font-semibold text-sm tracking-tight text-on-surface">Recall</span>
         </button>
 
         {/* Nav */}
@@ -68,7 +67,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
 
           {/* Tools section */}
           <div className="pt-3 pb-1 px-3">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">{t("nav.tools")}</span>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant">{t("nav.tools")}</span>
           </div>
           <NavButton active={false} icon={Timer} label={t("nav.focusTimer")} onClick={showDashboard} />
           <NavButton
@@ -84,19 +83,19 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         </nav>
 
         {/* Divider */}
-        <div className="mx-4 h-px bg-zinc-100 dark:bg-zinc-800" />
+        <div className="mx-4 h-px bg-outline-variant" />
 
         {/* Library stats */}
         <div className="px-5 py-3">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">{t("library.title")}</span>
-            <span className="text-[10px] tabular-nums text-zinc-400">{t("library.decks", { count: decks.length })}</span>
+            <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-on-surface-variant">{t("library.title")}</span>
+            <span className="text-[10px] tabular-nums text-on-surface-variant">{t("library.decks", { count: decks.length })}</span>
           </div>
           <div className="flex items-center text-sm tabular-nums">
-            <span className="font-semibold text-zinc-700 dark:text-zinc-300">{cards.length}</span>
-            <span className="ml-1.5 text-zinc-400">{t("library.cards")}</span>
+            <span className="font-semibold text-on-surface">{cards.length}</span>
+            <span className="ml-1.5 text-on-surface-variant">{t("library.cards")}</span>
             {dueCount > 0 && (
-              <span className="ml-auto flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400">
+              <span className="ml-auto flex items-center gap-1 text-xs font-medium text-secondary">
                 <Zap className="h-3 w-3" />
                 {dueCount}
               </span>
@@ -113,7 +112,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         <div className="px-5 pb-3">
           <button
             onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "?" }))}
-            className="text-[10px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+            className="text-[10px] text-on-surface-variant hover:text-on-surface transition-colors"
             aria-label={t("nav.showShortcuts")}
           >
             {t("nav.pressForShortcuts")}
@@ -123,11 +122,11 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
 
       {/* ── Mobile header ── */}
       <header
-        className="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-200 bg-white/90 px-4 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/90 lg:hidden"
+        className="sticky top-0 z-30 flex items-center justify-between border-b border-outline-variant bg-surface/90 px-4 backdrop-blur-sm dark:bg-surface-container/90 lg:hidden"
         style={{ minHeight: "calc(env(safe-area-inset-top) + 3.5rem)" }}
       >
-        <button className="flex items-center gap-2 font-semibold text-sm" onClick={showDashboard}>
-          <BookOpen className="h-5 w-5" />
+        <button className="flex items-center gap-2 font-semibold text-sm text-on-surface" onClick={showDashboard}>
+          <RecallLogo className="h-6 w-6 object-contain" />
           Recall
         </button>
         <div className="flex items-center gap-1">
@@ -141,7 +140,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
           >
             <Play className="h-4 w-4" />
             {dueCount > 0 && (
-              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-semibold text-white">
+              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-secondary px-1.5 text-[10px] font-semibold text-on-secondary">
                 {dueCount}
               </span>
             )}
@@ -161,7 +160,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
 
       {/* ── Mobile Bottom Tab Bar ── */}
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 flex items-stretch border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 flex items-stretch border-t border-outline-variant bg-surface dark:bg-surface-container lg:hidden"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         aria-label={t("nav.mobileNav")}
       >
@@ -205,11 +204,11 @@ function BottomTab({ active, icon: Icon, label, onClick, badge }: BottomTabProps
         <Icon
           className={cn(
             "h-5 w-5 shrink-0 transition-colors",
-            active ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-400 dark:text-zinc-500",
+            active ? "text-primary" : "text-on-surface-variant",
           )}
         />
         {badge !== undefined && badge > 0 && (
-          <span className="absolute -right-2 -top-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-bold text-white">
+          <span className="absolute -right-2 -top-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-secondary px-1 text-[9px] font-bold text-on-secondary">
             {badge}
           </span>
         )}
@@ -217,7 +216,7 @@ function BottomTab({ active, icon: Icon, label, onClick, badge }: BottomTabProps
       <span
         className={cn(
           "text-[10px] font-medium transition-colors",
-          active ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-400 dark:text-zinc-500",
+          active ? "text-primary" : "text-on-surface-variant",
         )}
       >
         {label}
@@ -244,14 +243,14 @@ function NavButton({ active, icon: Icon, label, onClick, badge }: NavButtonProps
       className={cn(
         "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
         active
-          ? "bg-zinc-100 text-zinc-900 font-medium dark:bg-zinc-800 dark:text-zinc-100"
-          : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-300",
+          ? "bg-primary-soft text-primary font-medium"
+          : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface dark:hover:bg-surface-container",
       )}
     >
       <Icon className="h-4 w-4 shrink-0" />
       <span className="flex-1 text-left">{label}</span>
       {badge !== undefined && badge > 0 && (
-        <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-semibold text-white">
+        <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-secondary px-1.5 text-[10px] font-semibold text-on-secondary">
           {badge}
         </span>
       )}
@@ -272,28 +271,28 @@ function LevelWidget(): JSX.Element {
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">
+        <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-on-surface-variant">
           {t("level.label", { level })}
         </span>
-        <span className="text-[10px] text-zinc-400 tabular-nums">{settings.xp} XP</span>
+        <span className="text-[10px] text-on-surface-variant tabular-nums">{settings.xp} XP</span>
       </div>
 
       <div className="flex items-center gap-1.5 mb-2">
-        <Shield className="h-3.5 w-3.5 text-zinc-700 dark:text-zinc-300" />
-        <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{title}</span>
+        <Shield className="h-3.5 w-3.5 text-on-surface" />
+        <span className="text-sm font-semibold text-on-surface">{title}</span>
       </div>
 
       {/* Progress bar */}
-      <div className="relative h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label={t("level.progress", { level, xp: settings.xp })}>
+      <div className="relative h-1.5 w-full rounded-full bg-surface-container-high overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label={t("level.progress", { level, xp: settings.xp })}>
         <div
-          className="absolute inset-y-0 left-0 rounded-full bg-zinc-700 transition-[width] duration-700 ease-out dark:bg-zinc-300"
+          className="absolute inset-y-0 left-0 rounded-full bg-primary transition-[width] duration-700 ease-out"
           style={{ width: `${Math.round(progress * 100)}%` }}
         />
       </div>
 
       <div className="flex items-center gap-1 mt-1.5">
-        <Star className="h-2.5 w-2.5 text-zinc-400" />
-        <span className="text-[10px] text-zinc-400 tabular-nums">{unlocked}/14</span>
+        <Star className="h-2.5 w-2.5 text-on-surface-variant" />
+        <span className="text-[10px] text-on-surface-variant tabular-nums">{unlocked}/14</span>
       </div>
     </div>
   );

@@ -2,49 +2,301 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   Recall Design System - Material 3-inspired tokens
+   Maps to the stitch-generated design system (recall_design_system).
+   Exposed to Tailwind as: bg-surface, text-on-surface,
+   bg-primary-container, border-outline-variant, text-text-secondary,
+   bg-review-good, rounded-2xl (28px), etc.
+   All M3 tokens are flat hex values.
+   ============================================================ */
+
 :root {
-  --background: 0 0% 98%;
-  --foreground: 240 10% 8%;
-  --card: 0 0% 100%;
-  --card-foreground: 240 10% 8%;
-  --primary: 240 6% 10%;
-  --primary-foreground: 0 0% 98%;
-  --secondary: 240 5% 92%;
-  --secondary-foreground: 240 6% 10%;
-  --muted: 240 6% 92%;
-  --muted-foreground: 240 4% 40%;
-  --accent: 240 6% 90%;
-  --accent-foreground: 240 6% 10%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 240 6% 86%;
-  --input: 240 6% 84%;
-  --ring: 240 6% 10%;
-  --radius: 8px;
+  /* ── M3 surface tiers (light) ── */
+  --surface: #ffffff;
+  --surface-dim: #d8dadc;
+  --surface-bright: #f7f9fb;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f2f4f6;
+  --surface-container: #eceef0;
+  --surface-container-high: #e6e8ea;
+  --surface-container-highest: #e0e3e5;
+  --surface-variant: #e0e3e5;
+  --surface-raised: #f1f5f9;
+
+  --on-surface: #191c1e;
+  --on-surface-variant: #434655;
+  --inverse-surface: #2d3133;
+  --inverse-on-surface: #eff1f3;
+
+  --outline: #737686;
+  --outline-variant: #c3c6d7;
+  --border-strong: #cbd5e1;
+  --surface-tint: #0053db;
+
+  /* ── M3 primary (brand blue) ── */
+  --primary: #004ac6;
+  --on-primary: #ffffff;
+  --primary-container: #2563eb;
+  --on-primary-container: #eeefff;
+  --primary-soft: #dbeafe;
+  --inverse-primary: #b4c5ff;
+
+  /* ── M3 secondary (motivation amber) ── */
+  --secondary: #855300;
+  --on-secondary: #ffffff;
+  --secondary-container: #fea619;
+  --on-secondary-container: #684000;
+
+  /* ── M3 tertiary (success green) ── */
+  --tertiary: #006243;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #007d57;
+  --on-tertiary-container: #bdffdc;
+
+  /* ── M3 error ── */
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
+
+  /* ── M3 fixed (bridge to containers) ── */
+  --primary-fixed: #dbe1ff;
+  --primary-fixed-dim: #b4c5ff;
+  --on-primary-fixed: #00174b;
+  --on-primary-fixed-variant: #003ea8;
+  --secondary-fixed: #ffddb8;
+  --secondary-fixed-dim: #ffb95f;
+  --on-secondary-fixed: #2a1700;
+  --on-secondary-fixed-variant: #653e00;
+  --tertiary-fixed: #85f8c4;
+  --tertiary-fixed-dim: #68dba9;
+  --on-tertiary-fixed: #002114;
+  --on-tertiary-fixed-variant: #005137;
+
+  /* ── Background / foreground ── */
+  --background: #f7f9fb;
+  --on-background: #191c1e;
+
+  /* ── Semantic text (design-system naming) ── */
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+
+  /* ── Review rating colors (4-color FSRS map) ── */
+  --review-again: #dc2626;
+  --review-hard: #d97706;
+  --review-good: #2563eb;
+  --review-easy: #059669;
+
+  /* ── LEGACY shadcn tokens (flat-renamed) for ui/ primitives.
+        Tailwind config references these via hsl(var(--shad-*)).
+        Do NOT reuse bare --primary/--border names for the legacy set. ── */
+  --shad-background: 210 25% 98%;
+  --shad-foreground: 240 10% 8%;
+  --shad-card: 0 0% 100%;
+  --shad-card-foreground: 240 10% 8%;
+  --shad-primary: 240 6% 10%;
+  --shad-primary-foreground: 0 0% 98%;
+  --shad-secondary: 240 5% 92%;
+  --shad-secondary-foreground: 240 6% 10%;
+  --shad-muted: 240 6% 92%;
+  --shad-muted-foreground: 240 4% 40%;
+  --shad-accent: 240 6% 90%;
+  --shad-accent-foreground: 240 6% 10%;
+  --shad-destructive: 0 72% 51%;
+  --shad-destructive-foreground: 0 0% 100%;
+  --shad-border: 240 6% 86%;
+  --shad-input: 240 6% 84%;
+  --shad-ring: 240 6% 10%;
+  --shad-radius: 8px;
+
+  /* Accent presets (user-selectable) */
+  --accent-zinc: #18181b;
+  --accent-blue: #1d4ed8;
+  --accent-green: #15803d;
+  --accent-rose: #be123c;
+  --accent-amber: #b45309;
+  --accent-violet: #7c3aed;
 }
 
 .dark {
-  --background: 240 10% 4%;
-  --foreground: 0 0% 94%;
-  --card: 240 9% 7%;
-  --card-foreground: 0 0% 94%;
-  --primary: 240 6% 96%;
-  --primary-foreground: 240 10% 4%;
-  --secondary: 240 6% 12%;
-  --secondary-foreground: 0 0% 94%;
-  --muted: 240 6% 12%;
-  --muted-foreground: 240 5% 70%;
-  --accent: 240 6% 14%;
-  --accent-foreground: 0 0% 96%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 240 6% 16%;
-  --input: 240 6% 18%;
-  --ring: 240 6% 96%;
+  /* ── M3 surface tiers (dark - deep navy/slate) ── */
+  --surface: #111827;
+  --surface-dim: #1f2937;
+  --surface-bright: #0b1120;
+  --surface-container-lowest: #0b1120;
+  --surface-container-low: #1f2937;
+  --surface-container: #1f2937;
+  --surface-container-high: #334155;
+  --surface-container-highest: #334155;
+  --surface-variant: #334155;
+  --surface-raised: #1f2937;
+
+  --on-surface: #f8fafc;
+  --on-surface-variant: #94a3b8;
+  --inverse-surface: #eff1f3;
+  --inverse-on-surface: #2d3133;
+
+  --outline: #475569;
+  --outline-variant: #334155;
+  --border-strong: #475569;
+  --surface-tint: #60a5fa;
+
+  /* ── M3 primary (lightened for dark) ── */
+  --primary: #60a5fa;
+  --on-primary: #06111f;
+  --primary-container: #1e3a8a;
+  --on-primary-container: #dbeafe;
+  --primary-soft: #172554;
+  --inverse-primary: #004ac6;
+
+  --secondary: #fbbf24;
+  --on-secondary: #111827;
+  --secondary-container: #78350f;
+  --on-secondary-container: #fbbf24;
+
+  --tertiary: #34d399;
+  --on-tertiary: #052e16;
+  --tertiary-container: #064e3b;
+  --on-tertiary-container: #bdffdc;
+
+  --error: #f87171;
+  --on-error: #111827;
+  --error-container: #7f1d1d;
+  --on-error-container: #ffdad6;
+
+  --primary-fixed: #1e3a8a;
+  --primary-fixed-dim: #172554;
+  --on-primary-fixed: #dbeafe;
+  --on-primary-fixed-variant: #60a5fa;
+  --secondary-fixed: #78350f;
+  --secondary-fixed-dim: #684000;
+  --on-secondary-fixed: #fbbf24;
+  --on-secondary-fixed-variant: #fbbf24;
+  --tertiary-fixed: #064e3b;
+  --tertiary-fixed-dim: #052e16;
+  --on-tertiary-fixed: #bdffdc;
+  --on-tertiary-fixed-variant: #34d399;
+
+  --background: #0b1120;
+  --on-background: #f8fafc;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+
+  --review-again: #f87171;
+  --review-hard: #fbbf24;
+  --review-good: #60a5fa;
+  --review-easy: #34d399;
+
+  /* Legacy shadcn (dark) */
+  --shad-background: 222 47% 7%;
+  --shad-foreground: 0 0% 94%;
+  --shad-card: 240 9% 7%;
+  --shad-card-foreground: 0 0% 94%;
+  --shad-primary: 240 6% 96%;
+  --shad-primary-foreground: 240 10% 4%;
+  --shad-secondary: 240 6% 12%;
+  --shad-secondary-foreground: 0 0% 94%;
+  --shad-muted: 240 6% 12%;
+  --shad-muted-foreground: 240 5% 70%;
+  --shad-accent: 240 6% 14%;
+  --shad-accent-foreground: 0 0% 96%;
+  --shad-destructive: 0 72% 51%;
+  --shad-destructive-foreground: 0 0% 100%;
+  --shad-border: 240 6% 16%;
+  --shad-input: 240 6% 18%;
+  --shad-ring: 240 6% 96%;
+
+  --accent-zinc: #f4f4f5;
+  --accent-blue: #60a5fa;
+  --accent-green: #4ade80;
+  --accent-rose: #fb7185;
+  --accent-amber: #fbbf24;
+  --accent-violet: #a78bfa;
 }
 
+/* ── High-contrast theme (overrides both) ── */
+.high-contrast {
+  --surface: #000000;
+  --surface-dim: #0a0a0a;
+  --surface-bright: #0a0a0a;
+  --surface-container-lowest: #000000;
+  --surface-container-low: #0a0a0a;
+  --surface-container: #0a0a0a;
+  --surface-container-high: #141414;
+  --surface-container-highest: #141414;
+  --surface-variant: #141414;
+  --surface-raised: #141414;
+
+  --on-surface: #ffffff;
+  --on-surface-variant: #f5f5f5;
+  --inverse-surface: #ffffff;
+  --inverse-on-surface: #000000;
+
+  --outline: #ffffff;
+  --outline-variant: #ffffff;
+  --border-strong: #ffffff;
+  --surface-tint: #7dd3fc;
+
+  --primary: #7dd3fc;
+  --on-primary: #000000;
+  --primary-container: #0a3a66;
+  --on-primary-container: #ffffff;
+  --primary-soft: #0a3a66;
+  --inverse-primary: #7dd3fc;
+
+  --secondary: #ffd60a;
+  --on-secondary: #000000;
+  --secondary-container: #4d3500;
+  --on-secondary-container: #ffd60a;
+
+  --tertiary: #34d399;
+  --on-tertiary: #000000;
+  --tertiary-container: #064e3b;
+  --on-tertiary-container: #34d399;
+
+  --error: #ff6b6b;
+  --on-error: #000000;
+  --error-container: #4d0a0a;
+  --on-error-container: #ff6b6b;
+
+  --background: #000000;
+  --on-background: #ffffff;
+
+  --text-primary: #ffffff;
+  --text-secondary: #d4d4d4;
+
+  --review-again: #fca5a5;
+  --review-hard: #fde68a;
+  --review-good: #7dd3fc;
+  --review-easy: #86efac;
+
+  --shad-background: 0 0% 0%;
+  --shad-foreground: 0 0% 100%;
+  --shad-card: 0 0% 0%;
+  --shad-card-foreground: 0 0% 100%;
+  --shad-primary: 0 0% 100%;
+  --shad-primary-foreground: 0 0% 0%;
+  --shad-secondary: 0 0% 10%;
+  --shad-secondary-foreground: 0 0% 100%;
+  --shad-muted: 0 0% 15%;
+  --shad-muted-foreground: 0 0% 85%;
+  --shad-accent: 0 0% 20%;
+  --shad-accent-foreground: 0 0% 100%;
+  --shad-destructive: 0 85% 60%;
+  --shad-destructive-foreground: 0 0% 100%;
+  --shad-border: 0 0% 50%;
+  --shad-input: 0 0% 30%;
+  --shad-ring: 0 0% 100%;
+}
+
+/* ============================================================
+   Base layer
+   ============================================================ */
+
 * {
-  border-color: hsl(var(--border));
+  border-color: hsl(var(--shad-border));
 }
 
 html,
@@ -55,17 +307,15 @@ body,
 
 body {
   margin: 0;
-  background: hsl(var(--background));
-  color: hsl(var(--foreground));
+  background: hsl(var(--shad-background));
+  color: hsl(var(--shad-foreground));
   font-family: InterVariable, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-feature-settings:
     "cv02",
     "cv03",
     "cv04",
     "cv11";
-  /* Prevent rubber-band overscroll on mobile for native feel */
   overscroll-behavior-y: none;
-  /* Prevent text size adjust on orientation change */
   -webkit-text-size-adjust: 100%;
 }
 
@@ -77,7 +327,6 @@ body {
     min-height: 44px;
     min-width: 44px;
   }
-  /* Exclude inline text links and small badges */
   .no-touch-min {
     min-height: 0;
     min-width: 0;
@@ -127,27 +376,7 @@ select {
   animation: shake 0.3s ease-in-out;
 }
 
-/* High contrast theme */
-.high-contrast {
-  --background: 0 0% 0%;
-  --foreground: 0 0% 100%;
-  --card: 0 0% 0%;
-  --card-foreground: 0 0% 100%;
-  --primary: 0 0% 100%;
-  --primary-foreground: 0 0% 0%;
-  --secondary: 0 0% 10%;
-  --secondary-foreground: 0 0% 100%;
-  --muted: 0 0% 15%;
-  --muted-foreground: 0 0% 85%;
-  --accent: 0 0% 20%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 85% 60%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 50%;
-  --input: 0 0% 30%;
-  --ring: 0 0% 100%;
-}
-
+/* High contrast structural emphasis */
 .high-contrast button,
 .high-contrast input,
 .high-contrast textarea,
@@ -158,25 +387,6 @@ select {
 .high-contrast .rounded-lg,
 .high-contrast .rounded-md {
   border-width: 2px;
-}
-
-/* Accent colors */
-:root {
-  --accent-zinc: #18181b;
-  --accent-blue: #1d4ed8;
-  --accent-green: #15803d;
-  --accent-rose: #be123c;
-  --accent-amber: #b45309;
-  --accent-violet: #7c3aed;
-}
-
-.dark {
-  --accent-zinc: #f4f4f5;
-  --accent-blue: #60a5fa;
-  --accent-green: #4ade80;
-  --accent-rose: #fb7185;
-  --accent-amber: #fbbf24;
-  --accent-violet: #a78bfa;
 }
 
 .accent-zinc { --accent-current: var(--accent-zinc); }
@@ -197,7 +407,7 @@ select {
   font-family: inherit;
 }
 
-/* Reduced motion: disable animations for users who prefer it */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

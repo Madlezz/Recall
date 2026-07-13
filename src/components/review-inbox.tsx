@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
 import { toast } from "sonner";
+import { cardSurface } from "@/lib/surface";
 
 export function ReviewInbox(): JSX.Element {
   const { t } = useTranslation();
@@ -44,14 +45,14 @@ export function ReviewInbox(): JSX.Element {
 
   if (totalDue === 0 && overdue === 0 && leech === 0) {
     return (
-      <div className="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-5 py-4 dark:border-zinc-800 dark:bg-zinc-900" role="status" aria-label={t("reviewInbox.noCardsDueAria")}>
+      <div className={cardSurface("flex items-center justify-between px-5 py-4")} role="status" aria-label={t("reviewInbox.noCardsDueAria")}>
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
-            <RotateCw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-review-easy/10">
+            <RotateCw className="h-4 w-4 text-review-easy" aria-hidden="true" />
           </div>
           <div>
-            <div className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{t("reviewInbox.allCaughtUp")}</div>
-            <div className="text-xs text-zinc-500">{t("reviewInbox.noCardsDueHint")}</div>
+            <div className="text-sm font-semibold text-on-surface">{t("reviewInbox.allCaughtUp")}</div>
+            <div className="text-xs text-on-surface-variant">{t("reviewInbox.noCardsDueHint")}</div>
           </div>
         </div>
       </div>
@@ -59,11 +60,11 @@ export function ReviewInbox(): JSX.Element {
   }
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900" role="region" aria-label={t("reviewInbox.regionAria")}>
+    <div className={cardSurface("")} role="region" aria-label={t("reviewInbox.regionAria")}>
       <div className="flex items-center justify-between px-5 py-4">
         <div>
-          <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("reviewInbox.title")}</h3>
-          <p className="mt-0.5 text-xs text-zinc-500">
+          <h3 className="text-sm font-bold text-on-surface">{t("reviewInbox.title")}</h3>
+          <p className="mt-0.5 text-xs text-on-surface-variant">
             {t("reviewInbox.cardsReady", { count: totalDue, minutes: estimatedMin })}
           </p>
         </div>
@@ -73,7 +74,7 @@ export function ReviewInbox(): JSX.Element {
         </Button>
       </div>
 
-      <div className="grid grid-cols-4 divide-x divide-zinc-100 border-t border-zinc-100 dark:divide-zinc-800 dark:border-zinc-800">
+      <div className="grid grid-cols-4 divide-x divide-outline-variant border-t border-outline-variant">
         <InboxCell icon={RotateCw} label={t("reviewInbox.due")} count={due} sub={t("reviewInbox.overdueCount", { count: overdue })} />
         <InboxCell icon={Brain} label={t("reviewInbox.learning")} count={learning} sub={t("reviewInbox.inProgress")} />
         <InboxCell
@@ -92,10 +93,10 @@ export function ReviewInbox(): JSX.Element {
       </div>
 
       {overdue > 0 && (
-        <div className="flex items-center gap-2 border-t border-zinc-100 px-5 py-3 text-sm dark:border-zinc-800" role="alert">
-          <Zap className="h-4 w-4 text-red-500 shrink-0" aria-hidden="true" />
-          <span className="font-semibold text-red-600 dark:text-red-400">{t("reviewInbox.overdueCount", { count: overdue })}</span>
-          <span className="text-zinc-500">{t("reviewInbox.tackleFirst")}</span>
+        <div className="flex items-center gap-2 border-t border-outline-variant px-5 py-3 text-sm" role="alert">
+          <Zap className="h-4 w-4 text-review-again shrink-0" aria-hidden="true" />
+          <span className="font-semibold text-review-again">{t("reviewInbox.overdueCount", { count: overdue })}</span>
+          <span className="text-on-surface-variant">{t("reviewInbox.tackleFirst")}</span>
         </div>
       )}
     </div>
@@ -118,12 +119,12 @@ function InboxCell({
   const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center justify-center px-2 py-4 text-center" aria-label={t("reviewInbox.cellAria", { count, label, sub })}>
-      <Icon className={cn("h-4 w-4 mb-1.5", accent ? "text-red-500" : "text-zinc-400")} aria-hidden="true" />
-      <span className={cn("text-xl font-bold tabular-nums", accent ? "text-red-600" : "text-zinc-800 dark:text-zinc-200")}>
+      <Icon className={cn("h-4 w-4 mb-1.5", accent ? "text-review-again" : "text-on-surface-variant")} aria-hidden="true" />
+      <span className={cn("text-xl font-bold tabular-nums", accent ? "text-review-again" : "text-on-surface")}>
         {count}
       </span>
-      <span className="text-[10px] font-medium text-zinc-500 mt-0.5">{label}</span>
-      <span className="text-[9px] text-zinc-400 mt-0.5">{sub}</span>
+      <span className="text-[10px] font-medium text-on-surface-variant mt-0.5">{label}</span>
+      <span className="text-[9px] text-on-surface-variant/70 mt-0.5">{sub}</span>
     </div>
   );
 }

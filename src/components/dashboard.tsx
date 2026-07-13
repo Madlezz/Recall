@@ -20,6 +20,7 @@ import { getDeckColorClass } from "@/lib/deck-colors";
 import { getDeckStats, getDeckHealth, getStudyStreak, isCardDueToday, getDueTodayCount } from "@/lib/stats";
 import { getLevel, getLevelTitle, levelProgress } from "@/lib/xp";
 import { cn } from "@/lib/utils";
+import { cardSurface } from "@/lib/surface";
 import { useRecallStore } from "@/stores/recall-store";
 import type { Deck } from "@/types";
 
@@ -63,11 +64,11 @@ export function Dashboard(): JSX.Element {
       {/* ── Hero ── */}
       <section className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">{t("dashboard.subtitle")}</p>
-          <h1 className="mt-2 text-[1.5rem] font-bold leading-tight tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-[1.75rem]">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-on-surface-variant">{t("dashboard.subtitle")}</p>
+          <h1 className="mt-2 font-display text-[1.75rem] font-bold leading-tight tracking-tight text-on-surface sm:text-[2rem]">
             {t("dashboard.title")}
           </h1>
-          <p className="mt-2 max-w-lg text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+          <p className="mt-2 max-w-lg text-sm leading-relaxed text-on-surface-variant">
             {t("dashboard.description")}
           </p>
         </div>
@@ -134,21 +135,21 @@ export function Dashboard(): JSX.Element {
       {/* ── Decks ── */}
       <section>
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold tracking-tight text-zinc-800 dark:text-zinc-200">{t("dashboard.yourDecks")}</h2>
+          <h2 className="font-headline text-lg font-bold tracking-tight text-on-surface">{t("dashboard.yourDecks")}</h2>
           <div className="flex items-center gap-3">
-            <span className="text-xs tabular-nums text-zinc-400">{t("dashboard.totalDecks", { count: decks.length })}</span>
+            <span className="text-xs tabular-nums text-on-surface-variant">{t("dashboard.totalDecks", { count: decks.length })}</span>
             {/* Segmented sort */}
-                        <div className="flex rounded-md bg-zinc-100 p-0.5 dark:bg-zinc-800" role="group" aria-label={t("dashboard.sortLabel")}>
-                          {(["name", "due", "cards"] as const).map((s) => (
-                            <button
-                              key={s}
-                              onClick={() => setSortBy(s)}
-                              aria-pressed={sortBy === s}
-                              className={cn(
+            <div className="flex rounded-md bg-surface-container-low p-0.5 dark:bg-surface-container" role="group" aria-label={t("dashboard.sortLabel")}>
+              {(["name", "due", "cards"] as const).map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setSortBy(s)}
+                  aria-pressed={sortBy === s}
+                  className={cn(
                     "px-3 py-1 text-xs font-medium rounded-sm transition-colors",
                     sortBy === s
-                      ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-100"
-                      : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200",
+                      ? "bg-surface text-on-surface shadow-sm"
+                      : "text-on-surface-variant hover:text-on-surface",
                   )}
                 >
                   {s === "name" ? t("dashboard.sortName") : s === "due" ? t("dashboard.sortDue") : t("dashboard.sortCards")}
@@ -161,25 +162,25 @@ export function Dashboard(): JSX.Element {
         {isLoading ? (
           <div className="grid gap-3 lg:grid-cols-2">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="rounded-lg border border-zinc-200 bg-white p-5 animate-pulse dark:border-zinc-800 dark:bg-zinc-900">
-                <div className="h-4 w-28 rounded bg-zinc-100 dark:bg-zinc-800 mb-3" />
-                <div className="h-3 w-44 rounded bg-zinc-100 dark:bg-zinc-800 mb-4" />
-                <div className="h-2 rounded bg-zinc-100 dark:bg-zinc-800 mb-4" />
+              <div key={i} className={cardSurface("p-5 animate-pulse")}>
+                <div className="h-4 w-28 rounded bg-surface-container-high dark:bg-surface-container-high mb-3" />
+                <div className="h-3 w-44 rounded bg-surface-container-high dark:bg-surface-container-high mb-4" />
+                <div className="h-2 rounded bg-surface-container-high dark:bg-surface-container-high mb-4" />
                 <div className="grid grid-cols-3 gap-2">
-                  <div className="h-10 rounded bg-zinc-100 dark:bg-zinc-800" />
-                  <div className="h-10 rounded bg-zinc-100 dark:bg-zinc-800" />
-                  <div className="h-10 rounded bg-zinc-100 dark:bg-zinc-800" />
+                  <div className="h-10 rounded bg-surface-container-high dark:bg-surface-container-high" />
+                  <div className="h-10 rounded bg-surface-container-high dark:bg-surface-container-high" />
+                  <div className="h-10 rounded bg-surface-container-high dark:bg-surface-container-high" />
                 </div>
               </div>
             ))}
           </div>
         ) : !hasAnyContent ? (
           <div className="flex flex-col items-center justify-center py-16 text-center sm:py-24">
-            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
-              <Library className="h-8 w-8 text-zinc-400" />
+            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-container-low">
+              <Library className="h-8 w-8 text-on-surface-variant" />
             </div>
-            <h3 className="text-xl font-bold tracking-tight text-zinc-800 dark:text-zinc-200">{t("dashboard.emptyTitle")}</h3>
-            <p className="mt-2 max-w-sm text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+            <h3 className="font-headline text-xl font-bold tracking-tight text-on-surface">{t("dashboard.emptyTitle")}</h3>
+            <p className="mt-2 max-w-sm text-sm leading-relaxed text-on-surface-variant">
               {t("dashboard.emptyDescription")}
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -251,39 +252,39 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
     <button
       onClick={onOpen}
       aria-label={t("deck.openDeck", { name: deck.name, due: stats.due, total: stats.total, progress })}
-      className="group relative flex flex-col rounded-lg border border-zinc-200 bg-white p-5 text-left transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
+      className={cardSurface("group relative flex flex-col p-5 text-left transition-colors hover:border-primary/40")}
     >
       {/* Top row: name + arrow */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <span className={cn("h-2 w-2 shrink-0 rounded-full", getDeckColorClass(deck.color))} />
-            <h3 className="truncate text-sm font-semibold text-zinc-800 dark:text-zinc-200">{deck.name}</h3>
+            <h3 className="truncate font-title-md text-on-surface group-hover:text-primary transition-colors">{deck.name}</h3>
             {examDays !== null && (
               <span
                 className={cn(
                   "shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold",
                   examDays <= 0
-                    ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400"
+                    ? "bg-review-again/10 text-review-again"
                     : examDays <= 3
-                      ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"
-                      : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400",
+                      ? "bg-review-hard/10 text-review-hard"
+                      : "bg-primary-soft text-primary",
                 )}
               >
                 📅 {examDays <= 0 ? t("deck.examToday") : examDays === 1 ? t("deck.examTomorrow") : t("deck.examDays", { count: examDays })}
               </span>
             )}
           </div>
-          <p className="mt-1.5 line-clamp-1 text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1.5 line-clamp-1 text-xs text-on-surface-variant">
             {deck.description || t("deck.noDescription")}
           </p>
         </div>
-        <ArrowRight className="h-4 w-4 shrink-0 text-zinc-300 transition-colors group-hover:text-zinc-500 dark:text-zinc-600 dark:group-hover:text-zinc-400" />
+        <ArrowRight className="h-4 w-4 shrink-0 text-outline transition-colors group-hover:text-primary" />
       </div>
 
       {/* Progress bar */}
       <div className="mt-4 space-y-1.5">
-        <div className="flex items-center justify-between text-xs text-zinc-500">
+        <div className="flex items-center justify-between text-xs text-on-surface-variant">
           <span>
             {t("deck.mastered", { mastered: stats.mastered, total: stats.total })}
           </span>
@@ -300,18 +301,16 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
       </div>
 
       {/* Footer */}
-      <div className="mt-3 flex items-center gap-3 border-t border-zinc-100 pt-3 text-xs dark:border-zinc-800">
+      <div className="mt-3 flex items-center gap-3 border-t border-outline-variant pt-3 text-xs">
         <span className={cn("font-semibold tabular-nums", retentionColor)}>{t("deck.retention", { percent: health.retention })}</span>
         {health.leeches > 0 && (
-          <span className="tabular-nums text-amber-600 dark:text-amber-400">
-            ⚠ {t("deck.leech", { count: health.leeches })}
-          </span>
+          <span className="tabular-nums text-review-hard">{t("deck.leech", { count: health.leeches })}</span>
         )}
         {health.overdue > 0 && (
-          <span className="tabular-nums text-red-600 dark:text-red-400">{t("deck.overdue", { count: health.overdue })}</span>
+          <span className="tabular-nums text-review-again">{t("deck.overdue", { count: health.overdue })}</span>
         )}
-        {stats.newCards > 0 && <span className="text-zinc-400 tabular-nums">{t("deck.newCards", { count: stats.newCards })}</span>}
-        {lastStudied && <span className="ml-auto text-zinc-400">{formatLastStudied(lastStudied, t)}</span>}
+        {stats.newCards > 0 && <span className="text-on-surface-variant tabular-nums">{t("deck.newCards", { count: stats.newCards })}</span>}
+        {lastStudied && <span className="ml-auto text-on-surface-variant">{formatLastStudied(lastStudied, t)}</span>}
       </div>
     </button>
   );
@@ -335,20 +334,20 @@ function MiniStat({ label, value, accent }: { label: string; value: string | num
     <div
       className={cn(
         "rounded-md px-2.5 py-2 text-center",
-        accent ? "bg-zinc-100 dark:bg-zinc-800" : "bg-zinc-50 dark:bg-zinc-800/50",
+        accent ? "bg-primary-soft" : "bg-surface-container-low dark:bg-surface-container",
       )}
     >
-      <div className={cn("text-sm font-bold tabular-nums", accent ? "text-zinc-800 dark:text-zinc-200" : "")}>
+      <div className={cn("text-sm font-bold tabular-nums", accent ? "text-primary" : "text-on-surface")}>
         {value}
       </div>
-      <div className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-zinc-400">{label}</div>
+      <div className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-on-surface-variant">{label}</div>
     </div>
   );
 }
 
 // ═══════════════════════════════════════════════
 // StreakWidget
-// ═══════════════════════════════════════════════
+// ═════════════════════════════════════════════
 
 function StreakWidget(): JSX.Element {
   const { t } = useTranslation();
@@ -357,21 +356,21 @@ function StreakWidget(): JSX.Element {
 
   const flameColor =
     streak >= 30
-      ? "text-amber-500"
+      ? "text-review-hard"
       : streak >= 7
-        ? "text-orange-500"
+        ? "text-review-hard"
         : streak >= 3
-          ? "text-amber-600"
-          : "text-zinc-300 dark:text-zinc-600";
+          ? "text-secondary"
+          : "text-on-surface-variant";
 
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 py-5 dark:border-zinc-800 dark:bg-zinc-900">
-      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">{t("streak.title")}</span>
+    <div className={cardSurface("flex flex-col items-center justify-center px-4 py-5")}>
+      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-on-surface-variant">{t("streak.title")}</span>
       <div className="mt-2 flex items-baseline gap-1">
         <Flame className={cn("h-5 w-5", flameColor)} />
         <span className={cn("text-3xl font-bold tabular-nums tracking-tight", flameColor)}>{streak}</span>
       </div>
-      <span className="mt-1 text-xs text-zinc-400">
+      <span className="mt-1 text-xs text-on-surface-variant">
         {streak === 0 ? t("streak.studyToday") : streak === 1 ? t("streak.oneDay") : t("streak.days", { count: streak })}
       </span>
     </div>
@@ -391,16 +390,16 @@ function LevelTile(): JSX.Element {
   const progress = levelProgress(xp);
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white px-4 py-5 dark:border-zinc-800 dark:bg-zinc-900">
-      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-zinc-400">{t("level.label", { level })}</span>
-      <div className="mt-1.5 text-lg font-bold tracking-tight text-zinc-800 dark:text-zinc-200">{title}</div>
-      <div className="mt-3 h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+    <div className={cardSurface("px-4 py-5")}>
+      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-on-surface-variant">{t("level.label", { level })}</span>
+      <div className="mt-1.5 font-headline text-lg font-bold tracking-tight text-on-surface">{title}</div>
+      <div className="mt-3 h-1.5 w-full rounded-full bg-surface-container-high overflow-hidden">
         <div
-          className="h-full rounded-full bg-zinc-700 transition-[width] duration-700 ease-out dark:bg-zinc-300"
+          className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
           style={{ width: `${Math.round(progress * 100)}%` }}
         />
       </div>
-      <div className="mt-1.5 text-xs text-zinc-400 tabular-nums">{xp.toLocaleString()} XP</div>
+      <div className="mt-1.5 text-xs text-on-surface-variant tabular-nums">{xp.toLocaleString()} XP</div>
     </div>
   );
 }
@@ -419,27 +418,27 @@ interface TodayBandProps {
 function TodayBand({ dueCount, newCount, reviewedToday, onStartReview }: TodayBandProps): JSX.Element {
   const { t } = useTranslation();
   return (
-    <section className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+    <section className={cardSurface("flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6")}>
       <div className="flex items-center gap-4 sm:gap-6">
         <div className="flex flex-col">
-          <span className="text-2xl font-bold tabular-nums text-zinc-800 dark:text-zinc-100 sm:text-3xl">
+          <span className="text-2xl font-bold tabular-nums text-on-surface sm:text-3xl">
             {dueCount}
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">{t("todayBand.due")}</span>
+          <span className="text-xs font-medium uppercase tracking-wider text-on-surface-variant">{t("todayBand.due")}</span>
         </div>
-        <div className="h-10 w-px bg-zinc-100 dark:bg-zinc-800" />
+        <div className="h-10 w-px bg-outline-variant" />
         <div className="flex flex-col">
-          <span className="text-2xl font-bold tabular-nums text-zinc-400 dark:text-zinc-500 sm:text-3xl">
+          <span className="text-2xl font-bold tabular-nums text-on-surface-variant sm:text-3xl">
             {newCount}
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">{t("todayBand.new")}</span>
+          <span className="text-xs font-medium uppercase tracking-wider text-on-surface-variant">{t("todayBand.new")}</span>
         </div>
-        <div className="h-10 w-px bg-zinc-100 dark:bg-zinc-800" />
+        <div className="h-10 w-px bg-outline-variant" />
         <div className="flex flex-col">
-          <span className="text-2xl font-bold tabular-nums text-zinc-400 dark:text-zinc-500 sm:text-3xl">
+          <span className="text-2xl font-bold tabular-nums text-on-surface-variant sm:text-3xl">
             {reviewedToday}
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">{t("todayBand.reviewed")}</span>
+          <span className="text-xs font-medium uppercase tracking-wider text-on-surface-variant">{t("todayBand.reviewed")}</span>
         </div>
       </div>
       <Button
