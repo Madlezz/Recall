@@ -442,6 +442,12 @@
     "deselectAll": "Batalkan Semua",
     "noResults": "Tidak ada hasil"
   },
+  "achievement": {
+    "newAchievement": "Pencapaian Baru",
+    "share": "Bagikan",
+    "continue": "Lanjutkan",
+    "keepGoing": "Teruskan! Setiap sesi review memperkuat ingatanmu."
+  },
   "commandPalette": {
     "placeholder": "Ketik perintah atau cari…",
     "noResults": "Tidak ada perintah yang ditemukan",
@@ -742,7 +748,16 @@
     "conceptTitle": "Belajar di waktu yang tepat",
     "conceptDesc": "Recall menampilkan kartu tepat sebelum kamu lupa, sehingga kamu bisa mengingat lebih banyak dengan usaha lebih sedikit.",
     "conceptBadge": "Didukung Spaced Repetition (FSRS)",
-    "conceptNext": "Lanjut"
+    "conceptNext": "Lanjut",
+    "systemTitle": "Cara mudah menilai",
+    "systemDesc": "Jujur saja. Kalau kartu terasa mudah, nanti muncul lagi. Kalau sulit, muncul lebih cepat.",
+    "systemNext": "Lanjut",
+    "systemOptimal": "Waktu optimal",
+    "systemOptimalDesc": "Kartu muncul tepat sebelum kamu lupa.",
+    "systemFsrs": "Algoritma FSRS",
+    "systemFsrsDesc": "Ilmu memori terbaru yang otomatis menyesuaikan denganmu.",
+    "systemTrust": "Percaya diri",
+    "systemTrustDesc": "Tidak ada penilaian salah. Ini kurva belajarmu sendiri."
   },
   "focusTimer": {
     "title": "Timer Fokus",
@@ -1079,7 +1094,9 @@
     "timeSpent": "Waktu dihabiskan",
     "avgRating": "Rata-rata rating",
     "achievementUnlocked": "Pencapaian Dibuka",
-    "continue": "Lanjut",
+    "continue": "Lanjutkan Belajar",
+    "backToDashboard": "Kembali ke Dasbor",
+    "accuracy": "Akurasi",
     "againHeavy": "Didominasi Again"
   },
   "pwa": {

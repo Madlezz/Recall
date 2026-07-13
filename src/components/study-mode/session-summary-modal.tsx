@@ -1,8 +1,10 @@
 import confetti from "canvas-confetti";
 import { Check } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { AchievementDetail } from "@/components/achievement-detail";
 import { Button } from "@/components/ui/button";
+import { useRecallStore } from "@/stores/recall-store";
 import { CONFETTI_COLORS, prefersReducedMotion } from "@/lib/xp";
 import type { SessionSummary } from "@/types";
 
@@ -14,6 +16,20 @@ function formatTime(ms: number): string {
 export function SessionSummaryModal({ summary, onContinue }: { summary: SessionSummary; onContinue: () => void }): JSX.Element {
   const { t } = useTranslation();
   const total = summary.againCount + summary.hardCount + summary.goodCount + summary.easyCount;
+  const [achievementIndex, setAchievementIndex] = useState(0);
+  const newAchievements = summary.newAchievements;
+  const showDashboard = useRecallStore((s) => s.showDashboard);
+  const accuracy = total > 0 ? Math.round(((summary.goodCount + summary.easyCount) / total) * 100) : 0;
+
+  // Show achievement detail if there are unlocked achievements
+  if (newAchievements.length > 0 && achievementIndex < newAchievements.length) {
+    return (
+      <AchievementDetail
+        achievement={newAchievements[achievementIndex]}
+        onContinue={() => setAchievementIndex((i) => i + 1)}
+      />
+    );
+  }
 
   useEffect(() => {
       const goodScore = summary.goodCount + summary.easyCount;
@@ -38,13 +54,6 @@ export function SessionSummaryModal({ summary, onContinue }: { summary: SessionS
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onContinue]);
 
-  function ratingLabel(avg: number): string {
-    if (avg >= 3.5) return t("study.easy");
-    if (avg >= 2.5) return t("study.good");
-    if (avg >= 1.5) return t("study.hard");
-    return t("sessionSummary.againHeavy");
-  }
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="session-summary-title">
       <div className="mx-4 w-full max-w-sm rounded-2xl bg-surface p-8 shadow-xl dark:bg-surface max-h-[90vh] overflow-y-auto">
@@ -63,54 +72,46 @@ export function SessionSummaryModal({ summary, onContinue }: { summary: SessionS
           </div>
         )}
 
-        <div className="mt-4 grid grid-cols-2 gap-3">
+        <div className="mt-4 grid grid-cols-3 gap-3">
+          <div className="rounded-lg bg-surface-container-low p-3 text-center dark:bg-surface-container">
+            <div className="text-lg font-bold tabular-nums text-text-primary">{summary.cardsStudied}</div>
+            <div className="text-xs text-on-surface-variant mt-0.5">{t("sessionSummary.cardsReviewed", { count: 0 })}</div>
+          </div>
           <div className="rounded-lg bg-surface-container-low p-3 text-center dark:bg-surface-container">
             <div className="text-lg font-bold tabular-nums text-text-primary">{formatTime(summary.timeSpentMs)}</div>
             <div className="text-xs text-on-surface-variant mt-0.5">{t("sessionSummary.timeSpent")}</div>
           </div>
           <div className="rounded-lg bg-surface-container-low p-3 text-center dark:bg-surface-container">
-            <div className="text-lg font-bold text-text-primary">{ratingLabel(summary.averageRating)}</div>
-            <div className="text-xs text-on-surface-variant mt-0.5">{t("sessionSummary.avgRating")}</div>
+            <div className="text-lg font-bold text-text-primary">{accuracy}%</div>
+            <div className="text-xs text-on-surface-variant mt-0.5">{t("sessionSummary.accuracy")}</div>
           </div>
         </div>
 
-        <div className="mt-3 grid grid-cols-4 gap-2">
-          <div className="rounded-md bg-review-again/10 p-2 text-center dark:bg-review-again/20">
-            <div className="font-bold text-review-again">{summary.againCount}</div>
-            <div className="text-[10px] text-review-again/70">{t("study.again")}</div>
-          </div>
-          <div className="rounded-md bg-review-hard/10 p-2 text-center dark:bg-review-hard/20">
-            <div className="font-bold text-review-hard">{summary.hardCount}</div>
-            <div className="text-[10px] text-review-hard/70">{t("study.hard")}</div>
-          </div>
-          <div className="rounded-md bg-review-good/10 p-2 text-center dark:bg-review-good/20">
-            <div className="font-bold text-review-good">{summary.goodCount}</div>
-            <div className="text-[10px] text-review-good/70">{t("study.good")}</div>
-          </div>
-          <div className="rounded-md bg-review-easy/10 p-2 text-center dark:bg-review-easy/20">
-            <div className="font-bold text-review-easy">{summary.easyCount}</div>
-            <div className="text-[10px] text-review-easy/70">{t("study.easy")}</div>
-          </div>
-        </div>
-
-        {summary.newAchievements.length > 0 && (
-          <div className="mt-4 rounded-xl bg-secondary-container border border-secondary-container p-4">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-on-secondary-container mb-2">{t("sessionSummary.achievementUnlocked")}</p>
-            <div className="space-y-2">
-              {summary.newAchievements.map((a) => (
-                <div key={a.id} className="flex items-center gap-2 text-sm">
-                  <span className="text-lg">{a.icon}</span>
-                  <div>
-                    <div className="font-semibold text-text-primary">{a.title}</div>
-                    <div className="text-xs text-on-surface-variant">{a.description}</div>
-                  </div>
-                </div>
-              ))}
+        {/* Rating distribution with animated bars */}
+        <div className="mt-4 space-y-2">
+          {[
+            { label: t("study.again"), count: summary.againCount, color: "bg-review-again", textColor: "text-review-again" },
+            { label: t("study.hard"), count: summary.hardCount, color: "bg-review-hard", textColor: "text-review-hard" },
+            { label: t("study.good"), count: summary.goodCount, color: "bg-review-good", textColor: "text-review-good" },
+            { label: t("study.easy"), count: summary.easyCount, color: "bg-review-easy", textColor: "text-review-easy" },
+          ].map((r) => (
+            <div key={r.label} className="flex items-center gap-2">
+              <span className={`w-12 text-right text-xs font-semibold ${r.textColor}`}>{r.count}</span>
+              <span className="w-10 text-xs text-on-surface-variant">{r.label}</span>
+              <div className="flex-1 h-2 rounded-full bg-surface-container-highest overflow-hidden">
+                <div
+                  className={`h-full rounded-full ${r.color} transition-all duration-700 ease-out`}
+                  style={{ width: `${(r.count / (total || 1)) * 100}%` }}
+                />
+              </div>
             </div>
-          </div>
-        )}
+          ))}
+        </div>
 
-        <Button className="mt-6 w-full" onClick={onContinue} autoFocus>{t("sessionSummary.continue")}</Button>
+        <div className="mt-6 flex gap-3">
+          <Button variant="outline" className="flex-1" onClick={showDashboard}>{t("sessionSummary.backToDashboard")}</Button>
+          <Button className="flex-1" onClick={onContinue} autoFocus>{t("sessionSummary.continue")}</Button>
+        </div>
       </div>
     </div>
   );

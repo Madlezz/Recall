@@ -9,7 +9,7 @@ import { Mascot } from "@/components/mascot";
 import { cardSurface } from "@/lib/surface";
 import { cn } from "@/lib/utils";
 
-type Step = "welcome" | "concept" | "templates" | "goal";
+type Step = "welcome" | "concept" | "system" | "templates" | "goal";
 
 const GOAL_OPTIONS = [5, 10, 20, 30, 50];
 
@@ -72,7 +72,7 @@ export function Onboarding(): JSX.Element {
     }
   }
 
-  const steps: Step[] = ["welcome", "concept", "templates", "goal"];
+  const steps: Step[] = ["welcome", "concept", "system", "templates", "goal"];
   const stepIndex = steps.indexOf(step);
 
   return (
@@ -205,7 +205,7 @@ export function Onboarding(): JSX.Element {
                 <ChevronLeft className="mr-1 h-4 w-4" aria-hidden="true" />
                 {t("onboarding.back")}
               </Button>
-              <Button size="lg" className="flex-1" onClick={() => setStep("templates")}>
+              <Button size="lg" className="flex-1" onClick={() => setStep("system")}>
                 {t("onboarding.conceptNext")}
                 <ChevronRight className="ml-1 h-4 w-4" aria-hidden="true" />
               </Button>
@@ -213,7 +213,77 @@ export function Onboarding(): JSX.Element {
           </div>
         )}
 
-        {/* ── Step 3: Templates ── */}
+        {/* ── Step 3: How to Rate ── */}
+        {step === "system" && (
+          <div className="space-y-6">
+            <div className="space-y-6 rounded-2xl border border-outline-variant bg-surface p-6">
+              <div className="space-y-2 text-center">
+                <h2 className="font-headline text-xl font-bold tracking-tight text-primary">
+                  {t("onboarding.systemTitle")}
+                </h2>
+                <p className="text-sm text-on-surface-variant">
+                  {t("onboarding.systemDesc")}
+                </p>
+              </div>
+
+              {/* Rating buttons preview */}
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: t("study.again"), time: "1m", color: "border-review-again bg-review-again/5 text-review-again" },
+                  { label: t("study.hard"), time: "4d", color: "border-review-hard bg-review-hard/5 text-review-hard" },
+                  { label: t("study.good"), time: "10d", color: "border-review-good bg-review-good/5 text-review-good" },
+                  { label: t("study.easy"), time: "25d", color: "border-review-easy bg-review-easy/5 text-review-easy" },
+                ].map((r) => (
+                  <div
+                    key={r.label}
+                    className={`flex flex-col items-center justify-center rounded-xl border-2 px-4 py-3 ${r.color}`}
+                  >
+                    <span className="text-sm font-semibold">{r.label}</span>
+                    <span className="text-xs opacity-70">{r.time}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Explanation cards */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div className="rounded-xl bg-primary-soft px-4 py-3 text-center">
+                  <div className="mx-auto mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                    <Brain className="h-4 w-4 text-primary" aria-hidden="true" />
+                  </div>
+                  <p className="text-xs font-semibold text-primary">{t("onboarding.systemOptimal")}</p>
+                  <p className="mt-0.5 text-[11px] text-on-surface-variant">{t("onboarding.systemOptimalDesc")}</p>
+                </div>
+                <div className="rounded-xl bg-secondary-container/10 px-4 py-3 text-center">
+                  <div className="mx-auto mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-secondary/10">
+                    <Sparkles className="h-4 w-4 text-secondary" aria-hidden="true" />
+                  </div>
+                  <p className="text-xs font-semibold text-secondary">{t("onboarding.systemFsrs")}</p>
+                  <p className="mt-0.5 text-[11px] text-on-surface-variant">{t("onboarding.systemFsrsDesc")}</p>
+                </div>
+                <div className="rounded-xl bg-tertiary-container/10 px-4 py-3 text-center">
+                  <div className="mx-auto mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-tertiary/10">
+                    <Shield className="h-4 w-4 text-tertiary" aria-hidden="true" />
+                  </div>
+                  <p className="text-xs font-semibold text-tertiary">{t("onboarding.systemTrust")}</p>
+                  <p className="mt-0.5 text-[11px] text-on-surface-variant">{t("onboarding.systemTrustDesc")}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button variant="outline" size="lg" className="flex-1" onClick={() => setStep("concept")}>
+                <ChevronLeft className="mr-1 h-4 w-4" aria-hidden="true" />
+                {t("onboarding.back")}
+              </Button>
+              <Button size="lg" className="flex-1" onClick={() => setStep("templates")}>
+                {t("onboarding.systemNext")}
+                <ChevronRight className="ml-1 h-4 w-4" aria-hidden="true" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Step 4: Templates ── */}
         {step === "templates" && (
           <div className="space-y-6">
             <div className="space-y-2">
@@ -250,7 +320,7 @@ export function Onboarding(): JSX.Element {
           </div>
         )}
 
-        {/* ── Step 4: Daily Goal ── */}
+        {/* ── Step 5: Daily Goal ── */}
         {step === "goal" && (
           <div className="space-y-6">
             <div className="space-y-2">

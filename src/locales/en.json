@@ -443,6 +443,12 @@
     "deselectAll": "Deselect All",
     "noResults": "No results found"
   },
+  "achievement": {
+    "newAchievement": "New Achievement",
+    "share": "Share",
+    "continue": "Continue",
+    "keepGoing": "Keep going! Every review session strengthens your memory."
+  },
   "commandPalette": {
     "placeholder": "Type a command or search…",
     "noResults": "No commands found",
@@ -743,7 +749,16 @@
     "conceptTitle": "Learn at the right time",
     "conceptDesc": "Recall brings cards back just before you forget them, so you can remember more with less effort.",
     "conceptBadge": "Based on Spaced Repetition (FSRS)",
-    "conceptNext": "Continue"
+    "conceptNext": "Continue",
+    "systemTitle": "It's simple to rate",
+    "systemDesc": "Just be honest. If a card feels easy, it comes back later. If it feels hard, it comes back sooner.",
+    "systemNext": "Next",
+    "systemOptimal": "Optimal timing",
+    "systemOptimalDesc": "Cards appear right before you're about to forget them.",
+    "systemFsrs": "FSRS Algorithm",
+    "systemFsrsDesc": "The latest memory science automatically adjusts to your pace.",
+    "systemTrust": "Trust yourself",
+    "systemTrustDesc": "There are no wrong ratings. Just your personal learning curve."
   },
   "focusTimer": {
     "title": "Focus Timer",
@@ -1081,7 +1096,9 @@
     "avgRating": "Avg rating",
     "achievementUnlocked": "Achievement Unlocked",
     "continue": "Continue",
-    "againHeavy": "Again-heavy"
+    "againHeavy": "Again-heavy",
+    "accuracy": "Accuracy",
+    "backToDashboard": "Back to Dashboard"
   },
   "pwa": {
     "updateAvailable": "Update available",
