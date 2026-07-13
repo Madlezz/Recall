@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, Beaker, FileSpreadsheet, Flame, Library, Plus, RotateCw } from "lucide-react";
+import { ArrowRight, Beaker, FileSpreadsheet, Flame, Library, Plus, RotateCw, Search } from "lucide-react";
 import { toast } from "sonner";
 import { AnkiImportDialog } from "@/components/anki-import-dialog";
 import { ReviewInbox } from "@/components/review-inbox";
@@ -33,6 +33,7 @@ export function Dashboard(): JSX.Element {
   const showDeck = useRecallStore((state) => state.showDeck);
   const startReview = useRecallStore((state) => state.startReview);
   const [sortBy, setSortBy] = useState<"name" | "due" | "cards">("name");
+  const [deckSearch, setDeckSearch] = useState("");
   const [showCreateDeck, setShowCreateDeck] = useState(false);
   const [showCustomStudy, setShowCustomStudy] = useState(false);
   const [showCsvImport, setShowCsvImport] = useState(false);
@@ -54,8 +55,8 @@ export function Dashboard(): JSX.Element {
       if (sortBy === "due") return b.dueCount - a.dueCount;
       if (sortBy === "cards") return b.totalCards - a.totalCards;
       return a.name.localeCompare(b.name);
-    });
-  }, [decks, cards, sortBy]);
+    }).filter((d) => !deckSearch || d.name.toLowerCase().includes(deckSearch.toLowerCase()));
+  }, [decks, cards, sortBy, deckSearch]);
 
   const hasAnyContent = decks.length > 0;
   const dueCount = getDueTodayCount(cards);
@@ -140,6 +141,18 @@ export function Dashboard(): JSX.Element {
 
       {/* ── Decks ── */}
       <section>
+        {/* Search bar */}
+        <div className="relative mb-4">
+          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-on-surface-variant" aria-hidden="true" />
+          <input
+            type="text"
+            value={deckSearch}
+            onChange={(e) => setDeckSearch(e.target.value)}
+            placeholder={t("dashboard.searchDecks")}
+            className="w-full rounded-xl border border-outline-variant bg-surface py-2.5 pl-10 pr-4 text-sm text-text-primary placeholder:text-on-surface-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
+            aria-label={t("dashboard.searchDecks")}
+          />
+        </div>
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-headline text-lg font-bold tracking-tight text-on-surface">{t("dashboard.yourDecks")}</h2>
           <div className="flex items-center gap-3">

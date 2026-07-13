@@ -70,7 +70,8 @@
     "greetingAfternoon": "Selamat siang, Pembelajar",
     "greetingEvening": "Selamat malam, Pembelajar",
     "cardsReady": "Kamu punya {{count}} kartu siap direview hari ini.",
-    "cardsReady_one": "Kamu punya 1 kartu siap direview hari ini."
+    "cardsReady_one": "Kamu punya 1 kartu siap direview hari ini.",
+    "searchDecks": "Cari deck kamu..."
   },
   "todayBand": {
     "due": "Jatuh tempo",
