@@ -21,7 +21,6 @@ import { getLevel, getLevelTitle, levelProgress } from "@/lib/xp";
 import { cn } from "@/lib/utils";
 import { cardSurface } from "@/lib/surface";
 import { useRecallStore } from "@/stores/recall-store";
-import type { Deck } from "@/types";
 
 export function Dashboard(): JSX.Element {
   const { t } = useTranslation();
