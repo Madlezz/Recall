@@ -1,19 +1,28 @@
-import { BookCheck, Brain, Shield, Sparkles, Zap } from "lucide-react";
+import { BookCheck, Brain, ChevronLeft, ChevronRight, Shield, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRecallStore } from "@/stores/recall-store";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { TEMPLATE_DECKS, createCardsFromTemplate, type TemplateDeck } from "@/data/templates";
+import { Mascot } from "@/components/mascot";
 import { cardSurface } from "@/lib/surface";
+import { cn } from "@/lib/utils";
+
+type Step = "welcome" | "templates" | "goal";
+
+const GOAL_OPTIONS = [5, 10, 20, 30, 50];
 
 export function Onboarding(): JSX.Element {
   const { t } = useTranslation();
   const completeOnboarding = useRecallStore((state) => state.completeOnboarding);
   const startFresh = useRecallStore((state) => state.startFresh);
   const importTemplateDecks = useRecallStore((state) => state.importTemplateDecks);
+  const updateSettings = useRecallStore((state) => state.updateSettings);
+  const [step, setStep] = useState<Step>("welcome");
   const [visible, setVisible] = useState(false);
   const [selectedTemplates, setSelectedTemplates] = useState<Set<string>>(new Set());
+  const [goal, setGoal] = useState(20);
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 50);
@@ -23,17 +32,28 @@ export function Onboarding(): JSX.Element {
   function toggleTemplate(id: string): void {
     setSelectedTemplates((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   }
 
-  async function handleTryDemo(): Promise<void> {
+  async function handleImportAndFinish(): Promise<void> {
     try {
+      if (selectedTemplates.size > 0) {
+        const allDecks: any[] = [];
+        const allCards: any[] = [];
+        for (const templateId of selectedTemplates) {
+          const template = TEMPLATE_DECKS.find((tpl) => tpl.id === templateId);
+          if (template) {
+            const { deck, cards } = createCardsFromTemplate(template);
+            allDecks.push(deck);
+            allCards.push(...cards);
+          }
+        }
+        await importTemplateDecks(allDecks, allCards);
+      }
+      updateSettings({ dailyGoal: goal });
       await completeOnboarding();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -52,146 +72,151 @@ export function Onboarding(): JSX.Element {
     }
   }
 
-  async function handleImportTemplates(): Promise<void> {
-    if (selectedTemplates.size === 0) {
-      toast.error(t("onboarding.selectAtLeastOne"));
-      return;
-    }
-
-    try {
-      const allDecks = [];
-      const allCards = [];
-
-      for (const templateId of selectedTemplates) {
-        const template = TEMPLATE_DECKS.find((tpl) => tpl.id === templateId);
-        if (template) {
-          const { deck, cards } = createCardsFromTemplate(template);
-          allDecks.push(deck);
-          allCards.push(...cards);
-        }
-      }
-
-      await importTemplateDecks(allDecks, allCards);
-      toast.success(t("onboarding.importedDecks", { count: allDecks.length }));
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.error("Failed to import templates:", error);
-      toast.error(t("onboarding.importFailed", { message }));
-    }
-  }
+  const steps: Step[] = ["welcome", "templates", "goal"];
+  const stepIndex = steps.indexOf(step);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4 text-text-primary">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-background px-4 text-text-primary">
       <div
-        className={`w-full max-w-2xl space-y-8 text-center transition-all duration-500 ${
-          visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-        }`}
+        className={cn(
+          "w-full max-w-lg space-y-8 text-center transition-all duration-500",
+          visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0",
+        )}
         role="region"
         aria-label={t("onboarding.welcomeAria")}
       >
-        <div className="space-y-4">
-          <div className={cardSurface("mx-auto flex h-14 w-14 items-center justify-center rounded-xl")}>
-            <Brain className="h-7 w-7 text-text-primary" aria-hidden="true" />
-          </div>
-          <div className="space-y-2">
-            <h1 className="font-headline text-3xl font-bold tracking-tight text-text-primary">
-              {t("onboarding.appName")}
-            </h1>
-            <p className="text-sm text-on-surface-variant">
-              {t("onboarding.tagline")}
-            </p>
-          </div>
+        {/* ── Step indicator ── */}
+        <div className="flex items-center justify-center gap-2" aria-label={t("onboarding.stepIndicator", { step: stepIndex + 1, total: steps.length })}>
+          {steps.map((s, i) => (
+            <div
+              key={s}
+              className={cn(
+                "h-2 rounded-full transition-all duration-300",
+                i === stepIndex ? "w-6 bg-primary" : i < stepIndex ? "w-2 bg-primary/40" : "w-2 bg-outline-variant",
+              )}
+            />
+          ))}
         </div>
 
-        <div className="space-y-3 text-left" role="group" aria-label={t("onboarding.featuresAria")}>
-          <div className={cardSurface("space-y-2 rounded-lg p-3")}>
-            <div className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-              <Zap className="h-4 w-4 text-on-surface-variant" aria-hidden="true" />
-              {t("onboarding.feature1Title")}
+        {/* ── Step 1: Welcome ── */}
+        {step === "welcome" && (
+          <div className="space-y-6">
+            <Mascot className="mx-auto h-20 w-20" />
+            <div className="space-y-2">
+              <h1 className="font-display text-3xl font-bold tracking-tight text-text-primary">
+                {t("onboarding.welcomeTitle")}
+              </h1>
+              <p className="text-sm text-on-surface-variant">
+                {t("onboarding.welcomeTagline")}
+              </p>
             </div>
-            <p className="text-xs leading-relaxed text-on-surface-variant">
-              {t("onboarding.feature1Desc")}
-            </p>
-          </div>
-
-          <div className={cardSurface("space-y-2 rounded-lg p-3")}>
-            <div className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-              <BookCheck className="h-4 w-4 text-on-surface-variant" aria-hidden="true" />
-              {t("onboarding.feature2Title")}
+            <div className="space-y-3 text-left" role="group" aria-label={t("onboarding.featuresAria")}>
+              {[
+                { icon: Zap, title: t("onboarding.feature1Title"), desc: t("onboarding.feature1Desc") },
+                { icon: BookCheck, title: t("onboarding.feature2Title"), desc: t("onboarding.feature2Desc") },
+                { icon: Shield, title: t("onboarding.feature3Title"), desc: t("onboarding.feature3Desc") },
+              ].map((f, i) => (
+                <div key={i} className={cardSurface("space-y-1 rounded-lg p-3")}>
+                  <div className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+                    <f.icon className="h-4 w-4 text-on-surface-variant" aria-hidden="true" />
+                    {f.title}
+                  </div>
+                  <p className="text-xs leading-relaxed text-on-surface-variant">{f.desc}</p>
+                </div>
+              ))}
             </div>
-            <p className="text-xs leading-relaxed text-on-surface-variant">
-              {t("onboarding.feature2Desc")}
-            </p>
-          </div>
-
-          <div className={cardSurface("space-y-2 rounded-lg p-3")}>
-            <div className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-              <Shield className="h-4 w-4 text-on-surface-variant" aria-hidden="true" />
-              {t("onboarding.feature3Title")}
+            <div className="space-y-3">
+              <Button size="lg" className="w-full" onClick={() => setStep("templates")}>
+                {t("onboarding.getStarted")}
+                <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="sm" className="w-full text-on-surface-variant" onClick={handleStartFresh}>
+                {t("onboarding.startFresh")}
+              </Button>
             </div>
-            <p className="text-xs leading-relaxed text-on-surface-variant">
-              {t("onboarding.feature3Desc")}
+          </div>
+        )}
+
+        {/* ── Step 2: Templates ── */}
+        {step === "templates" && (
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Brain className="mx-auto h-10 w-10 text-primary" aria-hidden="true" />
+              <h2 className="font-headline text-xl font-bold tracking-tight text-text-primary">
+                {t("onboarding.pickTemplates")}
+              </h2>
+              <p className="text-sm text-on-surface-variant">
+                {t("onboarding.pickTemplatesDesc")}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-left">
+              {TEMPLATE_DECKS.map((template) => (
+                <TemplateCard
+                  key={template.id}
+                  template={template}
+                  selected={selectedTemplates.has(template.id)}
+                  onToggle={() => toggleTemplate(template.id)}
+                />
+              ))}
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" size="lg" className="flex-1" onClick={() => setStep("welcome")}>
+                <ChevronLeft className="mr-1 h-4 w-4" />
+                {t("onboarding.back")}
+              </Button>
+              <Button size="lg" className="flex-1" onClick={() => setStep("goal")}>
+                {selectedTemplates.size > 0
+                  ? t("onboarding.continueWith", { count: selectedTemplates.size })
+                  : t("onboarding.skip")}
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Step 3: Daily Goal ── */}
+        {step === "goal" && (
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Sparkles className="mx-auto h-10 w-10 text-secondary" aria-hidden="true" />
+              <h2 className="font-headline text-xl font-bold tracking-tight text-text-primary">
+                {t("onboarding.setGoal")}
+              </h2>
+              <p className="text-sm text-on-surface-variant">
+                {t("onboarding.setGoalDesc")}
+              </p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-2">
+              {GOAL_OPTIONS.map((g) => (
+                <button
+                  key={g}
+                  onClick={() => setGoal(g)}
+                  className={cn(
+                    "rounded-xl px-5 py-3 text-lg font-bold tabular-nums transition-all",
+                    goal === g
+                      ? "bg-primary text-on-primary shadow-sm"
+                      : "bg-surface-container text-text-primary hover:bg-surface-container-high",
+                  )}
+                >
+                  {g}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-on-surface-variant">
+              {t("onboarding.goalHint", { count: goal })}
             </p>
+            <div className="flex gap-3">
+              <Button variant="outline" size="lg" className="flex-1" onClick={() => setStep("templates")}>
+                <ChevronLeft className="mr-1 h-4 w-4" />
+                {t("onboarding.back")}
+              </Button>
+              <Button size="lg" className="flex-1" onClick={() => void handleImportAndFinish()}>
+                <Sparkles className="mr-2 h-4 w-4" />
+                {t("onboarding.startLearning")}
+              </Button>
+            </div>
           </div>
-        </div>
-
-        <div className="space-y-3 text-left">
-          <h2 className="text-sm font-semibold text-text-secondary">
-            {t("onboarding.templateHeader")}
-          </h2>
-          <div className="grid grid-cols-2 gap-3">
-            {TEMPLATE_DECKS.map((template) => (
-              <TemplateCard
-                key={template.id}
-                template={template}
-                selected={selectedTemplates.has(template.id)}
-                onToggle={() => toggleTemplate(template.id)}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          {selectedTemplates.size > 0 && (
-            <Button
-              size="lg"
-              className="w-full bg-primary text-on-primary hover:bg-primary-hover dark:hover:bg-primary-hover"
-              onClick={() => void handleImportTemplates()}
-              aria-label={t("onboarding.importTemplatesAria", { count: selectedTemplates.size })}
-            >
-              <Sparkles className="mr-2 h-4 w-4" aria-hidden="true" />
-              {t("onboarding.importTemplates", { count: selectedTemplates.size })}
-            </Button>
-          )}
-
-          <Button
-            size="lg"
-            variant={selectedTemplates.size > 0 ? "outline" : "default"}
-            className={`w-full ${
-              selectedTemplates.size > 0
-                ? "border-outline-variant text-text-secondary hover:bg-surface-container-high"
-                : "bg-primary text-on-primary hover:bg-primary-hover"
-            }`}
-            onClick={() => void handleTryDemo()}
-            aria-label={t("onboarding.tryDemoAria")}
-          >
-            {t("onboarding.tryDemo")}
-          </Button>
-
-          <Button
-            size="lg"
-            variant="outline"
-            className="w-full border-outline-variant text-text-secondary hover:bg-surface-container-high"
-            onClick={() => void handleStartFresh()}
-            aria-label={t("onboarding.startFreshAria")}
-          >
-            {t("onboarding.startFresh")}
-          </Button>
-
-          <p className="text-xs text-on-surface-variant" id="privacy-note">
-            {t("onboarding.privacyNote")}
-          </p>
-        </div>
+        )}
       </div>
     </main>
   );
@@ -210,36 +235,23 @@ function TemplateCard({
   return (
     <button
       onClick={onToggle}
-      className={`rounded-lg border p-4 text-left transition-all ${
+      className={cn(
+        "rounded-lg border p-4 text-left transition-all",
         selected
           ? "border-primary bg-primary-soft ring-2 ring-primary/20"
-          : "border-outline-variant bg-surface hover:border-outline"
-      }`}
+          : "border-outline-variant bg-surface hover:border-outline",
+      )}
     >
       <div className="flex items-start gap-3">
-        <div className="text-2xl" aria-hidden="true">
-          {template.icon}
-        </div>
+        <div className="text-2xl" aria-hidden="true">{template.icon}</div>
         <div className="flex-1 space-y-1">
-          <h3 className="text-sm font-semibold text-text-primary">
-            {template.name}
-          </h3>
-          <p className="text-xs text-on-surface-variant">
-            {template.description}
-          </p>
-          <p className="text-xs text-on-surface-variant">
-            {t("onboarding.cardsCount", { count: template.cards.length })}
-          </p>
+          <h3 className="text-sm font-semibold text-text-primary">{template.name}</h3>
+          <p className="text-xs text-on-surface-variant">{template.description}</p>
+          <p className="text-xs text-on-surface-variant">{t("onboarding.cardsCount", { count: template.cards.length })}</p>
         </div>
         {selected && (
           <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-on-primary">
-            <svg
-              className="h-3 w-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={3}
-            >
+            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>

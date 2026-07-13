@@ -705,7 +705,20 @@
     "resetDataFailed": "Gagal mereset data: {{message}}",
     "importFailed": "Gagal mengimpor templat: {{message}}",
     "feature3Title": "Milikmu Sendiri",
-    "feature3Desc": "Tanpa akun, tanpa cloud, tanpa pelacakan. Kartumu tersimpan di komputermu. Ekspor cadangan kapan saja."
+    "feature3Desc": "Tanpa akun, tanpa cloud, tanpa pelacakan. Kartumu tersimpan di komputermu. Ekspor cadangan kapan saja.",
+    "welcomeTitle": "Selamat Datang di Recall",
+    "welcomeTagline": "Belajar fokus, tanpa repot pengaturan.",
+    "getStarted": "Mulai",
+    "pickTemplates": "Pilih Deck Awal",
+    "pickTemplatesDesc": "Pilih deck untuk memulai belajar. Kamu bisa tambah lagi nanti.",
+    "back": "Kembali",
+    "skip": "Lewati",
+    "continueWith": "Lanjut ({{count}})",
+    "setGoal": "Tentukan Target Harian",
+    "setGoalDesc": "Berapa kartu yang ingin kamu review setiap hari? Mulai dari yang kecil.",
+    "goalHint": "Kamu bisa ubah ini kapan saja di Pengaturan.",
+    "startLearning": "Mulai Belajar",
+    "stepIndicator": "Langkah {{step}} dari {{total}}"
   },
   "focusTimer": {
     "title": "Timer Fokus",

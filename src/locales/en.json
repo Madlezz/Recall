@@ -705,7 +705,20 @@
     "resetDataFailed": "Failed to reset data: {{message}}",
     "importFailed": "Failed to import templates: {{message}}",
     "feature3Title": "Yours Alone",
-    "feature3Desc": "No account, no cloud, no tracking. Your cards live on your computer. Export a backup anytime."
+    "feature3Desc": "No account, no cloud, no tracking. Your cards live on your computer. Export a backup anytime.",
+    "welcomeTitle": "Welcome to Recall",
+    "welcomeTagline": "Focused learning, without the setup friction.",
+    "getStarted": "Get Started",
+    "pickTemplates": "Pick Your Starter Decks",
+    "pickTemplatesDesc": "Choose decks to jumpstart your learning. You can always add more later.",
+    "back": "Back",
+    "skip": "Skip",
+    "continueWith": "Continue ({{count}})",
+    "setGoal": "Set a Daily Goal",
+    "setGoalDesc": "How many cards do you want to review each day? Start small.",
+    "goalHint": "You can change this anytime in Settings.",
+    "startLearning": "Start Learning",
+    "stepIndicator": "Step {{step}} of {{total}}"
   },
   "focusTimer": {
     "title": "Focus Timer",
