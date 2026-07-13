@@ -152,7 +152,10 @@
     "answer": "Jawaban",
     "answerRevealedSr": "Jawaban ditampilkan. Pilih penilaianmu.",
     "pressSpaceSr": "Tekan Spasi untuk menampilkan jawaban.",
-    "editCardTitle": "Edit kartu ini (E)"
+    "editCardTitle": "Edit kartu ini (E)",
+    "basicType": "Dasar",
+    "clozeType": "Cloze",
+    "imageOcclusionType": "Oklusi Gambar"
   },
   "cardDialog": {
     "newCard": "Kartu baru",

@@ -316,7 +316,7 @@ export function StudyMode(): JSX.Element {
           </div>
           <div className="mt-1.5 h-1.5 w-full rounded-full bg-surface-container dark:bg-surface-container overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100} aria-label={t("study.studyProgress", { current: activeStudy.currentIndex, total })}>
             <div
-              className="h-full rounded-full bg-zinc-500 transition-[width] duration-300 dark:bg-zinc-400"
+              className="h-full rounded-full bg-primary transition-[width] duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -358,9 +358,9 @@ export function StudyMode(): JSX.Element {
           <div
             className={cn(
               "rounded-md px-4 py-2 text-center text-sm font-semibold",
-              daysLeft <= 0 ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" :
-              daysLeft <= 3 ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" :
-              "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+              daysLeft <= 0 ? "bg-review-again/10 text-review-again dark:bg-review-again/20 dark:text-review-again" :
+              daysLeft <= 3 ? "bg-review-hard/10 text-review-hard dark:bg-review-hard/20 dark:text-review-hard" :
+              "bg-primary-soft text-primary dark:bg-primary-container dark:text-primary",
             )}
           >
             📅 {daysLeft <= 0 ? t("study.examToday") : daysLeft === 1 ? t("study.examTomorrow") : t("study.examInDays", { days: daysLeft })}
@@ -384,12 +384,17 @@ export function StudyMode(): JSX.Element {
               transitionDuration: isSwiping ? "0ms" : "320ms",
             }}
           >
-            {/* Front */}
-            <div className={cn("study-card-face absolute inset-0 flex flex-col justify-center", cardSurface("p-5 shadow-sm sm:p-10"))}>
-              <p className="text-xs font-medium text-on-surface-variant uppercase tracking-wider">{deck?.name ?? t("study.review")}</p>
-              <div className="mt-4 text-balance text-lg font-semibold leading-relaxed text-text-primary dark:text-text-primary sm:mt-5 sm:text-2xl">
-                <RichCard content={card.front} cardType={card.cardType} revealed={activeStudy.revealed} allowHtml={settings?.allowHtml} />
-              </div>
+{/* Front */}
+	            <div className={cn("study-card-face absolute inset-0 flex flex-col justify-center", cardSurface("p-5 shadow-sm sm:p-10"))}>
+	              <div className="flex items-center gap-2">
+	                <span className="rounded-full bg-primary-soft px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary">
+	                  {card.cardType === "cloze" ? t("study.clozeType") : card.cardType === "image-occlusion" ? t("study.imageOcclusionType") : t("study.basicType")}
+	                </span>
+	              </div>
+	              <p className="mt-2 text-xs font-medium text-on-surface-variant uppercase tracking-wider">{deck?.name ?? t("study.review")}</p>
+	              <div className="mt-4 text-balance text-lg font-semibold leading-relaxed text-text-primary dark:text-text-primary sm:mt-5 sm:text-2xl">
+	                <RichCard content={card.front} cardType={card.cardType} revealed={activeStudy.revealed} allowHtml={settings?.allowHtml} />
+	              </div>
               {card.hint && (
                 <p className="mt-4 text-sm text-on-surface-variant sm:mt-6">{t("study.hint")}: {card.hint}</p>
               )}

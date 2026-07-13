@@ -152,7 +152,10 @@
     "answer": "Answer",
     "answerRevealedSr": "Answer revealed. Choose your rating.",
     "pressSpaceSr": "Press Space to reveal answer.",
-    "editCardTitle": "Edit this card (E)"
+    "editCardTitle": "Edit this card (E)",
+    "basicType": "Basic",
+    "clozeType": "Cloze",
+    "imageOcclusionType": "Image Occlusion"
   },
   "cardDialog": {
     "newCard": "New card",
