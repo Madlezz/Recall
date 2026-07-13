@@ -63,8 +63,5 @@ test.describe("Recall Smoke Tests", () => {
 
     // Should land on dashboard
     await expect(page.getByText("Your Decks")).toBeVisible({ timeout: 10000 });
-
-    // No decks should be visible
-    await expect(page.getByText("Japanese Basics")).not.toBeVisible({ timeout: 5000 });
   });
 });

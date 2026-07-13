@@ -8,9 +8,25 @@ test("empty dashboard shows friendly empty state", async ({ page }) => {
   await page.reload();
 
   await page.waitForSelector("[role='region'][aria-label='Welcome to Recall']", { timeout: 10000 });
-  await expect(page.getByRole("button", { name: /Start Empty|Start with empty/i })).toBeVisible({ timeout: 15000 });
-  await page.getByRole("button", { name: /Start Empty|Start with empty/i }).click();
-  await expect(page.getByText("Spaced Repetition")).toBeVisible({ timeout: 10000 });
+  await expect(page.getByRole("button", { name: /Get Started/i })).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: /Get Started/i }).click();
 
-  await expect(page.getByText(/no decks|empty|create.*deck|get started/i).first()).toBeVisible({ timeout: 5000 });
+  // Concept → Continue
+  await expect(page.getByRole("button", { name: /Continue/i })).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: /Continue/i }).click();
+
+  // System → Next
+  await expect(page.getByRole("button", { name: /^Next$/i })).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: /^Next$/i }).click();
+
+  // Templates → Skip (footer button)
+  await expect(page.getByRole("button", { name: /^Skip$/i }).last()).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: /^Skip$/i }).last().click();
+
+  // Goal → Start Learning
+  await expect(page.getByRole("button", { name: /Start Learning/i })).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: /Start Learning/i }).click();
+
+  await expect(page.getByText("Your Decks")).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText(/no decks|empty|library is empty|create.*deck/i).first()).toBeVisible({ timeout: 5000 });
 });
