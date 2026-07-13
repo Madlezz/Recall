@@ -65,7 +65,12 @@
     "emptyDescription": "Create your first deck and start building knowledge that sticks.",
     "createDeck": "Create Deck",
     "importCards": "Import Cards",
-    "noCardsDue": "No cards due right now"
+    "noCardsDue": "No cards due right now",
+    "greetingMorning": "Good morning, Learner",
+    "greetingAfternoon": "Good afternoon, Learner",
+    "greetingEvening": "Good evening, Learner",
+    "cardsReady": "You have {{count}} cards ready today.",
+    "cardsReady_one": "You have 1 card ready today."
   },
   "todayBand": {
     "due": "Due",

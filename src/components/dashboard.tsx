@@ -58,6 +58,8 @@ export function Dashboard(): JSX.Element {
   }, [decks, cards, sortBy]);
 
   const hasAnyContent = decks.length > 0;
+  const dueCount = getDueTodayCount(cards);
+  const greeting = useMemo(() => getGreeting(t), [t]);
 
   return (
     <div className="animate-fade-in space-y-8 sm:space-y-12">
@@ -66,10 +68,12 @@ export function Dashboard(): JSX.Element {
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-on-surface-variant">{t("dashboard.subtitle")}</p>
           <h1 className="mt-2 font-display text-[1.75rem] font-bold leading-tight tracking-tight text-on-surface sm:text-[2rem]">
-            {t("dashboard.title")}
+            {greeting}
           </h1>
           <p className="mt-2 max-w-lg text-sm leading-relaxed text-on-surface-variant">
-            {t("dashboard.description")}
+            {dueCount > 0
+              ? t("dashboard.cardsReady", { count: dueCount })
+              : t("dashboard.description")}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -453,4 +457,15 @@ function TodayBand({ dueCount, newCount, reviewedToday, onStartReview }: TodayBa
       </Button>
     </section>
   );
+}
+
+// ═══════════════════════════════════════════════
+// getGreeting — time-based greeting
+// ═══════════════════════════════════════════════
+
+function getGreeting(t: (key: string, opts?: Record<string, unknown>) => string): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return t("dashboard.greetingMorning");
+  if (hour < 17) return t("dashboard.greetingAfternoon");
+  return t("dashboard.greetingEvening");
 }

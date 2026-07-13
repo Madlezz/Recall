@@ -65,7 +65,12 @@
     "emptyDescription": "Buat dek pertamamu dan mulai bangun pengetahuan yang melekat.",
     "createDeck": "Buat Dek",
     "importCards": "Impor Kartu",
-    "noCardsDue": "Tidak ada kartu yang jatuh tempo sekarang"
+    "noCardsDue": "Tidak ada kartu yang jatuh tempo sekarang",
+    "greetingMorning": "Selamat pagi, Pembelajar",
+    "greetingAfternoon": "Selamat siang, Pembelajar",
+    "greetingEvening": "Selamat malam, Pembelajar",
+    "cardsReady": "Kamu punya {{count}} kartu siap direview hari ini.",
+    "cardsReady_one": "Kamu punya 1 kartu siap direview hari ini."
   },
   "todayBand": {
     "due": "Jatuh tempo",
