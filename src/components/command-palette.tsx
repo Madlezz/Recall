@@ -168,7 +168,7 @@ export function CommandPalette(): JSX.Element {
                 <Icon className="h-4 w-4 shrink-0" />
                 <span className="flex-1 text-left">{cmd.label}</span>
                 {cmd.shortcut && (
-                  <kbd className="rounded border bg-surface-container px-1.5 py-0.5 text-[10px] font-mono text-on-surface-variant dark:bg-zinc-700 dark:text-on-surface-variant">
+                  <kbd className="rounded border bg-surface-container px-1.5 py-0.5 text-[10px] font-mono text-on-surface-variant dark:bg-surface-container-high dark:text-on-surface-variant">
                     {cmd.shortcut}
                   </kbd>
                 )}

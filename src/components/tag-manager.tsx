@@ -106,7 +106,7 @@ function TreeNode({
             <div className="ml-1 hidden items-center gap-0.5 group-hover:flex">
               <button
                 onClick={() => { setEditing(true); setEditValue(node.fullPath); }}
-                className="p-1 rounded text-on-surface-variant hover:text-on-surface-variant hover:bg-surface-container-high dark:hover:text-text-secondary dark:hover:bg-zinc-700"
+                className="p-1 rounded text-on-surface-variant hover:text-on-surface-variant hover:bg-surface-container-high dark:hover:text-text-secondary dark:hover:bg-surface-container-high"
                 aria-label={t("tagManager.renameTag")}
               >
                 <Edit3 className="h-3 w-3" />
@@ -313,7 +313,7 @@ export function TagManager(): JSX.Element {
             {savedSearches.map((search) => (
               <div
                 key={search.id}
-                className="group flex items-center justify-between rounded-md border border-zinc-100 p-2 dark:border-outline-variant"
+                className="group flex items-center justify-between rounded-md border border-outline-variant p-2 dark:border-outline-variant"
               >
                 <div className="flex-1">
                   <div className="text-sm font-medium text-text-secondary dark:text-text-secondary">{search.name}</div>
@@ -395,7 +395,7 @@ export function TagManager(): JSX.Element {
                 {selectedCards.slice(0, 20).map((card) => (
                   <div
                     key={card.id}
-                    className="rounded-md border border-zinc-100 p-2 text-xs dark:border-outline-variant"
+                    className="rounded-md border border-outline-variant p-2 text-xs dark:border-outline-variant"
                   >
                     <div className="truncate text-text-secondary dark:text-text-secondary">{card.front}</div>
                     <div className="mt-1 flex flex-wrap gap-1">
@@ -413,7 +413,7 @@ export function TagManager(): JSX.Element {
               </div>
 
               {/* Actions */}
-              <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-outline-variant space-y-2">
+              <div className="mt-3 pt-3 border-t border-outline-variant dark:border-outline-variant space-y-2">
                 <Button
                   variant="outline"
                   size="sm"

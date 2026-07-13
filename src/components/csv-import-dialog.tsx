@@ -191,7 +191,7 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
               accept=".csv,text/csv"
               onChange={handleFile}
               className="block w-full text-sm text-on-surface-variant dark:text-on-surface-variant
-                file:mr-4 file:rounded-md file:border-0 file:bg-surface-container file:text-text-primary hover:file:bg-surface-container-high dark:file:bg-surface-container dark:file:text-text-primary dark:hover:file:bg-zinc-700 file:px-4 file:py-2
+                file:mr-4 file:rounded-md file:border-0 file:bg-surface-container file:text-text-primary hover:file:bg-surface-container-high dark:file:bg-surface-container dark:file:text-text-primary dark:hover:file:bg-surface-container-high file:px-4 file:py-2
                 file:text-sm file:font-medium"
             />
             <p className="text-xs text-on-surface-variant dark:text-on-surface-variant">

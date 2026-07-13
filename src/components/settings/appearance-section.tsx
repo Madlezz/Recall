@@ -141,7 +141,7 @@ export function AppearanceSection(): JSX.Element {
               type="checkbox"
               checked={settings.ttsEnabled}
               onChange={(e) => void updateSettings({ ttsEnabled: e.target.checked })}
-              className="h-4 w-4 rounded border-outline text-text-secondary focus:ring-zinc-400 dark:border-zinc-600"
+              className="h-4 w-4 rounded border-outline text-text-secondary focus:ring-primary/50 dark:border-outline"
             />
             <Mic className="h-4 w-4 text-on-surface-variant" aria-hidden="true" />
             <span className="text-sm text-text-secondary dark:text-text-secondary">{t("settings.ttsEnabled")}</span>
@@ -152,7 +152,7 @@ export function AppearanceSection(): JSX.Element {
               checked={settings.ttsAutoRead}
               onChange={(e) => void updateSettings({ ttsAutoRead: e.target.checked })}
               disabled={!settings.ttsEnabled}
-              className="h-4 w-4 rounded border-outline text-text-secondary focus:ring-zinc-400 disabled:opacity-50 dark:border-zinc-600"
+              className="h-4 w-4 rounded border-outline text-text-secondary focus:ring-primary/50 disabled:opacity-50 dark:border-outline"
             />
             <span className="text-sm text-text-secondary dark:text-text-secondary">{t("settings.ttsAutoRead")}</span>
           </label>

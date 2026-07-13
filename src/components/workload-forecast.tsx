@@ -79,7 +79,7 @@ export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): J
                         "w-full transition-colors rounded-t-sm",
                         isHeaviest
                           ? "bg-amber-500 dark:bg-amber-400"
-                          : "bg-zinc-500 hover:bg-zinc-600 dark:bg-zinc-400 dark:hover:bg-zinc-300",
+                          : "bg-primary hover:bg-primary-hover dark:bg-surface-container dark:hover:bg-surface-container-high",
                       )}
                       style={{ height: `${Math.max(duePct, 2)}%` }}
                     />
@@ -121,7 +121,7 @@ export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): J
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-4 text-xs text-on-surface-variant">
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-sm bg-zinc-500 dark:bg-zinc-400" /> {t("workloadForecast.review")}
+              <span className="h-2.5 w-2.5 rounded-sm bg-primary dark:bg-surface-container" /> {t("workloadForecast.review")}
             </span>
             <span className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-sm bg-emerald-500/70" /> {t("workloadForecast.new")}

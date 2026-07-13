@@ -56,8 +56,8 @@ export function RetentionForecast({ cards }: RetentionForecastProps): JSX.Elemen
                   className={`w-full rounded-t-sm transition-colors ${
                     day.count > 0
                       ? isWeekend
-                        ? "bg-zinc-400 hover:bg-zinc-500 dark:bg-zinc-500 dark:hover:bg-zinc-400"
-                        : "bg-zinc-500 hover:bg-zinc-600 dark:bg-zinc-400 dark:hover:bg-zinc-300"
+                        ? "bg-surface-container hover:bg-surface-container-low0 dark:bg-primary dark:hover:bg-surface-container"
+                        : "bg-primary hover:bg-primary-hover dark:bg-surface-container dark:hover:bg-surface-container-high"
                       : "bg-surface-container dark:bg-surface-container"
                   }`}
                   style={{ height: `${Math.max(height, 2)}%` }}

@@ -178,7 +178,7 @@ export function ImageOcclusionEditor({ value, onChange }: Props) {
       {!value?.imageUrl ? (
         <button
           onClick={handleUploadImage}
-          className="w-full rounded-lg border-2 border-dashed border-outline bg-background p-8 text-center hover:border-zinc-400 hover:bg-surface-container-high dark:border-outline dark:bg-surface dark:hover:border-zinc-600 dark:hover:bg-surface-container"
+          className="w-full rounded-lg border-2 border-dashed border-outline bg-background p-8 text-center hover:border-outline hover:bg-surface-container-high dark:border-outline dark:bg-surface dark:hover:border-outline dark:hover:bg-surface-container"
         >
           <Plus className="mx-auto mb-2 h-8 w-8 text-on-surface-variant" />
           <p className="text-sm text-on-surface-variant dark:text-on-surface-variant">{t("imageOcclusionEditor.clickToUpload")}</p>

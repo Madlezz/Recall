@@ -123,7 +123,7 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
               onChange={(e) => { setFront(e.target.value); frontValueRef.current = e.target.value; }}
               placeholder={t("quickAdd.frontPlaceholder")}
               aria-label={t("quickAdd.frontAria")}
-              className="min-h-[80px] border-zinc-200 font-mono text-sm dark:border-zinc-800"
+              className="min-h-[80px] border-outline-variant font-mono text-sm"
               disabled={decks.length === 0}
             />
             {voiceInputEnabled && frontVoice.supported && (
@@ -166,7 +166,7 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
             )}
           </div>
 
-          <div className="flex justify-end gap-2 border-t border-zinc-100 pt-4 dark:border-outline-variant">
+          <div className="flex justify-end gap-2 border-t border-outline-variant pt-4 dark:border-outline-variant">
             <Button type="button" variant="ghost" size="sm" onClick={onClose} className="text-on-surface-variant hover:text-text-primary hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:text-text-primary dark:hover:bg-surface-container">
               {t("quickAdd.cancel")}
             </Button>

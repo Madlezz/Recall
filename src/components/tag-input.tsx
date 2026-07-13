@@ -132,7 +132,7 @@ export function TagInput({ value, onChange, className, placeholder = "Add tags..
                 e.stopPropagation();
                 removeTag(tag);
               }}
-              className="rounded p-0.5 hover:bg-surface-container-high dark:hover:bg-zinc-700"
+              className="rounded p-0.5 hover:bg-surface-container-high dark:hover:bg-surface-container-high"
               aria-label={`Remove ${tag}`}
             >
               <X className="h-2.5 w-2.5" />
@@ -172,7 +172,7 @@ export function TagInput({ value, onChange, className, placeholder = "Add tags..
                   "cursor-pointer px-3 py-1.5 text-sm transition-colors",
                   i === selectedIndex
                     ? "bg-surface-container text-text-primary dark:bg-surface-container dark:text-text-primary"
-                    : "text-text-secondary hover:bg-zinc-50 dark:text-text-secondary dark:hover:bg-surface-container/50"
+                    : "text-text-secondary hover:bg-surface-container-low dark:text-text-secondary dark:hover:bg-surface-container/50"
                 )}
                 onMouseDown={(e) => {
                   e.preventDefault();

@@ -135,7 +135,7 @@ export function ImageOcclusionStudy({ data, revealed }: Props) {
           {revealedIndex !== null && (
             <button
               onClick={handleRevealAll}
-              className="rounded-lg bg-surface-container-high px-4 py-2 text-sm font-semibold text-text-primary hover:bg-zinc-300 dark:bg-zinc-700 dark:text-text-primary dark:hover:bg-zinc-600"
+              className="rounded-lg bg-surface-container-high px-4 py-2 text-sm font-semibold text-text-primary hover:bg-surface-container-high dark:bg-surface-container-high dark:text-text-primary dark:hover:bg-surface-container"
             >
               {t("imageOcclusionStudy.revealAll")}
             </button>

@@ -264,7 +264,7 @@ function ShortcutEditor({
             className={`min-w-[72px] rounded border px-2 py-1 text-xs font-mono font-medium transition-colors ${
               capturing === action
                 ? "border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
-                : "border-outline-variant bg-background text-text-secondary hover:bg-surface-container-high dark:border-outline dark:bg-surface-container dark:text-text-primary dark:hover:bg-zinc-700"
+                : "border-outline-variant bg-background text-text-secondary hover:bg-surface-container-high dark:border-outline dark:bg-surface-container dark:text-text-primary dark:hover:bg-surface-container-high"
             }`}
           >
             {capturing === action ? t("settings.pressKey") : shortcutLabel(shortcuts[action])}
