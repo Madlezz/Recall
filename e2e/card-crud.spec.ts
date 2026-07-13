@@ -19,9 +19,9 @@ async function goToDashboard(page: import("@playwright/test").Page) {
   await expect(page.getByRole("button", { name: /^Next$/i })).toBeVisible({ timeout: 15000 });
   await page.getByRole("button", { name: /^Next$/i }).click();
 
-  // Step 4: Templates — skip without selecting
-  await expect(page.getByRole("button", { name: /^Skip$/i }).first()).toBeVisible({ timeout: 15000 });
-  await page.getByRole("button", { name: /^Skip$/i }).first().click();
+  // Step 4: Templates — skip without selecting (use last Skip = footer button)
+  await expect(page.getByRole("button", { name: /^Skip$/i }).last()).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: /^Skip$/i }).last().click();
 
   // Step 5: Daily Goal — accept default
   await expect(page.getByRole("button", { name: /Start Learning/i })).toBeVisible({ timeout: 15000 });
