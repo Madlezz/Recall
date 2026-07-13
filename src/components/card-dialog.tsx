@@ -247,7 +247,7 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
                           size="sm"
                           onClick={frontVoice.toggle}
                           title={t("cardDialog.voiceInput")}
-                          className={`h-8 ${frontVoice.listening ? "text-red-500 hover:text-red-600 animate-pulse" : "text-on-surface-variant hover:text-text-primary hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:text-text-primary dark:hover:bg-surface-container"}`}
+                          className={`h-8 ${frontVoice.listening ? "text-destructive hover:text-destructive/80 animate-pulse" : "text-on-surface-variant hover:text-text-primary hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:text-text-primary dark:hover:bg-surface-container"}`}
                         >
                           {frontVoice.listening ? <MicOff className="h-4 w-4 mr-1" /> : <Mic className="h-4 w-4 mr-1" />}
                           {frontVoice.listening ? t("cardDialog.stopListening") : t("cardDialog.voiceInput")}
@@ -299,7 +299,7 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
                           size="sm"
                           onClick={backVoice.toggle}
                           title={t("cardDialog.voiceInput")}
-                          className={`h-8 ${backVoice.listening ? "text-red-500 hover:text-red-600 animate-pulse" : "text-on-surface-variant hover:text-text-primary hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:text-text-primary dark:hover:bg-surface-container"}`}
+                          className={`h-8 ${backVoice.listening ? "text-destructive hover:text-destructive/80 animate-pulse" : "text-on-surface-variant hover:text-text-primary hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:text-text-primary dark:hover:bg-surface-container"}`}
                         >
                           {backVoice.listening ? <MicOff className="h-4 w-4 mr-1" /> : <Mic className="h-4 w-4 mr-1" />}
                           {backVoice.listening ? t("cardDialog.stopListening") : t("cardDialog.voiceInput")}

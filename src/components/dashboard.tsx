@@ -265,7 +265,7 @@ function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
   }, [cards, reviewLogs, deck.id]);
 
   const retentionColor =
-    health.retention >= 85 ? "text-emerald-600" : health.retention >= 70 ? "text-amber-600" : "text-red-600";
+    health.retention >= 85 ? "text-review-easy" : health.retention >= 70 ? "text-review-hard" : "text-review-again";
 
   return (
     <button

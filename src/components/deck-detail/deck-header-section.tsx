@@ -93,7 +93,7 @@ export function DeckHeaderSection({ deck, deckCards, onStudyNow }: DeckHeaderSec
             : t("deckDetail.setExamDate")}
         </button>
         {examDays !== null && examDays <= 3 && (
-          <span className="text-xs font-medium text-amber-400">
+          <span className="text-xs font-medium text-review-hard">
             {t("deckDetail.cramMode")}
           </span>
         )}

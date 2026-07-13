@@ -35,8 +35,8 @@ export function PWAUpdatePrompt() {
     <>
       {/* Update available */}
       {needRefresh && (
-        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 rounded-lg border border-blue-500/30 bg-slate-900 p-4 shadow-xl animate-in slide-in-from-bottom-2">
-          <RefreshCw className="h-5 w-5 text-blue-400 shrink-0" />
+        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 rounded-lg border border-primary/30 bg-surface p-4 shadow-xl animate-in slide-in-from-bottom-2">
+          <RefreshCw className="h-5 w-5 text-primary shrink-0" />
           <div className="flex-1">
             <p className="text-sm font-medium text-slate-100">
               {t("pwa.updateAvailable", "Update available")}
@@ -63,8 +63,8 @@ export function PWAUpdatePrompt() {
 
       {/* Offline ready */}
       {offlineReady && (
-        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 rounded-lg border border-green-500/30 bg-slate-900 p-4 shadow-xl animate-in slide-in-from-bottom-2">
-          <CheckCircle className="h-5 w-5 text-green-400 shrink-0" />
+        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 rounded-lg border border-review-easy/30 bg-surface p-4 shadow-xl animate-in slide-in-from-bottom-2">
+          <CheckCircle className="h-5 w-5 text-review-easy shrink-0" />
           <div className="flex-1">
             <p className="text-sm font-medium text-slate-100">
               {t("pwa.offlineReady", "Ready for offline use")}

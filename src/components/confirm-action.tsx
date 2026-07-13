@@ -72,7 +72,7 @@ className={destructive
             <Button
               variant={destructive ? "destructive" : "default"}
               className={destructive
-                ? "bg-red-600 text-white hover:bg-red-700"
+                ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 : "bg-primary text-on-primary hover:bg-primary-hover dark:bg-primary dark:text-on-primary dark:hover:bg-primary-container"
               }
               onClick={(event) => {

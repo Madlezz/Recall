@@ -268,9 +268,9 @@ export function DeckDetail(): JSX.Element {
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold">
               {qualityWarnings.length === 0 ? (
-                <span className="text-green-400">{t("deckDetail.allCardsGreat", { count: deckCards.length })}</span>
+                <span className="text-review-easy">{t("deckDetail.allCardsGreat", { count: deckCards.length })}</span>
               ) : (
-                <span className="text-amber-400">
+                <span className="text-review-hard">
                   {t("deckDetail.issuesFound", { count: qualityWarnings.length })}
                 </span>
               )}

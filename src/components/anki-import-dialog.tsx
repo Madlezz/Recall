@@ -264,9 +264,9 @@ export function AnkiImportDialog(): JSX.Element {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {report.failed > 0 ? (
-                <FileWarning className="h-5 w-5 text-amber-500" />
+                <FileWarning className="h-5 w-5 text-review-hard" />
               ) : (
-                <Check className="h-5 w-5 text-emerald-500" />
+                <Check className="h-5 w-5 text-review-easy" />
               )}
               {t("ankiImport.importComplete")}
             </DialogTitle>
@@ -287,14 +287,14 @@ export function AnkiImportDialog(): JSX.Element {
                 icon={Check}
                 label={t("ankiImport.imported")}
                 value={report.imported}
-                color="text-emerald-500"
+                color="text-review-easy"
               />
               {report.failed > 0 && (
                 <ReportTile
                   icon={X}
                   label={t("ankiImport.failed")}
                   value={report.failed}
-                  color="text-red-500"
+                  color="text-destructive"
                 />
               )}
             </div>
@@ -305,7 +305,7 @@ export function AnkiImportDialog(): JSX.Element {
                   icon={CalendarClock}
                   label={t("ankiImport.schedulingPreserved")}
                   value={report.schedulingPreserved}
-                  color="text-blue-500"
+                  color="text-primary"
                 />
                 {report.fsrsStateImported > 0 && (
                   <ReportTile
@@ -379,13 +379,13 @@ export function AnkiImportDialog(): JSX.Element {
 
             {report.warnings.length > 0 && (
               <div className="rounded-md bg-secondary-container border border-secondary-container p-3">
-                <div className="flex items-center gap-1 text-xs font-semibold text-amber-700 dark:text-amber-400 mb-2">
+                <div className="flex items-center gap-1 text-xs font-semibold text-review-hard mb-2">
                   <AlertTriangle className="h-3 w-3" />
                   {t("ankiImport.warnings")}
                 </div>
                 <ul className="space-y-1">
                   {report.warnings.map((w, i) => (
-                    <li key={i} className="text-xs text-amber-600 dark:text-amber-400/80">
+                    <li key={i} className="text-xs text-review-hard">
                       {w}
                     </li>
                   ))}

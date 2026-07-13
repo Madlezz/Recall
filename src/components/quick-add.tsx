@@ -132,7 +132,7 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
                 onClick={frontVoice.toggle}
                 title={t("cardDialog.voiceInput")}
                 aria-label={t("cardDialog.voiceInput")}
-                className={`absolute right-2 top-2 rounded-md p-1.5 transition-colors ${frontVoice.listening ? "text-red-500 animate-pulse" : "text-on-surface-variant hover:text-text-secondary dark:hover:text-text-primary"}`}
+                className={`absolute right-2 top-2 rounded-md p-1.5 transition-colors ${frontVoice.listening ? "text-destructive animate-pulse" : "text-on-surface-variant hover:text-text-secondary dark:hover:text-text-primary"}`}
               >
                 {frontVoice.listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
               </button>
@@ -159,7 +159,7 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
                 onClick={backVoice.toggle}
                 title={t("cardDialog.voiceInput")}
                 aria-label={t("cardDialog.voiceInput")}
-                className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 transition-colors ${backVoice.listening ? "text-red-500 animate-pulse" : "text-on-surface-variant hover:text-text-secondary dark:hover:text-text-primary"}`}
+                className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 transition-colors ${backVoice.listening ? "text-destructive animate-pulse" : "text-on-surface-variant hover:text-text-secondary dark:hover:text-text-primary"}`}
               >
                 {backVoice.listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
               </button>
