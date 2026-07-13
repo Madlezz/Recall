@@ -225,7 +225,7 @@ export function MatchGame(): JSX.Element {
       {feedback && (
         <div
           className={`pointer-events-none fixed inset-0 z-50 transition-opacity duration-300 ${
-            feedback === "match" ? "bg-emerald-500/10" : "bg-red-500/10"
+            feedback === "match" ? "bg-review-easy/10" : "bg-review-again/10"
           }`}
           aria-hidden="true"
         />
@@ -266,8 +266,8 @@ export function MatchGame(): JSX.Element {
 
       {/* Finished overlay */}
       {finished && (
-        <div className="mb-6 rounded-lg border bg-emerald-500/10 border-emerald-500/30 p-6 text-center" role="alert">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-500">
+        <div className="mb-6 rounded-lg border bg-review-easy/10 border-review-easy/30 p-6 text-center" role="alert">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-review-easy/20 text-review-easy">
             <Check className="h-6 w-6" aria-hidden="true" />
           </div>
           <h2 className="mt-3 text-xl font-bold">{t("matchGame.allMatched")}</h2>
@@ -307,15 +307,15 @@ export function MatchGame(): JSX.Element {
                 className={cn(
                   "min-h-[90px] rounded-lg border p-3 text-sm font-medium transition-all duration-200 text-left",
                   "hover:shadow-sm active:scale-[0.97]",
-                  isMatched
-                    ? "opacity-20 scale-95 pointer-events-none"
-                    : isShaking
-                      ? "animate-shake border-red-400 bg-red-500/10"
-                      : isSelected
-                        ? "border-outline dark:border-outline bg-surface-container dark:bg-surface-container shadow-sm ring-1 ring-zinc-300 dark:ring-zinc-700"
-                        : isFront
-                          ? "border-blue-500/30 bg-blue-500/5 hover:border-blue-500/50 hover:bg-blue-500/10"
-                          : "border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50 hover:bg-amber-500/10",
+isMatched
+	                    ? "opacity-20 scale-95 pointer-events-none"
+	                    : isShaking
+	                      ? "animate-shake border-review-again/30 bg-review-again/10"
+	                      : isSelected
+	                        ? "border-outline dark:border-outline bg-surface-container dark:bg-surface-container shadow-sm ring-1 ring-primary/20"
+	                        : isFront
+	                          ? "border-primary/30 bg-primary/5 hover:border-primary/50 hover:bg-primary/10"
+	                          : "border-secondary/30 bg-secondary/5 hover:border-secondary/50 hover:bg-secondary/10",
                 )}
               >
                 <span className="text-[10px] uppercase tracking-wider text-on-surface-variant dark:text-on-surface-variant mb-1 block">
