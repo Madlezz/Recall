@@ -5,11 +5,21 @@ async function goToDashboard(page: import("@playwright/test").Page) {
   await page.evaluate(() => localStorage.clear());
   await page.reload();
   await page.waitForSelector("[role='region'][aria-label='Welcome to Recall']", { timeout: 10000 });
-  // Wait for button to be visible (fade-in animation) before clicking
-  const skipBtn = page.getByRole("button", { name: /Skip/i });
-  await expect(skipBtn).toBeVisible({ timeout: 15000 });
-  await skipBtn.click();
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible({ timeout: 10000 });
+
+  // Multi-step onboarding: Welcome → Templates → Goal
+  // Step 1: Welcome
+  await expect(page.getByRole("button", { name: /Get Started/i })).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: /Get Started/i }).click();
+
+  // Step 2: Templates — skip without selecting
+  await expect(page.getByRole("button", { name: /^Skip$/i })).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: /^Skip$/i }).click();
+
+  // Step 3: Daily Goal — accept default
+  await expect(page.getByRole("button", { name: /Start Learning/i })).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: /Start Learning/i }).click();
+
+  await expect(page.getByText("Spaced Repetition")).toBeVisible({ timeout: 10000 });
 }
 
 test.describe("Settings", () => {
