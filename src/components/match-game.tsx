@@ -212,7 +212,7 @@ export function MatchGame(): JSX.Element {
       <div className="flex min-h-[70vh] items-center justify-center">
         <div className="text-center space-y-4">
           <h1 className="text-xl font-semibold">{t("matchGame.notEnoughCards")}</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("matchGame.addCardsHint")}</p>
+          <p className="text-sm text-on-surface-variant dark:text-on-surface-variant">{t("matchGame.addCardsHint")}</p>
           <Button onClick={showDashboard}>{t("matchGame.back")}</Button>
         </div>
       </div>
@@ -243,7 +243,7 @@ export function MatchGame(): JSX.Element {
           {t("matchGame.exit")}
         </Button>
 
-        <div className="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-400" role="group" aria-label={t("matchGame.gameStatsAria")}>
+        <div className="flex items-center gap-4 text-sm text-on-surface-variant dark:text-on-surface-variant" role="group" aria-label={t("matchGame.gameStatsAria")}>
           <span className="flex items-center gap-1" aria-label={t("matchGame.timeElapsedAria", { time: formatTime(elapsed) })}>
             <Clock className="h-4 w-4" aria-hidden="true" />
             {formatTime(elapsed)}
@@ -271,11 +271,11 @@ export function MatchGame(): JSX.Element {
             <Check className="h-6 w-6" aria-hidden="true" />
           </div>
           <h2 className="mt-3 text-xl font-bold">{t("matchGame.allMatched")}</h2>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-sm text-on-surface-variant dark:text-on-surface-variant">
             {t("matchGame.summary", { total: totalPairs, time: formatTime(elapsed), moves })}
           </p>
           {xpEarned > 0 && (
-            <p className="mt-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            <p className="mt-2 text-sm font-semibold text-text-primary dark:text-text-primary">
               {t("matchGame.xpEarned", { count: xpEarned })}
             </p>
           )}
@@ -312,13 +312,13 @@ export function MatchGame(): JSX.Element {
                     : isShaking
                       ? "animate-shake border-red-400 bg-red-500/10"
                       : isSelected
-                        ? "border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 shadow-sm ring-1 ring-zinc-300 dark:ring-zinc-700"
+                        ? "border-outline dark:border-outline bg-surface-container dark:bg-surface-container shadow-sm ring-1 ring-zinc-300 dark:ring-zinc-700"
                         : isFront
                           ? "border-blue-500/30 bg-blue-500/5 hover:border-blue-500/50 hover:bg-blue-500/10"
                           : "border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50 hover:bg-amber-500/10",
                 )}
               >
-                <span className="text-[10px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1 block">
+                <span className="text-[10px] uppercase tracking-wider text-on-surface-variant dark:text-on-surface-variant mb-1 block">
                   {isFront ? t("matchGame.question") : t("matchGame.answer")}
                 </span>
                 <p className="line-clamp-3 leading-snug">{tile.text}</p>

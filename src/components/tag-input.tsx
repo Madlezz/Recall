@@ -117,13 +117,13 @@ export function TagInput({ value, onChange, className, placeholder = "Add tags..
   return (
     <div ref={containerRef} className={cn("relative", className)}>
       <div
-        className="flex flex-wrap gap-1.5 rounded-md border border-zinc-200 bg-white px-2 py-1.5 focus-within:ring-1 focus-within:ring-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:focus-within:ring-zinc-600"
+        className="flex flex-wrap gap-1.5 rounded-md border border-outline-variant bg-surface px-2 py-1.5 focus-within:ring-1 focus-within:ring-zinc-300 dark:border-outline-variant dark:bg-surface dark:focus-within:ring-zinc-600"
         onClick={() => inputRef.current?.focus()}
       >
         {value.map((tag) => (
           <span
             key={tag}
-            className="inline-flex items-center gap-0.5 rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+            className="inline-flex items-center gap-0.5 rounded bg-surface-container px-1.5 py-0.5 text-xs text-text-secondary dark:bg-surface-container dark:text-text-secondary"
           >
             {tag}
             <button
@@ -132,7 +132,7 @@ export function TagInput({ value, onChange, className, placeholder = "Add tags..
                 e.stopPropagation();
                 removeTag(tag);
               }}
-              className="rounded p-0.5 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+              className="rounded p-0.5 hover:bg-surface-container-high dark:hover:bg-zinc-700"
               aria-label={`Remove ${tag}`}
             >
               <X className="h-2.5 w-2.5" />
@@ -149,7 +149,7 @@ export function TagInput({ value, onChange, className, placeholder = "Add tags..
                     if (input.trim()) setShowSuggestions(true);
                   }}
                   placeholder={value.length === 0 ? placeholder : ""}
-                  className="min-w-[80px] flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400"
+                  className="min-w-[80px] flex-1 bg-transparent text-sm outline-none placeholder:text-on-surface-variant"
                   autoComplete="off"
                   role="combobox"
                   aria-expanded={showSuggestions && suggestions.length > 0}
@@ -160,7 +160,7 @@ export function TagInput({ value, onChange, className, placeholder = "Add tags..
 
       {/* Suggestions dropdown */}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+        <div className="absolute z-50 mt-1 w-full rounded-md border border-outline-variant bg-surface shadow-sm dark:border-outline dark:bg-surface">
           <ul id="tag-suggestions" role="listbox" className="max-h-48 overflow-y-auto py-1">
                       {suggestions.map((tag, i) => (
                         <li
@@ -171,8 +171,8 @@ export function TagInput({ value, onChange, className, placeholder = "Add tags..
                           className={cn(
                   "cursor-pointer px-3 py-1.5 text-sm transition-colors",
                   i === selectedIndex
-                    ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100"
-                    : "text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800/50"
+                    ? "bg-surface-container text-text-primary dark:bg-surface-container dark:text-text-primary"
+                    : "text-text-secondary hover:bg-zinc-50 dark:text-text-secondary dark:hover:bg-surface-container/50"
                 )}
                 onMouseDown={(e) => {
                   e.preventDefault();
@@ -183,7 +183,7 @@ export function TagInput({ value, onChange, className, placeholder = "Add tags..
                 <span className="flex items-center gap-2">
                   <span>{tag}</span>
                   {tag.includes("::") && (
-                    <span className="text-xs text-zinc-400">
+                    <span className="text-xs text-on-surface-variant">
                       {tag.split("::").slice(0, -1).join("::")}
                     </span>
                   )}

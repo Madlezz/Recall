@@ -51,7 +51,7 @@ export function ConfirmAction({
           variant={destructive ? "destructive" : "outline"}
           className={destructive
             ? "bg-red-600 text-white hover:bg-red-700"
-            : "border-zinc-200 text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+            : "border-outline-variant text-text-secondary hover:bg-surface-container-high hover:text-text-primary dark:border-outline-variant dark:text-text-secondary dark:hover:bg-surface-container dark:hover:text-text-primary"
           }
         >
           {triggerLabel}
@@ -64,7 +64,7 @@ export function ConfirmAction({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel asChild>
-            <Button variant="outline" className="border-zinc-200 text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100">
+            <Button variant="outline" className="border-outline-variant text-text-secondary hover:bg-surface-container-high hover:text-text-primary dark:border-outline-variant dark:text-text-secondary dark:hover:bg-surface-container dark:hover:text-text-primary">
               {t("confirmAction.cancel")}
             </Button>
           </AlertDialogCancel>
@@ -73,7 +73,7 @@ export function ConfirmAction({
               variant={destructive ? "destructive" : "default"}
               className={destructive
                 ? "bg-red-600 text-white hover:bg-red-700"
-                : "bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                : "bg-primary text-on-primary hover:bg-primary-hover dark:bg-primary dark:text-on-primary dark:hover:bg-primary-container"
               }
               onClick={(event) => {
                 event.preventDefault();

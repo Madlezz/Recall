@@ -281,7 +281,7 @@ export function AnkiImportDialog(): JSX.Element {
                 icon={Layers}
                 label={t("ankiImport.found")}
                 value={report.totalFound}
-                color="text-zinc-500 dark:text-zinc-400"
+                color="text-on-surface-variant dark:text-on-surface-variant"
               />
               <ReportTile
                 icon={Check}
@@ -318,18 +318,18 @@ export function AnkiImportDialog(): JSX.Element {
               </div>
             )}
 
-            <div className="rounded-md bg-zinc-100/50 dark:bg-zinc-800/50 p-3 text-sm space-y-1">
+            <div className="rounded-md bg-surface-container/50 dark:bg-surface-container/50 p-3 text-sm space-y-1">
               <div className="flex justify-between">
-                <span className="text-zinc-500 dark:text-zinc-400">{t("ankiImport.basicCards")}</span>
+                <span className="text-on-surface-variant dark:text-on-surface-variant">{t("ankiImport.basicCards")}</span>
                 <span className="font-medium">{report.cardTypes.basic}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-500 dark:text-zinc-400">{t("ankiImport.clozeCards")}</span>
+                <span className="text-on-surface-variant dark:text-on-surface-variant">{t("ankiImport.clozeCards")}</span>
                 <span className="font-medium">{report.cardTypes.cloze}</span>
               </div>
               {report.mediaImported > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-zinc-500 dark:text-zinc-400">{t("ankiImport.mediaFiles")}</span>
+                  <span className="text-on-surface-variant dark:text-on-surface-variant">{t("ankiImport.mediaFiles")}</span>
                   <span className="font-medium">{report.mediaImported}</span>
                 </div>
               )}
@@ -337,18 +337,18 @@ export function AnkiImportDialog(): JSX.Element {
 
             {report.tags.length > 0 && (
               <div>
-                <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 mb-2">
+                <div className="flex items-center gap-1 text-xs text-on-surface-variant dark:text-on-surface-variant mb-2">
                   <Tag className="h-3 w-3" />
                   {t("ankiImport.tagsFound")}
                 </div>
                 <div className="flex flex-wrap gap-1">
                   {report.tags.slice(0, 10).map((tag) => (
-                    <span key={tag} className="rounded bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs">
+                    <span key={tag} className="rounded bg-surface-container dark:bg-surface-container px-2 py-0.5 text-xs">
                       {tag}
                     </span>
                   ))}
                   {report.tags.length > 10 && (
-                    <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                    <span className="text-xs text-on-surface-variant dark:text-on-surface-variant">
                       {t("ankiImport.moreTags", { count: report.tags.length - 10 })}
                     </span>
                   )}
@@ -358,7 +358,7 @@ export function AnkiImportDialog(): JSX.Element {
 
             {report.decksCreated.length > 1 && (
               <div>
-                <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 mb-2">
+                <div className="flex items-center gap-1 text-xs text-on-surface-variant dark:text-on-surface-variant mb-2">
                   <Layers className="h-3 w-3" />
                   {t("ankiImport.decksCreatedCount", { count: report.decksCreated.length })}
                 </div>
@@ -369,7 +369,7 @@ export function AnkiImportDialog(): JSX.Element {
                     </span>
                   ))}
                   {report.decksCreated.length > 8 && (
-                    <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                    <span className="text-xs text-on-surface-variant dark:text-on-surface-variant">
                       {t("ankiImport.moreDecks", { count: report.decksCreated.length - 8 })}
                     </span>
                   )}
@@ -417,9 +417,9 @@ function ReportTile({
   color: string;
 }): JSX.Element {
   return (
-    <div className="rounded-md border bg-white dark:bg-zinc-900 p-3 text-center">
+    <div className="rounded-md border bg-surface dark:bg-surface p-3 text-center">
       <div className={`text-2xl font-bold tabular-nums ${color}`}>{value}</div>
-      <div className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+      <div className="flex items-center justify-center gap-1 text-xs text-on-surface-variant dark:text-on-surface-variant mt-1">
         <Icon className="h-3 w-3" />
         {label}
       </div>

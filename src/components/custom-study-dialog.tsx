@@ -97,7 +97,7 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Beaker className="h-5 w-5 text-zinc-900 dark:text-zinc-100" />
+            <Beaker className="h-5 w-5 text-text-primary dark:text-text-primary" />
             {t("customStudy.title")}
           </DialogTitle>
           <DialogDescription>
@@ -139,10 +139,10 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
               onChange={(e) => setCardCount(e.target.value)}
               placeholder={t("customStudy.allPlaceholder")}
             />
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="text-xs text-on-surface-variant dark:text-on-surface-variant">
               {t("customStudy.allCardsHint")}
               {eligibleCount > 0 && (
-                <span className="ml-1 text-zinc-900 dark:text-zinc-100">{t("customStudy.available", { count: eligibleCount })}</span>
+                <span className="ml-1 text-text-primary dark:text-text-primary">{t("customStudy.available", { count: eligibleCount })}</span>
               )}
             </p>
           </div>
@@ -151,7 +151,7 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
           <div className="space-y-1.5">
             <Label className="flex items-center gap-1.5 text-xs">
               <Tag className="h-3.5 w-3.5" />
-              {t("customStudy.filterByTag")} <span className="text-zinc-500 dark:text-zinc-400">{t("customStudy.optional")}</span>
+              {t("customStudy.filterByTag")} <span className="text-on-surface-variant dark:text-on-surface-variant">{t("customStudy.optional")}</span>
             </Label>
             {availableTags.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
@@ -162,7 +162,7 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
                     onClick={() => setTagFilter(tag === tagFilter ? "" : tag)}
                     className={`rounded-full border px-2.5 py-0.5 text-xs transition ${
                       tagFilter === tag
-                        ? "border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+                        ? "border-outline dark:border-outline bg-surface-container dark:bg-surface-container text-text-primary dark:text-text-primary"
                         : "border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40 hover:text-foreground"
                     }`}
                   >
@@ -172,7 +172,7 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">{t("customStudy.noTags")}</p>
+              <p className="text-xs text-on-surface-variant dark:text-on-surface-variant">{t("customStudy.noTags")}</p>
             )}
           </div>
 
@@ -189,7 +189,7 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
         </div>
 
         <div className="flex items-center justify-between pt-2">
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="text-xs text-on-surface-variant dark:text-on-surface-variant">
             {eligibleCount > 0
               ? t("customStudy.cardsWillBePicked", { count: Math.min(clamped, eligibleCount) })
               : t("customStudy.noCardsMatch")}

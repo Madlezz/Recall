@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { TEMPLATE_DECKS, createCardsFromTemplate, type TemplateDeck } from "@/data/templates";
+import { cardSurface } from "@/lib/surface";
 
 export function Onboarding(): JSX.Element {
   const { t } = useTranslation();
@@ -80,7 +81,7 @@ export function Onboarding(): JSX.Element {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+    <main className="flex min-h-screen items-center justify-center bg-background px-4 text-text-primary">
       <div
         className={`w-full max-w-2xl space-y-8 text-center transition-all duration-500 ${
           visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
@@ -89,53 +90,53 @@ export function Onboarding(): JSX.Element {
         aria-label={t("onboarding.welcomeAria")}
       >
         <div className="space-y-4">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-            <Brain className="h-7 w-7 text-zinc-800 dark:text-zinc-200" aria-hidden="true" />
+          <div className={cardSurface("mx-auto flex h-14 w-14 items-center justify-center rounded-xl")}>
+            <Brain className="h-7 w-7 text-text-primary" aria-hidden="true" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+            <h1 className="font-headline text-3xl font-bold tracking-tight text-text-primary">
               {t("onboarding.appName")}
             </h1>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm text-on-surface-variant">
               {t("onboarding.tagline")}
             </p>
           </div>
         </div>
 
         <div className="space-y-3 text-left" role="group" aria-label={t("onboarding.featuresAria")}>
-          <div className="space-y-2 rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="flex items-center gap-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-              <Zap className="h-4 w-4 text-zinc-600 dark:text-zinc-400" aria-hidden="true" />
+          <div className={cardSurface("space-y-2 rounded-lg p-3")}>
+            <div className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+              <Zap className="h-4 w-4 text-on-surface-variant" aria-hidden="true" />
               {t("onboarding.feature1Title")}
             </div>
-            <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+            <p className="text-xs leading-relaxed text-on-surface-variant">
               {t("onboarding.feature1Desc")}
             </p>
           </div>
 
-          <div className="space-y-2 rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="flex items-center gap-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-              <BookCheck className="h-4 w-4 text-zinc-600 dark:text-zinc-400" aria-hidden="true" />
+          <div className={cardSurface("space-y-2 rounded-lg p-3")}>
+            <div className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+              <BookCheck className="h-4 w-4 text-on-surface-variant" aria-hidden="true" />
               {t("onboarding.feature2Title")}
             </div>
-            <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+            <p className="text-xs leading-relaxed text-on-surface-variant">
               {t("onboarding.feature2Desc")}
             </p>
           </div>
 
-          <div className="space-y-2 rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="flex items-center gap-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-              <Shield className="h-4 w-4 text-zinc-600 dark:text-zinc-400" aria-hidden="true" />
+          <div className={cardSurface("space-y-2 rounded-lg p-3")}>
+            <div className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+              <Shield className="h-4 w-4 text-on-surface-variant" aria-hidden="true" />
               {t("onboarding.feature3Title")}
             </div>
-            <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+            <p className="text-xs leading-relaxed text-on-surface-variant">
               {t("onboarding.feature3Desc")}
             </p>
           </div>
         </div>
 
         <div className="space-y-3 text-left">
-          <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+          <h2 className="text-sm font-semibold text-text-secondary">
             {t("onboarding.templateHeader")}
           </h2>
           <div className="grid grid-cols-2 gap-3">
@@ -154,7 +155,7 @@ export function Onboarding(): JSX.Element {
           {selectedTemplates.size > 0 && (
             <Button
               size="lg"
-              className="w-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              className="w-full bg-primary text-on-primary hover:bg-primary-hover dark:hover:bg-primary-hover"
               onClick={() => void handleImportTemplates()}
               aria-label={t("onboarding.importTemplatesAria", { count: selectedTemplates.size })}
             >
@@ -168,8 +169,8 @@ export function Onboarding(): JSX.Element {
             variant={selectedTemplates.size > 0 ? "outline" : "default"}
             className={`w-full ${
               selectedTemplates.size > 0
-                ? "border-zinc-200 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-900"
-                : "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                ? "border-outline-variant text-text-secondary hover:bg-surface-container-high"
+                : "bg-primary text-on-primary hover:bg-primary-hover"
             }`}
             onClick={() => void handleTryDemo()}
             aria-label={t("onboarding.tryDemoAria")}
@@ -180,14 +181,14 @@ export function Onboarding(): JSX.Element {
           <Button
             size="lg"
             variant="outline"
-            className="w-full border-zinc-200 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-900"
+            className="w-full border-outline-variant text-text-secondary hover:bg-surface-container-high"
             onClick={() => void handleStartFresh()}
             aria-label={t("onboarding.startFreshAria")}
           >
             {t("onboarding.startFresh")}
           </Button>
 
-          <p className="text-xs text-zinc-400 dark:text-zinc-500" id="privacy-note">
+          <p className="text-xs text-on-surface-variant" id="privacy-note">
             {t("onboarding.privacyNote")}
           </p>
         </div>
@@ -211,8 +212,8 @@ function TemplateCard({
       onClick={onToggle}
       className={`rounded-lg border p-4 text-left transition-all ${
         selected
-          ? "border-zinc-900 bg-zinc-50 ring-2 ring-zinc-900/10 dark:border-zinc-100 dark:bg-zinc-900 dark:ring-zinc-100/10"
-          : "border-zinc-200 bg-white hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
+          ? "border-primary bg-primary-soft ring-2 ring-primary/20"
+          : "border-outline-variant bg-surface hover:border-outline"
       }`}
     >
       <div className="flex items-start gap-3">
@@ -220,18 +221,18 @@ function TemplateCard({
           {template.icon}
         </div>
         <div className="flex-1 space-y-1">
-          <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+          <h3 className="text-sm font-semibold text-text-primary">
             {template.name}
           </h3>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="text-xs text-on-surface-variant">
             {template.description}
           </p>
-          <p className="text-xs text-zinc-400 dark:text-zinc-500">
+          <p className="text-xs text-on-surface-variant">
             {t("onboarding.cardsCount", { count: template.cards.length })}
           </p>
         </div>
         {selected && (
-          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900">
+          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-on-primary">
             <svg
               className="h-3 w-3"
               fill="none"

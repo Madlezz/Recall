@@ -26,7 +26,7 @@ export function BulkAddDialog({ open, onClose, deckId: _deckId, onImport }: Bulk
   // the Q:/A: syntax and contains cloze markers ({{c1::...}}) that collide with
   // i18next interpolation. The structural markers are parser syntax, not UI copy.
   const example = `Q: What is the powerhouse of the cell?
-A: Mitochondria
+	A: Mitochondria
 
 Q: {{c1::Tauri}} is a desktop framework written in {{c2::Rust}}
 Source: tauri.app
@@ -58,20 +58,20 @@ Tags: asia, capitals`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" role="dialog" aria-modal="true" aria-labelledby="bulk-add-title">
-      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg border bg-white dark:bg-zinc-900 p-6 shadow-sm animate-fade-in">
-        <button onClick={onClose} className="absolute right-4 top-4 rounded p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800" aria-label={t("bulkAdd.close")}>
+      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg border bg-surface dark:bg-surface p-6 shadow-sm animate-fade-in">
+        <button onClick={onClose} className="absolute right-4 top-4 rounded p-1 hover:bg-surface-container-high dark:hover:bg-surface-container" aria-label={t("bulkAdd.close")}>
           <X className="h-4 w-4" />
         </button>
 
         <div className="flex items-center gap-2 mb-2">
-          <FileText className="h-5 w-5 text-zinc-900 dark:text-zinc-100" />
+          <FileText className="h-5 w-5 text-text-primary dark:text-text-primary" />
           <h2 id="bulk-add-title" className="text-xl font-semibold">{t("bulkAdd.title")}</h2>
         </div>
 
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+        <p className="text-sm text-on-surface-variant dark:text-on-surface-variant mb-4">
           {t("bulkAdd.instructionsPrefix")}{" "}
-          <code className="bg-zinc-100 dark:bg-zinc-800 px-1 rounded">Q:</code>{" / "}
-          <code className="bg-zinc-100 dark:bg-zinc-800 px-1 rounded">A:</code>{" "}
+          <code className="bg-surface-container dark:bg-surface-container px-1 rounded">Q:</code>{" / "}
+          <code className="bg-surface-container dark:bg-surface-container px-1 rounded">A:</code>{" "}
           {t("bulkAdd.instructionsSuffix")}
         </p>
 
@@ -84,8 +84,8 @@ Tags: asia, capitals`;
 
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-center gap-2">
-            <Eye className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
-            <span className="text-sm text-zinc-500 dark:text-zinc-400">
+            <Eye className="h-4 w-4 text-on-surface-variant dark:text-on-surface-variant" />
+            <span className="text-sm text-on-surface-variant dark:text-on-surface-variant">
               {t("bulkAdd.cardsDetected", { count: parsed.length })}
             </span>
           </div>
@@ -103,16 +103,16 @@ Tags: asia, capitals`;
         {/* Preview */}
         {parsed.length > 0 && (
           <div className="mt-4 space-y-2">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{t("bulkAdd.preview")}</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-on-surface-variant dark:text-on-surface-variant">{t("bulkAdd.preview")}</h3>
             <div className="max-h-60 overflow-y-auto space-y-2">
               {parsed.map((card, i) => (
-                <div key={i} className="rounded-md border bg-zinc-50 dark:bg-zinc-800/50 p-3 text-sm">
+                <div key={i} className="rounded-md border bg-background dark:bg-surface-container/50 p-3 text-sm">
                   <div className="flex items-start gap-2">
-                    <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400 mt-0.5">#{i + 1}</span>
+                    <span className="text-xs font-mono text-on-surface-variant dark:text-on-surface-variant mt-0.5">#{i + 1}</span>
                     <div className="min-w-0 flex-1">
-                      <div className="font-medium truncate">{card.front || <span className="italic text-zinc-500 dark:text-zinc-400">{t("bulkAdd.empty")}</span>}</div>
-                      {card.back && <div className="text-zinc-500 dark:text-zinc-400 truncate mt-1">{card.back}</div>}
-                      {card.hint && <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">{t("bulkAdd.hintLabel")} {card.hint}</div>}
+                      <div className="font-medium truncate">{card.front || <span className="italic text-on-surface-variant dark:text-on-surface-variant">{t("bulkAdd.empty")}</span>}</div>
+                      {card.back && <div className="text-on-surface-variant dark:text-on-surface-variant truncate mt-1">{card.back}</div>}
+                      {card.hint && <div className="text-xs text-on-surface-variant dark:text-on-surface-variant mt-1">{t("bulkAdd.hintLabel")} {card.hint}</div>}
                       {card.nextDeckName && (
                         <Badge tone="warning" className="mt-1 text-xs">
                           → {card.nextDeckName}

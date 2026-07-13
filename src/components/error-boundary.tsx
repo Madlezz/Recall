@@ -1,7 +1,6 @@
-import { Component, useState, type ErrorInfo, type ReactNode } from "react";
-import { AlertTriangle, RefreshCw, ArrowLeft } from "lucide-react";
+import { Component, type ReactNode } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
 
 interface Props {
   children: ReactNode;
@@ -35,39 +34,37 @@ function ErrorFallback({ error, hasRecovery, onRecover }: ErrorFallbackProps): J
   }
 
   return (
-    <div className="flex min-h-[60vh] items-center justify-center p-8">
-      <div className="max-w-md space-y-6 rounded-xl border bg-card p-8 text-center shadow-lg">
-        <AlertTriangle className="mx-auto h-12 w-12 text-amber-500" />
-        <div>
-          <h1 className="text-xl font-semibold">{t("errorBoundary.title")}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {t("errorBoundary.dataSafe")}
-            {hasRecovery
-              ? t("errorBoundary.goBackHint")
-              : t("errorBoundary.refreshHint")}
-          </p>
-        </div>
-        <div className="flex gap-3 justify-center">
-          {hasRecovery && (
-            <Button
-              variant="outline"
+    <div className="flex min-h-[70vh] items-center justify-center">
+      <div className="text-center space-y-4 max-w-md">
+        <h1 className="text-xl font-semibold">{t("errorBoundary.somethingWentWrong")}</h1>
+        <p className="text-sm text-on-surface-variant">{t("errorBoundary.description")}</p>
+
+        <div className="flex gap-2 justify-center">
+          {hasRecovery ? (
+            <button
               onClick={onRecover}
-              className="gap-2"
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary hover:bg-primary-hover"
             >
-              <ArrowLeft className="h-4 w-4" />
               {t("errorBoundary.backToDashboard")}
-            </Button>
+            </button>
+          ) : (
+            <button
+              onClick={() => window.location.reload()}
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary hover:bg-primary-hover"
+            >
+              {t("errorBoundary.refresh")}
+            </button>
           )}
-          <Button
-            onClick={() => window.location.reload()}
-            className="gap-2"
+          <button
+            onClick={handleCopyError}
+            className="rounded-lg border border-outline bg-surface px-4 py-2 text-sm font-semibold hover:bg-surface-container-high"
           >
-            <RefreshCw className="h-4 w-4" />
-            {t("errorBoundary.refreshApp")}
-          </Button>
+            {copied ? t("errorBoundary.copied") : t("errorBoundary.copyError")}
+          </button>
         </div>
+
         <details className="text-left">
-          <summary className="cursor-pointer text-xs text-muted-foreground">
+          <summary className="cursor-pointer text-sm text-on-surface-variant hover:text-text-secondary">
             {t("errorBoundary.errorDetails")}
           </summary>
           <pre className="mt-2 max-h-48 overflow-auto rounded bg-muted p-3 text-xs">
@@ -78,7 +75,7 @@ function ErrorFallback({ error, hasRecovery, onRecover }: ErrorFallbackProps): J
           <button
             data-copy-btn
             onClick={handleCopyError}
-            className="mt-2 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 underline"
+            className="mt-2 text-xs text-on-surface-variant hover:text-text-secondary"
           >
             {copied ? t("errorBoundary.copied") : t("errorBoundary.copyError")}
           </button>
@@ -95,25 +92,20 @@ export class ErrorBoundary extends Component<Props, State> {
     return { error };
   }
 
-  componentDidCatch(error: Error, info: ErrorInfo): void {
-    const view = this.props.viewName ?? "unknown";
-    console.error(`[Recall] Uncaught error in ${view}:`, error, info.componentStack);
+  componentDidCatch(error: Error, info: React.ErrorInfo): void {
+    console.error(`[ErrorBoundary${this.props.viewName ? `:${this.props.viewName}` : ""}]`, error, info.componentStack);
   }
 
   handleRecover(): void {
-    if (this.props.onRecover) {
-      this.setState({ error: null });
-      this.props.onRecover();
-    } else {
-      window.location.reload();
-    }
+    this.setState({ error: null });
+    this.props.onRecover?.();
   }
 
   render(): ReactNode {
     if (this.state.error) {
       if (this.props.fallback) return this.props.fallback;
 
-      const hasRecovery = !!this.props.onRecover;
+      const hasRecovery = typeof this.props.onRecover === "function";
 
       return (
         <ErrorFallback

@@ -156,7 +156,7 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <FileSpreadsheet className="h-5 w-5 text-zinc-900 dark:text-zinc-100" />
+            <FileSpreadsheet className="h-5 w-5 text-text-primary dark:text-text-primary" />
             {t("csvImport.title")}
           </DialogTitle>
           <DialogDescription>
@@ -190,13 +190,13 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
               type="file"
               accept=".csv,text/csv"
               onChange={handleFile}
-              className="block w-full text-sm text-zinc-500 dark:text-zinc-400
-                file:mr-4 file:rounded-md file:border-0 file:bg-zinc-100 file:text-zinc-900 hover:file:bg-zinc-200 dark:file:bg-zinc-800 dark:file:text-zinc-100 dark:hover:file:bg-zinc-700 file:px-4 file:py-2
+              className="block w-full text-sm text-on-surface-variant dark:text-on-surface-variant
+                file:mr-4 file:rounded-md file:border-0 file:bg-surface-container file:text-text-primary hover:file:bg-surface-container-high dark:file:bg-surface-container dark:file:text-text-primary dark:hover:file:bg-zinc-700 file:px-4 file:py-2
                 file:text-sm file:font-medium"
             />
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="text-xs text-on-surface-variant dark:text-on-surface-variant">
               {t("csvImport.formatLabel")}{" "}
-              <code className="text-zinc-900 dark:text-zinc-100">front,back,hint,tags</code>{" "}
+              <code className="text-text-primary dark:text-text-primary">front,back,hint,tags</code>{" "}
               {t("csvImport.oneCardPerLine")}
             </p>
           </div>
@@ -209,7 +209,7 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
               </p>
               <div className="max-h-48 overflow-y-auto rounded-md border">
                 <table className="w-full text-xs">
-                  <thead className="bg-zinc-100/50 dark:bg-zinc-800/50">
+                  <thead className="bg-surface-container/50 dark:bg-surface-container/50">
                     <tr>
                       <th className="px-2 py-1.5 text-left">{t("csvImport.front")}</th>
                       <th className="px-2 py-1.5 text-left">{t("csvImport.back")}</th>
@@ -222,17 +222,17 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
                       <tr key={i} className="border-t">
                         <td className="max-w-[120px] truncate px-2 py-1">{row.front}</td>
                         <td className="max-w-[120px] truncate px-2 py-1">{row.back}</td>
-                        <td className="max-w-[80px] truncate px-2 py-1 text-zinc-500 dark:text-zinc-400">
+                        <td className="max-w-[80px] truncate px-2 py-1 text-on-surface-variant dark:text-on-surface-variant">
                           {row.hint || "-"}
                         </td>
-                        <td className="max-w-[80px] truncate px-2 py-1 text-zinc-500 dark:text-zinc-400">
+                        <td className="max-w-[80px] truncate px-2 py-1 text-on-surface-variant dark:text-on-surface-variant">
                           {row.tags || "-"}
                         </td>
                       </tr>
                     ))}
                     {rows.length > 20 && (
                       <tr>
-                        <td colSpan={4} className="px-2 py-1 text-center text-zinc-500 dark:text-zinc-400">
+                        <td colSpan={4} className="px-2 py-1 text-center text-on-surface-variant dark:text-on-surface-variant">
                           {t("csvImport.andMore", { count: rows.length - 20 })}
                         </td>
                       </tr>
@@ -245,7 +245,7 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
         </div>
 
         <div className="flex items-center justify-between pt-2">
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="text-xs text-on-surface-variant dark:text-on-surface-variant">
             {rows ? t("csvImport.cardsToImport", { count: rows.length }) : t("csvImport.pickFileFirst")}
           </p>
           <Button

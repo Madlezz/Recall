@@ -49,7 +49,7 @@ function TreeNode({
   return (
     <li>
       <div
-        className={`group flex items-center gap-1 rounded-md px-2 py-1.5 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+        className={`group flex items-center gap-1 rounded-md px-2 py-1.5 transition-colors hover:bg-surface-container-high dark:hover:bg-surface-container ${
           editing ? "ring-1 ring-zinc-300 dark:ring-zinc-700" : ""
         }`}
         style={{ paddingLeft: `${node.depth * 16 + 8}px` }}
@@ -58,7 +58,7 @@ function TreeNode({
         {hasChildren ? (
           <button
             onClick={() => onToggle(node.fullPath)}
-            className="flex h-5 w-5 items-center justify-center rounded text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+            className="flex h-5 w-5 items-center justify-center rounded text-on-surface-variant hover:text-on-surface-variant dark:hover:text-text-secondary"
             aria-label={isExpanded ? t("tagManager.collapse") : t("tagManager.expand")}
           >
             {isExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
@@ -68,7 +68,7 @@ function TreeNode({
         )}
 
         {/* Tag icon */}
-        <Tag className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
+        <Tag className="h-3.5 w-3.5 shrink-0 text-on-surface-variant" />
 
         {/* Name */}
         {editing ? (
@@ -86,7 +86,7 @@ function TreeNode({
             <button onClick={handleSubmitRename} className="p-1 text-emerald-600 hover:text-emerald-700" aria-label={t("tagManager.confirmRename")}>
                           <Check className="h-3.5 w-3.5" />
                         </button>
-                        <button onClick={() => setEditing(false)} className="p-1 text-zinc-400 hover:text-zinc-600" aria-label={t("tagManager.cancelRename")}>
+                        <button onClick={() => setEditing(false)} className="p-1 text-on-surface-variant hover:text-on-surface-variant" aria-label={t("tagManager.cancelRename")}>
                           <X className="h-3.5 w-3.5" />
                         </button>
           </div>
@@ -94,26 +94,26 @@ function TreeNode({
           <>
             <button
               onClick={() => onTagClick(node.fullPath)}
-              className="flex-1 text-left text-sm text-zinc-700 dark:text-zinc-300 hover:underline"
+              className="flex-1 text-left text-sm text-text-secondary dark:text-text-secondary hover:underline"
             >
               {node.name}
             </button>
 
             {/* Count */}
-            <span className="text-xs tabular-nums text-zinc-400">{node.count}</span>
+            <span className="text-xs tabular-nums text-on-surface-variant">{node.count}</span>
 
             {/* Actions */}
             <div className="ml-1 hidden items-center gap-0.5 group-hover:flex">
               <button
                 onClick={() => { setEditing(true); setEditValue(node.fullPath); }}
-                className="p-1 rounded text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200 dark:hover:text-zinc-300 dark:hover:bg-zinc-700"
+                className="p-1 rounded text-on-surface-variant hover:text-on-surface-variant hover:bg-surface-container-high dark:hover:text-text-secondary dark:hover:bg-zinc-700"
                 aria-label={t("tagManager.renameTag")}
               >
                 <Edit3 className="h-3 w-3" />
               </button>
               <button
                 onClick={() => onDelete(node.fullPath)}
-                className="p-1 rounded text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                className="p-1 rounded text-on-surface-variant hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
                 aria-label={t("tagManager.deleteTag")}
               >
                 <Trash2 className="h-3 w-3" />
@@ -304,8 +304,8 @@ export function TagManager(): JSX.Element {
 
       {/* Saved Searches */}
       {savedSearches.length > 0 && (
-        <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+        <div className="rounded-lg border border-outline-variant bg-surface p-4 dark:border-outline-variant dark:bg-surface">
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-text-primary dark:text-text-primary">
             <Bookmark className="h-4 w-4" />
             {t("tagManager.savedSearches")}
           </h2>
@@ -313,10 +313,10 @@ export function TagManager(): JSX.Element {
             {savedSearches.map((search) => (
               <div
                 key={search.id}
-                className="group flex items-center justify-between rounded-md border border-zinc-100 p-2 dark:border-zinc-800"
+                className="group flex items-center justify-between rounded-md border border-zinc-100 p-2 dark:border-outline-variant"
               >
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{search.name}</div>
+                  <div className="text-sm font-medium text-text-secondary dark:text-text-secondary">{search.name}</div>
                   <div className="mt-1 flex flex-wrap gap-1">
                     {search.tags.map((t) => (
                       <Badge key={t} tone="muted" className="text-[10px]">{t}</Badge>
@@ -329,14 +329,14 @@ export function TagManager(): JSX.Element {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleStudySavedSearch(search)}
-                    className="rounded p-1.5 text-zinc-400 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-950"
+                    className="rounded p-1.5 text-on-surface-variant hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-950"
                     aria-label={t("tagManager.startStudy")}
                   >
                     <Play className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() => handleDeleteSavedSearch(search)}
-                    className="rounded p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+                    className="rounded p-1.5 text-on-surface-variant hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
                     aria-label={t("tagManager.deleteSavedSearch")}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -350,7 +350,7 @@ export function TagManager(): JSX.Element {
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         {/* Tag tree */}
-        <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded-lg border border-outline-variant bg-surface p-4 dark:border-outline-variant dark:bg-surface">
           {filteredTree.length === 0 ? (
             <div className="py-12 text-center text-sm text-muted-foreground">
               <Tag className="mx-auto h-8 w-8 mb-2 opacity-40" />
@@ -374,17 +374,17 @@ export function TagManager(): JSX.Element {
         </div>
 
         {/* Selected tag details */}
-        <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded-lg border border-outline-variant bg-surface p-4 dark:border-outline-variant dark:bg-surface">
           {selectedTag ? (
             <>
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{selectedTag}</h3>
+                  <h3 className="text-sm font-semibold text-text-primary dark:text-text-primary">{selectedTag}</h3>
                   <p className="text-xs text-muted-foreground">{t("tagManager.cardCount", { count: selectedCards.length })}</p>
                 </div>
                 <button
                   onClick={() => setSelectedTag(null)}
-                  className="p-1 text-zinc-400 hover:text-zinc-600"
+                  className="p-1 text-on-surface-variant hover:text-on-surface-variant"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -395,9 +395,9 @@ export function TagManager(): JSX.Element {
                 {selectedCards.slice(0, 20).map((card) => (
                   <div
                     key={card.id}
-                    className="rounded-md border border-zinc-100 p-2 text-xs dark:border-zinc-800"
+                    className="rounded-md border border-zinc-100 p-2 text-xs dark:border-outline-variant"
                   >
-                    <div className="truncate text-zinc-700 dark:text-zinc-300">{card.front}</div>
+                    <div className="truncate text-text-secondary dark:text-text-secondary">{card.front}</div>
                     <div className="mt-1 flex flex-wrap gap-1">
                       {card.tags.map((t) => (
                         <Badge key={t} tone="muted" className="text-[10px]">{t}</Badge>
@@ -413,7 +413,7 @@ export function TagManager(): JSX.Element {
               </div>
 
               {/* Actions */}
-              <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800 space-y-2">
+              <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-outline-variant space-y-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -437,8 +437,8 @@ export function TagManager(): JSX.Element {
 
               {/* Save Search Dialog */}
               {showSaveDialog && (
-                <div className="mt-3 rounded-md border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-800">
-                  <div className="mb-2 text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                <div className="mt-3 rounded-md border border-outline-variant bg-background p-3 dark:border-outline dark:bg-surface-container">
+                  <div className="mb-2 text-xs font-medium text-text-secondary dark:text-text-secondary">
                     {t("tagManager.saveAsSearchLabel", { tag: selectedTag })}
                   </div>
                   <Input

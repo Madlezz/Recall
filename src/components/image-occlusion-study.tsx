@@ -119,7 +119,7 @@ export function ImageOcclusionStudy({ data, revealed }: Props) {
     <div className="space-y-4">
       <canvas
         ref={canvasRef}
-        className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700"
+        className="w-full rounded-lg border border-outline-variant dark:border-outline"
         role="img"
         aria-label={t("imageOcclusionStudy.canvasAria")}
       />
@@ -135,7 +135,7 @@ export function ImageOcclusionStudy({ data, revealed }: Props) {
           {revealedIndex !== null && (
             <button
               onClick={handleRevealAll}
-              className="rounded-lg bg-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-300 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600"
+              className="rounded-lg bg-surface-container-high px-4 py-2 text-sm font-semibold text-text-primary hover:bg-zinc-300 dark:bg-zinc-700 dark:text-text-primary dark:hover:bg-zinc-600"
             >
               {t("imageOcclusionStudy.revealAll")}
             </button>
@@ -144,7 +144,7 @@ export function ImageOcclusionStudy({ data, revealed }: Props) {
       )}
 
       {revealedIndex !== null && !revealed && (
-        <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-center text-sm text-on-surface-variant dark:text-on-surface-variant">
           {t("imageOcclusionStudy.revealed", { current: revealedIndex + 1, total: data.occlusions.length })}
         </p>
       )}

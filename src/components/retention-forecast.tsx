@@ -27,8 +27,8 @@ export function RetentionForecast({ cards }: RetentionForecastProps): JSX.Elemen
   if (totalDue === 0) {
     return (
       <section>
-        <h3 className="mb-3 text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("retentionForecast.dueForecast")}</h3>
-        <p className="text-sm text-zinc-400 py-6 text-center rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        <h3 className="mb-3 text-sm font-bold text-text-primary dark:text-text-primary">{t("retentionForecast.dueForecast")}</h3>
+        <p className="text-sm text-on-surface-variant py-6 text-center rounded-lg border border-outline-variant bg-surface dark:border-outline-variant dark:bg-surface">
           {t("retentionForecast.noSchedule")}
         </p>
       </section>
@@ -38,11 +38,11 @@ export function RetentionForecast({ cards }: RetentionForecastProps): JSX.Elemen
   return (
     <section>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("retentionForecast.dueForecast")}</h3>
-        <span className="text-xs tabular-nums text-zinc-400">{t("retentionForecast.cardsIn30Days", { count: totalDue })}</span>
+        <h3 className="text-sm font-bold text-text-primary dark:text-text-primary">{t("retentionForecast.dueForecast")}</h3>
+        <span className="text-xs tabular-nums text-on-surface-variant">{t("retentionForecast.cardsIn30Days", { count: totalDue })}</span>
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="rounded-lg border border-outline-variant bg-surface p-5 dark:border-outline-variant dark:bg-surface">
         <div className="flex items-end gap-[2px] h-28" role="img" aria-label="Due forecast chart">
           {forecast.map((day, i) => {
             const height = maxCount > 0 ? (day.count / maxCount) * 100 : 0;
@@ -58,17 +58,17 @@ export function RetentionForecast({ cards }: RetentionForecastProps): JSX.Elemen
                       ? isWeekend
                         ? "bg-zinc-400 hover:bg-zinc-500 dark:bg-zinc-500 dark:hover:bg-zinc-400"
                         : "bg-zinc-500 hover:bg-zinc-600 dark:bg-zinc-400 dark:hover:bg-zinc-300"
-                      : "bg-zinc-100 dark:bg-zinc-800"
+                      : "bg-surface-container dark:bg-surface-container"
                   }`}
                   style={{ height: `${Math.max(height, 2)}%` }}
                 />
                 {i % 7 === 0 && (
-                  <span className="absolute -bottom-5 left-0 text-[10px] text-zinc-400 whitespace-nowrap">
+                  <span className="absolute -bottom-5 left-0 text-[10px] text-on-surface-variant whitespace-nowrap">
                     {formatDate(day.date)}
                   </span>
                 )}
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block z-10">
-                  <span className="text-xs bg-white border border-zinc-200 text-zinc-700 px-2 py-1 rounded shadow-sm whitespace-nowrap dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-300">
+                  <span className="text-xs bg-surface border border-outline-variant text-text-secondary px-2 py-1 rounded shadow-sm whitespace-nowrap dark:bg-surface-container dark:border-outline dark:text-text-secondary">
                     {formatDate(day.date)}: {t("retentionForecast.cardCount", { count: day.count })}
                   </span>
                 </div>
@@ -79,8 +79,8 @@ export function RetentionForecast({ cards }: RetentionForecastProps): JSX.Elemen
 
         {forecast[0].count > 0 && (
           <p className="mt-6 text-center text-sm">
-            <span className="font-bold text-zinc-800 dark:text-zinc-200">{t("retentionForecast.cardCount", { count: forecast[0].count })}</span>
-            <span className="text-zinc-500"> {t("retentionForecast.dueToday")}</span>
+            <span className="font-bold text-text-primary dark:text-text-primary">{t("retentionForecast.cardCount", { count: forecast[0].count })}</span>
+            <span className="text-on-surface-variant"> {t("retentionForecast.dueToday")}</span>
           </p>
         )}
       </div>

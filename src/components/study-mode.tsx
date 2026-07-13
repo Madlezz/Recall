@@ -11,6 +11,7 @@ import { speakText, stopSpeaking, isTTSSupported, setSpeakingCallback } from "@/
 import { playFlipSound, playCorrectSound, playAgainSound, playHardSound } from "@/services/audio";
 import { previewIntervals } from "@/services/fsrs-engine";
 import { cn } from "@/lib/utils";
+import { cardSurface } from "@/lib/surface";
 import { matchesShortcut, shortcutLabel, DEFAULT_SHORTCUTS } from "@/lib/shortcuts";
 import { SessionSummaryModal } from "./study-mode/session-summary-modal";
 import { AnswerButton, CompletionStat } from "./study-mode/study-helpers";
@@ -189,11 +190,11 @@ export function StudyMode(): JSX.Element {
     return (
       <div className="flex min-h-[70vh] items-center justify-center">
         <div className="text-center space-y-3">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
-            <BookOpen className="h-7 w-7 text-zinc-400" />
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container dark:bg-surface-container">
+            <BookOpen className="h-7 w-7 text-on-surface-variant" />
           </div>
-          <h1 className="text-xl font-semibold text-zinc-800 dark:text-zinc-200">{t("study.noActiveSession")}</h1>
-          <p className="text-sm text-zinc-500">{t("study.startSessionHint")}</p>
+          <h1 className="text-xl font-semibold text-text-primary dark:text-text-primary">{t("study.noActiveSession")}</h1>
+          <p className="text-sm text-on-surface-variant">{t("study.startSessionHint")}</p>
           <Button className="mt-2" onClick={exitStudy}>{t("study.backToDashboard")}</Button>
         </div>
       </div>
@@ -209,11 +210,11 @@ export function StudyMode(): JSX.Element {
     return (
       <div className="flex min-h-[76vh] items-center justify-center">
         <div className="w-full max-w-sm text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
-            <Check className="h-7 w-7 text-zinc-600 dark:text-zinc-400" />
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container dark:bg-surface-container">
+            <Check className="h-7 w-7 text-on-surface-variant dark:text-on-surface-variant" />
           </div>
-          <h1 className="mt-5 text-2xl font-bold text-zinc-800 dark:text-zinc-200">{t("study.sessionComplete")}</h1>
-          <p className="mt-1 text-sm text-zinc-500">{deck?.name ?? t("study.allDueCards")}</p>
+          <h1 className="mt-5 text-2xl font-bold text-text-primary dark:text-text-primary">{t("study.sessionComplete")}</h1>
+          <p className="mt-1 text-sm text-on-surface-variant">{deck?.name ?? t("study.allDueCards")}</p>
 
           <div className="mt-6 grid grid-cols-5 gap-2">
             <CompletionStat label={t("study.cards")} value={totalReviews} />
@@ -224,8 +225,8 @@ export function StudyMode(): JSX.Element {
           </div>
 
           <div className="mt-4 flex items-center justify-center gap-3 text-sm">
-            <span className="text-zinc-500">{t("study.accuracy")}</span>
-            <span className="font-bold tabular-nums text-zinc-800 dark:text-zinc-200">{accuracy}%</span>
+            <span className="text-on-surface-variant">{t("study.accuracy")}</span>
+            <span className="font-bold tabular-nums text-text-primary dark:text-text-primary">{accuracy}%</span>
           </div>
 
           <Button className="mt-6 w-full gap-2" onClick={exitStudy}>
@@ -241,11 +242,11 @@ export function StudyMode(): JSX.Element {
     return (
       <div className="flex min-h-[70vh] items-center justify-center">
         <div className="text-center space-y-3">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
-            <AlertCircle className="h-7 w-7 text-zinc-400" />
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container dark:bg-surface-container">
+            <AlertCircle className="h-7 w-7 text-on-surface-variant" />
           </div>
-          <h1 className="text-xl font-semibold text-zinc-800 dark:text-zinc-200">{t("study.cardNotFound")}</h1>
-          <p className="text-sm text-zinc-500">{t("study.cardNotFoundHint")}</p>
+          <h1 className="text-xl font-semibold text-text-primary dark:text-text-primary">{t("study.cardNotFound")}</h1>
+          <p className="text-sm text-on-surface-variant">{t("study.cardNotFoundHint")}</p>
           <Button onClick={exitStudy}>{t("study.backToDashboard")}</Button>
         </div>
       </div>
@@ -282,10 +283,10 @@ export function StudyMode(): JSX.Element {
       {ratingFlash && (
         <div
           className={`pointer-events-none fixed inset-0 z-50 transition-opacity duration-300 ${
-            ratingFlash === "again" ? "bg-red-500/10" :
-            ratingFlash === "hard" ? "bg-amber-500/10" :
-            ratingFlash === "good" ? "bg-emerald-500/10" :
-            "bg-blue-500/10"
+            ratingFlash === "again" ? "bg-review-again/10" :
+            ratingFlash === "hard" ? "bg-review-hard/10" :
+            ratingFlash === "good" ? "bg-review-good/10" :
+            "bg-review-easy/10"
           }`}
           aria-hidden="true"
         />
@@ -305,15 +306,15 @@ export function StudyMode(): JSX.Element {
 
         {/* Center: progress - takes available space */}
         <div className="flex-1 min-w-0 max-w-[200px] mx-auto">
-          <div className="flex items-center justify-center gap-2 text-sm tabular-nums text-zinc-600 dark:text-zinc-400">
+          <div className="flex items-center justify-center gap-2 text-sm tabular-nums text-on-surface-variant dark:text-on-surface-variant">
             <span className="flex items-center gap-1">
               <Timer className="h-3.5 w-3.5" />
               {formatElapsed(elapsed)}
             </span>
-            <span className="text-zinc-300 dark:text-zinc-600">·</span>
+            <span className="text-on-surface-variant dark:text-on-surface-variant">·</span>
             <span>{activeStudy.currentIndex + 1} / {total}</span>
           </div>
-          <div className="mt-1.5 h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100} aria-label={t("study.studyProgress", { current: activeStudy.currentIndex, total })}>
+          <div className="mt-1.5 h-1.5 w-full rounded-full bg-surface-container dark:bg-surface-container overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100} aria-label={t("study.studyProgress", { current: activeStudy.currentIndex, total })}>
             <div
               className="h-full rounded-full bg-zinc-500 transition-[width] duration-300 dark:bg-zinc-400"
               style={{ width: `${progress}%` }}
@@ -337,7 +338,7 @@ export function StudyMode(): JSX.Element {
               className={`min-h-[44px] min-w-[44px] rounded-md p-1.5 transition-colors ${
                 isSpeaking
                   ? "text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 animate-pulse"
-                  : "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 dark:hover:text-zinc-300 dark:hover:bg-zinc-800"
+                  : "text-on-surface-variant hover:text-on-surface-variant hover:bg-surface-container-high dark:hover:text-text-secondary dark:hover:bg-surface-container"
               }`}
               title={t("study.readAloudTitle")}
             >
@@ -384,19 +385,19 @@ export function StudyMode(): JSX.Element {
             }}
           >
             {/* Front */}
-            <div className="study-card-face absolute inset-0 flex flex-col justify-center rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-10">
-              <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{deck?.name ?? t("study.review")}</p>
-              <div className="mt-4 text-balance text-lg font-semibold leading-relaxed text-zinc-800 dark:text-zinc-200 sm:mt-5 sm:text-2xl">
+            <div className={cn("study-card-face absolute inset-0 flex flex-col justify-center", cardSurface("p-5 shadow-sm sm:p-10"))}>
+              <p className="text-xs font-medium text-on-surface-variant uppercase tracking-wider">{deck?.name ?? t("study.review")}</p>
+              <div className="mt-4 text-balance text-lg font-semibold leading-relaxed text-text-primary dark:text-text-primary sm:mt-5 sm:text-2xl">
                 <RichCard content={card.front} cardType={card.cardType} revealed={activeStudy.revealed} allowHtml={settings?.allowHtml} />
               </div>
               {card.hint && (
-                <p className="mt-4 text-sm text-zinc-400 sm:mt-6">{t("study.hint")}: {card.hint}</p>
+                <p className="mt-4 text-sm text-on-surface-variant sm:mt-6">{t("study.hint")}: {card.hint}</p>
               )}
             </div>
             {/* Back */}
-            <div className="study-card-face study-card-back absolute inset-0 flex flex-col justify-center rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-10">
-              <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{t("study.answer")}</p>
-              <div className="mt-4 text-balance text-lg font-semibold leading-relaxed text-zinc-800 dark:text-zinc-200 sm:mt-5 sm:text-2xl">
+            <div className={cn("study-card-face study-card-back absolute inset-0 flex flex-col justify-center", cardSurface("p-5 shadow-sm sm:p-10"))}>
+              <p className="text-xs font-medium text-on-surface-variant uppercase tracking-wider">{t("study.answer")}</p>
+              <div className="mt-4 text-balance text-lg font-semibold leading-relaxed text-text-primary dark:text-text-primary sm:mt-5 sm:text-2xl">
                 <RichCard content={card.back} isBack allowHtml={settings?.allowHtml} />
               </div>
             </div>
@@ -432,7 +433,7 @@ export function StudyMode(): JSX.Element {
 
         {/* Swipe hint - mobile only, shown when revealed and swipe enabled */}
         {activeStudy.revealed && swipeEnabled && (
-          <p className="text-center text-[10px] text-zinc-400 lg:hidden">
+          <p className="text-center text-[10px] text-on-surface-variant lg:hidden">
             ← {t("study.again")} · → {t("study.good")} · ↑ {t("study.easy")} · ↓ {t("study.hard")}
           </p>
         )}

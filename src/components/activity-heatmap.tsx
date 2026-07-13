@@ -50,12 +50,16 @@ export function ActivityHeatmap(): JSX.Element {
     startDate.setDate(today.getDate() - 364);
 
     const currentDate = new Date(startDate);
-    for (let week = 0; week < 52; week++) {
+    for (let w = 0; w < 52; w++) {
       const weekData: DayData[] = [];
-      for (let day = 0; day < 7; day++) {
+      for (let d = 0; d < 7; d++) {
         const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}-${String(currentDate.getDate()).padStart(2, "0")}`;
         const count = counts.get(dateStr) ?? 0;
-        weekData.push({ date: dateStr, count, level: getLevel(count) });
+        weekData.push({
+          date: dateStr,
+          count,
+          level: getLevel(count),
+        });
         currentDate.setDate(currentDate.getDate() + 1);
       }
       weeks.push(weekData);
@@ -65,10 +69,8 @@ export function ActivityHeatmap(): JSX.Element {
   }, [reviewLogs]);
 
   const totalReviews = reviewLogs.length;
-
-  // Calculate stats for screen readers
-  const daysStudied = heatmapData.flat().filter((d) => d.count > 0).length;
-  const avgPerDay = daysStudied > 0 ? Math.round(totalReviews / daysStudied) : 0;
+  const activeDays = heatmapData.flat().filter((d) => d.count > 0).length;
+  const avgPerDay = activeDays > 0 ? Math.round(totalReviews / activeDays) : 0;
 
   const longestStreak = useMemo(() => {
     let current = 0;
@@ -93,14 +95,14 @@ export function ActivityHeatmap(): JSX.Element {
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-bold text-on-surface">{t("activityHeatmap.studyActivity")}</span>
         <div className="flex items-center gap-3 text-xs tabular-nums text-on-surface-variant">
-        {longestStreak > 0 && (
-          <span className="text-on-surface-variant">
-            {t("activityHeatmap.dayStreak", { count: longestStreak })}
+          {longestStreak > 0 && (
+            <span className="text-on-surface-variant">
+              {t("activityHeatmap.dayStreak", { count: longestStreak })}
+            </span>
+          )}
+          <span>
+            {t("activityHeatmap.reviewCount", { count: totalReviews })}
           </span>
-        )}
-        <span>
-          {t("activityHeatmap.reviewCount", { count: totalReviews })}
-        </span>
         </div>
       </div>
 
@@ -123,7 +125,7 @@ export function ActivityHeatmap(): JSX.Element {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 mt-3 text-[10px] text-zinc-400">
+      <div className="flex items-center gap-2 mt-3 text-on-surface-variant">
         <span>{t("activityHeatmap.less")}</span>
         {[0, 1, 2, 3].map((lvl) => (
           <div key={lvl} className={`h-[11px] w-[11px] rounded-sm ${LEVEL_COLORS[lvl]}`} />
@@ -131,10 +133,12 @@ export function ActivityHeatmap(): JSX.Element {
         <span>{t("activityHeatmap.more")}</span>
       </div>
 
-      {/* Screen reader summary */}
       <div className="sr-only" aria-live="polite">
-        {t("activityHeatmap.srSummary", { total: totalReviews, days: daysStudied, avg: avgPerDay })}
-        {longestStreak > 0 && ` ${t("activityHeatmap.srLongestStreak", { count: longestStreak })}`}
+        {t("activityHeatmap.srSummary", {
+          days: activeDays,
+          avg: avgPerDay,
+          streak: longestStreak,
+        })}
       </div>
     </div>
   );

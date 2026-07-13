@@ -127,25 +127,25 @@ export function CommandPalette(): JSX.Element {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="p-0 overflow-hidden" aria-describedby={undefined}>
         <DialogTitle className="sr-only">{t("commandPalette.title")}</DialogTitle>
-        <div className="flex items-center gap-3 border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
-          <Search className="h-4 w-4 shrink-0 text-zinc-400" />
+        <div className="flex items-center gap-3 border-b border-outline-variant px-4 py-3 dark:border-outline-variant">
+          <Search className="h-4 w-4 shrink-0 text-on-surface-variant" />
           <Input
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={t("commandPalette.placeholder")}
-            className="h-auto border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
+            className="h-auto border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-on-surface-variant dark:placeholder:text-on-surface-variant"
             aria-label={t("commandPalette.ariaSearch")}
           />
-          <kbd className="hidden rounded border bg-zinc-100 px-1.5 py-0.5 text-[10px] font-mono text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500 sm:inline-block">
+          <kbd className="hidden rounded border bg-surface-container px-1.5 py-0.5 text-[10px] font-mono text-on-surface-variant dark:bg-surface-container dark:text-on-surface-variant sm:inline-block">
             Esc
           </kbd>
         </div>
 
         <div ref={listRef} className="max-h-[300px] overflow-y-auto py-2" role="listbox" aria-label={t("commandPalette.ariaCommands")}>
           {filtered.length === 0 && (
-            <div className="px-4 py-6 text-center text-sm text-zinc-400">
+            <div className="px-4 py-6 text-center text-sm text-on-surface-variant">
               {t("commandPalette.noResults")}
             </div>
           )}
@@ -161,14 +161,14 @@ export function CommandPalette(): JSX.Element {
                 className={cn(
                   "flex w-full items-center gap-3 px-4 py-2 text-sm transition-colors",
                   i === selectedIndex
-                    ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100"
-                    : "text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-800/50",
+                    ? "bg-surface-container text-text-primary dark:bg-surface-container dark:text-text-primary"
+                    : "text-on-surface-variant hover:bg-background dark:text-on-surface-variant dark:hover:bg-surface-container/50",
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" />
                 <span className="flex-1 text-left">{cmd.label}</span>
                 {cmd.shortcut && (
-                  <kbd className="rounded border bg-zinc-100 px-1.5 py-0.5 text-[10px] font-mono text-zinc-400 dark:bg-zinc-700 dark:text-zinc-500">
+                  <kbd className="rounded border bg-surface-container px-1.5 py-0.5 text-[10px] font-mono text-on-surface-variant dark:bg-zinc-700 dark:text-on-surface-variant">
                     {cmd.shortcut}
                   </kbd>
                 )}
@@ -177,15 +177,15 @@ export function CommandPalette(): JSX.Element {
           })}
         </div>
 
-        <div className="flex items-center gap-4 border-t border-zinc-200 px-4 py-2 dark:border-zinc-800">
-          <span className="flex items-center gap-1 text-[10px] text-zinc-400">
-            <kbd className="rounded border bg-zinc-100 px-1 py-0.5 font-mono dark:bg-zinc-800">↑↓</kbd> {t("commandPalette.hints.navigate")}
+        <div className="flex items-center gap-4 border-t border-outline-variant px-4 py-2 dark:border-outline-variant">
+          <span className="flex items-center gap-1 text-[10px] text-on-surface-variant">
+            <kbd className="rounded border bg-surface-container px-1 py-0.5 font-mono dark:bg-surface-container">↑↓</kbd> {t("commandPalette.hints.navigate")}
           </span>
-          <span className="flex items-center gap-1 text-[10px] text-zinc-400">
-            <kbd className="rounded border bg-zinc-100 px-1 py-0.5 font-mono dark:bg-zinc-800">↵</kbd> {t("commandPalette.hints.select")}
+          <span className="flex items-center gap-1 text-[10px] text-on-surface-variant">
+            <kbd className="rounded border bg-surface-container px-1 py-0.5 font-mono dark:bg-surface-container">↵</kbd> {t("commandPalette.hints.select")}
           </span>
-          <span className="flex items-center gap-1 text-[10px] text-zinc-400">
-            <kbd className="rounded border bg-zinc-100 px-1 py-0.5 font-mono dark:bg-zinc-800">esc</kbd> {t("commandPalette.hints.close")}
+          <span className="flex items-center gap-1 text-[10px] text-on-surface-variant">
+            <kbd className="rounded border bg-surface-container px-1 py-0.5 font-mono dark:bg-surface-container">esc</kbd> {t("commandPalette.hints.close")}
           </span>
         </div>
       </DialogContent>

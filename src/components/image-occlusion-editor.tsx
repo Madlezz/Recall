@@ -178,17 +178,17 @@ export function ImageOcclusionEditor({ value, onChange }: Props) {
       {!value?.imageUrl ? (
         <button
           onClick={handleUploadImage}
-          className="w-full rounded-lg border-2 border-dashed border-zinc-300 bg-zinc-50 p-8 text-center hover:border-zinc-400 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
+          className="w-full rounded-lg border-2 border-dashed border-outline bg-background p-8 text-center hover:border-zinc-400 hover:bg-surface-container-high dark:border-outline dark:bg-surface dark:hover:border-zinc-600 dark:hover:bg-surface-container"
         >
-          <Plus className="mx-auto mb-2 h-8 w-8 text-zinc-400" />
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("imageOcclusionEditor.clickToUpload")}</p>
+          <Plus className="mx-auto mb-2 h-8 w-8 text-on-surface-variant" />
+          <p className="text-sm text-on-surface-variant dark:text-on-surface-variant">{t("imageOcclusionEditor.clickToUpload")}</p>
         </button>
       ) : (
         <>
           <div className="relative">
             <canvas
               ref={canvasRef}
-              className="w-full cursor-crosshair rounded-lg border border-zinc-200 dark:border-zinc-700"
+              className="w-full cursor-crosshair rounded-lg border border-outline-variant dark:border-outline"
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
@@ -199,7 +199,7 @@ export function ImageOcclusionEditor({ value, onChange }: Props) {
             />
             <button
               onClick={handleUploadImage}
-              className="absolute right-2 top-2 rounded bg-zinc-900/80 px-3 py-1 text-xs text-white hover:bg-zinc-900"
+              className="absolute right-2 top-2 rounded bg-primary/80 px-3 py-1 text-xs text-on-primary hover:bg-primary"
             >
               {t("imageOcclusionEditor.changeImage")}
             </button>
@@ -207,20 +207,20 @@ export function ImageOcclusionEditor({ value, onChange }: Props) {
 
           {value.occlusions.length > 0 && (
             <div className="space-y-2">
-              <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              <p className="text-sm font-medium text-text-secondary dark:text-text-secondary">
                 {t("imageOcclusionEditor.occlusions", { count: value.occlusions.length })}:
               </p>
               {value.occlusions.map((shape, i) => (
                 <div
                   key={shape.id}
-                  className="flex items-center justify-between rounded border border-zinc-200 bg-zinc-50 p-2 dark:border-zinc-700 dark:bg-zinc-900"
+                  className="flex items-center justify-between rounded border border-outline-variant bg-background p-2 dark:border-outline dark:bg-surface"
                 >
-                  <span className="text-sm text-zinc-700 dark:text-zinc-300">
+                  <span className="text-sm text-text-secondary dark:text-text-secondary">
                     {i + 1}. {shape.label}
                   </span>
                   <button
                     onClick={() => handleRemoveShape(shape.id)}
-                    className="rounded p-1 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                    className="rounded p-1 text-on-surface-variant hover:bg-surface-container-high hover:text-text-secondary dark:hover:bg-surface-container dark:hover:text-text-secondary"
                     aria-label={t("imageOcclusionEditor.removeShape", { label: shape.label })}
                   >
                     <X className="h-4 w-4" />
@@ -230,7 +230,7 @@ export function ImageOcclusionEditor({ value, onChange }: Props) {
             </div>
           )}
 
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="text-xs text-on-surface-variant dark:text-on-surface-variant">
             {t("imageOcclusionEditor.drawHint")}
           </p>
         </>

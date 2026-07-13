@@ -90,29 +90,29 @@ export function DeckDialog({ deck, trigger, open: controlledOpen, onOpenChange }
 
           <div className="space-y-5">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{t("deckDialog.nameLabel")}</label>
+              <label className="text-sm font-medium text-text-secondary dark:text-text-secondary">{t("deckDialog.nameLabel")}</label>
               <Input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 placeholder={t("deckDialog.namePlaceholder")}
-                className="border-zinc-200 dark:border-zinc-800"
+                className="border-outline-variant dark:border-outline-variant"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{t("deckDialog.descriptionLabel")}</label>
+              <label className="text-sm font-medium text-text-secondary dark:text-text-secondary">{t("deckDialog.descriptionLabel")}</label>
               <Textarea
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
                 placeholder={t("deckDialog.descriptionPlaceholder")}
-                className="border-zinc-200 dark:border-zinc-800"
+                className="border-outline-variant dark:border-outline-variant"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{t("deckDialog.colorLabel")}</label>
+              <label className="text-sm font-medium text-text-secondary dark:text-text-secondary">{t("deckDialog.colorLabel")}</label>
               <Select value={color} onValueChange={(value) => setColor(value as DeckColor)}>
-                <SelectTrigger className="border-zinc-200 dark:border-zinc-800">
+                <SelectTrigger className="border-outline-variant dark:border-outline-variant">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -130,10 +130,10 @@ export function DeckDialog({ deck, trigger, open: controlledOpen, onOpenChange }
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} className="border-zinc-200 text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100">
+            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} className="border-outline-variant text-text-secondary hover:bg-surface-container-high hover:text-text-primary dark:border-outline-variant dark:text-text-secondary dark:hover:bg-surface-container dark:hover:text-text-primary">
               {t("deckDialog.cancel")}
             </Button>
-            <Button type="submit" className="bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200">{deck ? t("deckDialog.saveChanges") : t("deckDialog.createDeck")}</Button>
+            <Button type="submit" className="bg-primary text-on-primary hover:bg-primary-hover dark:bg-primary dark:text-on-primary dark:hover:bg-primary-container">{deck ? t("deckDialog.saveChanges") : t("deckDialog.createDeck")}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

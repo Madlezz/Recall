@@ -17,7 +17,7 @@ export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): J
   const maxVal = Math.max(1, ...totalPerDay);
   const heaviestIdx = totalPerDay.indexOf(maxVal);
 
-  // 7-day rolling average of total cards
+  // 7-day rolling average total cards
   const avg7 = useMemo(() => {
     if (totalPerDay.length < 7) return 0;
     const sum = totalPerDay.slice(0, 7).reduce((a, b) => a + b, 0);
@@ -38,8 +38,8 @@ export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): J
   if (totalDue === 0) {
     return (
       <section>
-        <h3 className="mb-3 text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("workloadForecast.title")}</h3>
-        <p className="text-sm text-zinc-400 py-6 text-center rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        <h3 className="mb-3 text-sm font-bold text-text-primary dark:text-text-primary">{t("workloadForecast.title")}</h3>
+        <p className="text-sm text-on-surface-variant py-6 text-center rounded-lg border border-outline-variant bg-surface dark:border-outline-variant dark:bg-surface">
           {t("workloadForecast.noSchedule")}
         </p>
       </section>
@@ -49,20 +49,19 @@ export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): J
   return (
     <section>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("workloadForecast.title")}</h3>
-        <div className="flex items-center gap-3 text-xs tabular-nums text-zinc-400">
+        <h3 className="text-sm font-bold text-text-primary dark:text-text-primary">{t("workloadForecast.title")}</h3>
+        <div className="flex items-center gap-3 text-xs tabular-nums text-on-surface-variant">
           <span>{t("workloadForecast.sevenDayAvg", { count: avg7 })}</span>
           <span>{t("workloadForecast.total", { count: totalDue })}</span>
         </div>
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-        {/* Chart */}
-        <div className="flex items-end gap-[2px] h-32" role="img" aria-label="Workload forecast chart">
+      <div className="rounded-lg border border-outline-variant bg-surface p-5 dark:border-outline-variant dark:bg-surface">
+        <div className="flex items-end h-32" aria-label="Workload forecast chart">
           {forecast.map((day, i) => {
             const total = day.due + day.newCount;
-            const duePct = (day.due / maxVal) * 100;
-            const newPct = (day.newCount / maxVal) * 100;
+            const duePct = maxVal > 0 ? (day.due / maxVal) * 100 : 0;
+            const newPct = maxVal > 0 ? (day.newCount / maxVal) * 100 : 0;
             const isHeaviest = i === heaviestIdx && maxVal > 0;
 
             return (
@@ -100,15 +99,15 @@ export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): J
                   )}
                   {/* Empty placeholder */}
                   {total === 0 && (
-                    <div className="w-full h-[2%] rounded-sm bg-zinc-100 dark:bg-zinc-800" />
+                    <div className="w-full h-[2%] rounded-sm bg-surface-container dark:bg-surface-container" />
                   )}
                 </div>
 
                 {/* Tooltip */}
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block z-10">
-                  <div className="bg-white border border-zinc-200 rounded px-2 py-1 text-xs whitespace-nowrap shadow-sm dark:bg-zinc-800 dark:border-zinc-700">
-                    <div className="font-medium text-zinc-800 dark:text-zinc-200">{formatDayLabel(day.date, i)}</div>
-                    {day.due > 0 && <div className="text-zinc-500">{t("workloadForecast.reviewCount", { count: day.due })}</div>}
+                  <div className="bg-surface border border-outline-variant rounded px-2 py-1 text-xs whitespace-nowrap shadow-sm dark:bg-surface-container dark:border-outline">
+                    <div className="font-medium text-text-primary dark:text-text-primary">{formatDayLabel(day.date, i)}</div>
+                    {day.due > 0 && <div className="text-on-surface-variant">{t("workloadForecast.reviewCount", { count: day.due })}</div>}
                     {day.newCount > 0 && <div className="text-emerald-600 dark:text-emerald-400">{t("workloadForecast.newCount", { count: day.newCount })}</div>}
                     {isHeaviest && <div className="text-amber-600 dark:text-amber-400 font-medium mt-0.5">{t("workloadForecast.heaviest")}</div>}
                   </div>
@@ -118,22 +117,22 @@ export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): J
           })}
         </div>
 
-        {/* Legend + summary */}
+        {/* Legend */}
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-4 text-xs text-zinc-500">
+          <div className="flex items-center gap-4 text-xs text-on-surface-variant">
             <span className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-sm bg-zinc-500 dark:bg-zinc-400" /> {t("workloadForecast.review")}
             </span>
             <span className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-sm bg-emerald-500/70" /> {t("workloadForecast.new")}
             </span>
-            {heaviestIdx >= 0 && totalPerDay[heaviestIdx] > 0 && (
+            {heaviestIdx >= 0 && maxVal > 0 && (
               <span className="flex items-center gap-1.5">
                 <span className="h-2.5 w-2.5 rounded-sm bg-amber-500" /> {t("workloadForecast.heaviest")}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3 text-xs text-zinc-400">
+          <div className="flex items-center gap-3 text-xs text-on-surface-variant">
             {totalNew > 0 && (
               <span className="flex items-center gap-1">
                 <span className="font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">{totalNew}</span> {t("workloadForecast.new")}
@@ -141,7 +140,7 @@ export function WorkloadForecast({ cards, days = 30 }: WorkloadForecastProps): J
             )}
             {forecast[0].due > 0 && (
               <span className="flex items-center gap-1">
-                <span className="font-bold text-zinc-700 dark:text-zinc-300 tabular-nums">{forecast[0].due}</span> {t("workloadForecast.dueToday")}
+                <span className="font-bold text-text-secondary dark:text-text-secondary tabular-nums">{forecast[0].due}</span> {t("workloadForecast.dueToday")}
               </span>
             )}
           </div>

@@ -49,9 +49,9 @@ export function Settings(): JSX.Element {
     <div className="animate-fade-in space-y-6">
       {/* Header */}
       <section>
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">{t("settings.preferences")}</p>
-        <h1 className="mt-2 text-[1.75rem] font-bold leading-tight tracking-tight text-zinc-900 dark:text-zinc-100">{t("settings.title")}</h1>
-        <p className="mt-2 max-w-lg text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-on-surface-variant">{t("settings.preferences")}</p>
+        <h1 className="mt-2 text-[1.75rem] font-bold leading-tight tracking-tight text-text-primary dark:text-text-primary">{t("settings.title")}</h1>
+        <p className="mt-2 max-w-lg text-sm leading-relaxed text-on-surface-variant dark:text-on-surface-variant">
           {t("settings.headerDescription")}
         </p>
       </section>

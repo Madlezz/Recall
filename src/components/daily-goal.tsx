@@ -62,7 +62,7 @@ export function DailyGoal(): JSX.Element {
         />
       </div>
 
-      <p className="mt-1.5 text-xs text-zinc-400">
+      <p className="mt-1.5 text-xs text-on-surface-variant">
         {achieved ? t("dailyGoal.goalCrushed") : progress > 0.5 ? t("dailyGoal.moreToGo", { count: goal - done }) : t("dailyGoal.cardsToday", { count: goal - done })}
       </p>
     </div>
