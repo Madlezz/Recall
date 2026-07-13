@@ -17,15 +17,15 @@ export function NotificationsSection(): JSX.Element {
           onClick={() => void updateSettings({ notificationsEnabled: !settings.notificationsEnabled })}
           className={`flex items-center gap-2 rounded-md px-3.5 py-2 text-sm font-medium transition-colors ${
             settings.notificationsEnabled
-              ? "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200"
-              : "text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+              ? "bg-surface-container text-text-primary dark:bg-surface-container dark:text-text-primary"
+              : "text-on-surface-variant hover:bg-background dark:hover:bg-surface-container/50"
           }`}
         >
           {settings.notificationsEnabled ? <><Bell className="h-4 w-4" /> {t("settings.enabled")}</> : <><BellOff className="h-4 w-4" /> {t("settings.disabled")}</>}
         </button>
         {settings.notificationsEnabled && (
           <button
-            className="rounded-md px-3 py-2 text-sm font-medium text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+            className="rounded-md px-3 py-2 text-sm font-medium text-on-surface-variant hover:bg-background dark:hover:bg-surface-container/50"
             onClick={async () => {
               const ok = await sendTestNotification();
               if (ok) toast.success(t("settings.testNotificationSent"));

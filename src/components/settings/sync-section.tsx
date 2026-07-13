@@ -128,14 +128,14 @@ export function SyncSection(): JSX.Element {
 
   return (
     <section>
-      <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-2">
+      <h3 className="mb-4 text-sm font-bold text-text-primary dark:text-text-primary flex items-center gap-2">
         <Shield className="h-4 w-4" />
         {t("sync.encryptedSync")}
       </h3>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="rounded-lg border border-outline-variant bg-surface p-5 dark:border-outline-variant dark:bg-surface">
         {/* Description */}
-        <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+        <p className="text-sm text-on-surface-variant dark:text-on-surface-variant mb-4">
           {t("sync.description")}
         </p>
 
@@ -166,9 +166,9 @@ export function SyncSection(): JSX.Element {
             </div>
 
             {showCodeInput && (
-              <div className="space-y-3 rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
+              <div className="space-y-3 rounded-md border border-outline-variant p-4 dark:border-outline-variant">
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-zinc-500">
+                  <label className="mb-1.5 block text-xs font-medium text-on-surface-variant">
                     {t("sync.syncCode")}
                   </label>
                   <input
@@ -176,20 +176,20 @@ export function SyncSection(): JSX.Element {
                     value={codeInput}
                     onChange={(e) => setCodeInput(formatSyncCodeInput(e.target.value))}
                     placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX"
-                    className="w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-mono tracking-wider dark:border-zinc-700 dark:bg-zinc-800"
+                    className="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-sm font-mono tracking-wider dark:border-outline dark:bg-surface-container"
                     maxLength={59}
                   />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-zinc-500">
-                    {t("sync.relayUrl")} <span className="text-zinc-400">({t("sync.optional")})</span>
+                  <label className="mb-1.5 block text-xs font-medium text-on-surface-variant">
+                    {t("sync.relayUrl")} <span className="text-on-surface-variant">({t("sync.optional")})</span>
                   </label>
                   <input
                     type="url"
                     value={relayInput}
                     onChange={(e) => setRelayInput(e.target.value)}
                     placeholder={DEFAULT_RELAY_URL}
-                    className="w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
+                    className="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-sm dark:border-outline dark:bg-surface-container"
                   />
                 </div>
                 <div className="flex gap-2">
@@ -207,9 +207,9 @@ export function SyncSection(): JSX.Element {
           /* ── Paired: show sync status and controls ── */
           <div className="space-y-4">
             {/* Sync code display */}
-            <div className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
+            <div className="rounded-md border border-outline-variant p-4 dark:border-outline-variant">
               <div className="mb-1.5 flex items-center justify-between">
-                <span className="text-xs font-medium text-zinc-500">{t("sync.yourSyncCode")}</span>
+                <span className="text-xs font-medium text-on-surface-variant">{t("sync.yourSyncCode")}</span>
                 <button
                   onClick={() => void handleCopyCode()}
                   className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1"
@@ -218,17 +218,17 @@ export function SyncSection(): JSX.Element {
                   {t("sync.copy")}
                 </button>
               </div>
-              <code className="block text-sm font-mono tracking-wider text-zinc-800 dark:text-zinc-200 break-all">
+              <code className="block text-sm font-mono tracking-wider text-text-primary dark:text-text-primary break-all">
                 {settings.syncCode}
               </code>
-              <p className="mt-2 text-xs text-zinc-400">{t("sync.shareCodeHint")}</p>
+              <p className="mt-2 text-xs text-on-surface-variant">{t("sync.shareCodeHint")}</p>
             </div>
 
             {/* Sync status */}
-            <div className="flex items-center justify-between rounded-md bg-zinc-50 dark:bg-zinc-800/50 px-4 py-3">
+            <div className="flex items-center justify-between rounded-md bg-background dark:bg-surface-container/50 px-4 py-3">
               <div className="flex items-center gap-2">
-                <Cloud className="h-4 w-4 text-zinc-400" />
-                <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                <Cloud className="h-4 w-4 text-on-surface-variant" />
+                <span className="text-sm text-on-surface-variant dark:text-on-surface-variant">
                   {settings.syncLastAt
                     ? `${t("sync.lastSync")}: ${new Date(settings.syncLastAt).toLocaleString()}`
                     : t("sync.neverSynced")}
@@ -244,7 +244,7 @@ export function SyncSection(): JSX.Element {
                 onChange={(e) => void updateSettings({ syncAutoInterval: e.target.checked ? 15 : 0 })}
                 className="rounded"
               />
-              <span className="text-sm text-zinc-700 dark:text-zinc-300">{t("sync.autoSyncEvery15min")}</span>
+              <span className="text-sm text-text-secondary dark:text-text-secondary">{t("sync.autoSyncEvery15min")}</span>
             </label>
 
             {/* Actions */}
@@ -272,12 +272,12 @@ export function SyncSection(): JSX.Element {
             </div>
 
             {/* Relay URL (advanced) */}
-            <details className="text-xs text-zinc-400">
-              <summary className="cursor-pointer hover:text-zinc-600 dark:hover:text-zinc-300">
+            <details className="text-xs text-on-surface-variant">
+              <summary className="cursor-pointer hover:text-on-surface-variant dark:hover:text-text-secondary">
                 {t("sync.advanced")}
               </summary>
               <p className="mt-2">
-                {t("sync.relayUrl")}: <code className="text-zinc-500 dark:text-zinc-400">{relayUrl}</code>
+                {t("sync.relayUrl")}: <code className="text-on-surface-variant dark:text-on-surface-variant">{relayUrl}</code>
               </p>
             </details>
           </div>

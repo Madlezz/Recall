@@ -53,21 +53,21 @@ export function DataSection(): JSX.Element {
     <>
       {/* Data Health */}
       <section>
-        <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("settings.dataHealth")}</h3>
-        <div className="rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 divide-y divide-zinc-100 dark:divide-zinc-800">
+        <h3 className="mb-4 text-sm font-bold text-text-primary dark:text-text-primary">{t("settings.dataHealth")}</h3>
+        <div className="rounded-lg border border-outline-variant bg-surface dark:border-outline-variant dark:bg-surface divide-y divide-zinc-100 dark:divide-zinc-800">
           <div className="flex items-center justify-between px-5 py-3.5 text-sm">
-            <span className="flex items-center gap-2.5 text-zinc-500"><Layers className="h-4 w-4" /> {t("settings.cardsLabel")}</span>
-            <span className="font-semibold tabular-nums text-zinc-800 dark:text-zinc-200">{t("settings.cardsInDecks", { cards: cards.length, decks: decks.length })}</span>
+            <span className="flex items-center gap-2.5 text-on-surface-variant"><Layers className="h-4 w-4" /> {t("settings.cardsLabel")}</span>
+            <span className="font-semibold tabular-nums text-text-primary dark:text-text-primary">{t("settings.cardsInDecks", { cards: cards.length, decks: decks.length })}</span>
           </div>
           <div className="flex items-center justify-between px-5 py-3.5 text-sm">
-            <span className="flex items-center gap-2.5 text-zinc-500"><HardDrive className="h-4 w-4" /> {t("settings.reviewsLabel")}</span>
-            <span className="font-semibold tabular-nums text-zinc-800 dark:text-zinc-200">{t("settings.totalReviews", { count: reviewLogs.length })}</span>
+            <span className="flex items-center gap-2.5 text-on-surface-variant"><HardDrive className="h-4 w-4" /> {t("settings.reviewsLabel")}</span>
+            <span className="font-semibold tabular-nums text-text-primary dark:text-text-primary">{t("settings.totalReviews", { count: reviewLogs.length })}</span>
           </div>
           <div className="flex items-center justify-between px-5 py-3.5 text-sm">
-            <span className="flex items-center gap-2.5 text-zinc-500"><HardDrive className="h-4 w-4" /> {t("settings.sessionsLabel")}</span>
-            <span className="font-semibold tabular-nums text-zinc-800 dark:text-zinc-200">{t("settings.sessionsCompleted", { count: studySessions.length })}</span>
+            <span className="flex items-center gap-2.5 text-on-surface-variant"><HardDrive className="h-4 w-4" /> {t("settings.sessionsLabel")}</span>
+            <span className="font-semibold tabular-nums text-text-primary dark:text-text-primary">{t("settings.sessionsCompleted", { count: studySessions.length })}</span>
           </div>
-          <div className="px-5 py-3 text-xs text-zinc-400">
+          <div className="px-5 py-3 text-xs text-on-surface-variant">
             {isTauriRuntime() ? "SQLite (recall.db)" : t("settings.browserStorage")} · {t("settings.exportJsonHint")}
           </div>
         </div>
@@ -75,8 +75,8 @@ export function DataSection(): JSX.Element {
 
       {/* Auto-Backup */}
       <section>
-        <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("settings.autoBackup")}</h3>
-        <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <h3 className="mb-4 text-sm font-bold text-text-primary dark:text-text-primary">{t("settings.autoBackup")}</h3>
+        <div className="rounded-lg border border-outline-variant bg-surface p-5 dark:border-outline-variant dark:bg-surface">
           <div className="flex flex-wrap items-center gap-3">
             <Select
               value={settings.backupSchedule}
@@ -104,31 +104,31 @@ export function DataSection(): JSX.Element {
                   toast.error(t("settings.folderPickerTauriOnly"));
                 }
               }}
-              className="flex items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800/50"
+              className="flex items-center gap-1.5 rounded-md border border-outline-variant px-3 py-1.5 text-sm font-medium text-on-surface-variant hover:bg-background dark:border-outline dark:text-on-surface-variant dark:hover:bg-surface-container/50"
             >
               <Save className="h-3.5 w-3.5" />
               {settings.backupFolder ? t("settings.changeFolder") : t("settings.pickFolder")}
             </button>
             {settings.backupFolder && (
-              <span className="text-xs text-zinc-400 truncate max-w-[200px]">{settings.backupFolder}</span>
+              <span className="text-xs text-on-surface-variant truncate max-w-[200px]">{settings.backupFolder}</span>
             )}
           </div>
           {settings.lastBackupAt ? (
-            <p className="mt-3 text-xs text-zinc-400">
+            <p className="mt-3 text-xs text-on-surface-variant">
               <Save className="inline h-3 w-3 mr-1" />
               {t("settings.lastBackup")}: {new Date(settings.lastBackupAt).toLocaleDateString()}
             </p>
           ) : (
-            <p className="mt-3 text-xs text-zinc-400">{t("settings.noBackupsYet")}</p>
+            <p className="mt-3 text-xs text-on-surface-variant">{t("settings.noBackupsYet")}</p>
           )}
         </div>
       </section>
 
       {/* Cloud Sync */}
       <section>
-        <h3 className="mb-4 text-sm font-bold text-zinc-800 dark:text-zinc-200">{t("settings.cloudSync")}</h3>
-        <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+        <h3 className="mb-4 text-sm font-bold text-text-primary dark:text-text-primary">{t("settings.cloudSync")}</h3>
+        <div className="rounded-lg border border-outline-variant bg-surface p-5 dark:border-outline-variant dark:bg-surface">
+          <p className="text-sm text-on-surface-variant dark:text-on-surface-variant mb-4">
             {t("settings.cloudSyncDescription")}
           </p>
           <div className="flex flex-wrap items-center gap-3">
@@ -139,7 +139,7 @@ export function DataSection(): JSX.Element {
                 onChange={(e) => void updateSettings({ syncEnabled: e.target.checked })}
                 className="rounded"
               />
-              <span className="text-sm text-zinc-700 dark:text-zinc-300">{t("settings.enableSync")}</span>
+              <span className="text-sm text-text-secondary dark:text-text-secondary">{t("settings.enableSync")}</span>
             </label>
             <button
               onClick={async () => {
@@ -154,13 +154,13 @@ export function DataSection(): JSX.Element {
                   toast.error(t("settings.folderPickerTauriOnly"));
                 }
               }}
-              className="flex items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800/50"
+              className="flex items-center gap-1.5 rounded-md border border-outline-variant px-3 py-1.5 text-sm font-medium text-on-surface-variant hover:bg-background dark:border-outline dark:text-on-surface-variant dark:hover:bg-surface-container/50"
             >
               <Save className="h-3.5 w-3.5" />
               {settings.syncFolder ? t("settings.changeFolder") : t("settings.pickFolder")}
             </button>
             {settings.syncFolder && (
-              <span className="text-xs text-zinc-400 truncate max-w-[200px]">{settings.syncFolder}</span>
+              <span className="text-xs text-on-surface-variant truncate max-w-[200px]">{settings.syncFolder}</span>
             )}
             {settings.syncFolder && (
               <button
@@ -181,7 +181,7 @@ export function DataSection(): JSX.Element {
             )}
           </div>
           {settings.syncFolder && (
-            <p className="mt-3 text-xs text-zinc-400">
+            <p className="mt-3 text-xs text-on-surface-variant">
               {t("settings.dataWillSyncTo")}: <code className="text-xs">{settings.syncFolder}</code>
             </p>
           )}
@@ -193,8 +193,8 @@ export function DataSection(): JSX.Element {
         <h3 className="mb-4 text-sm font-bold text-red-600 dark:text-red-400">{t("settings.dangerZone")}</h3>
         <div className="rounded-lg border border-red-200 bg-red-50/30 p-5 dark:border-red-900 dark:bg-red-950/20 space-y-5">
           <div>
-            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">{t("settings.deleteAllData")}</p>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-3">
+            <p className="text-sm font-medium text-text-secondary dark:text-text-secondary mb-1">{t("settings.deleteAllData")}</p>
+            <p className="text-sm text-on-surface-variant dark:text-on-surface-variant mb-3">
               {t("settings.deleteAllDataDescription")}
             </p>
             <AlertDialog>
@@ -220,8 +220,8 @@ export function DataSection(): JSX.Element {
             </AlertDialog>
           </div>
           <div className="border-t border-red-200 dark:border-red-900 pt-5">
-            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">{t("settings.restoreDemoDecks")}</p>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-3">
+            <p className="text-sm font-medium text-text-secondary dark:text-text-secondary mb-1">{t("settings.restoreDemoDecks")}</p>
+            <p className="text-sm text-on-surface-variant dark:text-on-surface-variant mb-3">
               {t("settings.restoreDemoDescription")}
             </p>
             <AlertDialog>

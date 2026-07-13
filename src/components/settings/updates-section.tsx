@@ -66,18 +66,18 @@ export function UpdatesSection(): JSX.Element {
               {checking ? t("settings.checking") : t("settings.checkForUpdates")}
             </Button>
             {updateInfo && (
-              <span className="text-sm text-zinc-600 dark:text-zinc-400">
+              <span className="text-sm text-on-surface-variant dark:text-on-surface-variant">
                 {t("settings.updateAvailable", { version: updateInfo.version })}
               </span>
             )}
             {!updateInfo && !checking && (
-              <span className="text-sm text-zinc-500">{t("settings.upToDate")}</span>
+              <span className="text-sm text-on-surface-variant">{t("settings.upToDate")}</span>
             )}
           </div>
           {updateInfo && (
             <div className="space-y-2">
               {updateInfo.body && (
-                <div className="rounded-md bg-zinc-50 dark:bg-zinc-800 p-3 text-xs text-zinc-600 dark:text-zinc-400 max-h-32 overflow-y-auto">
+                <div className="rounded-md bg-background dark:bg-surface-container p-3 text-xs text-on-surface-variant dark:text-on-surface-variant max-h-32 overflow-y-auto">
                   {updateInfo.body}
                 </div>
               )}

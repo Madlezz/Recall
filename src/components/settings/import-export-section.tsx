@@ -95,13 +95,13 @@ export function ImportExportSection({
         </Select>
         <button
           onClick={() => void handleNativeImport()}
-          className="flex items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800/50"
+          className="flex items-center gap-1.5 rounded-md border border-outline-variant px-3 py-1.5 text-sm font-medium text-on-surface-variant hover:bg-background dark:border-outline dark:text-on-surface-variant dark:hover:bg-surface-container/50"
         >
           <Upload className="h-3.5 w-3.5" /> {t("settings.importData")}
         </button>
         <button
           onClick={() => void handleExport()}
-          className="flex items-center gap-1.5 rounded-md bg-zinc-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          className="flex items-center gap-1.5 rounded-md bg-primary-hover px-3 py-1.5 text-sm font-medium text-on-primary hover:bg-primary dark:bg-primary-container dark:text-on-primary dark:hover:bg-primary-container"
         >
           <Download className="h-3.5 w-3.5" /> {t("settings.exportData")}
         </button>
