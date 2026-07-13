@@ -92,7 +92,7 @@ describe("Dashboard", () => {
 
   it("renders dashboard heading", () => {
     render(React.createElement(Dashboard));
-    expect(screen.getByText("Dashboard")).toBeTruthy();
+    expect(screen.getByText("Spaced Repetition")).toBeTruthy();
   });
 
   it("renders empty state when no decks", () => {

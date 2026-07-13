@@ -1,11 +1,11 @@
 type AnswerVariant = "again" | "hard" | "good" | "easy";
 
-// Default palette (red/amber/emerald/blue) used in normal mode.
+// Default palette using semantic review tokens from the design system.
 const answerStyles: Record<AnswerVariant, string> = {
-  again: "bg-red-50 text-red-700 border-red-200 hover:bg-red-100 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900",
-  hard: "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900",
-  good: "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900",
-  easy: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900",
+  again: "bg-review-again/10 text-review-again border-review-again/30 hover:bg-review-again/20 dark:bg-review-again/20",
+  hard: "bg-review-hard/10 text-review-hard border-review-hard/30 hover:bg-review-hard/20 dark:bg-review-hard/20",
+  good: "bg-review-good/10 text-review-good border-review-good/30 hover:bg-review-good/20 dark:bg-review-good/20",
+  easy: "bg-review-easy/10 text-review-easy border-review-easy/30 hover:bg-review-easy/20 dark:bg-review-easy/20",
 };
 
 // Color-blind-safe palette (Okabe-Ito) + a distinct glyph so ratings are never
@@ -70,9 +70,9 @@ export function AnswerButton({
 
 export function CompletionStat({ label, value }: { label: string; value: number }): JSX.Element {
   return (
-    <div className="rounded-lg bg-zinc-50 py-2.5 px-1 dark:bg-zinc-800/50">
-      <div className="text-lg font-bold tabular-nums text-zinc-800 dark:text-zinc-200">{value}</div>
-      <div className="mt-0.5 text-[10px] font-medium text-zinc-400">{label}</div>
+<div className="rounded-lg bg-surface-container-low py-2.5 px-1 dark:bg-surface-container">
+	      <div className="text-lg font-bold tabular-nums text-text-primary">{value}</div>
+	      <div className="mt-0.5 text-[10px] font-medium text-on-surface-variant">{label}</div>
     </div>
   );
 }
