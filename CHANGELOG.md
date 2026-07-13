@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ## [Unreleased]
 
 ### Added
+- **Material 3 design system:** Complete UI redesign with M3-inspired semantic tokens — surface tiers, text hierarchy, outline variants, primary/secondary/tertiary containers, review rating colors, light/dark/high-contrast themes. All 38 components migrated from legacy zinc classes to semantic tokens. CSS custom properties in `index.css`, Tailwind config extended, `src/lib/surface.ts` helpers (`cardSurface`, `softSurface`, `brandSurface`, `typeClass`). New components: `RecallLogo`, `Mascot`, `ui/surface.tsx`. 767 tests pass, typecheck clean.
 - **Color-blind friendly UI:** Settings → Study toggle swaps rating buttons for an Okabe-Ito color-blind-safe palette and adds a distinct shape + text glyph (✕ ◑ ✓ ★) per rating, so ratings are never conveyed by color alone (WCAG 1.4.1). The stats rating-distribution chart and legend follow the same palette.
 - **Customizable keyboard shortcuts:** Rebindable study shortcuts (reveal, rate Again/Hard/Good/Easy, bury, snooze, read aloud, undo) with live conflict detection. Shortcuts persist in settings; a single source of truth in `src/lib/shortcuts.ts` drives both the study handler and the help dialog. Reset-to-defaults button included.
 
