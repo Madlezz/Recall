@@ -7,7 +7,7 @@ export interface NavigationSlice {
   showSettings: () => void;
   showDeck: (deckId: string) => void;
   showStats: () => void;
-  showBrowser: () => void;
+  showDeckBrowser: () => void;  showBrowser: () => void;
   showTags: () => void;
   startMatch: (deckId: string) => void;
 }
@@ -52,6 +52,11 @@ export const navigationSlice = (
   showBrowser() {
     autoExitStudy();
     _set({ view: "browser", error: null });
+  },
+
+  showDeckBrowser() {
+    autoExitStudy();
+    _set({ view: "deck-browser", error: null });
   },
 
   showTags() {

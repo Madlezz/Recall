@@ -1,4 +1,4 @@
-import { Home, LayoutGrid, Play, Settings, Shield, Star, Tag, Timer, TrendingUp, Zap } from "lucide-react";
+import { Home, LayoutGrid, Library, Play, Settings, Shield, Star, Tag, Timer, TrendingUp, Zap } from "lucide-react";
 import { type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { CommandPalette } from "@/components/command-palette";
@@ -22,6 +22,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
   const showSettings = useRecallStore((state) => state.showSettings);
   const showStats = useRecallStore((state) => state.showStats);
   const showBrowser = useRecallStore((state) => state.showBrowser);
+  const showDeckBrowser = useRecallStore((state) => state.showDeckBrowser);
   const showTags = useRecallStore((state) => state.showTags);
   const startReview = useRecallStore((state) => state.startReview);
   const startMatch = useRecallStore((state) => state.startMatch);
@@ -53,6 +54,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         {/* Nav */}
         <nav className="flex-1 px-3 py-3 space-y-1" aria-label={t("nav.mainNav")}>
           <NavButton active={view === "dashboard"} icon={Home} label={t("nav.dashboard")} onClick={showDashboard} />
+          <NavButton active={view === "deck-browser"} icon={Library} label={t("nav.decks")} onClick={showDeckBrowser} />
           <NavButton
             active={view === "study"}
             icon={Play}
@@ -172,8 +174,8 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
           onClick={() => startReview(null)}
           badge={dueCount > 0 ? dueCount : undefined}
         />
+        <BottomTab active={view === "deck-browser"} icon={Library} label={t("nav.decks")} onClick={showDeckBrowser} />
         <BottomTab active={view === "browser"} icon={LayoutGrid} label={t("nav.browser")} onClick={showBrowser} />
-        <BottomTab active={view === "tags"} icon={Tag} label={t("nav.tags")} onClick={showTags} />
         <BottomTab active={view === "stats"} icon={TrendingUp} label={t("nav.stats")} onClick={showStats} />
       </nav>
 

@@ -9,6 +9,7 @@ import { QuickAddDialog } from "@/components/quick-add";
 import { useRecallStore } from "@/stores/recall-store";
 import { toast } from "sonner";
 
+const DeckBrowser = lazy(() => import("@/components/deck-browser").then(m => ({ default: m.DeckBrowser })));
 const DeckDetail = lazy(() => import("@/components/deck-detail").then(m => ({ default: m.DeckDetail })));
 const CardBrowser = lazy(() => import("@/components/card-browser").then(m => ({ default: m.CardBrowser })));
 const MatchGame = lazy(() => import("@/components/match-game").then(m => ({ default: m.MatchGame })));
@@ -154,6 +155,11 @@ export function App(): JSX.Element {
                   <TagManager />
                 </ErrorBoundary>
               ) : null}
+              {view === "deck-browser" ? (
+                <ErrorBoundary viewName="DeckBrowser" onRecover={recoverToDashboard}>
+                  <DeckBrowser />
+                </ErrorBoundary>
+              ) : null}
               {view === "onboarding" ? (
                 <ErrorBoundary viewName="Onboarding" onRecover={recoverToDashboard}>
                   <Onboarding />
@@ -177,6 +183,7 @@ export function App(): JSX.Element {
           {view === "tags" && t("app.tagsView")}
           {view === "stats" && t("app.statsView")}
           {view === "settings" && t("app.settingsView")}
+          {view === "deck-browser" && t("app.deckBrowserView")}
           {view === "onboarding" && t("app.onboardingView")}
         </div>
       </ErrorBoundary>

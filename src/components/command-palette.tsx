@@ -1,4 +1,4 @@
-import { Home, LayoutGrid, Moon, Search, Settings, Sun, Tag, TrendingUp, Zap } from "lucide-react";
+import { Home, LayoutGrid, Library, Moon, Search, Settings, Sun, Tag, TrendingUp, Zap } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -24,6 +24,7 @@ export function CommandPalette(): JSX.Element {
 
   const showDashboard = useRecallStore((s) => s.showDashboard);
   const showBrowser = useRecallStore((s) => s.showBrowser);
+  const showDeckBrowser = useRecallStore((s) => s.showDeckBrowser);
   const showStats = useRecallStore((s) => s.showStats);
   const showSettings = useRecallStore((s) => s.showSettings);
   const showTags = useRecallStore((s) => s.showTags);
@@ -35,6 +36,7 @@ export function CommandPalette(): JSX.Element {
 
   const commands: Command[] = useMemo(() => [
     { id: "dashboard", label: t("commandPalette.commands.dashboard"), icon: Home, action: showDashboard },
+    { id: "decks", label: t("commandPalette.commands.decks"), icon: Library, action: showDeckBrowser },
     { id: "browser", label: t("commandPalette.commands.browser"), icon: LayoutGrid, action: showBrowser },
     { id: "tags", label: t("commandPalette.commands.tags"), icon: Tag, action: showTags },
     { id: "stats", label: t("commandPalette.commands.stats"), icon: TrendingUp, action: showStats },

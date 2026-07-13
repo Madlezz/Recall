@@ -9,6 +9,7 @@
     "studyModeView": "Mode belajar",
     "matchGameView": "Permainan mencocokkan",
     "browserView": "Browser kartu",
+    "deckBrowserView": "Browser dek",
     "tagsView": "Tag",
     "statsView": "Statistik",
     "settingsView": "Pengaturan",
@@ -16,6 +17,7 @@
   },
   "nav": {
     "dashboard": "Beranda",
+    "decks": "Dek",
     "review": "Ulangan",
     "browser": "Jelajah",
     "tags": "Label",
@@ -77,6 +79,23 @@
     "due": "Jatuh tempo",
     "new": "Baru",
     "reviewed": "Diulas"
+  },
+  "deckBrowser": {
+    "title": "Dek Saya",
+    "count": "{{count}} dek",
+    "searchPlaceholder": "Cari dek...",
+    "filterAria": "Filter dek",
+    "filterAll": "Semua",
+    "filterDue": "Jatuh Tempo",
+    "filterNew": "Baru",
+    "filterMastered": "Dikuasai",
+    "sortAria": "Urutkan dek",
+    "sortName": "nama",
+    "sortDue": "jatuh tempo",
+    "sortCards": "kartu",
+    "newDeck": "Dek Baru",
+    "emptyTitle": "Belum ada dek",
+    "emptyDesc": "Buat dek pertama untuk memulai"
   },
   "deck": {
     "noDescription": "Tanpa deskripsi",
@@ -428,8 +447,9 @@
     "noResults": "Tidak ada perintah yang ditemukan",
     "title": "Palet Perintah",
     "commands": {
-      "dashboard": "Buka Dasbor",
-      "browser": "Buka Browser Kartu",
+"dashboard": "Buka Dasbor",
+        "decks": "Buka Dek",
+        "browser": "Buka Browser Kartu",
       "tags": "Kelola Tag",
       "stats": "Buka Statistik",
       "settings": "Buka Pengaturan",

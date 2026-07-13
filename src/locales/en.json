@@ -9,6 +9,7 @@
     "studyModeView": "Study mode",
     "matchGameView": "Match game",
     "browserView": "Card browser",
+    "deckBrowserView": "Deck browser",
     "tagsView": "Tags",
     "statsView": "Statistics",
     "settingsView": "Settings",
@@ -16,6 +17,7 @@
   },
   "nav": {
     "dashboard": "Dashboard",
+    "decks": "Decks",
     "review": "Review",
     "browser": "Browser",
     "tags": "Tags",
@@ -77,6 +79,24 @@
     "due": "Due",
     "new": "New",
     "reviewed": "Reviewed"
+  },
+  "deckBrowser": {
+    "title": "My Decks",
+    "count": "{{count}} deck",
+    "count_plural": "{{count}} decks",
+    "searchPlaceholder": "Search decks...",
+    "filterAria": "Filter decks",
+    "filterAll": "All",
+    "filterDue": "Due",
+    "filterNew": "New",
+    "filterMastered": "Mastered",
+    "sortAria": "Sort decks",
+    "sortName": "name",
+    "sortDue": "due",
+    "sortCards": "cards",
+    "newDeck": "New Deck",
+    "emptyTitle": "No decks yet",
+    "emptyDesc": "Create your first deck to get started"
   },
   "deck": {
     "noDescription": "No description",
@@ -428,8 +448,9 @@
     "noResults": "No commands found",
     "title": "Command Palette",
     "commands": {
-      "dashboard": "Go to Dashboard",
-      "browser": "Open Card Browser",
+"dashboard": "Go to Dashboard",
+        "decks": "Go to Decks",
+        "browser": "Open Card Browser",
       "tags": "Manage Tags",
       "stats": "Go to Stats",
       "settings": "Go to Settings",
