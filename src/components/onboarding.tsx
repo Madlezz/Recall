@@ -1,5 +1,4 @@
 import { ArrowRight, BookCheck, Brain, ChevronLeft, ChevronRight, Shield, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useRecallStore } from "@/stores/recall-store";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -7,6 +6,7 @@ import { toast } from "sonner";
 import { TEMPLATE_DECKS, createCardsFromTemplate, type TemplateDeck } from "@/data/templates";
 import { RecallLogo } from "@/components/recall-logo";
 import { cn } from "@/lib/utils";
+import { cardSurface, typeClass } from "@/lib/surface";
 
 type Step = "welcome" | "concept" | "system" | "templates" | "goal";
 
@@ -69,9 +69,12 @@ export function Onboarding(): JSX.Element {
           <div className="flex items-center gap-2">
             <RecallLogo className="h-8 w-8 object-contain" />
           </div>
-          <Button variant="ghost" size="sm" className="text-on-surface-variant" onClick={() => setStep("templates")}>
+          <button
+            className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-3 py-1.5 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+            onClick={() => setStep("templates")}
+          >
             {t("onboarding.skip")}
-          </Button>
+          </button>
         </header>
       )}
 
@@ -112,10 +115,13 @@ export function Onboarding(): JSX.Element {
               </p>
             </div>
             <div className="space-y-3">
-              <Button size="lg" className="w-full rounded-xl shadow-lg hover:shadow-xl active:scale-95 transition-all" onClick={() => setStep("concept")}>
+              <button
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
+                onClick={() => setStep("concept")}
+              >
                 {t("onboarding.getStarted")}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+                <ArrowRight className="h-4 w-4" />
+              </button>
               <p className="text-xs text-on-surface-variant">
                 {t("onboarding.privacyNote")}
               </p>
@@ -132,7 +138,7 @@ export function Onboarding(): JSX.Element {
         {/* ── Step 2: How It Works ── */}
         {step === "concept" && (
           <div className="space-y-6">
-            <div className="space-y-6 rounded-2xl border border-outline-variant bg-surface p-6">
+            <div className={cn(cardSurface("p-6"), "space-y-6")}>
               {/* Timeline illustration */}
               <div className="relative mx-auto aspect-[21/9] w-full max-w-md overflow-hidden rounded-xl bg-surface-container-lowest">
                 {/* Forgetting curve (dashed) */}
@@ -193,14 +199,20 @@ export function Onboarding(): JSX.Element {
 
             {/* Navigation */}
             <div className="flex gap-3">
-              <Button variant="outline" size="lg" className="flex-1" onClick={() => setStep("welcome")}>
-                <ChevronLeft className="mr-1 h-4 w-4" aria-hidden="true" />
+              <button
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-outline-variant bg-surface px-6 py-3 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+                onClick={() => setStep("welcome")}
+              >
+                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                 {t("onboarding.back")}
-              </Button>
-              <Button size="lg" className="flex-1" onClick={() => setStep("system")}>
+              </button>
+              <button
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
+                onClick={() => setStep("system")}
+              >
                 {t("onboarding.conceptNext")}
-                <ChevronRight className="ml-1 h-4 w-4" aria-hidden="true" />
-              </Button>
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              </button>
             </div>
           </div>
         )}
@@ -208,7 +220,7 @@ export function Onboarding(): JSX.Element {
         {/* ── Step 3: How to Rate ── */}
         {step === "system" && (
           <div className="space-y-6">
-            <div className="space-y-6 rounded-2xl border border-outline-variant bg-surface p-6">
+            <div className={cn(cardSurface("p-6"), "space-y-6")}>
               <div className="space-y-2 text-center">
                 <h2 className="font-headline text-xl font-bold tracking-tight text-primary">
                   {t("onboarding.systemTitle")}
@@ -243,34 +255,40 @@ export function Onboarding(): JSX.Element {
                     <Brain className="h-4 w-4 text-primary" aria-hidden="true" />
                   </div>
                   <p className="text-xs font-semibold text-primary">{t("onboarding.systemOptimal")}</p>
-                  <p className="mt-0.5 text-[11px] text-on-surface-variant">{t("onboarding.systemOptimalDesc")}</p>
+                  <p className={cn(typeClass.caption, "mt-0.5 text-on-surface-variant")}>{t("onboarding.systemOptimalDesc")}</p>
                 </div>
                 <div className="rounded-xl bg-secondary-container/10 px-4 py-3 text-center">
                   <div className="mx-auto mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-secondary/10">
                     <Sparkles className="h-4 w-4 text-secondary" aria-hidden="true" />
                   </div>
                   <p className="text-xs font-semibold text-secondary">{t("onboarding.systemFsrs")}</p>
-                  <p className="mt-0.5 text-[11px] text-on-surface-variant">{t("onboarding.systemFsrsDesc")}</p>
+                  <p className={cn(typeClass.caption, "mt-0.5 text-on-surface-variant")}>{t("onboarding.systemFsrsDesc")}</p>
                 </div>
                 <div className="rounded-xl bg-tertiary-container/10 px-4 py-3 text-center">
                   <div className="mx-auto mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-tertiary/10">
                     <Shield className="h-4 w-4 text-tertiary" aria-hidden="true" />
                   </div>
                   <p className="text-xs font-semibold text-tertiary">{t("onboarding.systemTrust")}</p>
-                  <p className="mt-0.5 text-[11px] text-on-surface-variant">{t("onboarding.systemTrustDesc")}</p>
+                  <p className={cn(typeClass.caption, "mt-0.5 text-on-surface-variant")}>{t("onboarding.systemTrustDesc")}</p>
                 </div>
               </div>
             </div>
 
             <div className="flex gap-3">
-              <Button variant="outline" size="lg" className="flex-1" onClick={() => setStep("concept")}>
-                <ChevronLeft className="mr-1 h-4 w-4" aria-hidden="true" />
+              <button
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-outline-variant bg-surface px-6 py-3 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+                onClick={() => setStep("concept")}
+              >
+                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                 {t("onboarding.back")}
-              </Button>
-              <Button size="lg" className="flex-1" onClick={() => setStep("templates")}>
+              </button>
+              <button
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
+                onClick={() => setStep("templates")}
+              >
                 {t("onboarding.systemNext")}
-                <ChevronRight className="ml-1 h-4 w-4" aria-hidden="true" />
-              </Button>
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              </button>
             </div>
           </div>
         )}
@@ -298,16 +316,22 @@ export function Onboarding(): JSX.Element {
               ))}
             </div>
             <div className="flex gap-3">
-              <Button variant="outline" size="lg" className="flex-1" onClick={() => setStep("welcome")}>
-                <ChevronLeft className="mr-1 h-4 w-4" />
+              <button
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-outline-variant bg-surface px-6 py-3 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+                onClick={() => setStep("welcome")}
+              >
+                <ChevronLeft className="h-4 w-4" />
                 {t("onboarding.back")}
-              </Button>
-              <Button size="lg" className="flex-1" onClick={() => setStep("goal")}>
+              </button>
+              <button
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
+                onClick={() => setStep("goal")}
+              >
                 {selectedTemplates.size > 0
                   ? t("onboarding.continueWith", { count: selectedTemplates.size })
                   : t("onboarding.skip")}
-                <ChevronRight className="ml-1 h-4 w-4" />
-              </Button>
+                <ChevronRight className="h-4 w-4" />
+              </button>
             </div>
           </div>
         )}
@@ -367,14 +391,20 @@ export function Onboarding(): JSX.Element {
             </p>
 
             <div className="flex gap-3">
-              <Button variant="outline" size="lg" className="flex-1" onClick={() => setStep("templates")}>
-                <ChevronLeft className="mr-1 h-4 w-4" />
+              <button
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-outline-variant bg-surface px-6 py-3 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+                onClick={() => setStep("templates")}
+              >
+                <ChevronLeft className="h-4 w-4" />
                 {t("onboarding.back")}
-              </Button>
-              <Button size="lg" className="flex-1" onClick={() => void handleImportAndFinish()}>
-                <Sparkles className="mr-2 h-4 w-4" />
+              </button>
+              <button
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
+                onClick={() => void handleImportAndFinish()}
+              >
+                <Sparkles className="h-4 w-4" />
                 {t("onboarding.startLearning")}
-              </Button>
+              </button>
             </div>
           </div>
         )}
