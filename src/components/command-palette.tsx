@@ -1,4 +1,4 @@
-import { Home, LayoutGrid, Library, Moon, Search, Settings, Sun, Tag, TrendingUp, Zap } from "lucide-react";
+import { Download, Home, LayoutGrid, Library, Moon, Search, Settings, Sun, Tag, Timer, TrendingUp, Zap } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -28,6 +28,8 @@ export function CommandPalette(): JSX.Element {
   const showStats = useRecallStore((s) => s.showStats);
   const showSettings = useRecallStore((s) => s.showSettings);
   const showTags = useRecallStore((s) => s.showTags);
+  const showImportHub = useRecallStore((s) => s.showImportHub);
+  const showFocusTimer = useRecallStore((s) => s.showFocusTimer);
   const startReview = useRecallStore((s) => s.startReview);
   const setTheme = useRecallStore((s) => s.setTheme);
   const settings = useRecallStore((s) => s.settings);
@@ -39,6 +41,8 @@ export function CommandPalette(): JSX.Element {
     { id: "decks", label: t("commandPalette.commands.decks"), icon: Library, action: showDeckBrowser },
     { id: "browser", label: t("commandPalette.commands.browser"), icon: LayoutGrid, action: showBrowser },
     { id: "tags", label: t("commandPalette.commands.tags"), icon: Tag, action: showTags },
+    { id: "import", label: t("commandPalette.commands.import"), icon: Download, action: showImportHub },
+    { id: "focus", label: t("commandPalette.commands.focus"), icon: Timer, action: showFocusTimer },
     { id: "stats", label: t("commandPalette.commands.stats"), icon: TrendingUp, action: showStats },
     { id: "settings", label: t("commandPalette.commands.settings"), icon: Settings, action: showSettings },
     {
