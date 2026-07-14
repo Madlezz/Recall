@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Tag, ChevronRight, ChevronDown, Search, Trash2, Edit3, X, Check, Bookmark, Play } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useRecallStore } from "@/stores/recall-store";
@@ -449,25 +448,21 @@ export function TagManager(): JSX.Element {
 
               {/* Actions — stitch border divider */}
               <div className="mt-3 pt-3 border-t border-outline-variant space-y-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
+                <button
+                  className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-3 py-1.5 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
                   onClick={() => {
                     showBrowser();
                   }}
                 >
                   {t("tagManager.viewInBrowser")}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
+                </button>
+                <button
+                  className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-3 py-1.5 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
                   onClick={() => setShowSaveDialog(true)}
                 >
-                  <Bookmark className="mr-1.5 h-3 w-3" />
+                  <Bookmark className="h-3 w-3" />
                   {t("tagManager.saveAsSearch")}
-                </Button>
+                </button>
               </div>
 
               {/* Save Search Dialog — stitch card pattern */}
@@ -506,19 +501,21 @@ export function TagManager(): JSX.Element {
                     </label>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" onClick={handleSaveSearch} className="flex-1">
+                    <button
+                      className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
+                      onClick={handleSaveSearch}
+                    >
                       {t("tagManager.save")}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
+                    </button>
+                    <button
+                      className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-3 py-1.5 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
                       onClick={() => {
                         setShowSaveDialog(false);
                         setNewSearchName("");
                       }}
                     >
                       {t("tagManager.cancel")}
-                    </Button>
+                    </button>
                   </div>
                 </div>
               )}

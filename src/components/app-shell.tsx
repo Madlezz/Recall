@@ -3,7 +3,6 @@ import { type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { CommandPalette } from "@/components/command-palette";
 import { RecallLogo } from "@/components/recall-logo";
-import { Button } from "@/components/ui/button";
 import { getDueTodayCount } from "@/lib/stats";
 import { cn } from "@/lib/utils";
 import { typeClass } from "@/lib/surface";
@@ -137,11 +136,9 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         </button>
         <div className="flex items-center gap-1">
           {/* Quick review button - primary action, thumb-reachable */}
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
             onClick={() => startReview(null)}
-            className="gap-1.5"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-3 py-1.5 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
             aria-label={t("nav.review")}
           >
             <Play className="h-4 w-4" />
@@ -150,10 +147,14 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
                 {dueCount}
               </span>
             )}
-          </Button>
-          <Button variant="ghost" size="icon" onClick={showSettings} aria-label={t("nav.openSettings")}>
+          </button>
+          <button
+            onClick={showSettings}
+            className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+            aria-label={t("nav.openSettings")}
+          >
             <Settings className="h-4 w-4" />
-          </Button>
+          </button>
         </div>
       </header>
 

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { SettingsCard } from "./settings-card";
 
 export function UpdatesSection(): JSX.Element {
@@ -58,13 +57,13 @@ export function UpdatesSection(): JSX.Element {
       <SettingsCard title={t("settings.updatesTitle")} description={t("settings.updatesDescription")}>
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <Button
+            <button
               onClick={handleCheckUpdate}
               disabled={checking || downloading}
-              size="sm"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
             >
               {checking ? t("settings.checking") : t("settings.checkForUpdates")}
-            </Button>
+            </button>
             {updateInfo && (
               <span className="text-sm text-on-surface-variant dark:text-on-surface-variant">
                 {t("settings.updateAvailable", { version: updateInfo.version })}
@@ -81,13 +80,13 @@ export function UpdatesSection(): JSX.Element {
                   {updateInfo.body}
                 </div>
               )}
-              <Button
+              <button
                 onClick={handleInstallUpdate}
                 disabled={downloading}
-                size="sm"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
               >
                 {downloading ? t("settings.downloading", { size: Math.round(progress / 1024) }) : t("settings.installUpdate")}
-              </Button>
+              </button>
             </div>
           )}
         </div>
