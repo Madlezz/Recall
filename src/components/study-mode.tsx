@@ -3,7 +3,6 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { RichCard } from "@/components/RichCard";
-import { Button } from "@/components/ui/button";
 import { CardDialog } from "@/components/card-dialog";
 import { useRecallStore } from "@/stores/recall-store";
 import { useSwipeGesture, type SwipeDirection } from "@/hooks/use-swipe-gesture";
@@ -11,7 +10,7 @@ import { speakText, stopSpeaking, isTTSSupported, setSpeakingCallback } from "@/
 import { playFlipSound, playCorrectSound, playAgainSound, playHardSound } from "@/services/audio";
 import { previewIntervals } from "@/services/fsrs-engine";
 import { cn } from "@/lib/utils";
-import { cardSurface } from "@/lib/surface";
+import { cardSurface, typeClass } from "@/lib/surface";
 import { matchesShortcut, shortcutLabel, DEFAULT_SHORTCUTS } from "@/lib/shortcuts";
 import { SessionSummaryModal } from "./study-mode/session-summary-modal";
 import { AnswerButton, CompletionStat } from "./study-mode/study-helpers";
@@ -195,7 +194,12 @@ export function StudyMode(): JSX.Element {
           </div>
           <h1 className="text-xl font-semibold text-text-primary dark:text-text-primary">{t("study.noActiveSession")}</h1>
           <p className="text-sm text-on-surface-variant">{t("study.startSessionHint")}</p>
-          <Button className="mt-2" onClick={exitStudy}>{t("study.backToDashboard")}</Button>
+          <button
+            onClick={exitStudy}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
+          >
+            {t("study.backToDashboard")}
+          </button>
         </div>
       </div>
     );
@@ -229,9 +233,12 @@ export function StudyMode(): JSX.Element {
             <span className="font-bold tabular-nums text-text-primary dark:text-text-primary">{accuracy}%</span>
           </div>
 
-          <Button className="mt-6 w-full gap-2" onClick={exitStudy}>
+          <button
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
+            onClick={exitStudy}
+          >
             <ArrowLeft className="h-4 w-4" /> {t("study.return")}
-          </Button>
+          </button>
         </div>
       </div>
     );
@@ -247,7 +254,12 @@ export function StudyMode(): JSX.Element {
           </div>
           <h1 className="text-xl font-semibold text-text-primary dark:text-text-primary">{t("study.cardNotFound")}</h1>
           <p className="text-sm text-on-surface-variant">{t("study.cardNotFoundHint")}</p>
-          <Button onClick={exitStudy}>{t("study.backToDashboard")}</Button>
+          <button
+            onClick={exitStudy}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
+          >
+            {t("study.backToDashboard")}
+          </button>
         </div>
       </div>
     );
@@ -300,9 +312,13 @@ export function StudyMode(): JSX.Element {
 
       {/* Top bar - compact on mobile */}
       <header className="flex items-center justify-between py-2 gap-2">
-        <Button variant="ghost" size="sm" onClick={exitStudy} className="gap-1.5 shrink-0" aria-label={t("study.exitStudyMode")}>
+        <button
+          onClick={exitStudy}
+          className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-3 py-1.5 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all shrink-0"
+          aria-label={t("study.exitStudyMode")}
+        >
           <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">{t("study.exit")}</span>
-        </Button>
+        </button>
 
         {/* Center: progress - takes available space */}
         <div className="flex-1 min-w-0 max-w-[200px] mx-auto">
@@ -388,11 +404,11 @@ export function StudyMode(): JSX.Element {
 {/* Front */}
 	            <div className={cn("study-card-face absolute inset-0 flex flex-col justify-center", cardSurface("p-5 shadow-sm sm:p-10"))}>
 	              <div className="flex items-center gap-2">
-	                <span className="rounded-full bg-primary-soft px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary">
+	                <span className={cn(typeClass.label-lg, "rounded-full bg-primary-soft px-3 py-1 text-primary")}>
 	                  {card.cardType === "cloze" ? t("study.clozeType") : card.cardType === "image-occlusion" ? t("study.imageOcclusionType") : t("study.basicType")}
 	                </span>
 	              </div>
-	              <p className="mt-2 text-xs font-medium text-on-surface-variant uppercase tracking-wider">{deck?.name ?? t("study.review")}</p>
+	              <p className={cn(typeClass.caption, "mt-2 text-on-surface-variant")}>{deck?.name ?? t("study.review")}</p>
 	              <div className="mt-4 text-balance text-lg font-semibold leading-relaxed text-text-primary dark:text-text-primary sm:mt-5 sm:text-2xl">
 	                <RichCard content={card.front} cardType={card.cardType} revealed={activeStudy.revealed} allowHtml={settings?.allowHtml} />
 	              </div>
@@ -402,7 +418,7 @@ export function StudyMode(): JSX.Element {
             </div>
             {/* Back */}
             <div className={cn("study-card-face study-card-back absolute inset-0 flex flex-col justify-center", cardSurface("p-5 shadow-sm sm:p-10"))}>
-              <p className="text-xs font-medium text-on-surface-variant uppercase tracking-wider">{t("study.answer")}</p>
+              <p className={cn(typeClass.caption, "text-on-surface-variant uppercase tracking-[0.15em]")}>{t("study.answer")}</p>
               <div className="mt-4 text-balance text-lg font-semibold leading-relaxed text-text-primary dark:text-text-primary sm:mt-5 sm:text-2xl">
                 <RichCard content={card.back} isBack allowHtml={settings?.allowHtml} />
               </div>
@@ -414,19 +430,21 @@ export function StudyMode(): JSX.Element {
       {/* Answer footer - full-width grid on mobile */}
       <footer className="flex flex-col gap-2 pb-4 lg:flex-wrap lg:flex-row lg:items-center lg:justify-center">
         {!activeStudy.revealed && activeStudy.currentIndex > 0 && (
-          <Button
-            variant="ghost" size="sm"
+          <button
             onClick={() => void undoLastReview().then((didUndo) => { if (didUndo) toast.info(t("study.reviewUndone")); else toast.info(t("study.nothingToUndo")); })}
-            className="gap-1.5 self-start lg:self-auto"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-3 py-1.5 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all self-start lg:self-auto"
           >
             <RotateCcw className="h-3.5 w-3.5" /> {t("study.undo")}
-          </Button>
+          </button>
         )}
 
         {!activeStudy.revealed ? (
-          <Button size="lg" onClick={() => { playFlipSound(); revealAnswer(); }} className="gap-2 min-h-[48px] w-full sm:w-auto sm:min-w-[140px]">
+          <button
+            onClick={() => { playFlipSound(); revealAnswer(); }}
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all min-h-[48px] w-full sm:w-auto sm:min-w-[140px]"
+          >
             <RotateCw className="h-4 w-4" /> {t("study.reveal")}
-          </Button>
+          </button>
         ) : (
           /* 2x2 grid on mobile, inline row on desktop */
           <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center">
@@ -450,21 +468,30 @@ export function StudyMode(): JSX.Element {
             card={card}
             deckId={card.deckId}
             trigger={
-              <Button variant="ghost" size="sm" className="gap-1.5 self-start lg:self-auto" title={t("study.editCardTitle")}>
+              <button
+                className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-3 py-1.5 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all self-start lg:self-auto"
+                title={t("study.editCardTitle")}
+              >
                 <Edit3 className="h-3.5 w-3.5" /> {t("study.edit")}
-              </Button>
+              </button>
             }
           />
         )}
 
         {!activeStudy.revealed && (
           <div className="flex gap-2 self-start">
-            <Button variant="ghost" size="sm" onClick={buryCard} className="gap-1.5 min-h-[44px]">
+            <button
+              onClick={buryCard}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-3 py-1.5 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all min-h-[44px]"
+            >
               <EyeOff className="h-3.5 w-3.5" /> <span className="hidden sm:inline">{t("study.bury")}</span>
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => { void snoozeCard(120); toast.info(t("study.snoozed")); }} className="gap-1.5 min-h-[44px]">
+            </button>
+            <button
+              onClick={() => { void snoozeCard(120); toast.info(t("study.snoozed")); }}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-3 py-1.5 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all min-h-[44px]"
+            >
               <Clock className="h-3.5 w-3.5" /> <span className="hidden sm:inline">{t("study.snooze")}</span>
-            </Button>
+            </button>
           </div>
         )}
       </footer>
