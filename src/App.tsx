@@ -174,7 +174,11 @@ export function App(): JSX.Element {
               ) : null}
               {view === "focus-timer" ? (
                 <ErrorBoundary viewName="FocusTimer" onRecover={recoverToDashboard}>
-                  <FocusTimer />
+                  <div className="flex items-center justify-center min-h-full p-8">
+                    <div className="w-full max-w-md">
+                      <FocusTimer />
+                    </div>
+                  </div>
                 </ErrorBoundary>
               ) : null}
             </AppShell>
