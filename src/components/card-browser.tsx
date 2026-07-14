@@ -447,7 +447,7 @@ export function CardBrowser(): JSX.Element {
                 onClick={() => showDeck?.(card.deckId)}
               >
                 <div className="flex items-start justify-between gap-2 mb-2">
-                  <Badge tone="muted" className="text-[10px]">{deckMap[card.deckId]?.name ?? t("cardBrowser.unknownDeck")}</Badge>
+                  <Badge tone="muted" className="text-[10px]">{deckMap.get(card.deckId)?.name ?? t("cardBrowser.unknownDeck")}</Badge>
                   <Badge tone="warning" className={cn("text-[10px]", STATE_COLORS[card.state])}>{stateLabel(card.state)}</Badge>
                 </div>
                 <p className="text-sm font-medium line-clamp-2 mb-1">{card.front}</p>

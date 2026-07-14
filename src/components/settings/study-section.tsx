@@ -203,6 +203,7 @@ const SHORTCUT_LABEL_KEYS: Record<ShortcutAction, string> = {
   undo: "shortcutHelp.undoReview",
   // Non-rebindable actions (kept for type completeness; not rendered).
   commandPalette: "",
+  importHub: "",
   quickAdd: "",
   showHelp: "",
   closeDialog: "",
