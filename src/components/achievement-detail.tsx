@@ -1,9 +1,10 @@
+import { useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
-import { ArrowRight, Share2, Sparkles, X } from "lucide-react";
-import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
-import { CONFETTI_COLORS, prefersReducedMotion } from "@/lib/xp";
+import { Share, X } from "lucide-react";
+import { prefersReducedMotion, CONFETTI_COLORS } from "@/lib/xp";
+import { cn } from "@/lib/utils";
+import { typeClass } from "@/lib/surface";
 import type { Achievement } from "@/types";
 
 interface AchievementDetailProps {
@@ -11,32 +12,29 @@ interface AchievementDetailProps {
   onContinue: () => void;
 }
 
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 export function AchievementDetail({ achievement, onContinue }: AchievementDetailProps): JSX.Element {
   const { t } = useTranslation();
+  const hasFired = useRef(false);
 
-  // Fire confetti on mount
   useEffect(() => {
-    if (!prefersReducedMotion()) {
-      const duration = 3000;
-      const end = Date.now() + duration;
-      const frame = () => {
+    if (!hasFired.current && !prefersReducedMotion()) {
+      hasFired.current = true;
+      setTimeout(() => {
         confetti({
-          particleCount: 3,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0, y: 0.7 },
+          particleCount: 60,
+          spread: 60,
+          origin: { y: 0.3 },
           colors: [...CONFETTI_COLORS.celebration],
         });
-        confetti({
-          particleCount: 3,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1, y: 0.7 },
-          colors: [...CONFETTI_COLORS.celebration],
-        });
-        if (Date.now() < end) requestAnimationFrame(frame);
-      };
-      frame();
+      }, 200);
     }
   }, []);
 
@@ -49,102 +47,94 @@ export function AchievementDetail({ achievement, onContinue }: AchievementDetail
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onContinue]);
 
-  const handleShare = useMemo(() => {
-    return () => {
-      const text = `${achievement.icon} ${achievement.title} — ${achievement.description}\nEarned with Recall: spaced repetition flashcards.`;
-      void navigator.clipboard.writeText(text).then(() => {
-        // Toast handled by parent
-      });
-    };
-  }, [achievement]);
+  function handleShare(): void {
+    const text = `${achievement.icon} ${achievement.title} — ${achievement.description}\nEarned with Recall: spaced repetition flashcards.`;
+    void navigator.clipboard.writeText(text);
+  }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-md"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+      onClick={onContinue}
       role="dialog"
       aria-modal="true"
       aria-labelledby="achievement-title"
     >
-      {/* Decorative background circles */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-20 -top-20 h-80 w-80 rounded-full bg-primary-soft/20 blur-3xl" />
-        <div className="absolute -bottom-32 -right-20 h-96 w-96 rounded-full bg-secondary-container/30 blur-3xl" />
-      </div>
-
-      {/* Close button */}
-      <button
-        onClick={onContinue}
-        className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-low hover:bg-surface-container transition-colors"
-        aria-label={t("common.close")}
+      <div
+        className={cn(
+          "relative mx-auto w-full max-w-sm animate-fade-in rounded-2xl bg-surface p-8 shadow-[0_0_60px_var(--secondary-container)]",
+        )}
+        onClick={(e) => e.stopPropagation()}
       >
-        <X className="h-5 w-5 text-on-surface-variant" />
-      </button>
+        {/* Close button */}
+        <button
+          onClick={onContinue}
+          className="absolute right-3 top-3 rounded-full p-1.5 text-on-surface-variant hover:bg-surface-container-low transition-colors"
+          aria-label={t("common.close")}
+        >
+          <X className="h-5 w-5" />
+        </button>
 
-      {/* Card */}
-      <div className="relative mx-4 w-full max-w-sm animate-fade-in rounded-2xl bg-surface p-8 shadow-[0_0_60px_rgba(254,166,25,0.15)] dark:bg-surface">
-        {/* Label */}
-        <p className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-secondary">
-          {t("achievement.newAchievement")}
-        </p>
-
-        {/* Icon */}
-        <div className="mx-auto mt-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-secondary-container text-4xl shadow-lg animate-float">
-          {achievement.icon}
+        {/* Badge chip */}
+        <div className="flex justify-center">
+          <span className="inline-flex items-center rounded-full bg-secondary-container px-3 py-1 text-xs font-semibold text-on-secondary-container">
+            {t("achievement.newAchievement")}
+          </span>
         </div>
 
-        {/* Title (gradient) */}
+        {/* Icon */}
+        <div className="mt-4 flex justify-center">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-secondary-container text-4xl">
+            {achievement.icon}
+          </div>
+        </div>
+
+        {/* Title */}
         <h2
           id="achievement-title"
-          className="mt-5 text-center font-display text-2xl font-bold"
-          style={{
-            background: "linear-gradient(135deg, #855300, #FEA619)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
+          className={cn("mt-4 text-center font-display text-2xl font-bold text-secondary")}
         >
           {achievement.title}
         </h2>
 
         {/* Description */}
-        <p className="mt-2 text-center text-sm text-on-surface-variant">
+        <p className={cn(typeClass["body-md"], "mt-2 text-center text-on-surface-variant")}>
           {achievement.description}
         </p>
 
-        {/* Unlock date */}
+        {/* Date */}
         {achievement.unlockedAt && (
-          <p className="mt-1 text-center text-xs text-outline">
-            {new Date(achievement.unlockedAt).toLocaleDateString(undefined, {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
+          <p className={cn(typeClass.caption, "mt-2 text-center text-on-surface-variant")}>
+            {formatDate(achievement.unlockedAt)}
           </p>
         )}
 
-        {/* Tip card */}
-        <div className="mt-6 rounded-xl border border-secondary-container/30 bg-secondary-container/10 px-4 py-3 backdrop-blur-sm">
-          <div className="flex items-start gap-2">
-            <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-secondary" aria-hidden="true" />
-            <p className="text-xs text-on-surface-variant">
-              {t("achievement.keepGoing")}
-            </p>
-          </div>
+        {/* Tip */}
+        <div className={cn(
+          "mt-5 rounded-xl border border-outline-variant bg-surface-container-low p-3",
+        )}>
+          <p className={cn(typeClass.caption, "text-on-surface-variant")}>
+            {t("achievement.keepGoing")}
+          </p>
         </div>
 
-        {/* Buttons */}
-        <div className="mt-6 flex gap-3">
-          <Button
-            variant="outline"
-            className="flex-1"
+        {/* Actions */}
+        <div className="mt-6 flex items-center gap-2">
+          <button
             onClick={handleShare}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2.5 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+            aria-label={t("achievement.share")}
           >
-            <Share2 className="mr-1.5 h-4 w-4" aria-hidden="true" />
+            <Share className="h-4 w-4" />
             {t("achievement.share")}
-          </Button>
-          <Button className="flex-1" onClick={onContinue} autoFocus>
+          </button>
+          <button
+            onClick={onContinue}
+            className="flex-1 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
+            autoFocus
+          >
             {t("achievement.continue")}
-            <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden="true" />
-          </Button>
+          </button>
         </div>
       </div>
     </div>
