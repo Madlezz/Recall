@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Coffee, CloudRain, Headphones, Pause, Play, RotateCcw, VolumeX } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { startSoundscape, stopSoundscape } from "@/services/audio";
 import { getLevel, triggerLevelUpConfetti } from "@/lib/xp";
 import { getFocusTimerXp } from "@/lib/xp-rules";
 import { useRecallStore } from "@/stores/recall-store";
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
+import { cardSurface, typeClass } from "@/lib/surface";
 import type { Soundscape } from "@/services/audio";
 
 const SOUNDSCAPES: { id: Soundscape; labelKey: string; icon: typeof Headphones }[] = [
@@ -56,7 +57,6 @@ export function FocusTimer(): JSX.Element {
   // Keyboard shortcuts
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent): void {
-      // Don't capture shortcuts when typing in inputs
       const target = event.target as HTMLElement;
       if (target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) return;
 
@@ -142,13 +142,24 @@ export function FocusTimer(): JSX.Element {
   const progress = duration > 0 ? 1 - remaining / duration : 1;
   const circumference = 2 * Math.PI * 72;
 
+  // Shared chip button classes matching stitch filter-chip pattern
+  const chipActive = "rounded-full bg-primary text-on-primary font-label-lg text-label-lg";
+  const chipInactive = "rounded-full bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-low transition-colors";
+
   return (
-    <div className={`rounded-2xl border bg-surface px-5 py-5 dark:bg-surface-container transition-all duration-500 ${
+    <div className={cn(
+      cardSurface("p-lg"),
+      "transition-all duration-500",
       showCompletionFlash
-        ? "border-tertiary shadow-[0_0_20px_rgba(0,114,67,0.4)] dark:border-tertiary"
-        : "border-outline-variant"
-    }`}>
-      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-on-surface-variant">{t("focusTimer.title")}</span>
+        ? "border-tertiary shadow-[0_0_24px_var(--tertiary-container)] dark:border-tertiary dark:shadow-[0_0_24px_rgba(52,211,153,0.25)]"
+        : "border-outline-variant",
+    )}>
+      <span className={cn(typeClass.caption, "text-on-surface-variant tracking-[0.15em]")}>
+        {t("focusTimer.title")}
+      </span>
+      <p className={cn(typeClass.caption, "mt-1 text-on-surface-variant")}>
+        {t("focusTimer.purpose")}
+      </p>
 
       {/* Screen reader announcement for timer completion */}
       {showCompletionFlash && (
@@ -168,27 +179,31 @@ export function FocusTimer(): JSX.Element {
               strokeDasharray={circumference}
               strokeDashoffset={circumference * (1 - progress)}
               strokeLinecap="round"
-              className={`transition-[stroke-dashoffset] duration-1000 ease-linear ${
-                showCompletionFlash ? "text-tertiary" : "text-primary dark:text-primary"
-              }`}
+              className={cn(
+                "transition-[stroke-dashoffset] duration-1000 ease-linear",
+                showCompletionFlash ? "text-tertiary" : "text-primary dark:text-primary",
+              )}
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className={`text-3xl font-bold tabular-nums tracking-tight transition-colors duration-500 ${
-              showCompletionFlash ? "text-tertiary" : "text-on-surface"
-            }`}>
+            <span className={cn(
+              "font-display text-[36px] font-bold tabular-nums tracking-tight transition-colors duration-500",
+              showCompletionFlash ? "text-tertiary" : "text-on-surface",
+            )}>
               {formatTime(remaining)}
             </span>
-            <span className={`mt-0.5 text-[11px] font-semibold transition-colors duration-500 ${
-              showCompletionFlash ? "text-tertiary" : "text-on-surface-variant"
-            }`}>
+            <span className={cn(
+              typeClass.label-lg,
+              "mt-0.5 transition-colors duration-500",
+              showCompletionFlash ? "text-tertiary" : "text-on-surface-variant",
+            )}>
               {running ? t("focusTimer.focusing") : completed ? t("focusTimer.done") : t("focusTimer.ready")}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Presets */}
+      {/* Presets — stitch chip pattern */}
       <div className="flex justify-center gap-1.5 mt-5">
         {PRESETS.map((m) => (
           <button
@@ -196,45 +211,60 @@ export function FocusTimer(): JSX.Element {
             disabled={running}
             onClick={() => pickPreset(m)}
             aria-pressed={duration === m * 60}
-            className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
-              duration === m * 60
-                ? "bg-surface-container-high text-on-surface"
-                : "text-on-surface-variant hover:bg-surface-container-low"
-            }`}
+            className={cn(
+              "px-3.5 py-1.5 transition-colors",
+              duration === m * 60 ? chipActive : chipInactive,
+              running && "opacity-50",
+            )}
           >
             {t("focusTimer.presetMinutes", { count: m })}
           </button>
         ))}
       </div>
 
-      {/* Controls */}
+      {/* Controls — stitch button patterns */}
       <div className="flex justify-center gap-2 mt-3">
         {running ? (
-          <Button size="sm" variant="outline" onClick={pause} className="gap-1.5" aria-label={t("focusTimer.pauseAria")}>
+          <button
+            onClick={pause}
+            aria-label={t("focusTimer.pauseAria")}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+          >
             <Pause className="h-3.5 w-3.5" /> {t("focusTimer.pause")}
-          </Button>
+          </button>
         ) : (
-          <Button size="sm" onClick={start} disabled={remaining === 0 && completed} className="gap-1.5" aria-label={t(remaining === duration ? "focusTimer.startAria" : "focusTimer.resumeAria")}>
+          <button
+            onClick={start}
+            disabled={remaining === 0 && completed}
+            aria-label={t(remaining === duration ? "focusTimer.startAria" : "focusTimer.resumeAria")}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
+          >
             <Play className="h-3.5 w-3.5" /> {t(remaining === duration ? "focusTimer.start" : "focusTimer.resume")}
-          </Button>
+          </button>
         )}
-        <Button size="sm" variant="ghost" onClick={reset} disabled={running || (remaining === duration && !completed)} aria-label={t("focusTimer.resetAria")}>
+        <button
+          onClick={reset}
+          disabled={running || (remaining === duration && !completed)}
+          aria-label={t("focusTimer.resetAria")}
+          className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+        >
           <RotateCcw className="h-3.5 w-3.5" />
-        </Button>
+        </button>
       </div>
 
-      <p className="mt-2 text-center text-[10px] text-on-surface-variant">
-        {t("focusTimer.pressPrefix")} <kbd className="rounded border border-outline-variant bg-surface-container-low px-1 py-0.5 text-[10px] font-mono">F</kbd> {t(running ? "focusTimer.toPause" : "focusTimer.toStart")}
+      <p className={cn(typeClass.caption, "mt-2 text-center text-on-surface-variant")}>
+        {t("focusTimer.pressPrefix")} <kbd className="rounded border border-outline-variant bg-surface-container-low px-1 py-0.5 font-mono text-[10px]">F</kbd> {t(running ? "focusTimer.toPause" : "focusTimer.toStart")}
       </p>
 
-      {/* Soundscapes */}
+      {/* Soundscapes — stitch chip pattern */}
       <div className="mt-4 flex justify-center gap-1">
         <button
           onClick={() => toggleSoundscape("none")}
           aria-pressed={sc === "none"}
-          className={`px-2 py-1.5 rounded text-[10px] font-medium transition-colors ${
-            sc === "none" ? "bg-surface-container-high text-on-surface" : "text-on-surface-variant hover:text-on-surface"
-          }`}
+          className={cn(
+            "px-2.5 py-1.5 transition-colors",
+            sc === "none" ? chipActive : chipInactive,
+          )}
         >
           <VolumeX className="h-3 w-3 inline mr-0.5" />
           {t("focusTimer.off")}
@@ -244,9 +274,10 @@ export function FocusTimer(): JSX.Element {
             key={id}
             onClick={() => toggleSoundscape(id)}
             aria-pressed={sc === id}
-            className={`px-2 py-1.5 rounded text-[10px] font-medium transition-colors ${
-              sc === id ? "bg-surface-container-high text-on-surface" : "text-on-surface-variant hover:text-on-surface"
-            }`}
+            className={cn(
+              "px-2.5 py-1.5 transition-colors",
+              sc === id ? chipActive : chipInactive,
+            )}
           >
             <Icon className="h-3 w-3 inline mr-0.5" />
             {t(labelKey)}

@@ -1,108 +1,99 @@
-import { usePWA } from "@/hooks/use-pwa";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { RefreshCw, Download, X, CheckCircle } from "lucide-react";
-import { useEffect } from "react";
+import { Download, Loader2, X } from "lucide-react";
+import { useRegisterSW } from "virtual:pwa-register/react";
+import { cn } from "@/lib/utils";
+import { typeClass } from "@/lib/surface";
 
-/**
- * Renders PWA install prompt, update-available prompt, and offline-ready toast.
- * Only visible in browser/PWA mode - hidden in Tauri.
- */
-export function PWAUpdatePrompt() {
-  const {
-    isTauri,
-    needRefresh,
-    offlineReady,
-    isInstalled,
-    canInstall,
-    promptInstall,
-    updateServiceWorker,
-    closeUpdatePrompt,
-    closeOfflineReadyPrompt,
-  } = usePWA();
+export function PWAUpdatePrompt(): JSX.Element {
   const { t } = useTranslation();
+  const [updating, setUpdating] = useState(false);
+  const [updateError, setUpdateError] = useState(false);
+  const {
+    needRefresh: [needRefresh, setNeedRefresh],
+    updateServiceWorker,
+  } = useRegisterSW({
+    onRegisteredSW(_swUrl, r) {
+      if (r) {
+        setInterval(() => {
+          void r.update();
+        }, 60 * 60 * 1000);
+      }
+    },
+    onRegisterError(error) {
+      console.error("SW registration error", error);
+    },
+  });
 
-  // Auto-dismiss offline-ready after 4s
-  useEffect(() => {
-    if (offlineReady) {
-      const timer = setTimeout(closeOfflineReadyPrompt, 4000);
-      return () => clearTimeout(timer);
+  async function handleUpdate(): Promise<void> {
+    setUpdating(true);
+    setUpdateError(false);
+    try {
+      await updateServiceWorker(true);
+    } catch {
+      setUpdateError(true);
+      setUpdating(false);
     }
-  }, [offlineReady, closeOfflineReadyPrompt]);
+  }
 
-  if (isTauri) return null;
+  function handleDismiss(): void {
+    setNeedRefresh(false);
+  }
+
+  if (!needRefresh) return <></>;
 
   return (
-    <>
-      {/* Update available */}
-      {needRefresh && (
-        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 rounded-lg border border-primary/30 bg-surface p-4 shadow-xl animate-in slide-in-from-bottom-2">
-          <RefreshCw className="h-5 w-5 text-primary shrink-0" />
-          <div className="flex-1">
-            <p className="text-sm font-medium text-slate-100">
-              {t("pwa.updateAvailable", "Update available")}
-            </p>
-            <p className="text-xs text-slate-400">
-              {t("pwa.updateDescription", "A new version of Recall is ready.")}
-            </p>
-          </div>
+    <div
+      className="fixed bottom-4 right-4 z-50 flex max-w-sm items-start gap-3 rounded-2xl border border-outline-variant bg-surface p-4 shadow-lg"
+      role="alert"
+      aria-live="polite"
+    >
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
+        <Download className="h-4 w-4" aria-hidden="true" />
+      </div>
+      <div className="flex-1">
+        <p className={cn(typeClass.label-lg, "text-text-primary")}>
+          {t("pwa.updateAvailable", "Update available")}
+        </p>
+        <p className={cn(typeClass.caption, "mt-0.5 text-on-surface-variant")}>
+          {t("pwa.newVersionDescription", "A new version of Recall is ready. Update now to get the latest features and fixes.")}
+        </p>
+        <div className="mt-3 flex items-center gap-2">
           <button
-            onClick={() => updateServiceWorker(true)}
-            className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-on-primary hover:bg-primary-hover transition-colors"
+            onClick={handleDismiss}
+            disabled={updating}
+            className="rounded-lg px-3 py-1.5 text-xs font-medium text-on-surface-variant hover:text-text-primary transition-colors disabled:opacity-50"
           >
-            {t("pwa.update", "Update")}
+            {t("pwa.dismiss", "Dismiss")}
           </button>
           <button
-            onClick={closeUpdatePrompt}
-            className="text-slate-500 hover:text-slate-300 transition-colors"
-            aria-label={t("common.close", "Close")}
+            onClick={handleUpdate}
+            disabled={updating}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-on-primary hover:bg-primary-hover transition-colors disabled:opacity-50"
           >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      )}
-
-      {/* Offline ready */}
-      {offlineReady && (
-        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 rounded-lg border border-review-easy/30 bg-surface p-4 shadow-xl animate-in slide-in-from-bottom-2">
-          <CheckCircle className="h-5 w-5 text-review-easy shrink-0" />
-          <div className="flex-1">
-            <p className="text-sm font-medium text-slate-100">
-              {t("pwa.offlineReady", "Ready for offline use")}
-            </p>
-            <p className="text-xs text-slate-400">
-              {t("pwa.offlineReadyDescription", "Recall is cached and works without internet.")}
-            </p>
-          </div>
-          <button
-            onClick={closeOfflineReadyPrompt}
-            className="text-slate-500 hover:text-slate-300 transition-colors"
-            aria-label={t("common.close", "Close")}
-          >
-            <X className="h-4 w-4" />
+            {updating ? (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin" />
+                {t("pwa.updating", "Updating…")}
+              </>
+            ) : (
+              t("pwa.update", "Update")
+            )}
           </button>
         </div>
-      )}
-
-      {/* Install prompt (not yet installed, browser supports it) */}
-      {canInstall && !isInstalled && (
-        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 rounded-lg border border-violet-500/30 bg-slate-900 p-4 shadow-xl animate-in slide-in-from-bottom-2">
-          <Download className="h-5 w-5 text-violet-400 shrink-0" />
-          <div className="flex-1">
-            <p className="text-sm font-medium text-slate-100">
-              {t("pwa.installApp", "Install Recall")}
-            </p>
-            <p className="text-xs text-slate-400">
-              {t("pwa.installDescription", "Add to your home screen for quick access.")}
-            </p>
-          </div>
-          <button
-            onClick={promptInstall}
-            className="rounded-md bg-violet-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-violet-700 transition-colors"
-          >
-            {t("pwa.install", "Install")}
-          </button>
-        </div>
-      )}
-    </>
+        {updateError && (
+          <p className={cn(typeClass.caption, "mt-2 text-destructive")}>
+            {t("pwa.updateFailed", "Update failed. Please try again or reload the page.")}
+          </p>
+        )}
+      </div>
+      <button
+        onClick={handleDismiss}
+        className="rounded-full p-1 text-on-surface-variant hover:bg-surface-container-low transition-colors"
+        aria-label={t("common.close")}
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </div>
   );
 }

@@ -789,6 +789,7 @@
   },
   "focusTimer": {
     "title": "Timer Fokus",
+    "purpose": "Atur timer untuk tetap fokus saat sesi belajar. Pilih preset, pilih suasana, dan mulai.",
     "completeAria": "Timer fokus selesai! Kerja bagus.",
     "timerAria": "Timer fokus: {{remaining}} tersisa, {{progress}}% selesai",
     "focusing": "berfokus",
@@ -933,7 +934,8 @@
     "question": "Pertanyaan",
     "answer": "Jawaban",
     "alreadyMatched": "Sudah cocok",
-    "currentlySelected": "Sedang dipilih"
+    "currentlySelected": "Sedang dipilih",
+    "rulesHint": "Cocokkan setiap pertanyaan dengan jawabannya. Klik dua ubin untuk membukanya."
   },
   "reviewCalendar": {
     "title": "Kalender",
@@ -1119,9 +1121,12 @@
     "confirmRename": "Konfirmasi ganti nama",
     "cancelRename": "Batal ganti nama",
     "noCardsWithTag": "Tidak ada kartu dengan label ini",
+    "hierarchyHint": "Label bersifat hirarkis — \"bahasa/jepang\" mengelompokkan kartu di bawah \"bahasa\" dan \"jepang\".",
     "renamedTag": "Ganti nama \"{{oldTag}}\" → \"{{newTag}}\" ({{count}} kartu)",
+    "renamedTagPartial": "Ganti nama \"{{oldTag}}\" → \"{{newTag}}\" pada {{count}} dari {{total}} kartu. {{failed}} gagal.",
     "confirmRemoveTag": "Hapus label \"{{tag}}\" dari {{count}} kartu?",
     "removedTag": "Hapus \"{{tag}}\" dari {{count}} kartu",
+    "removedTagPartial": "Hapus \"{{tag}}\" dari {{count}} dari {{total}} kartu. {{failed}} gagal.",
     "enterSearchName": "Masukkan nama untuk pencarian tersimpan",
     "savedSearchSaved": "Pencarian tersimpan \"{{name}}\"",
     "noCardsMatchSearch": "Tidak ada kartu cocok dengan pencarian ini",

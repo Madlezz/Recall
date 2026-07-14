@@ -6,6 +6,7 @@ import { RecallLogo } from "@/components/recall-logo";
 import { Button } from "@/components/ui/button";
 import { getDueTodayCount } from "@/lib/stats";
 import { cn } from "@/lib/utils";
+import { typeClass } from "@/lib/surface";
 import { getLevel, getLevelTitle, levelProgress } from "@/lib/xp";
 import { useRecallStore } from "@/stores/recall-store";
 
@@ -72,7 +73,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
 
           {/* Tools section */}
           <div className="pt-3 pb-1 px-3">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant">{t("nav.tools")}</span>
+            <span className={cn(typeClass.caption, "uppercase tracking-[0.15em] text-on-surface-variant")}>{t("nav.tools")}</span>
           </div>
           <NavButton active={view === "focus-timer"} icon={Timer} label={t("nav.focusTimer")} onClick={showFocusTimer} />
           <NavButton
@@ -93,7 +94,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         {/* Library stats */}
         <div className="px-5 py-3">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-on-surface-variant">{t("library.title")}</span>
+            <span className={cn(typeClass.caption, "uppercase tracking-[0.15em] text-on-surface-variant")}>{t("library.title")}</span>
             <span className="text-[10px] tabular-nums text-on-surface-variant">{t("library.decks", { count: decks.length })}</span>
           </div>
           <div className="flex items-center text-sm tabular-nums">
@@ -117,7 +118,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         <div className="px-5 pb-3">
           <button
             onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "?" }))}
-            className="text-[10px] text-on-surface-variant hover:text-on-surface transition-colors"
+            className={cn(typeClass.caption, "text-on-surface-variant hover:text-on-surface transition-colors")}
             aria-label={t("nav.showShortcuts")}
           >
             {t("nav.pressForShortcuts")}

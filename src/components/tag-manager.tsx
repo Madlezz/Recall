@@ -15,6 +15,8 @@ import {
   isValidTag,
 } from "@/lib/tags";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { cardSurface, softSurface, typeClass } from "@/lib/surface";
 import type { SavedSearch } from "@/stores/slices/saved-search.slice";
 
 function TreeNode({
@@ -49,16 +51,17 @@ function TreeNode({
   return (
     <li>
       <div
-        className={`group flex items-center gap-1 rounded-md px-2 py-1.5 transition-colors hover:bg-surface-container-high dark:hover:bg-surface-container ${
-          editing ? "ring-1 ring-zinc-300 dark:ring-zinc-700" : ""
-        }`}
+        className={cn(
+          "group flex items-center gap-1 rounded-md px-2 py-1.5 transition-colors hover:bg-surface-container-high",
+          editing && "ring-1 ring-outline-variant",
+        )}
         style={{ paddingLeft: `${node.depth * 16 + 8}px` }}
       >
         {/* Expand/collapse */}
         {hasChildren ? (
           <button
             onClick={() => onToggle(node.fullPath)}
-            className="flex h-5 w-5 items-center justify-center rounded text-on-surface-variant hover:text-on-surface-variant dark:hover:text-text-secondary"
+            className="flex h-5 w-5 items-center justify-center rounded text-on-surface-variant hover:text-text-primary transition-colors"
             aria-label={isExpanded ? t("tagManager.collapse") : t("tagManager.expand")}
           >
             {isExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
@@ -83,37 +86,50 @@ function TreeNode({
               className="h-7 text-xs flex-1"
               autoFocus
             />
-            <button onClick={handleSubmitRename} className="p-1 text-emerald-600 hover:text-emerald-700" aria-label={t("tagManager.confirmRename")}>
-                          <Check className="h-3.5 w-3.5" />
-                        </button>
-                        <button onClick={() => setEditing(false)} className="p-1 text-on-surface-variant hover:text-on-surface-variant" aria-label={t("tagManager.cancelRename")}>
-                          <X className="h-3.5 w-3.5" />
-                        </button>
+            <button
+              onClick={handleSubmitRename}
+              className="rounded-full p-1 text-review-easy hover:bg-review-easy/10 transition-colors"
+              aria-label={t("tagManager.confirmRename")}
+            >
+              <Check className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => setEditing(false)}
+              className="rounded-full p-1 text-on-surface-variant hover:bg-surface-container-high transition-colors"
+              aria-label={t("tagManager.cancelRename")}
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
           </div>
         ) : (
           <>
             <button
               onClick={() => onTagClick(node.fullPath)}
-              className="flex-1 text-left text-sm text-text-secondary dark:text-text-secondary hover:underline"
+              className="flex-1 text-left text-sm text-text-secondary hover:underline"
             >
               {node.name}
             </button>
 
-            {/* Count */}
-            <span className="text-xs tabular-nums text-on-surface-variant">{node.count}</span>
+            {/* Count — stitch chip pattern */}
+            <span className={cn(
+              "rounded-full px-2 py-0.5 text-xs tabular-nums",
+              "bg-surface-container-high text-on-surface-variant",
+            )}>
+              {node.count}
+            </span>
 
-            {/* Actions */}
+            {/* Actions — stitch icon button pattern */}
             <div className="ml-1 hidden items-center gap-0.5 group-hover:flex">
               <button
                 onClick={() => { setEditing(true); setEditValue(node.fullPath); }}
-                className="p-1 rounded text-on-surface-variant hover:text-on-surface-variant hover:bg-surface-container-high dark:hover:text-text-secondary dark:hover:bg-surface-container-high"
+                className="rounded-full p-1 text-on-surface-variant hover:bg-surface-container-high transition-colors"
                 aria-label={t("tagManager.renameTag")}
               >
                 <Edit3 className="h-3 w-3" />
               </button>
               <button
                 onClick={() => onDelete(node.fullPath)}
-                className="p-1 rounded text-on-surface-variant hover:text-destructive hover:bg-destructive/10"
+                className="rounded-full p-1 text-on-surface-variant hover:text-destructive hover:bg-destructive/10 transition-colors"
                 aria-label={t("tagManager.deleteTag")}
               >
                 <Trash2 className="h-3 w-3" />
@@ -165,7 +181,6 @@ export function TagManager(): JSX.Element {
   const filteredTree = useMemo(() => {
     if (!search.trim()) return tagTree;
     const q = search.toLowerCase();
-    // Flatten tree and filter, then rebuild
     const allTags = [...tagCounts.keys()].filter((t) => t.toLowerCase().includes(q));
     const filteredCounts = new Map(allTags.map((t) => [t, tagCounts.get(t) ?? 0]));
     return buildTagTree(filteredCounts);
@@ -193,6 +208,7 @@ export function TagManager(): JSX.Element {
 
     const renamedCards = renameTagInCards(affectedCards, oldTag, newTag);
     let updated = 0;
+    const failed: string[] = [];
     for (const card of renamedCards) {
       try {
         await updateCard(card.id, {
@@ -205,10 +221,14 @@ export function TagManager(): JSX.Element {
         });
         updated++;
       } catch {
-        // skip
+        failed.push(card.id);
       }
     }
-    toast.success(t("tagManager.renamedTag", { oldTag, newTag, count: updated }));
+    if (failed.length === 0) {
+      toast.success(t("tagManager.renamedTag", { oldTag, newTag, count: updated }));
+    } else {
+      toast.warning(t("tagManager.renamedTagPartial", { oldTag, newTag, count: updated, total: affectedCards.length, failed: failed.length }));
+    }
     setSelectedTag(null);
   }
 
@@ -222,6 +242,7 @@ export function TagManager(): JSX.Element {
     if (!confirm(t("tagManager.confirmRemoveTag", { tag, count: affectedCards.length }))) return;
 
     let updated = 0;
+    const failed: string[] = [];
     for (const card of affectedCards) {
       try {
         await updateCard(card.id, {
@@ -234,10 +255,14 @@ export function TagManager(): JSX.Element {
         });
         updated++;
       } catch {
-        // skip
+        failed.push(card.id);
       }
     }
-    toast.success(t("tagManager.removedTag", { tag, count: updated }));
+    if (failed.length === 0) {
+      toast.success(t("tagManager.removedTag", { tag, count: updated }));
+    } else {
+      toast.warning(t("tagManager.removedTagPartial", { tag, count: updated, total: affectedCards.length, failed: failed.length }));
+    }
     if (selectedTag === tag) setSelectedTag(null);
   }
 
@@ -283,29 +308,32 @@ export function TagManager(): JSX.Element {
 
   return (
     <div className="animate-fade-in space-y-6">
-      {/* Header */}
+      {/* Header — stitch pattern */}
       <div>
-        <h1 className="text-2xl font-semibold tracking-normal">{t("tagManager.title")}</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="text-2xl font-semibold tracking-normal text-text-primary">{t("tagManager.title")}</h1>
+        <p className={cn(typeClass["body-md"], "text-on-surface-variant")}>
           {t("tagManager.tagStats", { tags: totalTags, cards: cards.length })}
+        </p>
+        <p className={cn(typeClass.caption, "mt-1 text-on-surface-variant")}>
+          {t("tagManager.hierarchyHint")}
         </p>
       </div>
 
-      {/* Search */}
+      {/* Search — stitch pattern */}
       <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-on-surface-variant" />
         <Input
           placeholder={t("tagManager.searchPlaceholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-9"
+          className="pl-9 rounded-xl"
         />
       </div>
 
-      {/* Saved Searches */}
+      {/* Saved Searches — stitch card pattern */}
       {savedSearches.length > 0 && (
-        <div className="rounded-lg border border-outline-variant bg-surface p-4 dark:border-outline-variant dark:bg-surface">
-          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-text-primary dark:text-text-primary">
+        <div className={cardSurface("p-md")}>
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-text-primary">
             <Bookmark className="h-4 w-4" />
             {t("tagManager.savedSearches")}
           </h2>
@@ -313,15 +341,18 @@ export function TagManager(): JSX.Element {
             {savedSearches.map((search) => (
               <div
                 key={search.id}
-                className="group flex items-center justify-between rounded-md border border-outline-variant p-2 dark:border-outline-variant"
+                className={cn(
+                  "group flex items-center justify-between rounded-md border border-outline-variant p-2",
+                  "hover:bg-surface-container-low transition-colors",
+                )}
               >
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-text-secondary dark:text-text-secondary">{search.name}</div>
+                  <div className="text-sm font-medium text-text-secondary">{search.name}</div>
                   <div className="mt-1 flex flex-wrap gap-1">
                     {search.tags.map((t) => (
                       <Badge key={t} tone="muted" className="text-[10px]">{t}</Badge>
                     ))}
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-[10px] text-on-surface-variant">
                       {search.matchMode === "all" ? t("tagManager.allTags") : t("tagManager.anyTag")}
                     </span>
                   </div>
@@ -329,14 +360,14 @@ export function TagManager(): JSX.Element {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleStudySavedSearch(search)}
-                    className="rounded p-1.5 text-on-surface-variant hover:bg-review-easy/10 hover:text-review-easy"
+                    className="rounded-full p-1.5 text-on-surface-variant hover:bg-review-easy/10 hover:text-review-easy transition-colors"
                     aria-label={t("tagManager.startStudy")}
                   >
                     <Play className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() => handleDeleteSavedSearch(search)}
-                    className="rounded p-1.5 text-on-surface-variant hover:bg-destructive/10 hover:text-destructive"
+                    className="rounded-full p-1.5 text-on-surface-variant hover:bg-destructive/10 hover:text-destructive transition-colors"
                     aria-label={t("tagManager.deleteSavedSearch")}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -349,12 +380,16 @@ export function TagManager(): JSX.Element {
       )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        {/* Tag tree */}
-        <div className="rounded-lg border border-outline-variant bg-surface p-4 dark:border-outline-variant dark:bg-surface">
+        {/* Tag tree — stitch card pattern */}
+        <div className={cardSurface("p-md")}>
           {filteredTree.length === 0 ? (
-            <div className="py-12 text-center text-sm text-muted-foreground">
-              <Tag className="mx-auto h-8 w-8 mb-2 opacity-40" />
-              {search ? t("tagManager.noMatchingTags") : t("tagManager.noTagsYet")}
+            <div className="py-12 text-center">
+              <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-low">
+                <Tag className="h-5 w-5 text-on-surface-variant" />
+              </div>
+              <p className={cn(typeClass["body-md"], "text-on-surface-variant")}>
+                {search ? t("tagManager.noMatchingTags") : t("tagManager.noTagsYet")}
+              </p>
             </div>
           ) : (
             <ul className="space-y-0.5">
@@ -373,31 +408,31 @@ export function TagManager(): JSX.Element {
           )}
         </div>
 
-        {/* Selected tag details */}
-        <div className="rounded-lg border border-outline-variant bg-surface p-4 dark:border-outline-variant dark:bg-surface">
+        {/* Selected tag details — stitch card pattern */}
+        <div className={cardSurface("p-md")}>
           {selectedTag ? (
             <>
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <h3 className="text-sm font-semibold text-text-primary dark:text-text-primary">{selectedTag}</h3>
-                  <p className="text-xs text-muted-foreground">{t("tagManager.cardCount", { count: selectedCards.length })}</p>
+                  <h3 className="text-sm font-semibold text-text-primary">{selectedTag}</h3>
+                  <p className={cn(typeClass.caption, "text-on-surface-variant")}>
+                    {t("tagManager.cardCount", { count: selectedCards.length })}
+                  </p>
                 </div>
                 <button
                   onClick={() => setSelectedTag(null)}
-                  className="p-1 text-on-surface-variant hover:text-on-surface-variant"
+                  className="rounded-full p-1 text-on-surface-variant hover:bg-surface-container-high transition-colors"
+                  aria-label={t("tagManager.close")}
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
 
-              {/* Sample cards */}
+              {/* Sample cards — stitch soft surface */}
               <div className="space-y-2 max-h-80 overflow-y-auto">
                 {selectedCards.slice(0, 20).map((card) => (
-                  <div
-                    key={card.id}
-                    className="rounded-md border border-outline-variant p-2 text-xs dark:border-outline-variant"
-                  >
-                    <div className="truncate text-text-secondary dark:text-text-secondary">{card.front}</div>
+                  <div key={card.id} className={softSurface("p-2 rounded-md")}>
+                    <div className="truncate text-xs text-text-secondary">{card.front}</div>
                     <div className="mt-1 flex flex-wrap gap-1">
                       {card.tags.map((t) => (
                         <Badge key={t} tone="muted" className="text-[10px]">{t}</Badge>
@@ -406,14 +441,14 @@ export function TagManager(): JSX.Element {
                   </div>
                 ))}
                 {selectedCards.length > 20 && (
-                  <p className="text-xs text-muted-foreground text-center">
+                  <p className={cn(typeClass.caption, "text-center text-on-surface-variant")}>
                     {t("tagManager.andMore", { count: selectedCards.length - 20 })}
                   </p>
                 )}
               </div>
 
-              {/* Actions */}
-              <div className="mt-3 pt-3 border-t border-outline-variant dark:border-outline-variant space-y-2">
+              {/* Actions — stitch border divider */}
+              <div className="mt-3 pt-3 border-t border-outline-variant space-y-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -435,21 +470,21 @@ export function TagManager(): JSX.Element {
                 </Button>
               </div>
 
-              {/* Save Search Dialog */}
+              {/* Save Search Dialog — stitch card pattern */}
               {showSaveDialog && (
-                <div className="mt-3 rounded-md border border-outline-variant bg-background p-3 dark:border-outline dark:bg-surface-container">
-                  <div className="mb-2 text-xs font-medium text-text-secondary dark:text-text-secondary">
+                <div className={cn(cardSurface("p-md"), "mt-3")}>
+                  <div className={cn(typeClass.caption, "mb-2 text-text-secondary")}>
                     {t("tagManager.saveAsSearchLabel", { tag: selectedTag })}
                   </div>
                   <Input
                     placeholder={t("tagManager.searchNamePlaceholder")}
                     value={newSearchName}
                     onChange={(e) => setNewSearchName(e.target.value)}
-                    className="mb-2 h-8 text-xs"
+                    className="mb-2 h-8 text-xs rounded-xl"
                     autoFocus
                   />
                   <div className="mb-2 flex gap-2">
-                    <label className="flex items-center gap-1 text-xs">
+                    <label className="flex items-center gap-1 text-xs text-on-surface-variant">
                       <input
                         type="radio"
                         name="matchMode"
@@ -459,7 +494,7 @@ export function TagManager(): JSX.Element {
                       />
                       {t("tagManager.allTags")}
                     </label>
-                    <label className="flex items-center gap-1 text-xs">
+                    <label className="flex items-center gap-1 text-xs text-on-surface-variant">
                       <input
                         type="radio"
                         name="matchMode"
@@ -489,8 +524,13 @@ export function TagManager(): JSX.Element {
               )}
             </>
           ) : (
-            <div className="py-8 text-center text-sm text-muted-foreground">
-              {t("tagManager.clickTagToSee")}
+            <div className="py-8 text-center">
+              <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-low">
+                <Tag className="h-5 w-5 text-on-surface-variant" />
+              </div>
+              <p className={cn(typeClass["body-md"], "text-on-surface-variant")}>
+                {t("tagManager.clickTagToSee")}
+              </p>
             </div>
           )}
         </div>

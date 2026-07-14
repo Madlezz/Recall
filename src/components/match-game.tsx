@@ -1,9 +1,9 @@
 import confetti from "canvas-confetti";
 import { ArrowLeft, Check, Clock, RotateCcw, Zap } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { cardSurface, successSurface, typeClass } from "@/lib/surface";
 import { useRecallStore } from "@/stores/recall-store";
 import { prefersReducedMotion, CONFETTI_COLORS } from "@/lib/xp";
 import { getLevel, triggerLevelUpConfetti } from "@/lib/xp";
@@ -17,6 +17,8 @@ interface MatchTile {
   side: "front" | "back";
   text: string;
 }
+
+type FeedbackType = "match" | "mismatch" | null;
 
 function formatTime(secs: number): string {
   const m = Math.floor(secs / 60);
@@ -39,25 +41,17 @@ function buildTiles(cards: Card[]): MatchTile[] {
   return tiles.sort(() => Math.random() - 0.5);
 }
 
-// Visual feedback types for match/mismatch (for deaf users)
-type FeedbackType = "match" | "mismatch" | null;
-
 export function MatchGame(): JSX.Element {
   const { t } = useTranslation();
-  const _allCards = useRecallStore((state) => state.cards);
+  const cards = useRecallStore((state) => state.cards);
   const settings = useRecallStore((state) => state.settings);
   const addXp = useRecallStore((state) => state.addXp);
   const showDashboard = useRecallStore((state) => state.showDashboard);
   const selectedDeckId = useRecallStore((state) => state.selectedDeckId);
-  const _decks = useRecallStore((state) => state.decks);
+  const decks = useRecallStore((state) => state.decks);
 
-  useRecallStore((state) => state.cards); // ensure subscription
-  const cards = useRecallStore((state) => state.cards).filter((c) => c.deckId === selectedDeckId);
-  const deckCards = useMemo(
-    () => (selectedDeckId ? cards.filter((c) => c.deckId === selectedDeckId) : cards),
-    [cards, selectedDeckId],
-  );
-
+  const deck = selectedDeckId ? decks.find((d) => d.id === selectedDeckId) : null;
+  const deckCards = cards.filter((c) => c.deckId === selectedDeckId);
   const pairCount = Math.min(6, Math.max(2, Math.floor(deckCards.length / 2)));
 
   const [tiles, setTiles] = useState<MatchTile[]>([]);
@@ -108,14 +102,13 @@ export function MatchGame(): JSX.Element {
     }, 1000);
   }, [deckCards, pairCount]);
 
-  // Start on mount
+  // Cleanup on unmount
   useEffect(() => {
-    startGame();
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [startGame]);
+  }, []);
 
   function handleTileClick(tileId: string): void {
     if (!running || finished) return;
@@ -207,13 +200,23 @@ export function MatchGame(): JSX.Element {
   const totalPairs = gameCards.length;
   const matchedPairs = matched.size / 2;
 
+  // --- Empty state (stitch pattern) ---
   if (deckCards.length < 2) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center">
         <div className="text-center space-y-4">
-          <h1 className="text-xl font-semibold">{t("matchGame.notEnoughCards")}</h1>
-          <p className="text-sm text-on-surface-variant dark:text-on-surface-variant">{t("matchGame.addCardsHint")}</p>
-          <Button onClick={showDashboard}>{t("matchGame.back")}</Button>
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-surface-container-low">
+            <Zap className="h-6 w-6 text-on-surface-variant" />
+          </div>
+          <h1 className={cn(typeClass["title-md"], "text-text-primary")}>{t("matchGame.notEnoughCards")}</h1>
+          <p className={cn(typeClass["body-md"], "text-on-surface-variant")}>{t("matchGame.addCardsHint")}</p>
+          <button
+            onClick={showDashboard}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {t("matchGame.back")}
+          </button>
         </div>
       </div>
     );
@@ -236,52 +239,70 @@ export function MatchGame(): JSX.Element {
         {announcement}
       </div>
 
-      {/* Header */}
+      {/* Header — stitch pattern */}
       <header className="flex items-center justify-between pb-4">
-        <Button variant="ghost" onClick={showDashboard} aria-label={t("matchGame.exitAria")}>
+        <button
+          onClick={showDashboard}
+          className="inline-flex items-center gap-1.5 rounded-xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low px-3 py-2 active:scale-95 transition-all"
+          aria-label={t("matchGame.exitAria")}
+        >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           {t("matchGame.exit")}
-        </Button>
+        </button>
 
-        <div className="flex items-center gap-4 text-sm text-on-surface-variant dark:text-on-surface-variant" role="group" aria-label={t("matchGame.gameStatsAria")}>
-          <span className="flex items-center gap-1" aria-label={t("matchGame.timeElapsedAria", { time: formatTime(elapsed) })}>
-            <Clock className="h-4 w-4" aria-hidden="true" />
+        <div className="flex items-center gap-4" role="group" aria-label={t("matchGame.gameStatsAria")}>
+          <span className={cn("flex items-center gap-1", typeClass.caption, "text-on-surface-variant")} aria-label={t("matchGame.timeElapsedAria", { time: formatTime(elapsed) })}>
+            <Clock className="h-3.5 w-3.5" aria-hidden="true" />
             {formatTime(elapsed)}
           </span>
-          <span className="flex items-center gap-1" aria-label={t("matchGame.pairsMatchedAria", { matched: matchedPairs, total: totalPairs })}>
-            <Check className="h-4 w-4" aria-hidden="true" />
+          <span className={cn("flex items-center gap-1", typeClass.caption, "text-on-surface-variant")} aria-label={t("matchGame.pairsMatchedAria", { matched: matchedPairs, total: totalPairs })}>
+            <Check className="h-3.5 w-3.5" aria-hidden="true" />
             {matchedPairs}/{totalPairs}
           </span>
-          <span className="flex items-center gap-1" aria-label={t("matchGame.movesAria", { count: moves })}>
-            <Zap className="h-4 w-4" aria-hidden="true" />
+          <span className={cn("flex items-center gap-1", typeClass.caption, "text-on-surface-variant")} aria-label={t("matchGame.movesAria", { count: moves })}>
+            <Zap className="h-3.5 w-3.5" aria-hidden="true" />
             {t("matchGame.moves", { count: moves })}
           </span>
         </div>
 
-        <Button variant="outline" size="sm" onClick={startGame} aria-label={t("matchGame.restartAria")}>
-          <RotateCcw className="h-4 w-4 mr-1" aria-hidden="true" />
+        <button
+          onClick={startGame}
+          className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-3 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+          aria-label={t("matchGame.restartAria")}
+        >
+          <RotateCcw className="h-4 w-4" aria-hidden="true" />
           {t("matchGame.restart")}
-        </Button>
+        </button>
       </header>
 
-      {/* Finished overlay */}
+      {/* Rules hint — brief, dismissible */}
+      {!finished && (
+        <p className={cn(typeClass.caption, "mb-3 text-center text-on-surface-variant")}>
+          {t("matchGame.rulesHint")}
+        </p>
+      )}
+
+      {/* Finished overlay — stitch success pattern */}
       {finished && (
-        <div className="mb-6 rounded-lg border bg-review-easy/10 border-review-easy/30 p-6 text-center" role="alert">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-review-easy/20 text-review-easy">
+        <div className={cn(successSurface("p-lg mb-6 text-center"), "border-tertiary/30")} role="alert">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-tertiary-container text-tertiary">
             <Check className="h-6 w-6" aria-hidden="true" />
           </div>
-          <h2 className="mt-3 text-xl font-bold">{t("matchGame.allMatched")}</h2>
-          <p className="mt-1 text-sm text-on-surface-variant dark:text-on-surface-variant">
+          <h2 className={cn(typeClass["title-md"], "mt-3 text-text-primary")}>{t("matchGame.allMatched")}</h2>
+          <p className={cn(typeClass["body-md"], "mt-1 text-on-surface-variant")}>
             {t("matchGame.summary", { total: totalPairs, time: formatTime(elapsed), moves })}
           </p>
           {xpEarned > 0 && (
-            <p className="mt-2 text-sm font-semibold text-text-primary dark:text-text-primary">
+            <p className={cn(typeClass.label-lg, "mt-2 text-on-secondary-container")}>
               {t("matchGame.xpEarned", { count: xpEarned })}
             </p>
           )}
-          <Button className="mt-4" onClick={startGame}>
+          <button
+            onClick={startGame}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
+          >
             {t("matchGame.playAgain")}
-          </Button>
+          </button>
         </div>
       )}
 
@@ -305,20 +326,20 @@ export function MatchGame(): JSX.Element {
                 aria-selected={isSelected}
                 aria-disabled={isMatched}
                 className={cn(
-                  "min-h-[90px] rounded-lg border p-3 text-sm font-medium transition-all duration-200 text-left",
-                  "hover:shadow-sm active:scale-[0.97]",
-isMatched
-	                    ? "opacity-20 scale-95 pointer-events-none"
-	                    : isShaking
-	                      ? "animate-shake border-review-again/30 bg-review-again/10"
-	                      : isSelected
-	                        ? "border-outline dark:border-outline bg-surface-container dark:bg-surface-container shadow-sm ring-1 ring-primary/20"
-	                        : isFront
-	                          ? "border-primary/30 bg-primary/5 hover:border-primary/50 hover:bg-primary/10"
-	                          : "border-secondary/30 bg-secondary/5 hover:border-secondary/50 hover:bg-secondary/10",
+                  "min-h-[90px] rounded-xl p-3 text-sm font-medium transition-all duration-200 text-left",
+                  "hover:shadow-md active:scale-[0.97]",
+                  isMatched
+                    ? "opacity-20 scale-95 pointer-events-none"
+                    : isShaking
+                      ? "animate-shake border border-review-again/30 bg-review-again/10"
+                      : isSelected
+                        ? cn(cardSurface("p-3"), "shadow-sm ring-2 ring-primary/20 border-primary/30")
+                        : isFront
+                          ? cn(cardSurface("p-3"), "hover:border-primary/30 hover:bg-primary/5")
+                          : cn(cardSurface("p-3"), "hover:border-secondary/30 hover:bg-secondary/5"),
                 )}
               >
-                <span className="text-[10px] uppercase tracking-wider text-on-surface-variant dark:text-on-surface-variant mb-1 block">
+                <span className={cn(typeClass.caption, "text-on-surface-variant mb-1 block uppercase tracking-[0.15em]")}>
                   {isFront ? t("matchGame.question") : t("matchGame.answer")}
                 </span>
                 <p className="line-clamp-3 leading-snug">{tile.text}</p>

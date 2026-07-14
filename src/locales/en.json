@@ -790,6 +790,7 @@
   },
   "focusTimer": {
     "title": "Focus Timer",
+    "purpose": "Set a timer to stay focused during study sessions. Choose a preset, pick a soundscape, and start.",
     "completeAria": "Focus timer complete! Great work.",
     "timerAria": "Focus timer: {{remaining}} remaining, {{progress}}% complete",
     "focusing": "focusing",
@@ -934,7 +935,8 @@
     "question": "Question",
     "answer": "Answer",
     "alreadyMatched": "Already matched",
-    "currentlySelected": "Currently selected"
+    "currentlySelected": "Currently selected",
+    "rulesHint": "Match each question to its answer. Click two tiles to reveal them."
   },
   "reviewCalendar": {
     "title": "Calendar",
@@ -1120,9 +1122,12 @@
     "confirmRename": "Confirm rename",
     "cancelRename": "Cancel rename",
     "noCardsWithTag": "No cards with this tag",
+    "hierarchyHint": "Tags are hierarchical — \"language/japanese\" groups cards under both \"language\" and \"japanese\".",
     "renamedTag": "Renamed \"{{oldTag}}\" → \"{{newTag}}\" ({{count}} cards)",
+    "renamedTagPartial": "Renamed \"{{oldTag}}\" → \"{{newTag}}\" on {{count}} of {{total}} cards. {{failed}} failed.",
     "confirmRemoveTag": "Remove tag \"{{tag}}\" from {{count}} card(s)?",
     "removedTag": "Removed \"{{tag}}\" from {{count}} card(s)",
+    "removedTagPartial": "Removed \"{{tag}}\" from {{count}} of {{total}} cards. {{failed}} failed.",
     "enterSearchName": "Please enter a name for the saved search",
     "savedSearchSaved": "Saved search \"{{name}}\"",
     "noCardsMatchSearch": "No cards match this saved search",
