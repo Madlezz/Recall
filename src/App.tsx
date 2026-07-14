@@ -29,6 +29,7 @@ export function App(): JSX.Element {
   const error = useRecallStore((state) => state.error);
   const initialize = useRecallStore((state) => state.initialize);
   const showDashboard = useRecallStore((state) => state.showDashboard);
+  const showImportHub = useRecallStore((state) => state.showImportHub);
   const startReview = useRecallStore((state) => state.startReview);
   const recoverToDashboard = () => showDashboard();
   const [showQuickAdd, setShowQuickAdd] = useState(false);
@@ -58,6 +59,12 @@ export function App(): JSX.Element {
             if (event.ctrlKey && event.key.toLowerCase() === "n") {
               event.preventDefault();
               setShowQuickAdd(true);
+            }
+
+            // Press 'I' to open Import Hub
+            if (event.key.toLowerCase() === "i" && view !== "study" && view !== "match") {
+              event.preventDefault();
+              showImportHub();
             }
 
             // ? to show keyboard shortcuts

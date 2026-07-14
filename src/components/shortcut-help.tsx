@@ -12,6 +12,7 @@ interface ShortcutHelpProps {
 // Actions to show in the help dialog, in display order.
 const HELP_ACTIONS: { action: ShortcutAction; descKey: string }[] = [
   { action: "commandPalette", descKey: "shortcutHelp.commandPalette" },
+  { action: "importHub", descKey: "shortcutHelp.importHub" },
   { action: "reveal", descKey: "shortcutHelp.revealAnswer" },
   { action: "rateAgain", descKey: "shortcutHelp.rateAgain" },
   { action: "rateHard", descKey: "shortcutHelp.rateHard" },

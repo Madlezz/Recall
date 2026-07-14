@@ -15,7 +15,8 @@ export type ShortcutAction =
   | "commandPalette"
   | "quickAdd"
   | "showHelp"
-  | "closeDialog";
+  | "closeDialog"
+  | "importHub";
 
 // A shortcut is stored as a normalized string:
 //   - modifier prefixes: "ctrl+" (case-insensitive, joined with "+")
@@ -36,6 +37,7 @@ export const DEFAULT_SHORTCUTS: ShortcutMap = {
   commandPalette: "ctrl+k",
   quickAdd: "ctrl+n",
   showHelp: "?",
+  importHub: "i",
   closeDialog: "escape",
 };
 
