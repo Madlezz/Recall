@@ -14,7 +14,8 @@ import {
   subMonths,
 } from "date-fns";
 import { useRecallStore } from "@/stores/recall-store";
-import { cardSurface } from "@/lib/surface";
+import { cardSurface, typeClass } from "@/lib/surface";
+import { cn } from "@/lib/utils";
 import type { ReviewLog } from "@/types";
 
 function getReviewCounts(logs: ReviewLog[]): Map<string, number> {
@@ -65,7 +66,7 @@ export function ReviewCalendar(): JSX.Element {
   return (
     <div className={cardSurface("px-5 py-5")}>
       <div className="flex items-center justify-between mb-4">
-        <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-on-surface-variant">{t("reviewCalendar.title")}</span>
+        <span className={cn(typeClass.caption, "text-on-surface-variant tracking-[0.15em]")}>{t("reviewCalendar.title")}</span>
         <div className="flex items-center gap-2">
           <button
             className="rounded p-1 transition-colors hover:bg-surface-container-low"
@@ -93,7 +94,7 @@ export function ReviewCalendar(): JSX.Element {
         <>
           <div className="grid grid-cols-7 mb-1">
             {weekDays.map((d) => (
-              <div key={d} className="text-center text-[10px] font-medium text-on-surface-variant py-1">
+              <div key={d} className={cn(typeClass.caption, "text-center text-on-surface-variant py-1")}>
                 {d}
               </div>
             ))}
@@ -110,7 +111,7 @@ export function ReviewCalendar(): JSX.Element {
                 <div
                   key={key}
                   title={count > 0 ? t("reviewCalendar.reviewCount", { count, date: format(day, "MMM d") }) : format(day, "MMM d, yyyy")}
-                  className={`aspect-square flex flex-col items-center justify-center rounded-md text-[11px] transition-colors ${
+                  className={`aspect-square flex flex-col items-center justify-center rounded-md ${cn(typeClass.caption, "transition-colors")} ${
                     today ? "ring-1 ring-primary" : ""
                   } ${isCurrentMonth ? "" : "opacity-30"} ${
                     count > 0 ? intensityClass(count, maxCount) + " text-on-tertiary-container" : "text-on-surface-variant"
@@ -123,12 +124,12 @@ export function ReviewCalendar(): JSX.Element {
           </div>
 
           <div className="flex items-center justify-end gap-1.5 mt-3">
-            <span className="text-[10px] text-on-surface-variant">{t("reviewCalendar.less")}</span>
+            <span className={cn(typeClass.caption, "text-on-surface-variant")}>{t("reviewCalendar.less")}</span>
             <span className="h-3 w-3 rounded-sm bg-surface-container-high" />
             <span className="h-3 w-3 rounded-sm bg-tertiary-container/50" />
             <span className="h-3 w-3 rounded-sm bg-tertiary-container" />
             <span className="h-3 w-3 rounded-sm bg-tertiary" />
-            <span className="text-[10px] text-on-surface-variant">{t("reviewCalendar.more")}</span>
+            <span className={cn(typeClass.caption, "text-on-surface-variant")}>{t("reviewCalendar.more")}</span>
           </div>
         </>
       )}
