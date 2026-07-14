@@ -10,8 +10,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
+import { typeClass } from "@/lib/surface";
 import { isTauriRuntime } from "@/db/client";
 import { useRecallStore } from "@/stores/recall-store";
 import type { RecallExportPayload } from "@/types";
@@ -49,7 +50,7 @@ export function Settings(): JSX.Element {
     <div className="animate-fade-in space-y-6">
       {/* Header */}
       <section>
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-on-surface-variant">{t("settings.preferences")}</p>
+        <p className={cn(typeClass.caption, "text-on-surface-variant tracking-[0.15em]")}>{t("settings.preferences")}</p>
         <h1 className="mt-2 text-[1.75rem] font-bold leading-tight tracking-tight text-text-primary dark:text-text-primary">{t("settings.title")}</h1>
         <p className="mt-2 max-w-lg text-sm leading-relaxed text-on-surface-variant dark:text-on-surface-variant">
           {t("settings.headerDescription")}
@@ -108,7 +109,12 @@ export function Settings(): JSX.Element {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction asChild>
-              <Button variant="destructive" onClick={() => void handleReplace()}>{t("settings.replaceData")}</Button>
+              <button
+                className="inline-flex items-center justify-center rounded-xl bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground hover:bg-destructive/90 active:scale-95 transition-all"
+                onClick={() => void handleReplace()}
+              >
+                {t("settings.replaceData")}
+              </button>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

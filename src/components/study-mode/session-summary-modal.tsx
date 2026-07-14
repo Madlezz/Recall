@@ -3,7 +3,6 @@ import { Check } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AchievementDetail } from "@/components/achievement-detail";
-import { Button } from "@/components/ui/button";
 import { useRecallStore } from "@/stores/recall-store";
 import { CONFETTI_COLORS, prefersReducedMotion } from "@/lib/xp";
 import type { SessionSummary } from "@/types";
@@ -109,8 +108,19 @@ export function SessionSummaryModal({ summary, onContinue }: { summary: SessionS
         </div>
 
         <div className="mt-6 flex gap-3">
-          <Button variant="outline" className="flex-1" onClick={showDashboard}>{t("sessionSummary.backToDashboard")}</Button>
-          <Button className="flex-1" onClick={onContinue} autoFocus>{t("sessionSummary.continue")}</Button>
+          <button
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+            onClick={showDashboard}
+          >
+            {t("sessionSummary.backToDashboard")}
+          </button>
+          <button
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
+            onClick={onContinue}
+            autoFocus
+          >
+            {t("sessionSummary.continue")}
+          </button>
         </div>
       </div>
     </div>
