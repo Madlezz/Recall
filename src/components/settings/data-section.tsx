@@ -12,7 +12,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { isTauriRuntime } from "@/db/client";
 import { useRecallStore } from "@/stores/recall-store";
@@ -213,7 +212,7 @@ export function DataSection(): JSX.Element {
                 <AlertDialogFooter>
                   <AlertCancelButton />
                   <AlertDialogAction asChild>
-                    <Button variant="destructive" onClick={() => void handleStartFresh()}>{t("settings.deleteEverything")}</Button>
+                    <button className="inline-flex items-center justify-center rounded-xl bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground hover:bg-destructive/90 active:scale-95 transition-all" onClick={() => void handleStartFresh()}>{t("settings.deleteEverything")}</button>
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -240,7 +239,7 @@ export function DataSection(): JSX.Element {
                 <AlertDialogFooter>
                   <AlertCancelButton />
                   <AlertDialogAction asChild>
-                    <Button variant="destructive" onClick={() => void handleReset()}>{t("settings.restoreDemoDecks")}</Button>
+                    <button className="inline-flex items-center justify-center rounded-xl bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground hover:bg-destructive/90 active:scale-95 transition-all" onClick={() => void handleReset()}>{t("settings.restoreDemoDecks")}</button>
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

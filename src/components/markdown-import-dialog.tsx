@@ -3,7 +3,6 @@ import { FileText } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -113,10 +112,10 @@ export function MarkdownImportDialog({ deckId, open: controlledOpen, onOpenChang
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); else setOpen(true); }}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all">
           <FileText className="h-4 w-4 mr-1" />
           {t("markdownImport.importMd")}
-        </Button>
+        </button>
       </DialogTrigger>
       <DialogContent className="w-[min(92vw,700px)] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
@@ -133,9 +132,9 @@ export function MarkdownImportDialog({ deckId, open: controlledOpen, onOpenChang
               <p className="text-sm text-on-surface-variant dark:text-on-surface-variant">
                 {t("markdownImport.selectFileHint")}
               </p>
-              <Button onClick={handleFilePick} disabled={loading}>
+              <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all" onClick={handleFilePick} disabled={loading}>
                 {loading ? t("markdownImport.reading") : t("markdownImport.chooseFile")}
-              </Button>
+              </button>
             </div>
           ) : (
             <>
@@ -143,9 +142,9 @@ export function MarkdownImportDialog({ deckId, open: controlledOpen, onOpenChang
                 <p className="text-sm font-medium">
                   {t("markdownImport.cardsFound", { count: cards.length })}
                 </p>
-                <Button variant="ghost" size="sm" onClick={handleFilePick} disabled={loading}>
+                <button className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={handleFilePick} disabled={loading}>
                   {t("markdownImport.chooseDifferentFile")}
-                </Button>
+                </button>
               </div>
 
               <div className="space-y-2">
@@ -189,12 +188,12 @@ export function MarkdownImportDialog({ deckId, open: controlledOpen, onOpenChang
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
+          <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={handleClose}>
             {t("markdownImport.cancel")}
-          </Button>
-          <Button onClick={handleImport} disabled={cards.length === 0 || !targetDeckId}>
+          </button>
+          <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all" onClick={handleImport} disabled={cards.length === 0 || !targetDeckId}>
             {t("markdownImport.importCards", { count: cards.length })}
-          </Button>
+          </button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

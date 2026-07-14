@@ -2,7 +2,6 @@ import { Cloud, Copy, KeyRound, Link2, Loader2, RefreshCw, Shield, Unlink, X } f
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { useRecallStore } from "@/stores/recall-store";
 import { generateSyncCode, formatSyncCodeInput, isValidSyncCode } from "@/services/crypto";
 import { performEncryptedSync, testSyncRelay, getDefaultRelayUrl, type SyncConfig } from "@/services/sync-protocol";
@@ -151,18 +150,17 @@ export function SyncSection(): JSX.Element {
           /* ── Not paired: show setup options ── */
           <div className="space-y-4">
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Button onClick={handleGenerateCode} className="gap-2 min-h-[44px] flex-1">
+              <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all gap-2 min-h-[44px] flex-1" onClick={handleGenerateCode}>
                 <KeyRound className="h-4 w-4" />
                 {t("sync.generateCode")}
-              </Button>
-              <Button
-                variant="outline"
+              </button>
+              <button
+                className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all gap-2 min-h-[44px] flex-1"
                 onClick={() => setShowCodeInput(!showCodeInput)}
-                className="gap-2 min-h-[44px] flex-1"
               >
                 <Link2 className="h-4 w-4" />
                 {t("sync.enterCode")}
-              </Button>
+              </button>
             </div>
 
             {showCodeInput && (
@@ -193,12 +191,12 @@ export function SyncSection(): JSX.Element {
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button onClick={() => void handleEnterCode()} className="flex-1 min-h-[44px]">
+                  <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all flex-1 min-h-[44px]" onClick={() => void handleEnterCode()}>
                     {t("sync.pairDevice")}
-                  </Button>
-                  <Button variant="ghost" onClick={() => setShowCodeInput(false)} className="min-h-[44px]">
+                  </button>
+                  <button className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all min-h-[44px]" onClick={() => setShowCodeInput(false)}>
                     <X className="h-4 w-4" />
-                  </Button>
+                  </button>
                 </div>
               </div>
             )}
@@ -249,10 +247,10 @@ export function SyncSection(): JSX.Element {
 
             {/* Actions */}
             <div className="flex flex-col gap-2 sm:flex-row">
-              <Button
+              <button
+                className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all gap-2 min-h-[44px] flex-1"
                 onClick={() => void handleSyncNow()}
                 disabled={isSyncing}
-                className="gap-2 min-h-[44px] flex-1"
               >
                 {isSyncing ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -260,15 +258,14 @@ export function SyncSection(): JSX.Element {
                   <RefreshCw className="h-4 w-4" />
                 )}
                 {isSyncing ? t("sync.syncing") : t("sync.syncNow")}
-              </Button>
-              <Button
-                variant="outline"
+              </button>
+              <button
+                className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all gap-2 min-h-[44px]"
                 onClick={() => void handleUnlink()}
-                className="gap-2 min-h-[44px]"
               >
                 <Unlink className="h-4 w-4" />
                 {t("sync.unlink")}
-              </Button>
+              </button>
             </div>
 
             {/* Relay URL (advanced) */}

@@ -2,7 +2,6 @@ import { Eye, FileText, Plus, X } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { parseBulkCards, type BulkCardInput } from "@/lib/bulk-parser";
 
@@ -90,13 +89,13 @@ Tags: asia, capitals`;
             </span>
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" size="sm" onClick={() => setText(example)}>
+            <button className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={() => setText(example)}>
               {t("bulkAdd.loadExample")}
-            </Button>
-            <Button size="sm" onClick={() => void handleImport()} disabled={parsed.length === 0 || importing}>
+            </button>
+            <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all" onClick={() => void handleImport()} disabled={parsed.length === 0 || importing}>
               <Plus className="h-4 w-4 mr-1" />
               {importing ? t("bulkAdd.importing") : t("bulkAdd.importCards", { count: parsed.length })}
-            </Button>
+            </button>
           </div>
         </div>
 

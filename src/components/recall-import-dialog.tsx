@@ -2,7 +2,6 @@ import { PackageOpen } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -129,10 +128,10 @@ export function RecallImportDialog({ deckId }: RecallImportDialogProps): JSX.Ele
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); else setOpen(true); }}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" onClick={handleOpen}>
+        <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={handleOpen}>
           <PackageOpen className="h-4 w-4 mr-1" />
           {t("recallImport.importRecall")}
-        </Button>
+        </button>
       </DialogTrigger>
       <DialogContent className="w-[min(92vw,600px)] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
@@ -194,12 +193,12 @@ export function RecallImportDialog({ deckId }: RecallImportDialogProps): JSX.Ele
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
+          <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={handleClose}>
             {t("recallImport.cancel")}
-          </Button>
-          <Button onClick={handleImport} disabled={!pkgData || (!targetDeckId && targetDeckId !== "__new__")}>
+          </button>
+          <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all" onClick={handleImport} disabled={!pkgData || (!targetDeckId && targetDeckId !== "__new__")}>
             {t("recallImport.importCards", { count: pkgData ? pkgData.cardCount : 0 })}
-          </Button>
+          </button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

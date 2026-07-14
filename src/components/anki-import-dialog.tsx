@@ -4,7 +4,6 @@ import type { AnkiCard } from "@/services/anki-import";
 import { useRecallStore } from "@/stores/recall-store";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -203,10 +202,10 @@ export function AnkiImportDialog(): JSX.Element {
   return (
     <Dialog open={openDialog} onOpenChange={(open) => { setOpenDialog(open); if (!open) resetState(); }}>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all">
           <Upload className="h-4 w-4" />
           {t("ankiImport.importFromAnki")}
-        </Button>
+        </button>
       </DialogTrigger>
 
       {/* Import form screen */}
@@ -240,20 +239,20 @@ export function AnkiImportDialog(): JSX.Element {
                   placeholder={t("ankiImport.noFileSelected")}
                   className="flex-1"
                 />
-                <Button variant="outline" onClick={handleFileSelect} disabled={isImporting}>
+                <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={handleFileSelect} disabled={isImporting}>
                   {t("ankiImport.browse")}
-                </Button>
+                </button>
               </div>
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="ghost" onClick={handleClose} disabled={isImporting}>
+            <button className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={handleClose} disabled={isImporting}>
               {t("ankiImport.cancel")}
-            </Button>
-            <Button onClick={handleImport} disabled={isImporting || !selectedFile || !deckName.trim()}>
+            </button>
+            <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all" onClick={handleImport} disabled={isImporting || !selectedFile || !deckName.trim()}>
               {isImporting ? t("ankiImport.importing") : t("ankiImport.importCards")}
-            </Button>
+            </button>
           </DialogFooter>
         </DialogContent>
       )}
@@ -395,9 +394,9 @@ export function AnkiImportDialog(): JSX.Element {
           </div>
 
           <DialogFooter>
-            <Button onClick={handleClose} className="w-full">
+            <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all w-full" onClick={handleClose}>
               {t("ankiImport.done")}
-            </Button>
+            </button>
           </DialogFooter>
         </DialogContent>
       )}

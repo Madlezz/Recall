@@ -2,7 +2,6 @@ import { FileSpreadsheet, Upload } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
@@ -260,13 +259,14 @@ export function CsvImportDialog({ open, onClose, deckId, file }: CsvImportDialog
           <p className="text-xs text-on-surface-variant dark:text-on-surface-variant">
             {rows ? t("csvImport.cardsToImport", { count: rows.length }) : t("csvImport.pickFileFirst")}
           </p>
-          <Button
+          <button
             onClick={() => void handleImport()}
             disabled={!rows || rows.length === 0 || !targetDeck || pending}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
           >
             <Upload className="mr-1.5 h-4 w-4" />
             {pending ? t("csvImport.importing") : t("csvImport.importCards", { count: rows?.length ?? 0 })}
-          </Button>
+          </button>
         </div>
       </DialogContent>
     </Dialog>

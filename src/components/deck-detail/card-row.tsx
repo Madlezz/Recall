@@ -7,7 +7,6 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { CardDialog } from "@/components/card-dialog";
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
@@ -106,11 +105,11 @@ export function CardRow({ card, deckId, isSelected, onToggle }: CardRowProps): J
           <CardDialog
             deckId={deckId}
             card={card}
-            trigger={<Button variant="outline">{t("deckDetail.edit")}</Button>}
+            trigger={<button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all">{t("deckDetail.edit")}</button>}
           />
-          <Button variant="ghost" onClick={() => void handleDelete()} disabled={isDeleting}>
+          <button className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={() => void handleDelete()} disabled={isDeleting}>
             {t("deckDetail.delete")}
-          </Button>
+          </button>
         </div>
       </div>
     </article>

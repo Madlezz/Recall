@@ -1,6 +1,5 @@
 import { Search, Trash2, CheckSquare, Square, X, FileText, Plus, BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   AlertDialog,
@@ -63,16 +62,16 @@ export function CardListSection({
           <CardDialog
             deckId={deckId}
             trigger={
-              <Button>
+              <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all">
                 <Plus className="h-4 w-4" />
                 {t("cardDialog.addCard")}
-              </Button>
+              </button>
             }
           />
-          <Button variant="outline" onClick={onBulkAdd}>
+          <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={onBulkAdd}>
             <FileText className="h-4 w-4" />
             {t("deckDetail.bulkAdd")}
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -90,14 +89,14 @@ export function CardListSection({
       {/* Bulk selection bar - sticky while scrolling long card lists */}
       {filteredCards.length > 0 && (
         <div className="sticky top-0 z-10 flex flex-wrap items-center gap-3 rounded-lg bg-background/95 backdrop-blur py-2">
-          <Button variant="outline" size="sm" onClick={toggleSelectAll}>
+          <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={toggleSelectAll}>
             {selectedCardIds.size === filteredCards.length ? (
               <CheckSquare className="h-4 w-4" />
             ) : (
               <Square className="h-4 w-4" />
             )}
             {selectedCardIds.size === filteredCards.length ? t("deckDetail.deselectAll") : t("deckDetail.selectAll")}
-          </Button>
+          </button>
           {selectedCardIds.size > 0 && (
             <>
               <span className="text-sm text-muted-foreground">
@@ -105,10 +104,10 @@ export function CardListSection({
               </span>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="sm">
+                  <button className="inline-flex items-center justify-center rounded-xl bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground hover:bg-destructive/90 active:scale-95 transition-all">
                     <Trash2 className="h-4 w-4" />
                     {t("deckDetail.deleteSelected")}
-                  </Button>
+                  </button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
@@ -120,9 +119,9 @@ export function CardListSection({
                   <AlertDialogFooter>
                     <AlertDialogCancel>{t("confirmAction.cancel")}</AlertDialogCancel>
                     <AlertDialogAction asChild>
-                      <Button variant="destructive" onClick={() => void onBulkDelete()}>
+                      <button className="inline-flex items-center justify-center rounded-xl bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground hover:bg-destructive/90 active:scale-95 transition-all" onClick={() => void onBulkDelete()}>
                         {t("deckDetail.delete")}
-                      </Button>
+                      </button>
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>

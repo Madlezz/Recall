@@ -1,7 +1,6 @@
 import { Calendar, Play, Brain } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { getDeckStats } from "@/lib/stats";
@@ -56,14 +55,14 @@ export function DeckHeaderSection({ deck, deckCards, onStudyNow }: DeckHeaderSec
           </p>
         </div>
         <div className="flex gap-2">
-          <Button size="lg" onClick={onStudyNow} aria-label={t("deckDetail.studyNowAria")}>
+          <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all" onClick={onStudyNow} aria-label={t("deckDetail.studyNowAria")}>
             <Play className="h-4 w-4" aria-hidden="true" />
             {t("deckDetail.studyNow")}
-          </Button>
-          <Button size="lg" variant="outline" onClick={() => startMatch(deck.id)} aria-label={t("deckDetail.matchGameAria")}>
+          </button>
+          <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={() => startMatch(deck.id)} aria-label={t("deckDetail.matchGameAria")}>
             <Brain className="h-4 w-4" aria-hidden="true" />
             {t("deckDetail.matchGame")}
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -109,20 +108,19 @@ export function DeckHeaderSection({ deck, deckCards, onStudyNow }: DeckHeaderSec
             onChange={(e) => setExamDateInput(e.target.value)}
             className="rounded-md border bg-background px-3 py-1.5 text-sm"
           />
-          <Button size="sm" onClick={() => void handleSetExamDeadline()}>
+          <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all" onClick={() => void handleSetExamDeadline()}>
             {t("deckDetail.save")}
-          </Button>
+          </button>
           {deck.examDeadline && (
-            <Button
-              size="sm"
-              variant="ghost"
+            <button
+              className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
               onClick={() => {
                 setExamDateInput("");
                 void handleSetExamDeadline();
               }}
             >
               {t("deckDetail.remove")}
-            </Button>
+            </button>
           )}
         </div>
       )}
