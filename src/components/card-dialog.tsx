@@ -3,7 +3,6 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { RichCard } from "@/components/RichCard";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -163,10 +162,10 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger ?? (
-          <Button>
+          <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all">
             <Plus className="h-4 w-4" />
             {t("cardDialog.addCard")}
-          </Button>
+          </button>
         )}
       </DialogTrigger>
       <DialogContent className="w-[min(92vw,900px)] max-h-[90vh] overflow-y-auto">
@@ -234,29 +233,25 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="front-input" className="text-sm font-medium text-text-secondary dark:text-text-secondary">{t("cardDialog.contentMarkdown")}</Label>
-                      <Button
+                      <button
                         type="button"
-                        variant="ghost"
-                        size="sm"
+                        className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all h-8 text-on-surface-variant hover:text-text-primary hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:text-text-primary dark:hover:bg-surface-container"
                         onClick={() => handleInsertImage(frontRef.current, front, setFront)}
                         title={t("cardDialog.image")}
-                        className="h-8 text-on-surface-variant hover:text-text-primary hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:text-text-primary dark:hover:bg-surface-container"
                       >
                         <ImageIcon className="h-4 w-4 mr-1" />
                         {t("cardDialog.image")}
-                      </Button>
+                      </button>
                       {voiceInputEnabled && frontVoice.supported && (
-                        <Button
+                        <button
                           type="button"
-                          variant="ghost"
-                          size="sm"
+                          className={`rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all h-8 ${frontVoice.listening ? "text-destructive hover:text-destructive/80 animate-pulse" : "text-on-surface-variant hover:text-text-primary hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:text-text-primary dark:hover:bg-surface-container"}`}
                           onClick={frontVoice.toggle}
                           title={t("cardDialog.voiceInput")}
-                          className={`h-8 ${frontVoice.listening ? "text-destructive hover:text-destructive/80 animate-pulse" : "text-on-surface-variant hover:text-text-primary hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:text-text-primary dark:hover:bg-surface-container"}`}
                         >
                           {frontVoice.listening ? <MicOff className="h-4 w-4 mr-1" /> : <Mic className="h-4 w-4 mr-1" />}
                           {frontVoice.listening ? t("cardDialog.stopListening") : t("cardDialog.voiceInput")}
-                        </Button>
+                        </button>
                       )}
                     </div>
                     <Textarea
@@ -286,29 +281,25 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="back-input" className="text-sm font-medium text-text-secondary dark:text-text-secondary">{t("cardDialog.contentMarkdown")}</Label>
-                      <Button
+                      <button
                         type="button"
-                        variant="ghost"
-                        size="sm"
+                        className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all h-8 text-on-surface-variant hover:text-text-primary hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:text-text-primary dark:hover:bg-surface-container"
                         onClick={() => handleInsertImage(backRef.current, back, setBack)}
                         title={t("cardDialog.image")}
-                        className="h-8 text-on-surface-variant hover:text-text-primary hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:text-text-primary dark:hover:bg-surface-container"
                       >
                         <ImageIcon className="h-4 w-4 mr-1" />
                         {t("cardDialog.image")}
-                      </Button>
+                      </button>
                       {voiceInputEnabled && backVoice.supported && (
-                        <Button
+                        <button
                           type="button"
-                          variant="ghost"
-                          size="sm"
+                          className={`rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all h-8 ${backVoice.listening ? "text-destructive hover:text-destructive/80 animate-pulse" : "text-on-surface-variant hover:text-text-primary hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:text-text-primary dark:hover:bg-surface-container"}`}
                           onClick={backVoice.toggle}
                           title={t("cardDialog.voiceInput")}
-                          className={`h-8 ${backVoice.listening ? "text-destructive hover:text-destructive/80 animate-pulse" : "text-on-surface-variant hover:text-text-primary hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:text-text-primary dark:hover:bg-surface-container"}`}
                         >
                           {backVoice.listening ? <MicOff className="h-4 w-4 mr-1" /> : <Mic className="h-4 w-4 mr-1" />}
                           {backVoice.listening ? t("cardDialog.stopListening") : t("cardDialog.voiceInput")}
-                        </Button>
+                        </button>
                       )}
                     </div>
                     <Textarea
@@ -373,10 +364,10 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)} className="border-outline-variant text-text-secondary hover:bg-surface-container-high hover:text-text-primary dark:border-outline-variant dark:text-text-secondary dark:hover:bg-surface-container dark:hover:text-text-primary">
+            <button type="button" className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all border-outline-variant text-text-secondary hover:bg-surface-container-high hover:text-text-primary dark:border-outline-variant dark:text-text-secondary dark:hover:bg-surface-container dark:hover:text-text-primary" onClick={() => setOpen(false)}>
               {t("cardDialog.cancel")}
-            </Button>
-            <Button type="submit" className="bg-primary text-on-primary hover:bg-primary-hover dark:bg-primary dark:text-on-primary dark:hover:bg-primary-container">{card ? t("cardDialog.saveChanges") : t("cardDialog.createCard")}</Button>
+            </button>
+            <button type="submit" className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all bg-primary text-on-primary hover:bg-primary-hover dark:bg-primary dark:text-on-primary dark:hover:bg-primary-container">{card ? t("cardDialog.saveChanges") : t("cardDialog.createCard")}</button>
           </DialogFooter>
         </form>
       </DialogContent>

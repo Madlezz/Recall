@@ -15,7 +15,6 @@ import {
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { StatTile } from "@/components/stat-tile";
 import { BulkAddDialog } from "@/components/bulk-add-dialog";
 import { ConfirmAction } from "@/components/confirm-action";
@@ -88,9 +87,9 @@ export function DeckDetail(): JSX.Element {
     return (
       <div className="rounded-lg border border-dashed p-10 text-center">
         <h1 className="font-semibold">{t("deckDetail.notFound")}</h1>
-        <Button className="mt-4" onClick={showDashboard}>
+        <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all mt-4" onClick={showDashboard}>
           {t("deckDetail.backToDashboard")}
-        </Button>
+        </button>
       </div>
     );
   }
@@ -172,51 +171,49 @@ export function DeckDetail(): JSX.Element {
     <div className="animate-fade-in space-y-7">
       {/* Top bar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Button variant="ghost" onClick={showDashboard} aria-label={t("deckDetail.backToDashboard")}>
+        <button className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={showDashboard} aria-label={t("deckDetail.backToDashboard")}>
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           {t("dashboard.title")}
-        </Button>
+        </button>
         <div className="flex flex-wrap gap-2">
           <DeckDialog
             deck={deck}
             trigger={
-              <Button variant="outline">
+              <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all">
                 <Edit3 className="h-4 w-4" aria-hidden="true" />
                 {t("deckDetail.edit")}
-              </Button>
+              </button>
             }
           />
-          <Button variant="outline" onClick={handleExport}>
+          <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={handleExport}>
             <Download className="h-4 w-4" aria-hidden="true" />
             {t("deckDetail.exportJson")}
-          </Button>
-          <Button variant="outline" onClick={() => void handleExportRecall()}>
+          </button>
+          <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={() => void handleExportRecall()}>
             <PackageOpen className="h-4 w-4" aria-hidden="true" />
             {t("deckDetail.exportRecall")}
-          </Button>
-          <Button
-            variant="outline"
+          </button>
+          <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
             onClick={() => setQualityWarnings(checkDeckQuality(deckCards).warnings)}
           >
             <ShieldCheck className="h-4 w-4" aria-hidden="true" />
             {t("deckDetail.checkQuality")}
-          </Button>
-          <Button
-            variant="outline"
+          </button>
+          <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
             onClick={handleOptimizeDeck}
             title={t("deckDetail.optimizeTitle")}
           >
             <TrendingUp className="h-4 w-4" aria-hidden="true" />
             {t("deckDetail.optimize")}
-          </Button>
-          <Button variant="outline" onClick={() => setShowCustomStudy(true)}>
+          </button>
+          <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={() => setShowCustomStudy(true)}>
             <Beaker className="h-4 w-4" aria-hidden="true" />
             {t("deckDetail.customStudy")}
-          </Button>
-          <Button variant="outline" onClick={() => setShowCsvImport(true)}>
+          </button>
+          <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={() => setShowCsvImport(true)}>
             <FileSpreadsheet className="h-4 w-4" aria-hidden="true" />
             {t("deckDetail.csvImport")}
-          </Button>
+          </button>
           <MarkdownImportDialog deckId={currentDeckId} />
           <RecallImportDialog deckId={currentDeckId} />
           <ConfirmAction
@@ -275,9 +272,9 @@ export function DeckDetail(): JSX.Element {
                 </span>
               )}
             </h3>
-            <Button variant="ghost" size="sm" onClick={() => setQualityWarnings(null)}>
+            <button className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={() => setQualityWarnings(null)}>
               {t("deckDetail.dismiss")}
-            </Button>
+            </button>
           </div>
           {qualityWarnings.map((warning) => (
             <div

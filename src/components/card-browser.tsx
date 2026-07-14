@@ -1,6 +1,5 @@
 import { ArrowUpDown, ChevronLeft, ChevronRight, ExternalLink, Filter, Grid3X3, List, PackageOpen, Search, Tag, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -250,10 +249,10 @@ export function CardBrowser(): JSX.Element {
         </Select>
 
         {(search || deckFilter !== "all" || stateFilter !== "all") && (
-          <Button variant="ghost" size="sm" onClick={clearFilters}>
+          <button className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={clearFilters}>
             <X className="mr-1 h-3.5 w-3.5" />
             {t("cardBrowser.clear")}
-          </Button>
+          </button>
         )}
       </div>
 
@@ -303,17 +302,17 @@ export function CardBrowser(): JSX.Element {
                   }}
                   autoFocus
                 />
-                <Button size="sm" variant="ghost" onClick={() => void applyBulkTags()}>{t("cardBrowser.apply")}</Button>
+                <button className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={() => void applyBulkTags()}>{t("cardBrowser.apply")}</button>
               </div>
             ) : (
-              <Button variant="outline" size="sm" onClick={() => setShowBulkTag(true)}>
+              <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={() => setShowBulkTag(true)}>
                 <Tag className="mr-1 h-3.5 w-3.5" /> {t("cardBrowser.tag")}
-              </Button>
+              </button>
             )}
 
-            <Button variant="ghost" size="sm" onClick={clearSelection}>
+            <button className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={clearSelection}>
               <X className="mr-1 h-3.5 w-3.5" /> {t("cardBrowser.clear")}
-            </Button>
+            </button>
           </div>
         </div>
       )}
@@ -360,9 +359,9 @@ export function CardBrowser(): JSX.Element {
                         : t("cardBrowser.noMatches")}
                     </p>
                     {(search || deckFilter !== "all" || stateFilter !== "all") && (
-                      <Button variant="outline" size="sm" onClick={clearFilters}>
+                      <button className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all" onClick={clearFilters}>
                         {t("cardBrowser.clearFilters")}
-                      </Button>
+                      </button>
                     )}
                   </div>
                 </td>
@@ -473,29 +472,25 @@ export function CardBrowser(): JSX.Element {
             {t("cardBrowser.pagination", { from: currentPage * PAGE_SIZE + 1, to: Math.min((currentPage + 1) * PAGE_SIZE, totalCount), total: totalCount })}
           </p>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
+            <button
+              className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all gap-1"
               disabled={currentPage === 0}
               onClick={() => setPage((p) => Math.max(0, p - 1))}
-              className="gap-1"
             >
               <ChevronLeft className="h-3.5 w-3.5" />
               {t("cardBrowser.previous")}
-            </Button>
+            </button>
             <span className="text-sm tabular-nums">
               {currentPage + 1} / {totalPages}
             </span>
-            <Button
-              variant="outline"
-              size="sm"
+            <button
+              className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all gap-1"
               disabled={currentPage >= totalPages - 1}
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-              className="gap-1"
             >
               {t("cardBrowser.next")}
               <ChevronRight className="h-3.5 w-3.5" />
-            </Button>
+            </button>
           </div>
         </div>
       )}
