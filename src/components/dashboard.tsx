@@ -6,7 +6,6 @@ import { DailyGoal } from "@/components/daily-goal";
 import { DeckDialog } from "@/components/deck-dialog";
 import { DeckCard } from "@/components/deck-card";
 import { RecentActivity } from "@/components/recent-activity";
-import { Button } from "@/components/ui/button";
 import { getStudyStreak, getDueTodayCount } from "@/lib/stats";
 import { cn } from "@/lib/utils";
 import { cardSurface } from "@/lib/surface";
@@ -58,14 +57,14 @@ export function Dashboard(): JSX.Element {
               : t("dashboard.description")}
           </p>
         </div>
-        <Button
+        <button
           onClick={handleStartReview}
-          className="gap-2 min-h-[48px] px-8 py-4 rounded-2xl shadow-lg hover:shadow-xl active:scale-95 transition-all w-full md:w-auto justify-center"
+          className="inline-flex items-center gap-2 rounded-2xl bg-primary px-8 py-4 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all min-h-[48px] w-full md:w-auto justify-center"
           aria-label={t("deck.startReview")}
         >
           <RotateCw className="h-5 w-5" aria-hidden="true" />
           {t("dashboard.startReview")}
-        </Button>
+        </button>
       </section>
 
       {/* ── Bento Grid ── */}
@@ -117,10 +116,10 @@ export function Dashboard(): JSX.Element {
               <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <DeckDialog
                   trigger={
-                    <Button className="gap-2 min-h-[48px]">
+                    <button className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all min-h-[48px]">
                       <Plus className="h-4 w-4" />
                       {t("dashboard.createDeck")}
-                    </Button>
+                    </button>
                   }
                 />
               </div>

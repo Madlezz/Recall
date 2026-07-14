@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { LayoutGrid, Plus, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { DeckCard } from "@/components/deck-card";
 import { DeckDialog } from "@/components/deck-dialog";
 import { getDueTodayCount, isCardDueToday } from "@/lib/stats";
@@ -103,10 +102,10 @@ export function DeckBrowser(): JSX.Element {
             {t("deckBrowser.count", { count: decks.length })}
           </p>
         </div>
-        <Button onClick={() => setShowCreateDeck(true)} className="gap-2 min-h-[44px]">
+        <button onClick={() => setShowCreateDeck(true)} className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all min-h-[44px]">
           <Plus className="h-4 w-4" aria-hidden="true" />
           {t("deckBrowser.newDeck")}
-        </Button>
+        </button>
       </div>
 
       {/* Search */}
@@ -189,10 +188,10 @@ export function DeckBrowser(): JSX.Element {
           <LayoutGrid className="mb-4 h-12 w-12 text-outline-variant" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-on-surface">{t("deckBrowser.emptyTitle")}</h2>
           <p className="mt-1 text-sm text-on-surface-variant">{t("deckBrowser.emptyDesc")}</p>
-          <Button onClick={() => setShowCreateDeck(true)} className="mt-4 gap-2">
+          <button onClick={() => setShowCreateDeck(true)} className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all mt-4">
             <Plus className="h-4 w-4" aria-hidden="true" />
             {t("deckBrowser.newDeck")}
-          </Button>
+          </button>
         </div>
       )}
 

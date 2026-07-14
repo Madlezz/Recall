@@ -1,10 +1,9 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { BarChart3, Flame, Zap, Library, TrendingUp, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { RetentionForecast } from "@/components/retention-forecast";
 import { WorkloadForecast } from "@/components/workload-forecast";
-import { cardSurface } from "@/lib/surface";
+import { cardSurface, typeClass } from "@/lib/surface";
 import { getDeckStats, getStudyStreak } from "@/lib/stats";
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
@@ -62,9 +61,13 @@ export function Stats(): JSX.Element {
         <h1 className="font-display text-2xl font-bold tracking-tight text-text-primary">
           {t("stats.title")}
         </h1>
-        <Button variant="ghost" size="icon" onClick={showDashboard} aria-label={t("common.close")}>
+        <button
+          onClick={showDashboard}
+          className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+          aria-label={t("common.close")}
+        >
           <X className="h-5 w-5" />
-        </Button>
+        </button>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
@@ -81,12 +84,12 @@ export function Stats(): JSX.Element {
         <div className="flex items-end gap-2 h-32">
           {last7Days.map((day, i) => (
             <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
-              <span className="text-[10px] text-on-surface-variant tabular-nums">{day.count}</span>
+              <span className={cn(typeClass.caption, "text-on-surface-variant tabular-nums")}>{day.count}</span>
               <div
                 className={cn("w-full rounded-t-md transition-all duration-500", i === 6 ? "bg-secondary-container" : "bg-primary-soft")}
                 style={{ height: `${(day.count / maxCount) * 100}%`, minHeight: day.count > 0 ? 4 : 0 }}
               />
-              <span className={cn("text-[10px] mt-1", i === 6 ? "text-secondary font-semibold" : "text-outline")}>
+              <span className={cn(typeClass.caption, "mt-1", i === 6 ? "text-secondary font-semibold" : "text-outline")}>
                 {day.label}
               </span>
             </div>
