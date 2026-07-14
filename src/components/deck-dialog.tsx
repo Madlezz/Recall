@@ -2,7 +2,6 @@ import { Plus } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -75,10 +74,10 @@ export function DeckDialog({ deck, trigger, open: controlledOpen, onOpenChange }
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {trigger ?? (
-          <Button>
+          <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all">
             <Plus className="h-4 w-4" />
             {t("deckDialog.newDeck")}
-          </Button>
+          </button>
         )}
       </DialogTrigger>
       <DialogContent>
@@ -130,10 +129,17 @@ export function DeckDialog({ deck, trigger, open: controlledOpen, onOpenChange }
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} className="border-outline-variant text-text-secondary hover:bg-surface-container-high hover:text-text-primary dark:border-outline-variant dark:text-text-secondary dark:hover:bg-surface-container dark:hover:text-text-primary">
+            <button
+              type="button"
+              onClick={() => handleOpenChange(false)}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+            >
               {t("deckDialog.cancel")}
-            </Button>
-            <Button type="submit" className="bg-primary text-on-primary hover:bg-primary-hover dark:bg-primary dark:text-on-primary dark:hover:bg-primary-container">{deck ? t("deckDialog.saveChanges") : t("deckDialog.createDeck")}</Button>
+            </button>
+            <button
+              type="submit"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl hover:bg-primary-hover active:scale-95 transition-all"
+            >{deck ? t("deckDialog.saveChanges") : t("deckDialog.createDeck")}</button>
           </DialogFooter>
         </form>
       </DialogContent>

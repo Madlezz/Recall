@@ -1,7 +1,6 @@
 import { AlertTriangle, BookOpen, Brain, RotateCw, Zap } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
 import {
   getDueTodayCount,
   getEstimatedReviewMinutes,
@@ -68,10 +67,14 @@ export function ReviewInbox(): JSX.Element {
             {t("reviewInbox.cardsReady", { count: totalDue, minutes: estimatedMin })}
           </p>
         </div>
-        <Button onClick={handleStartReview} className="gap-2" aria-label={t("reviewInbox.startAria", { count: totalDue, minutes: estimatedMin })}>
+        <button
+          onClick={handleStartReview}
+          className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
+          aria-label={t("reviewInbox.startAria", { count: totalDue, minutes: estimatedMin })}
+        >
           <RotateCw className="h-4 w-4" aria-hidden="true" />
           {t("reviewInbox.start")}
-        </Button>
+        </button>
       </div>
 
       <div className="grid grid-cols-4 divide-x divide-outline-variant border-t border-outline-variant">

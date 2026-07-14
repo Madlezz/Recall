@@ -9,7 +9,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -47,15 +47,16 @@ export function ConfirmAction({
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button
-          variant={destructive ? "destructive" : "outline"}
-className={destructive
-	            ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-	            : "border-outline-variant text-text-secondary hover:bg-surface-container-high hover:text-text-primary dark:border-outline-variant dark:text-text-secondary dark:hover:bg-surface-container dark:hover:text-text-primary"
-          }
+<button
+          type="button"
+          className={cn(
+            destructive
+              ? "inline-flex items-center justify-center rounded-xl bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground hover:bg-destructive/90 active:scale-95 transition-all"
+              : "inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+          )}
         >
           {triggerLabel}
-        </Button>
+        </button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -64,17 +65,22 @@ className={destructive
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel asChild>
-            <Button variant="outline" className="border-outline-variant text-text-secondary hover:bg-surface-container-high hover:text-text-primary dark:border-outline-variant dark:text-text-secondary dark:hover:bg-surface-container dark:hover:text-text-primary">
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+            >
               {t("confirmAction.cancel")}
-            </Button>
+            </button>
           </AlertDialogCancel>
           <AlertDialogAction asChild>
-            <Button
-              variant={destructive ? "destructive" : "default"}
-              className={destructive
-                ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                : "bg-primary text-on-primary hover:bg-primary-hover dark:bg-primary dark:text-on-primary dark:hover:bg-primary-container"
-              }
+            <button
+              type="button"
+              className={cn(
+                destructive
+                  ? "inline-flex items-center justify-center rounded-xl bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground hover:bg-destructive/90 active:scale-95 transition-all"
+                  : "inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all",
+                pending && "opacity-50 cursor-not-allowed"
+              )}
               onClick={(event) => {
                 event.preventDefault();
                 void handleConfirm();
@@ -82,7 +88,7 @@ className={destructive
               disabled={pending}
             >
               {actionLabel}
-            </Button>
+            </button>
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

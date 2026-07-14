@@ -1,7 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Eye, FileSpreadsheet, FileText, FileDown, Package, Plus, Upload, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { AnkiImportDialog } from "@/components/anki-import-dialog";
 import { CsvImportDialog } from "@/components/csv-import-dialog";
 import { MarkdownImportDialog } from "@/components/markdown-import-dialog";
@@ -88,9 +87,13 @@ export function ImportHub(): JSX.Element {
         <h1 className="font-display text-2xl font-bold tracking-tight text-text-primary">
           {t("importHub.title")}
         </h1>
-        <Button variant="ghost" size="icon" onClick={showDashboard} aria-label={t("common.close")}>
+        <button
+          onClick={showDashboard}
+          aria-label={t("common.close")}
+          className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+        >
           <X className="h-5 w-5" />
-        </Button>
+        </button>
       </div>
 
       <p className="text-sm text-on-surface-variant mb-6">
@@ -218,10 +221,14 @@ export function ImportHub(): JSX.Element {
                   {t("bulkAdd.cardsDetected", { count: manualParsed.length })}
                 </span>
               </div>
-              <Button size="sm" onClick={() => void handleManualImport()} disabled={manualParsed.length === 0 || !manualDeckId || manualImporting}>
+              <button
+                onClick={() => void handleManualImport()}
+                disabled={manualParsed.length === 0 || !manualDeckId || manualImporting}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
+              >
                 <Plus className="h-4 w-4 mr-1" />
                 {manualImporting ? t("bulkAdd.importing") : t("bulkAdd.importCards", { count: manualParsed.length })}
-              </Button>
+              </button>
             </div>
 
             {/* Preview */}

@@ -2,7 +2,7 @@ import { Mic, MicOff, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -167,13 +167,21 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
           </div>
 
           <div className="flex justify-end gap-2 border-t border-outline-variant pt-4 dark:border-outline-variant">
-            <Button type="button" variant="ghost" size="sm" onClick={onClose} className="text-on-surface-variant hover:text-text-primary hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:text-text-primary dark:hover:bg-surface-container">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container-high hover:text-text-primary active:scale-95 transition-all"
+            >
               {t("quickAdd.cancel")}
-            </Button>
-            <Button type="submit" size="sm" disabled={!deckId || !front.trim() || !back.trim()} className="bg-primary text-on-primary hover:bg-primary-hover dark:bg-primary dark:text-on-primary dark:hover:bg-primary-container">
+            </button>
+            <button
+              type="submit"
+              disabled={!deckId || !front.trim() || !back.trim()}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl hover:bg-primary-hover active:scale-95 transition-all"
+            >
               <Plus className="h-4 w-4 mr-1" />
               {t("quickAdd.addCard")}
-            </Button>
+            </button>
           </div>
         </form>
       </div>

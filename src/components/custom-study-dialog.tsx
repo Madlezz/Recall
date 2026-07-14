@@ -2,7 +2,7 @@ import { Beaker, Hash, Library, Play, Tag, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -194,10 +194,14 @@ export function CustomStudyDialog({ open, onClose, deckId }: CustomStudyDialogPr
               ? t("customStudy.cardsWillBePicked", { count: Math.min(clamped, eligibleCount) })
               : t("customStudy.noCardsMatch")}
           </p>
-          <Button onClick={handleStart} disabled={eligibleCount === 0}>
+          <button
+            onClick={handleStart}
+            disabled={eligibleCount === 0}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
+          >
             <Play className="mr-1.5 h-4 w-4" />
             {t("customStudy.start")}
-          </Button>
+          </button>
         </div>
       </DialogContent>
     </Dialog>
