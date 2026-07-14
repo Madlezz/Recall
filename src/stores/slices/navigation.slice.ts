@@ -9,6 +9,8 @@ export interface NavigationSlice {
   showStats: () => void;
   showDeckBrowser: () => void;  showBrowser: () => void;
   showTags: () => void;
+  showImportHub: () => void;
+  showFocusTimer: () => void;
   startMatch: (deckId: string) => void;
 }
 
@@ -62,6 +64,16 @@ export const navigationSlice = (
   showTags() {
     autoExitStudy();
     _set({ view: "tags", error: null });
+  },
+
+  showImportHub() {
+    autoExitStudy();
+    _set({ view: "import-hub", error: null });
+  },
+
+  showFocusTimer() {
+    autoExitStudy();
+    _set({ view: "focus-timer", error: null });
   },
 
   startMatch(deckId: string) {

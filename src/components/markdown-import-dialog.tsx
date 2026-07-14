@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { FileText } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -19,16 +20,29 @@ import { useRecallStore } from "@/stores/recall-store";
 
 interface MarkdownImportDialogProps {
   deckId?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  initialText?: string;
 }
 
-export function MarkdownImportDialog({ deckId }: MarkdownImportDialogProps): JSX.Element {
+export function MarkdownImportDialog({ deckId, open: controlledOpen, onOpenChange, initialText }: MarkdownImportDialogProps): JSX.Element {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = onOpenChange ?? setInternalOpen;
   const [cards, setCards] = useState<MarkdownCardInput[]>([]);
   const [targetDeckId, setTargetDeckId] = useState(deckId ?? "");
   const [loading, setLoading] = useState(false);
   const decks = useRecallStore((state) => state.decks);
   const createCard = useRecallStore((state) => state.createCard);
+
+  // Pre-load text from drag-and-drop
+  useEffect(() => {
+    if (initialText && open) {
+      const parsed = parseMarkdownCards(initialText);
+      if (parsed.length > 0) setCards(parsed);
+    }
+  }, [initialText, open]);
 
   async function handleFilePick(): Promise<void> {
     try {

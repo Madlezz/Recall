@@ -8,7 +8,7 @@ const mockStore: any = {
   settings: { xp: 0, leechThreshold: 5, dailyGoal: 20, dailyNewCardLimit: 20, theme: "light", accentColor: "zinc", dyslexiaFont: false, soundVolume: 100, desiredRetention: 0.9, onboardingComplete: true, seededAt: "", achievements: [], notificationsEnabled: false, allowHtml: false, backupFolder: null, backupSchedule: "never", lastBackupAt: null, syncFolder: null, syncEnabled: false, syncCode: null, syncRelayUrl: null, syncLastAt: null, syncAutoInterval: 0, ttsEnabled: false, ttsAutoRead: false, ttsSpeed: 1, fsrsWeights: null, voiceInputEnabled: true },
   view: "dashboard",
   showDashboard: vi.fn(), showSettings: vi.fn(), showStats: vi.fn(),
-  showBrowser: vi.fn(), showTags: vi.fn(), startReview: vi.fn(), startMatch: vi.fn(),
+  showBrowser: vi.fn(), showTags: vi.fn(), startReview: vi.fn(), startMatch: vi.fn(), showImportHub: vi.fn(), showFocusTimer: vi.fn(),
 };
 
 vi.mock("@/stores/recall-store", () => ({
@@ -63,6 +63,8 @@ describe("AppShell", () => {
     mockStore.showStats = vi.fn();
     mockStore.showBrowser = vi.fn();
     mockStore.showTags = vi.fn();
+    mockStore.showImportHub = vi.fn();
+    mockStore.showFocusTimer = vi.fn();
     mockStore.startReview = vi.fn();
     mockStore.startMatch = vi.fn();
   });
@@ -180,10 +182,10 @@ describe("AppShell", () => {
     expect(mockStore.showSettings).toHaveBeenCalled();
   });
 
-  it("calls showDashboard when Focus Timer clicked", () => {
+  it("calls showFocusTimer when Focus Timer clicked", () => {
     render(React.createElement(AppShell, null, "content"));
     screen.getByText("Focus Timer").click();
-    expect(mockStore.showDashboard).toHaveBeenCalled();
+    expect(mockStore.showFocusTimer).toHaveBeenCalled();
   });
 
   it("calls startMatch with first deck id when Match Game clicked", () => {

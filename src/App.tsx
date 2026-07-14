@@ -19,6 +19,8 @@ const ShortcutHelp = lazy(() => import("@/components/shortcut-help").then(m => (
 const Stats = lazy(() => import("@/components/stats").then(m => ({ default: m.Stats })));
 const StudyMode = lazy(() => import("@/components/study-mode").then(m => ({ default: m.StudyMode })));
 const TagManager = lazy(() => import("@/components/tag-manager").then(m => ({ default: m.TagManager })));
+const ImportHub = lazy(() => import("@/components/import-hub").then(m => ({ default: m.ImportHub })));
+const FocusTimer = lazy(() => import("@/components/focus-timer").then(m => ({ default: m.FocusTimer })));
 
 export function App(): JSX.Element {
   const { t } = useTranslation();
@@ -165,6 +167,16 @@ export function App(): JSX.Element {
                   <Onboarding />
                 </ErrorBoundary>
               ) : null}
+              {view === "import-hub" ? (
+                <ErrorBoundary viewName="ImportHub" onRecover={recoverToDashboard}>
+                  <ImportHub />
+                </ErrorBoundary>
+              ) : null}
+              {view === "focus-timer" ? (
+                <ErrorBoundary viewName="FocusTimer" onRecover={recoverToDashboard}>
+                  <FocusTimer />
+                </ErrorBoundary>
+              ) : null}
             </AppShell>
           )}
         </Suspense>
@@ -185,6 +197,8 @@ export function App(): JSX.Element {
           {view === "settings" && t("app.settingsView")}
           {view === "deck-browser" && t("app.deckBrowserView")}
           {view === "onboarding" && t("app.onboardingView")}
+          {view === "import-hub" && t("app.importHubView")}
+          {view === "focus-timer" && t("app.focusTimerView")}
         </div>
       </ErrorBoundary>
     );

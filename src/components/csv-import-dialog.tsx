@@ -1,5 +1,5 @@
 import { FileSpreadsheet, Upload } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,8 @@ interface CsvImportDialogProps {
   onClose: () => void;
   /** Pre-select a deck when opened from deck detail */
   deckId?: string | null;
+  /** Pre-load a file (from drag-and-drop) */
+  file?: File | null;
 }
 
 interface CsvRow {
@@ -28,7 +30,7 @@ interface CsvRow {
   tags: string;
 }
 
-export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps): JSX.Element {
+export function CsvImportDialog({ open, onClose, deckId, file }: CsvImportDialogProps): JSX.Element {
   const { t } = useTranslation();
   const decks = useRecallStore((s) => s.decks);
   const createCard = useRecallStore((s) => s.createCard);
@@ -36,6 +38,13 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
   const [rows, setRows] = useState<CsvRow[] | null>(null);
   const [pending, setPending] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Pre-load file from drag-and-drop
+  useEffect(() => {
+    if (file && open) {
+      parseFile(file);
+    }
+  }, [file, open]);
 
   const deckName = useMemo(
     () => decks.find((d) => d.id === targetDeck)?.name ?? t("csvImport.selectDeck"),
@@ -69,10 +78,7 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
     return result;
   }
 
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>): void {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  function parseFile(f: File): void {
     const reader = new FileReader();
     reader.onload = () => {
       const text = reader.result as string;
@@ -109,7 +115,13 @@ export function CsvImportDialog({ open, onClose, deckId }: CsvImportDialogProps)
       setRows(csvRows);
       toast.success(t("csvImport.parsedCards", { count: csvRows.length }));
     };
-    reader.readAsText(file);
+    reader.readAsText(f);
+  }
+
+  function handleFile(e: React.ChangeEvent<HTMLInputElement>): void {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    parseFile(f);
   }
 
   async function handleImport(): Promise<void> {

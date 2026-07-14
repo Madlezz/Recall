@@ -13,7 +13,9 @@
     "tagsView": "Tags",
     "statsView": "Statistics",
     "settingsView": "Settings",
-    "onboardingView": "Welcome to Recall"
+    "onboardingView": "Welcome to Recall",
+    "importHubView": "Import Hub",
+    "focusTimerView": "Focus Timer"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -34,6 +36,7 @@
     "openSettings": "Open settings",
     "showShortcuts": "Show keyboard shortcuts",
     "pressForShortcuts": "Press ? for shortcuts",
+    "importHub": "Import",
     "mainNav": "Main navigation",
     "mobileNav": "Mobile navigation"
   },
@@ -1147,7 +1150,12 @@
     "title": "Import Decks",
     "description": "Bring your existing flashcards into Recall. Your data stays local.",
     "dropTitle": "Drop your file here",
+    "dropHere": "Drop to import!",
     "dropHint": "Supports .apkg, .csv, .md, and .recall files",
+    "dropMarkdownHint": "Click the Markdown card to import this file.",
+    "dropAnkiHint": "Click the Anki card to import this file.",
+    "dropRecallHint": "Click the Recall card to import this package.",
+    "unsupportedFormat": "Unsupported file format. Try .csv, .apkg, .md, or .recall.",
     "anki": "Anki (.apkg)",
     "ankiDesc": "Import from Anki with scheduling and media preserved.",
     "csv": "CSV",

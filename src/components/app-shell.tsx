@@ -1,4 +1,4 @@
-import { Home, LayoutGrid, Library, Play, Settings, Shield, Star, Tag, Timer, TrendingUp, Zap } from "lucide-react";
+import { Home, LayoutGrid, Library, Play, Settings, Shield, Star, Tag, Timer, TrendingUp, Zap, Download } from "lucide-react";
 import { type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { CommandPalette } from "@/components/command-palette";
@@ -24,6 +24,8 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
   const showBrowser = useRecallStore((state) => state.showBrowser);
   const showDeckBrowser = useRecallStore((state) => state.showDeckBrowser);
   const showTags = useRecallStore((state) => state.showTags);
+  const showImportHub = useRecallStore((state) => state.showImportHub);
+  const showFocusTimer = useRecallStore((state) => state.showFocusTimer);
   const startReview = useRecallStore((state) => state.startReview);
   const startMatch = useRecallStore((state) => state.startMatch);
 
@@ -66,12 +68,13 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
           <NavButton active={view === "tags"} icon={Tag} label={t("nav.tags")} onClick={showTags} />
           <NavButton active={view === "stats"} icon={TrendingUp} label={t("nav.stats")} onClick={showStats} />
           <NavButton active={view === "settings"} icon={Settings} label={t("nav.settings")} onClick={showSettings} />
+          <NavButton active={view === "import-hub"} icon={Download} label={t("nav.importHub")} onClick={showImportHub} />
 
           {/* Tools section */}
           <div className="pt-3 pb-1 px-3">
             <span className="text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant">{t("nav.tools")}</span>
           </div>
-          <NavButton active={false} icon={Timer} label={t("nav.focusTimer")} onClick={showDashboard} />
+          <NavButton active={view === "focus-timer"} icon={Timer} label={t("nav.focusTimer")} onClick={showFocusTimer} />
           <NavButton
             active={view === "match"}
             icon={Zap}

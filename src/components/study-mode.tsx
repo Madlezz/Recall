@@ -263,7 +263,7 @@ export function StudyMode(): JSX.Element {
   // Compute card transform for visual feedback during swipe
   const cardTransform = isSwiping
     ? `translate(${swipeOffset.x * 0.5}px, ${swipeOffset.y * 0.5}px)`
-    : "translate(0, 0)";
+    : undefined;
 
   // Tint color based on swipe direction
   const swipeTint = isSwiping
@@ -377,11 +377,12 @@ export function StudyMode(): JSX.Element {
           {...(swipeEnabled ? touchHandlers : {})}
         >
           <div
-            className={cn("study-card relative min-h-[300px] sm:min-h-[380px] transition-transform", swipeTint)}
+            key={card?.id}
+            className={cn("study-card relative min-h-[300px] sm:min-h-[380px]", swipeTint)}
             data-revealed={activeStudy.revealed}
             style={{
-              transform: cardTransform,
-              transitionDuration: isSwiping ? "0ms" : "320ms",
+              ...(cardTransform ? { transform: cardTransform } : {}),
+              ...(isSwiping ? { transitionDuration: "0ms" } : {}),
             }}
           >
 {/* Front */}

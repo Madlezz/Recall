@@ -13,7 +13,9 @@
     "tagsView": "Tag",
     "statsView": "Statistik",
     "settingsView": "Pengaturan",
-    "onboardingView": "Selamat datang di Recall"
+    "onboardingView": "Selamat datang di Recall",
+    "importHubView": "Impor",
+    "focusTimerView": "Timer Fokus"
   },
   "nav": {
     "dashboard": "Beranda",
@@ -34,6 +36,7 @@
     "openSettings": "Buka pengaturan",
     "showShortcuts": "Tampilkan pintasan keyboard",
     "pressForShortcuts": "Tekan ? untuk pintasan",
+    "importHub": "Impor",
     "mainNav": "Navigasi utama",
     "mobileNav": "Navigasi seluler"
   },
@@ -1146,7 +1149,12 @@
     "title": "Impor Dek",
     "description": "Bawa flashcard yang sudah ada ke Recall. Data tetap lokal.",
     "dropTitle": "Letakkan file di sini",
+    "dropHere": "Lepas untuk impor!",
     "dropHint": "Mendukung file .apkg, .csv, .md, dan .recall",
+    "dropMarkdownHint": "Klik kartu Markdown untuk mengimpor file ini.",
+    "dropAnkiHint": "Klik kartu Anki untuk mengimpor file ini.",
+    "dropRecallHint": "Klik kartu Recall untuk mengimpor paket ini.",
+    "unsupportedFormat": "Format file tidak didukung. Coba .csv, .apkg, .md, atau .recall.",
     "anki": "Anki (.apkg)",
     "ankiDesc": "Impor dari Anki dengan penjadwalan dan media tersimpan.",
     "csv": "CSV",
