@@ -497,6 +497,8 @@
   "cardBrowser": {
     "title": "Card Browser",
     "cardCount": "{{count}} cards",
+    "listView": "List view",
+    "gridView": "Grid view",
     "loading": "loading...",
     "selectedCount": "{{count}} selected",
     "searchPlaceholder": "Search front, back, hint, tags...",

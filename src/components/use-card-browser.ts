@@ -61,6 +61,7 @@ export function useCardBrowser() {
   const [bulkTagInput, setBulkTagInput] = useState("");
   const [bulkTagMode, setBulkTagMode] = useState<"add" | "set" | "remove">("add");
   const [showBulkTag, setShowBulkTag] = useState(false);
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
 
   const deckMap = useMemo(() => {
     const map = new Map<string, Deck>();
@@ -262,6 +263,8 @@ export function useCardBrowser() {
     setBulkTagInput,
     setBulkTagMode,
     setShowBulkTag,
+    viewMode,
+    setViewMode,
     // store actions
     deleteCard,
     moveCard,

@@ -496,6 +496,8 @@
   "cardBrowser": {
     "title": "Browser Kartu",
     "cardCount": "{{count}} kartu",
+    "listView": "Tampilan daftar",
+    "gridView": "Tampilan grid",
     "loading": "memuat...",
     "selectedCount": "{{count}} dipilih",
     "searchPlaceholder": "Cari depan, belakang, petunjuk, tag...",

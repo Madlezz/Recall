@@ -1,4 +1,4 @@
-import { ArrowUpDown, ChevronLeft, ChevronRight, ExternalLink, Filter, PackageOpen, Search, Tag, X } from "lucide-react";
+import { ArrowUpDown, ChevronLeft, ChevronRight, ExternalLink, Filter, Grid3X3, List, PackageOpen, Search, Tag, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,6 +82,8 @@ export function CardBrowser(): JSX.Element {
     setBulkTagInput,
     setBulkTagMode,
     setShowBulkTag,
+    viewMode,
+    setViewMode,
     deleteCard,
     moveCard,
     updateCard,
@@ -188,6 +190,24 @@ export function CardBrowser(): JSX.Element {
           <p className="text-sm text-muted-foreground">
             {t("cardBrowser.cardCount", { count: totalCount })}{loading && ` · ${t("cardBrowser.loading")}`}{selected.size > 0 && <> · {t("cardBrowser.selectedCount", { count: selected.size })}</>}
           </p>
+        </div>
+        <div className="flex items-center gap-1 rounded-md border border-outline-variant p-0.5">
+          <button
+            onClick={() => setViewMode("table")}
+            className={`rounded px-2 py-1 text-xs transition-colors ${viewMode === "table" ? "bg-surface-container-high text-on-surface" : "text-on-surface-variant hover:text-on-surface"}`}
+            aria-label={t("cardBrowser.listView")}
+            aria-pressed={viewMode === "table"}
+          >
+            <List className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => setViewMode("grid")}
+            className={`rounded px-2 py-1 text-xs transition-colors ${viewMode === "grid" ? "bg-surface-container-high text-on-surface" : "text-on-surface-variant hover:text-on-surface"}`}
+            aria-label={t("cardBrowser.gridView")}
+            aria-pressed={viewMode === "grid"}
+          >
+            <Grid3X3 className="h-3.5 w-3.5" />
+          </button>
         </div>
       </div>
 
@@ -299,6 +319,8 @@ export function CardBrowser(): JSX.Element {
       )}
 
       {/* Table */}
+      {/* Table view */}
+      {viewMode === "table" && (
       <div className="overflow-x-auto rounded-lg border">
         <table className="w-full text-sm">
           <thead>
@@ -406,6 +428,43 @@ export function CardBrowser(): JSX.Element {
           </tbody>
         </table>
       </div>
+      )}
+
+      {/* Grid view */}
+      {viewMode === "grid" && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {paginatedCards.length === 0 ? (
+            <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
+              <PackageOpen className="mb-4 h-10 w-10 text-muted-foreground" />
+              <p className="text-sm font-medium text-foreground">{t("cardBrowser.emptyTitle")}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("cardBrowser.emptyDescription")}</p>
+            </div>
+          ) : (
+            paginatedCards.map((card) => (
+              <div
+                key={card.id}
+                className="rounded-lg border bg-surface p-4 hover:shadow-sm transition-shadow cursor-pointer"
+                onClick={() => showDeck?.(card.deckId)}
+              >
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <Badge tone="muted" className="text-[10px]">{deckMap[card.deckId]?.name ?? t("cardBrowser.unknownDeck")}</Badge>
+                  <Badge tone="warning" className={cn("text-[10px]", STATE_COLORS[card.state])}>{stateLabel(card.state)}</Badge>
+                </div>
+                <p className="text-sm font-medium line-clamp-2 mb-1">{card.front}</p>
+                <p className="text-xs text-muted-foreground line-clamp-2">{card.back}</p>
+                {card.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-3">
+                    {card.tags.slice(0, 3).map((tag) => (
+                      <Badge key={tag} tone="muted" className="text-[10px]">{tag}</Badge>
+                    ))}
+                    {card.tags.length > 3 && <span className="text-[10px] text-muted-foreground">+{card.tags.length - 3}</span>}
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (
