@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Star } from "lucide-react";
 import { useRecallStore } from "@/stores/recall-store";
 import { prefersReducedMotion, CONFETTI_COLORS } from "@/lib/xp";
-import { cardSurface } from "@/lib/surface";
+import { cardSurface, typeClass } from "@/lib/surface";
 import { Mascot } from "@/components/mascot";
 import { cn } from "@/lib/utils";
 
@@ -60,7 +60,7 @@ export function DailyGoal({ variant = "compact", className }: DailyGoalProps): J
         <div className="relative z-10">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-secondary font-bold">
+              <span className={cn(typeClass.label-lg, "text-secondary font-bold")}>
                 {t("dailyGoal.title")}
               </span>
               <h2 className="font-title-lg text-lg font-bold text-text-primary mt-1">
@@ -98,7 +98,7 @@ export function DailyGoal({ variant = "compact", className }: DailyGoalProps): J
   // Compact variant (original)
   return (
     <div className={cn(cardSurface("px-4 py-5"), className)}>
-      <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-on-surface-variant">
+      <span className={cn(typeClass.caption, "text-on-surface-variant tracking-[0.15em]")}>
         {t("dailyGoal.title")}
       </span>
 
