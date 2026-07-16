@@ -531,6 +531,173 @@ pub async fn delete_cards_atomic(
     Ok(())
 }
 
+/// Atomically move cards to a different deck.
+#[tauri::command]
+pub async fn move_cards_to_deck(
+    app: tauri::AppHandle,
+    card_ids: Vec<String>,
+    deck_id: String,
+) -> Result<(), String> {
+    if card_ids.is_empty() {
+        return Ok(());
+    }
+    let conn = open_db_connection(&app)?;
+
+    conn.execute_batch("BEGIN IMMEDIATE")
+        .map_err(|e| format!("BEGIN failed: {}", e))?;
+
+    // Build placeholders: (?, ?, ?, ?, ...)
+    let placeholders = card_ids.iter().map(|_| "?").collect::<Vec<_>>().join(", ");
+    let sql = format!(
+        "UPDATE cards SET deck_id = ? WHERE id IN ({})",
+        placeholders
+    );
+
+    let params: Vec<Box<dyn rusqlite::ToSql>> =
+        vec![Box::new(&deck_id) as Box<dyn rusqlite::ToSql>]
+            .into_iter()
+            .chain(card_ids.iter().map(|id| Box::new(id) as Box<dyn rusqlite::ToSql>))
+            .collect();
+
+    let param_refs: Vec<&dyn rusqlite::ToSql> = params.iter().map(|p| p.as_ref()).collect();
+
+    if let Err(e) = conn.execute(sql.as_str(), param_refs.as_slice()) {
+        let _ = conn.execute_batch("ROLLBACK");
+        return Err(format!("UPDATE cards deck_id failed: {}", e));
+    }
+
+    conn.execute_batch("COMMIT")
+        .map_err(|e| format!("COMMIT failed: {}", e))?;
+
+    Ok(())
+}
+
+/// Atomically update tags for multiple cards.
+#[tauri::command]
+pub async fn update_cards_tags(
+    app: tauri::AppHandle,
+    card_ids: Vec<String>,
+    tags: String,
+) -> Result<(), String> {
+    if card_ids.is_empty() {
+        return Ok(());
+    }
+    let conn = open_db_connection(&app)?;
+
+    conn.execute_batch("BEGIN IMMEDIATE")
+        .map_err(|e| format!("BEGIN failed: {}", e))?;
+
+    let placeholders = card_ids.iter().map(|_| "?").collect::<Vec<_>>().join(", ");
+    let sql = format!(
+        "UPDATE cards SET tags = ? WHERE id IN ({})",
+        placeholders
+    );
+
+    let params: Vec<Box<dyn rusqlite::ToSql>> =
+        vec![Box::new(&tags) as Box<dyn rusqlite::ToSql>]
+            .into_iter()
+            .chain(card_ids.iter().map(|id| Box::new(id) as Box<dyn rusqlite::ToSql>))
+            .collect();
+
+    let param_refs: Vec<&dyn rusqlite::ToSql> = params.iter().map(|p| p.as_ref()).collect();
+
+    if let Err(e) = conn.execute(sql.as_str(), param_refs.as_slice()) {
+        let _ = conn.execute_batch("ROLLBACK");
+        return Err(format!("UPDATE cards tags failed: {}", e));
+    }
+
+    conn.execute_batch("COMMIT")
+        .map_err(|e| format!("COMMIT failed: {}", e))?;
+
+    Ok(())
+}
+
+/// Atomically update the state for multiple cards.
+#[tauri::command]
+pub async fn update_cards_state(
+    app: tauri::AppHandle,
+    card_ids: Vec<String>,
+    state: String,
+) -> Result<(), String> {
+    if card_ids.is_empty() {
+        return Ok(());
+    }
+    let conn = open_db_connection(&app)?;
+
+    conn.execute_batch("BEGIN IMMEDIATE")
+        .map_err(|e| format!("BEGIN failed: {}", e))?;
+
+    let placeholders = card_ids.iter().map(|_| "?").collect::<Vec<_>>().join(", ");
+    let sql = format!(
+        "UPDATE cards SET state = ? WHERE id IN ({})",
+        placeholders
+    );
+
+    let params: Vec<Box<dyn rusqlite::ToSql>> =
+        vec![Box::new(&state) as Box<dyn rusqlite::ToSql>]
+            .into_iter()
+            .chain(card_ids.iter().map(|id| Box::new(id) as Box<dyn rusqlite::ToSql>))
+            .collect();
+
+    let param_refs: Vec<&dyn rusqlite::ToSql> = params.iter().map(|p| p.as_ref()).collect();
+
+    if let Err(e) = conn.execute(sql.as_str(), param_refs.as_slice()) {
+        let _ = conn.execute_batch("ROLLBACK");
+        return Err(format!("UPDATE cards state failed: {}", e));
+    }
+
+    conn.execute_batch("COMMIT")
+        .map_err(|e| format!("COMMIT failed: {}", e))?;
+
+    Ok(())
+}
+
+/// Atomically upsert multiple cards in a single transaction.
+#[tauri::command]
+pub async fn upsert_cards_batch(
+    app: tauri::AppHandle,
+    cards: Vec<CardRowData>,
+) -> Result<(), String> {
+    if cards.is_empty() {
+        return Ok(());
+    }
+    let conn = open_db_connection(&app)?;
+
+    conn.execute_batch("BEGIN IMMEDIATE")
+        .map_err(|e| format!("BEGIN failed: {}", e))?;
+
+    for card in &cards {
+        if let Err(e) = conn.execute(
+            "INSERT INTO cards (id, deck_id, front, back, hint, source, tags, card_type, state,
+             last_review_date, next_review_date, stability, difficulty, elapsed_days,
+             scheduled_days, reps, lapses, learning_steps, created_at, updated_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20)
+             ON CONFLICT(id) DO UPDATE SET
+               deck_id=excluded.deck_id, front=excluded.front, back=excluded.back, hint=excluded.hint,
+               source=excluded.source, tags=excluded.tags, card_type=excluded.card_type, state=excluded.state,
+               last_review_date=excluded.last_review_date, next_review_date=excluded.next_review_date,
+               stability=excluded.stability, difficulty=excluded.difficulty, elapsed_days=excluded.elapsed_days,
+               scheduled_days=excluded.scheduled_days, reps=excluded.reps, lapses=excluded.lapses,
+               learning_steps=excluded.learning_steps, updated_at=excluded.updated_at",
+            rusqlite::params![
+                card.id, card.deck_id, card.front, card.back, card.hint, card.source,
+                card.tags, card.card_type, card.state, card.last_review_date,
+                card.next_review_date, card.stability, card.difficulty, card.elapsed_days,
+                card.scheduled_days, card.reps, card.lapses, card.learning_steps,
+                card.created_at, card.updated_at,
+            ],
+        ) {
+            let _ = conn.execute_batch("ROLLBACK");
+            return Err(format!("UPSERT card '{}' failed: {}", card.id, e));
+        }
+    }
+
+    conn.execute_batch("COMMIT")
+        .map_err(|e| format!("COMMIT failed: {}", e))?;
+
+    Ok(())
+}
+
 /// Atomically upsert a single setting (insert or update).
 #[tauri::command]
 pub async fn upsert_setting_atomic(

@@ -133,6 +133,31 @@ export async function persistCardsBatchDelete(
   set({ ...snapshot, ...extra, error: null });
 }
 
+export async function persistCardsBatchMove(
+  set: StoreSet,
+  snapshot: RecallStateSnapshot,
+  cardIds: string[],
+  deckId: string,
+  extra: Record<string, unknown> = {},
+): Promise<void> {
+  const repository = await getRepository();
+  await repository.moveCards(cardIds, deckId);
+  applyTheme(snapshot.settings.theme);
+  set({ ...snapshot, ...extra, error: null });
+}
+
+export async function persistCardsBatchUpsert(
+  set: StoreSet,
+  snapshot: RecallStateSnapshot,
+  cards: Card[],
+  extra: Record<string, unknown> = {},
+): Promise<void> {
+  const repository = await getRepository();
+  await repository.upsertCards(cards);
+  applyTheme(snapshot.settings.theme);
+  set({ ...snapshot, ...extra, error: null });
+}
+
 export async function persistReviewSnapshot(
   set: StoreSet,
   snapshot: RecallStateSnapshot,

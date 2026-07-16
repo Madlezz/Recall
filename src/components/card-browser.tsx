@@ -83,9 +83,9 @@ export function CardBrowser(): JSX.Element {
     setShowBulkTag,
     viewMode,
     setViewMode,
-    deleteCard,
-    moveCard,
-    updateCard,
+    deleteCards: deleteCardsAction,
+    moveCards: moveCardsAction,
+    upsertCards: upsertCardsAction,
   } = useCardBrowser();
   const showDeck = useRecallStore((s) => s.showDeck);
   const { t } = useTranslation();
@@ -113,32 +113,16 @@ export function CardBrowser(): JSX.Element {
 
   async function bulkDelete() {
     const ids = [...selected];
-    for (const id of ids) {
-      try {
-        await deleteCard(id);
-      } catch {
-        // continue
-      }
-    }
+    await deleteCardsAction(ids);
     toast.success(t("cardBrowser.toasts.deleted", { count: ids.length }));
     clearSelection();
   }
 
   async function bulkMove(deckId: string) {
     const ids = [...selected];
-    let moved = 0;
-    for (const id of ids) {
-      try {
-        await moveCard(id, deckId);
-        moved++;
-      } catch {
-        // skip
-      }
-    }
-    if (moved > 0) {
-      const name = deckMap.get(deckId)?.name ?? deckId;
-      toast.success(t("cardBrowser.toasts.moved", { count: moved, name }));
-    }
+    await moveCardsAction(ids, deckId);
+    const name = deckMap.get(deckId)?.name ?? deckId;
+    toast.success(t("cardBrowser.toasts.moved", { count: ids.length, name }));
     clearSelection();
   }
 
@@ -150,29 +134,27 @@ export function CardBrowser(): JSX.Element {
     if (tags.length === 0 && bulkTagMode !== "remove") return;
 
     const ids = [...selected];
-    let updated = 0;
-    for (const id of ids) {
-      const card = cards.find((c) => c.id === id);
-      if (!card) continue;
-      try {
+    const idSet = new Set(ids);
+    const tagMode = bulkTagMode;
+    const updated = cards
+      .filter((c) => idSet.has(c.id))
+      .map((card) => {
         let newTags: string[];
-        if (bulkTagMode === "add") {
+        if (tagMode === "add") {
           newTags = [...new Set([...card.tags, ...tags])];
-        } else if (bulkTagMode === "set") {
+        } else if (tagMode === "set") {
           newTags = tags;
         } else {
           const removeSet = new Set(tags);
           newTags = card.tags.filter((tag) => !removeSet.has(tag));
         }
-        await updateCard(id, { deckId: card.deckId, front: card.front, back: card.back, hint: card.hint, source: card.source, tags: newTags });
-        updated++;
-      } catch {
-        // skip
-      }
-    }
-    const msg = bulkTagMode === "remove"
-      ? t("cardBrowser.toasts.untagged", { count: updated })
-      : t("cardBrowser.toasts.tagged", { count: updated });
+        return { ...card, tags: newTags };
+      });
+
+    await upsertCardsAction(updated);
+    const msg = tagMode === "remove"
+      ? t("cardBrowser.toasts.untagged", { count: updated.length })
+      : t("cardBrowser.toasts.tagged", { count: updated.length });
     toast.success(msg);
     setShowBulkTag(false);
     setBulkTagInput("");

@@ -37,7 +37,10 @@ export function useCardBrowser() {
   const cards = useRecallStore((s) => s.cards);
   const decks = useRecallStore((s) => s.decks);
   const deleteCard = useRecallStore((s) => s.deleteCard);
+  const deleteCards = useRecallStore((s) => s.deleteCards);
   const moveCard = useRecallStore((s) => s.moveCard);
+  const moveCards = useRecallStore((s) => s.moveCards);
+  const upsertCards = useRecallStore((s) => s.upsertCards);
   const updateCard = useRecallStore((s) => s.updateCard);
 
   // ── Filters & sort ──
@@ -267,7 +270,10 @@ export function useCardBrowser() {
     setViewMode,
     // store actions
     deleteCard,
+    deleteCards,
     moveCard,
+    moveCards,
+    upsertCards,
     updateCard,
   };
 }

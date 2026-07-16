@@ -51,6 +51,8 @@ export interface RecallRepository {
   deleteDeck(deckId: string): Promise<void>;
   deleteCard(cardId: string): Promise<void>;
   deleteCards(cardIds: string[]): Promise<void>;
+  moveCards(cardIds: string[], deckId: string): Promise<void>;
+  upsertCards(cards: Card[]): Promise<void>;
   queryCards(filters: { deckId?: string; state?: string; search?: string; sortField: string; sortDir: string; limit: number; offset: number }): Promise<{ cards: Card[]; total: number }>;
 }
 
@@ -483,13 +485,45 @@ class SqliteRecallRepository implements RecallRepository {
       }
     }
 
-    async deleteCards(cardIds: string[]): Promise<void> {
-      if (cardIds.length === 0) return;
-      if (isTauriRuntime()) {
-        const { invoke } = await import("@tauri-apps/api/core");
-        await invoke("delete_cards_atomic", { cardIds });
-      }
+  async deleteCards(cardIds: string[]): Promise<void> {
+    if (cardIds.length === 0) return;
+    if (isTauriRuntime()) {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("delete_cards_atomic", { cardIds });
     }
+  }
+
+  async moveCards(cardIds: string[], deckId: string): Promise<void> {
+    if (cardIds.length === 0) return;
+    if (isTauriRuntime()) {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("move_cards_to_deck", { cardIds, deckId });
+    }
+  }
+
+  async updateCardsTags(cardIds: string[], tags: string): Promise<void> {
+    if (cardIds.length === 0) return;
+    if (isTauriRuntime()) {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("update_cards_tags", { cardIds, tags });
+    }
+  }
+
+  async updateCardsState(cardIds: string[], state: string): Promise<void> {
+    if (cardIds.length === 0) return;
+    if (isTauriRuntime()) {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("update_cards_state", { cardIds, state });
+    }
+  }
+
+  async upsertCards(cards: Card[]): Promise<void> {
+    if (cards.length === 0) return;
+    if (isTauriRuntime()) {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("upsert_cards_batch", { cards: cards.map(cardToRow) });
+    }
+  }
 
     async queryCards(filters: { deckId?: string; state?: string; search?: string; sortField: string; sortDir: string; limit: number; offset: number }): Promise<{ cards: Card[]; total: number }> {
       if (!isTauriRuntime()) {
@@ -612,6 +646,21 @@ class LocalStorageRecallRepository implements RecallRepository {
     snapshot.cards = snapshot.cards.filter((c) => !idSet.has(c.id));
     await this.saveSnapshot(snapshot);
   }
+
+  async moveCards(cardIds: string[], deckId: string): Promise<void> {
+    const idSet = new Set(cardIds);
+    const snapshot = await this.loadAppData();
+    snapshot.cards = snapshot.cards.map((c) => idSet.has(c.id) ? { ...c, deckId } : c);
+    await this.saveSnapshot(snapshot);
+  }
+
+  async upsertCards(cards: Card[]): Promise<void> {
+    const snapshot = await this.loadAppData();
+    const map = new Map(cards.map((c) => [c.id, c]));
+    snapshot.cards = snapshot.cards.map((c) => map.get(c.id) ?? c);
+    await this.saveSnapshot(snapshot);
+  }
+
   async queryCards(_filters: { deckId?: string; state?: string; search?: string; sortField: string; sortDir: string; limit: number; offset: number }): Promise<{ cards: Card[]; total: number }> {
     // LocalStorage can't do DB-side queries; fallback to client-side
     const all = await this.loadAppData();

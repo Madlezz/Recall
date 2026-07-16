@@ -5,7 +5,8 @@ use anki_import::parse_anki_apkg;
 use db_atomic::{
     create_safety_backup, delete_card_atomic, delete_cards_atomic, delete_deck_atomic, query_cards,
     record_review_atomic, save_snapshot_atomic, upsert_card_atomic, upsert_deck_atomic,
-    upsert_setting_atomic,
+    upsert_setting_atomic, move_cards_to_deck, update_cards_tags, update_cards_state,
+    upsert_cards_batch,
 };
 use tauri::tray::{TrayIconBuilder, TrayIconEvent};
 use tauri::Emitter;
@@ -192,11 +193,15 @@ pub fn run() {
             create_safety_backup,
             upsert_deck_atomic,
             upsert_card_atomic,
+            upsert_cards_batch,
             delete_deck_atomic,
             delete_card_atomic,
             delete_cards_atomic,
             upsert_setting_atomic,
             query_cards,
+            move_cards_to_deck,
+            update_cards_tags,
+            update_cards_state,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Recall");

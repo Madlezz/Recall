@@ -1,3 +1,4 @@
+import * as React from "react";
 import { AlertCircle, ArrowLeft, BookOpen, Check, Clock, Edit3, EyeOff, RotateCcw, RotateCw, Timer, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
@@ -14,6 +15,40 @@ import { cardSurface, typeClass } from "@/lib/surface";
 import { matchesShortcut, shortcutLabel, DEFAULT_SHORTCUTS } from "@/lib/shortcuts";
 import { SessionSummaryModal } from "./study-mode/session-summary-modal";
 import { AnswerButton, CompletionStat } from "./study-mode/study-helpers";
+
+function formatElapsed(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, "0");
+  const s = (seconds % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+}
+
+const SessionTimer = React.memo(function SessionTimer({
+  startTime,
+}: {
+  startTime: number;
+}): JSX.Element {
+  const [elapsed, setElapsed] = useState(() => Math.floor((Date.now() - startTime) / 1000));
+  const rafRef = useRef<number>(0);
+  const prevTickRef = useRef<number>(startTime);
+
+  useEffect(() => {
+    const tick = () => {
+      const now = Date.now();
+      if (now - prevTickRef.current >= 950) {
+        prevTickRef.current = now;
+        setElapsed(Math.floor((now - startTime) / 1000));
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [startTime]);
+
+  return <span className="tabular-nums">{formatElapsed(elapsed)}</span>;
+});
+SessionTimer.displayName = "SessionTimer";
 
 export function StudyMode(): JSX.Element {
   const { t } = useTranslation();
@@ -113,22 +148,6 @@ export function StudyMode(): JSX.Element {
   }, [activeStudy, answerCurrentCard, revealAnswer, undoLastReview, buryCard, snoozeCard, settings, isSpeaking, card, t]);
 
   useEffect(() => { return () => { stopSpeaking(); if (ttsTimeoutRef.current) { clearTimeout(ttsTimeoutRef.current); ttsTimeoutRef.current = null; } }; }, [cardId]);
-
-  const [elapsed, setElapsed] = useState(0);
-  useEffect(() => {
-    if (!activeStudy || activeStudy.completed) return;
-    const start = new Date(activeStudy.startedAt).getTime();
-    const tick = () => setElapsed(Date.now() - start);
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-tick on activeStudy lifecycle
-    }, [activeStudy?.id, activeStudy?.completed]);
-
-  function formatElapsed(ms: number): string {
-    const sec = Math.floor(ms / 1000);
-    return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
-  }
 
   // ── Swipe gesture handling ──
   // Must be before early returns - hooks can't be conditional
@@ -325,7 +344,7 @@ export function StudyMode(): JSX.Element {
           <div className="flex items-center justify-center gap-2 text-sm tabular-nums text-on-surface-variant dark:text-on-surface-variant">
             <span className="flex items-center gap-1">
               <Timer className="h-3.5 w-3.5" />
-              {formatElapsed(elapsed)}
+              <SessionTimer startTime={new Date(activeStudy.startedAt).getTime()} />
             </span>
             <span className="text-on-surface-variant dark:text-on-surface-variant">·</span>
             <span>{activeStudy.currentIndex + 1} / {total}</span>

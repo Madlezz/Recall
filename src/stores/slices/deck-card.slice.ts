@@ -10,6 +10,8 @@ import {
   persistCardDelta,
   persistCardDelete,
   persistCardsBatchDelete,
+  persistCardsBatchMove,
+  persistCardsBatchUpsert,
   persistSnapshot,
   touchDeck,
   type StoreSet,
@@ -50,6 +52,8 @@ export interface DeckCardSlice {
   deleteCard: (cardId: string) => Promise<void>;
   deleteCards: (cardIds: string[]) => Promise<void>;
   moveCard: (cardId: string, deckId: string) => Promise<void>;
+  moveCards: (cardIds: string[], deckId: string) => Promise<void>;
+  upsertCards: (cards: Card[]) => Promise<void>;
   resetDeckProgress: (deckId: string) => Promise<void>;
 }
 
@@ -175,6 +179,26 @@ export const deckCardSlice = (
       reviewLogs: state.reviewLogs.filter((r: ReviewLog) => !idSet.has(r.cardId)),
     };
     await persistCardsBatchDelete(set, snapshot, cardIds);
+  },
+
+  async moveCards(cardIds: string[], deckId: string) {
+    if (cardIds.length === 0) return;
+    const idSet = new Set(cardIds);
+    const state = get();
+    const updatedCards = state.cards.map((c: Card) =>
+      idSet.has(c.id) && c.deckId !== deckId ? { ...c, deckId } : c,
+    );
+    const snapshot = { ...dataState(state), cards: updatedCards };
+    await persistCardsBatchMove(set, snapshot, cardIds, deckId);
+  },
+
+  async upsertCards(cards: Card[]) {
+    if (cards.length === 0) return;
+    const state = get();
+    const map = new Map(cards.map((c) => [c.id, c]));
+    const updatedCards = state.cards.map((c: Card) => map.get(c.id) ?? c);
+    const snapshot = { ...dataState(state), cards: updatedCards };
+    await persistCardsBatchUpsert(set, snapshot, cards);
   },
 
   async moveCard(cardId: string, deckId: string) {
