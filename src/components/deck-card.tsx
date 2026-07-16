@@ -1,8 +1,9 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { getDeckColorClass } from "@/lib/deck-colors";
-import { getDeckStats } from "@/lib/stats";
+import { forecastDueByDay, getDeckStats } from "@/lib/stats";
 import { cn } from "@/lib/utils";
+import { cardSurface, typeClass } from "@/lib/surface";
 import { useRecallStore } from "@/stores/recall-store";
 import type { Deck as DeckType } from "@/types";
 
@@ -14,11 +15,19 @@ interface DeckCardProps {
 export function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
   const { t } = useTranslation();
   const cards = useRecallStore((state) => state.cards);
-  const stats = getDeckStats(deck, cards);
+  const deckCards = useMemo(() => cards.filter((c) => c.deckId === deck.id), [cards, deck.id]);
+  const stats = getDeckStats(deck, deckCards);
   const due = deck.dueCount ?? stats.due;
   const newCards = stats.newCards;
   const learning = stats.learning;
   const progress = stats.total === 0 ? 0 : Math.round((stats.mastered / stats.total) * 100);
+
+  // Sparkline: 30-day due forecast
+  const sparkData = useMemo(() => {
+    const forecast = forecastDueByDay(deckCards, 30);
+    const max = Math.max(...forecast.map((f) => f.due), 1);
+    return forecast.map((f) => ({ height: Math.max(Math.round((f.due / max) * 20), 1) }));
+  }, [deckCards]);
 
   const abbr = useMemo(() => {
     const words = deck.name.trim().split(/\s+/);
@@ -30,9 +39,8 @@ export function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
     <button
       onClick={onOpen}
       className={cn(
-        "bg-surface border border-outline-variant",
-        "p-5 rounded-2xl text-left",
-        "hover:border-primary/30 hover:shadow-md transition-all cursor-pointer group",
+        cardSurface("p-5 text-left"),
+        "hover:shadow-md cursor-pointer group",
       )}
       aria-label={t("deck.openDeck", { name: deck.name })}
     >
@@ -46,13 +54,13 @@ export function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
           {abbr}
         </div>
         {due > 0 && (
-          <span className="bg-surface-variant px-3 py-1 rounded-full font-caption text-xs font-medium text-on-surface-variant">
+          <span className={cn("bg-surface-variant px-3 py-1 rounded-full", typeClass.caption, "text-on-surface-variant")}>
             {t("deck.duePill", { count: due })}
           </span>
         )}
       </div>
 
-      <h3 className="font-title-md text-lg font-semibold text-text-primary group-hover:text-primary transition-colors line-clamp-1">
+      <h3 className={cn(typeClass["title-md"], "text-text-primary group-hover:text-primary transition-colors line-clamp-1")}>
         {deck.name}
       </h3>
 
@@ -64,18 +72,41 @@ export function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
             style={{ width: `${progress}%` }}
           />
         </div>
-        <span className="font-caption text-xs text-outline tabular-nums">{progress}%</span>
+        <span className={cn(typeClass.caption, "text-outline tabular-nums")}>{progress}%</span>
       </div>
+
+      {/* 30-day due forecast sparkline */}
+      {stats.total > 0 && (
+        <svg
+          viewBox="0 0 90 24"
+          className="w-full h-6 mt-4"
+          role="img"
+          aria-label={t("deck.dueForecastAria", { count: due })}
+          preserveAspectRatio="none"
+        >
+          {sparkData.map((bar, i) => (
+            <rect
+              key={i}
+              x={i * 3}
+              y={24 - bar.height}
+              width={2}
+              height={bar.height}
+              className="fill-primary/40"
+              rx={0.5}
+            />
+          ))}
+        </svg>
+      )}
 
       {/* New / Learning counts */}
       <div className="flex mt-4 gap-4">
         <div className="flex flex-col">
-          <span className="font-caption text-xs text-outline">{t("deck.newCardsLabel")}</span>
-          <span className="font-label-lg text-sm font-semibold text-text-primary">{newCards}</span>
+          <span className={cn(typeClass.caption, "text-outline")}>{t("deck.newCardsLabel")}</span>
+          <span className={cn(typeClass["label-lg"], "text-sm font-semibold text-text-primary")}>{newCards}</span>
         </div>
         <div className="flex flex-col border-l border-outline-variant pl-4">
-          <span className="font-caption text-xs text-outline">{t("deck.learningLabel")}</span>
-          <span className="font-label-lg text-sm font-semibold text-text-primary">{learning}</span>
+          <span className={cn(typeClass.caption, "text-outline")}>{t("deck.learningLabel")}</span>
+          <span className={cn(typeClass["label-lg"], "text-sm font-semibold text-text-primary")}>{learning}</span>
         </div>
       </div>
     </button>

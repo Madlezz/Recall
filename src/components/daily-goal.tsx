@@ -60,10 +60,10 @@ export function DailyGoal({ variant = "compact", className }: DailyGoalProps): J
         <div className="relative z-10">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <span className={cn(typeClass.label-lg, "text-secondary font-bold")}>
+              <span className={cn(typeClass["label-lg"], "text-secondary font-bold")}>
                 {t("dailyGoal.title")}
               </span>
-              <h2 className="font-title-lg text-lg font-bold text-text-primary mt-1">
+              <h2 className={cn(typeClass["title-lg"], "text-text-primary mt-1")}>
                 {t("dailyGoal.countLabel", { done, goal })}
               </h2>
             </div>

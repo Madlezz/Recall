@@ -404,7 +404,7 @@ export function StudyMode(): JSX.Element {
 {/* Front */}
 	            <div className={cn("study-card-face absolute inset-0 flex flex-col justify-center", cardSurface("p-5 shadow-sm sm:p-10"))}>
 	              <div className="flex items-center gap-2">
-	                <span className={cn(typeClass.label-lg, "rounded-full bg-primary-soft px-3 py-1 text-primary")}>
+		        <span className={cn(typeClass["label-lg"], "rounded-full bg-primary-soft px-3 py-1 text-primary")}>
 	                  {card.cardType === "cloze" ? t("study.clozeType") : card.cardType === "image-occlusion" ? t("study.imageOcclusionType") : t("study.basicType")}
 	                </span>
 	              </div>

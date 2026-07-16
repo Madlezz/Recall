@@ -8,7 +8,7 @@ import { DeckCard } from "@/components/deck-card";
 import { RecentActivity } from "@/components/recent-activity";
 import { getStudyStreak, getDueTodayCount } from "@/lib/stats";
 import { cn } from "@/lib/utils";
-import { cardSurface } from "@/lib/surface";
+import { cardSurface, typeClass } from "@/lib/surface";
 import { useRecallStore } from "@/stores/recall-store";
 
 export function Dashboard(): JSX.Element {
@@ -48,10 +48,10 @@ export function Dashboard(): JSX.Element {
       {/* ── Hero ── */}
       <section className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="font-display text-[1.75rem] font-bold leading-tight tracking-tight text-text-primary sm:text-[2rem]">
+          <h1 className={cn(typeClass["title-lg"], "text-text-primary")}>
             {greeting}
           </h1>
-          <p className="font-body-lg text-body-lg text-text-secondary mt-2">
+          <p className={cn(typeClass["body-lg"], "text-text-secondary mt-2")}>
             {dueCount > 0
               ? t("dashboard.cardsReady", { count: dueCount })
               : t("dashboard.description")}
@@ -80,7 +80,7 @@ export function Dashboard(): JSX.Element {
         {/* Your Decks header */}
         <div className="col-span-12 mt-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-title-lg text-title-lg text-text-primary">
+            <h2 className={cn(typeClass["title-lg"], "text-text-primary")}>
               {t("dashboard.yourDecks")}
             </h2>
             <button
@@ -107,7 +107,7 @@ export function Dashboard(): JSX.Element {
               <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-surface-container-low">
                 <Library className="h-8 w-8 text-on-surface-variant" />
               </div>
-              <h3 className="font-headline text-xl font-bold tracking-tight text-on-surface">
+              <h3 className={cn(typeClass.headline, "text-xl font-bold text-on-surface")}>
                 {t("dashboard.emptyTitle")}
               </h3>
               <p className="mt-2 max-w-sm text-sm leading-relaxed text-on-surface-variant">

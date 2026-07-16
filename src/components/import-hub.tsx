@@ -8,7 +8,7 @@ import { RecallImportDialog } from "@/components/recall-import-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { parseBulkCards } from "@/lib/bulk-parser";
-import { cardSurface, dashedSurface } from "@/lib/surface";
+import { cardSurface, dashedSurface, typeClass } from "@/lib/surface";
 import { cn } from "@/lib/utils";
 import { useRecallStore } from "@/stores/recall-store";
 import { toast } from "sonner";
@@ -84,7 +84,7 @@ export function ImportHub(): JSX.Element {
   return (
     <div className="animate-fade-in max-w-[768px] mx-auto px-gutter-mobile py-6">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="font-display text-2xl font-bold tracking-tight text-text-primary">
+        <h1 className={cn(typeClass.display, "text-2xl font-bold text-text-primary")}>
           {t("importHub.title")}
         </h1>
         <button
@@ -115,7 +115,7 @@ export function ImportHub(): JSX.Element {
         ) : (
           <Upload className="h-10 w-10 text-outline mb-4" />
         )}
-        <p className="font-label-lg text-sm font-semibold text-text-primary mb-1">
+        <p className={cn(typeClass["label-lg"], "text-sm font-semibold text-text-primary mb-1")}>
           {dragOver ? t("importHub.dropHere") : t("importHub.dropTitle")}
         </p>
         <p className="text-xs text-on-surface-variant">
@@ -159,7 +159,7 @@ export function ImportHub(): JSX.Element {
             <ArrowRight className="h-5 w-5 text-primary" />
           </div>
           <div className="flex-1">
-            <p className="font-label-lg text-sm font-semibold text-text-primary">{t("importHub.recall")}</p>
+            <p className={cn(typeClass["label-lg"], "text-sm font-semibold text-text-primary")}>{t("importHub.recall")}</p>
             <p className="text-xs text-on-surface-variant">{t("importHub.recallDesc")}</p>
           </div>
           <RecallImportDialog />
@@ -276,7 +276,7 @@ function ImportCard({
       <div className="w-12 h-12 rounded-xl bg-primary-soft flex items-center justify-center mb-4 group-hover:bg-primary-container transition-colors">
         <Icon className="h-5 w-5 text-primary" />
       </div>
-      <h3 className="font-label-lg text-sm font-semibold text-text-primary mb-1">{title}</h3>
+      <h3 className={cn(typeClass["label-lg"], "text-sm font-semibold text-text-primary mb-1")}>{title}</h3>
       <p className="text-xs text-on-surface-variant mb-3">{desc}</p>
       {dialog}
     </div>

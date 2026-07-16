@@ -48,6 +48,7 @@ vi.mock("@/lib/stats", () => ({
   getStudyStreak: () => 3,
   isCardDueToday: () => true,
   getDueTodayCount: (cards: any[]) => cards.length,
+  forecastDueByDay: () => [],
   getNewCardsReviewedToday: () => 0,
 }));
 vi.mock("@/lib/xp", () => ({

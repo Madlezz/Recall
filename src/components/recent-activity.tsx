@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { CheckCircle, TrendingUp } from "lucide-react";
 import { useRecallStore } from "@/stores/recall-store";
-import { cardSurface } from "@/lib/surface";
+import { cardSurface, typeClass } from "@/lib/surface";
 import { cn } from "@/lib/utils";
 
 function relativeTime(dateStr: string, t: (key: string, opts?: Record<string, unknown>) => string): string {
@@ -75,7 +75,7 @@ export function RecentActivity(): JSX.Element | null {
 
   return (
     <div>
-      <h2 className="font-title-lg text-lg font-bold text-text-primary mb-4">
+      <h2 className={cn(typeClass["title-lg"], "text-text-primary mb-4")}>
         {t("activity.title")}
       </h2>
       <div className="space-y-3">
@@ -100,14 +100,14 @@ export function RecentActivity(): JSX.Element | null {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-label-lg text-sm font-semibold text-text-primary truncate">
+              <p className={cn(typeClass["label-lg"], "text-text-primary truncate")}>
                 {a.title}
               </p>
-              <p className="font-caption text-xs text-outline truncate">
+              <p className={cn(typeClass.caption, "text-outline truncate")}>
                 {a.subtitle}
               </p>
             </div>
-            <span className="font-caption text-xs text-outline shrink-0">
+            <span className={cn(typeClass.caption, "text-outline shrink-0")}>
               {a.timestamp}
             </span>
           </div>

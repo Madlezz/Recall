@@ -128,7 +128,8 @@
     "customStudySession": "Custom study session",
     "newCardsLabel": "New",
     "learningLabel": "Learning",
-    "duePill": "{{count}} Due"
+    "duePill": "{{count}} Due",
+    "dueForecastAria": "{{count}} cards due in next 30 days"
   },
   "streak": {
     "title": "Streak",

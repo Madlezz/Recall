@@ -48,9 +48,6 @@ export function MatchGame(): JSX.Element {
   const addXp = useRecallStore((state) => state.addXp);
   const showDashboard = useRecallStore((state) => state.showDashboard);
   const selectedDeckId = useRecallStore((state) => state.selectedDeckId);
-  const decks = useRecallStore((state) => state.decks);
-
-  const deck = selectedDeckId ? decks.find((d) => d.id === selectedDeckId) : null;
   const deckCards = cards.filter((c) => c.deckId === selectedDeckId);
   const pairCount = Math.min(6, Math.max(2, Math.floor(deckCards.length / 2)));
 
@@ -293,7 +290,7 @@ export function MatchGame(): JSX.Element {
             {t("matchGame.summary", { total: totalPairs, time: formatTime(elapsed), moves })}
           </p>
           {xpEarned > 0 && (
-            <p className={cn(typeClass.label-lg, "mt-2 text-on-secondary-container")}>
+            <p className={cn(typeClass["label-lg"], "mt-2 text-on-secondary-container")}>
               {t("matchGame.xpEarned", { count: xpEarned })}
             </p>
           )}

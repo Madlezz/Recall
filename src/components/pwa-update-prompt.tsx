@@ -52,7 +52,7 @@ export function PWAUpdatePrompt(): JSX.Element {
         <Download className="h-4 w-4" aria-hidden="true" />
       </div>
       <div className="flex-1">
-        <p className={cn(typeClass.label-lg, "text-text-primary")}>
+        <p className={cn(typeClass["label-lg"], "text-text-primary")}>
           {t("pwa.updateAvailable", "Update available")}
         </p>
         <p className={cn(typeClass.caption, "mt-0.5 text-on-surface-variant")}>

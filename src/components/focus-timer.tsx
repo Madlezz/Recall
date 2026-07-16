@@ -143,8 +143,8 @@ export function FocusTimer(): JSX.Element {
   const circumference = 2 * Math.PI * 72;
 
   // Shared chip button classes matching stitch filter-chip pattern
-  const chipActive = "rounded-full bg-primary text-on-primary font-label-lg text-label-lg";
-  const chipInactive = "rounded-full bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-low transition-colors";
+  const chipActive = cn("rounded-full bg-primary text-on-primary", typeClass["label-lg"]);
+  const chipInactive = cn("rounded-full bg-surface border border-outline-variant text-on-surface-variant hover:bg-surface-container-low transition-colors", typeClass["label-lg"]);
 
   return (
     <div className={cn(
@@ -193,7 +193,7 @@ export function FocusTimer(): JSX.Element {
               {formatTime(remaining)}
             </span>
             <span className={cn(
-              typeClass.label-lg,
+              typeClass["label-lg"],
               "mt-0.5 transition-colors duration-500",
               showCompletionFlash ? "text-tertiary" : "text-on-surface-variant",
             )}>

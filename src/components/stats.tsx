@@ -58,7 +58,7 @@ export function Stats(): JSX.Element {
   return (
     <div className="animate-fade-in max-w-[1152px] mx-auto px-gutter-mobile py-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-2xl font-bold tracking-tight text-text-primary">
+        <h1 className={cn(typeClass.display, "text-2xl font-bold text-text-primary")}>
           {t("stats.title")}
         </h1>
         <button
@@ -133,7 +133,7 @@ export function Stats(): JSX.Element {
                   <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-text-primary">{pct}%</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-label-lg text-sm font-semibold text-text-primary truncate">{deck.name}</p>
+                  <p className={cn(typeClass["label-lg"], "text-text-primary truncate")}>{deck.name}</p>
                   <p className="text-xs text-outline">{t("stats.cardsMastered", { mastered: stats.mastered, total: stats.total })}</p>
                 </div>
               </div>

@@ -354,7 +354,7 @@ export function Onboarding(): JSX.Element {
               <span className="font-display text-[4.5rem] font-bold leading-none tracking-tight text-text-primary tabular-nums">
                 {goal}
               </span>
-              <span className="font-body-lg text-base text-on-surface-variant ml-1">
+              <span className={cn(typeClass["body-lg"], "text-on-surface-variant ml-1")}>
                 {t("onboarding.cardsPerDay")}
               </span>
             </div>
