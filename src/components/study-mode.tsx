@@ -63,10 +63,10 @@ export function StudyMode(): JSX.Element {
     if (ttsTimeoutRef.current) { clearTimeout(ttsTimeoutRef.current); ttsTimeoutRef.current = null; }
     if (activeStudy?.revealed) {
       // Read back when answer revealed
-      ttsTimeoutRef.current = setTimeout(() => speakText(card.back, "en-US", settings.ttsSpeed), 300);
+      ttsTimeoutRef.current = setTimeout(() => speakText(card.back, undefined, settings.ttsSpeed), 300);
     } else {
       // Read front when card shown
-      ttsTimeoutRef.current = setTimeout(() => speakText(card.front, "en-US", settings.ttsSpeed), 300);
+      ttsTimeoutRef.current = setTimeout(() => speakText(card.front, undefined, settings.ttsSpeed), 300);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- only trigger on card/reveal change
   }, [card?.id, activeStudy?.revealed, settings?.ttsEnabled, settings?.ttsAutoRead]);
@@ -94,7 +94,7 @@ export function StudyMode(): JSX.Element {
         if (matchesShortcut(event, sc.snooze)) { event.preventDefault(); void snoozeCard(120); toast.info(t("study.snoozed")); return; }
         if (matchesShortcut(event, sc.tts) && settings?.ttsEnabled) {
           event.preventDefault();
-          if (isSpeaking) { stopSpeaking(); } else { speakText(card!.front, "en-US", settings.ttsSpeed); }
+          if (isSpeaking) { stopSpeaking(); } else { speakText(card!.front, undefined, settings.ttsSpeed); }
           return;
         }
       }
@@ -348,7 +348,7 @@ export function StudyMode(): JSX.Element {
                   stopSpeaking();
                 } else {
                   const text = activeStudy.revealed ? `${card.front} ${card.back}` : card.front;
-                  speakText(text, "en-US", settings.ttsSpeed);
+                  speakText(text, undefined, settings.ttsSpeed);
                 }
               }}
               className={`min-h-[44px] min-w-[44px] rounded-md p-1.5 transition-colors ${
@@ -402,7 +402,11 @@ export function StudyMode(): JSX.Element {
             }}
           >
 {/* Front */}
-	            <div className={cn("study-card-face absolute inset-0 flex flex-col justify-center", cardSurface("p-5 shadow-sm sm:p-10"))}>
+		          <div
+			            className={cn("study-card-face absolute inset-0 flex flex-col justify-center", cardSurface("p-5 shadow-sm sm:p-10"))}
+		            aria-hidden={activeStudy.revealed}
+		            inert={activeStudy.revealed || undefined}
+		          >
 	              <div className="flex items-center gap-2">
 		        <span className={cn(typeClass["label-lg"], "rounded-full bg-primary-soft px-3 py-1 text-primary")}>
 	                  {card.cardType === "cloze" ? t("study.clozeType") : card.cardType === "image-occlusion" ? t("study.imageOcclusionType") : t("study.basicType")}
@@ -417,7 +421,11 @@ export function StudyMode(): JSX.Element {
               )}
             </div>
             {/* Back */}
-            <div className={cn("study-card-face study-card-back absolute inset-0 flex flex-col justify-center", cardSurface("p-5 shadow-sm sm:p-10"))}>
+            <div
+              className={cn("study-card-face study-card-back absolute inset-0 flex flex-col justify-center", cardSurface("p-5 shadow-sm sm:p-10"))}
+              aria-hidden={!activeStudy.revealed}
+              inert={!activeStudy.revealed || undefined}
+            >
               <p className={cn(typeClass.caption, "text-on-surface-variant uppercase tracking-[0.15em]")}>{t("study.answer")}</p>
               <div className="mt-4 text-balance text-lg font-semibold leading-relaxed text-text-primary dark:text-text-primary sm:mt-5 sm:text-2xl">
                 <RichCard content={card.back} isBack allowHtml={settings?.allowHtml} />

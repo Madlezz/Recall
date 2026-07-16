@@ -1,3 +1,10 @@
+/**
+ * @module repository
+ * @description DB abstraction layer. Supports Dexie (browser) and Rusqlite (Tauri).
+ * @entryPoints saveSnapshot, saveSettings, loadAppData, replaceDataFromImport, mergeDataFromImport, resetToSeedData
+ * @secrets NEVER include syncCode/syncRelayUrl/syncEnabled from imports — use preserveDeviceSyncSettings().
+ * @backup Backups via buildExportPayload — include device on-disk backup creation before destructive ops.
+ */
 import {
   cardFromRow,
   cardToRow,
@@ -394,6 +401,9 @@ class SqliteRecallRepository implements RecallRepository {
     async replaceDataFromImport(payload: RecallExportPayload): Promise<RecallStateSnapshot> {
       const snapshot = exportPayloadToSnapshot(payload);
       validateImportSnapshot(snapshot);
+      // Keep the device's own sync credentials — never trust an import file.
+      const device = await this.loadAppData();
+      snapshot.settings = preserveDeviceSyncSettings(snapshot.settings, device.settings);
 
       // Create safety backup before destructive import
       if (isTauriRuntime()) {
@@ -413,6 +423,8 @@ class SqliteRecallRepository implements RecallRepository {
     async mergeDataFromImport(current: RecallStateSnapshot, payload: RecallExportPayload): Promise<RecallStateSnapshot> {
       validateImportSnapshot(exportPayloadToSnapshot(payload));
       const snapshot = mergeImportPayload(current, payload);
+      // mergeImportPayload already returns current.settings, but stay defensive.
+      snapshot.settings = preserveDeviceSyncSettings(snapshot.settings, current.settings);
       validateImportSnapshot(snapshot);
       await this.saveSnapshot(snapshot);
       return snapshot;
@@ -615,6 +627,30 @@ function exportPayloadToSnapshot(payload: RecallExportPayload): RecallStateSnaps
     reviewLogs: payload.reviewLogs,
     settings: migrateSettings(payload.settings),
   };
+}
+
+// Sync credentials are per-device secrets — syncCode IS the E2E key.
+// Never let an imported file override them: a crafted .recall could set syncCode
+// + syncRelayUrl + syncEnabled and redirect the user's data to an attacker relay.
+const SYNC_SECRET_KEYS = [
+  "syncFolder",
+  "syncEnabled",
+  "syncCode",
+  "syncRelayUrl",
+  "syncLastAt",
+  "syncAutoInterval",
+] as const satisfies readonly (keyof RecallStateSnapshot["settings"])[];
+
+export function preserveDeviceSyncSettings(
+  imported: RecallStateSnapshot["settings"],
+  device: RecallStateSnapshot["settings"],
+): RecallStateSnapshot["settings"] {
+  const next = { ...imported };
+  for (const key of SYNC_SECRET_KEYS) {
+    // @ts-expect-error indexed copy of known same-typed keys
+    next[key] = device[key];
+  }
+  return next;
 }
 
 function migrateSettings(settings: Partial<RecallStateSnapshot["settings"]> & { theme: string; seededAt: string }): RecallStateSnapshot["settings"] {

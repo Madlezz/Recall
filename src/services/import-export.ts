@@ -1,3 +1,10 @@
+/**
+ * @module import-export
+ * @description Serialization, validation, and merge for .recall export files.
+ * @entryPoints exportDeckToJson, parseImportPayload, mergeImportPayload, buildExportPayload, validateImportSnapshot
+ * @crypto Calls crypto.encryptData/decryptData for image payloads.
+ * @sideEffects Writes buildExportPayload(result) to disk (backup/sync). Never includes syncCode in exports — repo layer strips it.
+ */
 import type { Card, Deck, RecallExportPayload, RecallStateSnapshot, ReviewLog, StudySession } from "@/types";
 import { isCardState, isDeckColor, isReviewRating } from "@/lib/domain";
 import { createId, normalizeName } from "@/lib/utils";
@@ -151,11 +158,17 @@ export async function exportDeckPackage(deck: Deck, cards: Card[]): Promise<{ js
 
   // Read images from app data dir and convert to base64
   if (imageRefs.length > 0) {
+    // Dynamic import catch: Tauri not available in browser
+    let dir: string | undefined;
     try {
       const { appDataDir } = await import("@tauri-apps/api/path");
+      dir = await appDataDir();
+    } catch {
+      // Browser fallback: images will be empty
+      dir = undefined;
+    }
+    if (dir) {
       const { readFile } = await import("@tauri-apps/plugin-fs");
-      const dir = await appDataDir();
-
       for (const filename of imageRefs) {
         try {
           const data = await readFile(`${dir}images/${filename}`);
@@ -168,8 +181,6 @@ export async function exportDeckPackage(deck: Deck, cards: Card[]): Promise<{ js
           failed.push(filename);
         }
       }
-    } catch {
-      // Browser fallback: images will be empty
     }
   }
 

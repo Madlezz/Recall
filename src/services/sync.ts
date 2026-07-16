@@ -1,5 +1,5 @@
 import type { RecallStateSnapshot, RecallExportPayload } from "@/types";
-import { buildExportPayload, mergeImportPayload } from "./import-export";
+import { buildExportPayload, parseImportPayload, mergeImportPayload } from "./import-export";
 
 /**
  * Folder-based sync service
@@ -46,7 +46,7 @@ export async function importFromSyncFolder(
     const { readTextFile } = await import("@tauri-apps/plugin-fs");
     const { join } = await import("@tauri-apps/api/path");
     const content = await readTextFile(await join(syncFolder, filename));
-    const data = JSON.parse(content) as RecallExportPayload;
+    const data = parseImportPayload(content);
 
     // Validate version
     if (data.version !== 2) {

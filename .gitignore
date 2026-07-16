@@ -33,3 +33,15 @@ src-tauri/gen/schemas/
 sync-relay/node_modules
 sync-relay/.wrangler
 sync-relay/.dev.vars
+
+# Agent tooling (Obsidian vault + graphify graph)
+graphify-out/
+.obsidian/
+.agents/
+.hermes/
+
+# Playwright MCP session artifacts
+.playwright-mcp/
+
+# Root-level audit/screenshot artifacts
+/audit-dashboard.png

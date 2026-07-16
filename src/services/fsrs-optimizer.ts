@@ -68,7 +68,7 @@ export function optimizeFromHistory(
   const optimizedWeights = [...default_w];
 
   // Adjust w0-w3 (initial stability for Again, Hard, Good, Easy)
-  if (firstReviewAnalysis.hasData) {
+  if (firstReviewAnalysis.hasData && firstReviewAnalysis.totalCount > 0) {
     // If users rate "Again" often on first review, reduce initial stability
     // If users rate "Good/Easy" often, increase initial stability
     const againRatio = firstReviewAnalysis.againCount / firstReviewAnalysis.totalCount;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { RecallStateSnapshot } from "@/types";
-import { validateImportSnapshot } from "@/services/repository";
+import { preserveDeviceSyncSettings, validateImportSnapshot } from "@/services/repository";
 
 const validSnapshot: RecallStateSnapshot = {
   decks: [
@@ -146,5 +146,51 @@ describe("validateImportSnapshot", () => {
         reviewLogs: [{ ...validSnapshot.reviewLogs[0], rating: "maybe" as never }],
       }),
     ).toThrow("Invalid review rating");
+  });
+});
+
+describe("preserveDeviceSyncSettings", () => {
+  const deviceSettings = {
+    syncFolder: "/safe/vault",
+    syncEnabled: true,
+    syncCode: "DEVICE-SECRET-KEY",
+    syncRelayUrl: "https://device.relay",
+    syncLastAt: "2026-01-01T00:00:00.000Z",
+    syncAutoInterval: 15,
+  } as const;
+
+  const importedSettings = {
+    syncFolder: "/evil/vault",
+    syncEnabled: true,
+    syncCode: "ATTACKER-KEY",
+    syncRelayUrl: "https://evil.relay",
+    syncLastAt: null,
+    syncAutoInterval: 0,
+  } as const;
+
+  it("never lets an import override the device sync credentials", () => {
+    const result = preserveDeviceSyncSettings(
+      importedSettings as unknown as RecallStateSnapshot["settings"],
+      deviceSettings as unknown as RecallStateSnapshot["settings"],
+    );
+    expect(result.syncCode).toBe("DEVICE-SECRET-KEY");
+    expect(result.syncRelayUrl).toBe("https://device.relay");
+    expect(result.syncFolder).toBe("/safe/vault");
+    expect(result.syncEnabled).toBe(true);
+    expect(result.syncAutoInterval).toBe(15);
+  });
+
+  it("preserves non-sync settings from the imported payload", () => {
+    const merged = {
+      ...importedSettings,
+      theme: "dark" as const,
+      dailyGoal: 50,
+    } as unknown as RecallStateSnapshot["settings"];
+    const result = preserveDeviceSyncSettings(
+      merged,
+      deviceSettings as unknown as RecallStateSnapshot["settings"],
+    );
+    expect(result.theme).toBe("dark");
+    expect(result.dailyGoal).toBe(50);
   });
 });

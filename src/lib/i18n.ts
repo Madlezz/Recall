@@ -23,4 +23,11 @@ i18n
     },
   });
 
+// Sync <html lang> when i18n detects or switches language.
+i18n.on("languageChanged", (lng) => {
+  if (typeof document !== "undefined") {
+    document.documentElement.lang = lng;
+  }
+});
+
 export default i18n;

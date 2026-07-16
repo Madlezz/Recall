@@ -269,9 +269,12 @@ describe("DeckDetail", () => {
       expect.objectContaining({
         desiredRetention: 0.92,
         fsrsWeights: [1, 2, 3],
-        voiceInputEnabled: true,
-        swipeGestures: true,
       }),
     );
+    // Must not clobber existing user settings (regression: GH-#optimizer-bug)
+    const call = mockStore.updateSettings.mock.calls[0][0];
+    expect(call).not.toHaveProperty("voiceInputEnabled");
+    expect(call).not.toHaveProperty("swipeGestures");
+    expect(call).not.toHaveProperty("shortcuts");
   });
 });

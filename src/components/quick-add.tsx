@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { useRecallStore } from "@/stores/recall-store";
 import { useVoiceInput } from "@/hooks/use-voice-input";
 
@@ -37,8 +38,6 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
       if (decks.length > 0 && !deckId) {
         setDeckId(decks[0].id);
       }
-      // Focus front input after open animation
-      setTimeout(() => frontRef.current?.focus(), 100);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- deckId intentionally omitted
   }, [open, decks]);
@@ -73,31 +72,11 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
     }
   }
 
-  function handleKeyDown(e: React.KeyboardEvent): void {
-    if (e.key === "Escape") {
-      onClose();
-    }
-  }
-
-  if (!open) return <></>;
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] bg-black/40"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="quick-add-title"
-    >
-      <div
-        className="mx-4 w-full max-w-lg border border-outline-variant bg-surface p-6 text-text-primary shadow-sm dark:border-outline-variant dark:bg-background dark:text-text-primary"
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={handleKeyDown}
-      >
-        <div className="mb-5">
-          <h2 id="quick-add-title" className="text-base font-medium tracking-tight text-text-primary dark:text-text-primary">{t("quickAdd.title")}</h2>
-          <p className="text-sm text-on-surface-variant dark:text-on-surface-variant">{t("quickAdd.pressEscapeToClose")}</p>
-        </div>
+    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="max-w-lg" aria-describedby={undefined}>
+        <DialogTitle id="quick-add-title">{t("quickAdd.title")}</DialogTitle>
+        <DialogDescription>{t("quickAdd.pressEscapeToClose")}</DialogDescription>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           {decks.length > 0 ? (
@@ -183,7 +162,7 @@ export function QuickAddDialog({ open, onClose }: QuickAddProps): JSX.Element {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

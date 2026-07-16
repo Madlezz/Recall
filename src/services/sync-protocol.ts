@@ -15,7 +15,7 @@
  */
 
 import type { RecallStateSnapshot, RecallExportPayload } from "@/types";
-import { buildExportPayload, mergeImportPayload } from "./import-export";
+import { buildExportPayload, mergeImportPayload, parseImportPayload } from "./import-export";
 import { encryptData, decryptData, type EncryptedPayload } from "./crypto";
 
 /**
@@ -104,6 +104,7 @@ async function downloadEncrypted(
   relayUrl: string,
   deviceId: string,
 ): Promise<EncryptedPayload | null> {
+  enforceHttps(relayUrl);
   const response = await fetch(`${relayUrl}/sync/${blobKey}`, {
     method: "GET",
     headers: {
@@ -114,21 +115,55 @@ async function downloadEncrypted(
   if (response.status === 404) return null; // No data yet
   if (!response.ok) throw new Error(`Sync relay error: ${response.status}`);
 
-  return (await response.json()) as EncryptedPayload;
+  // Cap response size to prevent resource exhaustion (max 5MB)
+  const body = await response.text();
+  if (body.length > 5 * 1024 * 1024) {
+    throw new Error("Sync payload exceeds maximum size (5MB)");
+  }
+
+  let payload: unknown;
+  try {
+    payload = JSON.parse(body);
+  } catch {
+    throw new Error("Invalid sync relay response: not valid JSON");
+  }
+
+  // Validate required fields
+  if (
+    typeof payload !== "object" ||
+    payload === null ||
+    !("ciphertext" in payload) ||
+    !("iv" in payload) ||
+    typeof (payload as EncryptedPayload).ciphertext !== "string" ||
+    typeof (payload as EncryptedPayload).iv !== "string"
+  ) {
+    throw new Error("Invalid sync relay response: missing ciphertext/iv");
+  }
+
+  return payload as EncryptedPayload;
 }
 
 /**
- * Perform a full bidirectional sync:
- * 1. Download remote encrypted blob
- * 2. Decrypt it
- * 3. Merge with local state
- * 4. Re-encrypt merged state
- * 5. Upload to relay
- *
- * @param localState Current local state
- * @param config Sync configuration
- * @returns Sync result with merged snapshot
+ * Enforce HTTPS on relay URLs. Plaintext HTTP exposes deviceId + encrypted blobs
+ * to network sniffers, defeating the purpose of E2E encryption metadata protection.
  */
+function enforceHttps(relayUrl: string): string {
+  if (!relayUrl.startsWith("https://")) {
+    throw new Error("Sync relay must use HTTPS");
+  }
+  return relayUrl;
+}
+
+/**
+ * Validate the shape of a decrypted sync payload before merging.
+ * Prevents type-corrupt data from mangling local state.
+ */
+function validateDecryptedPayload(raw: string): RecallExportPayload {
+  const parsed = parseImportPayload(raw);
+  // mergeImportPayload already reconstructs a valid snapshot structure,
+  // and the final snapshot is validated via validateImportSnapshot at call-site.
+  return parsed;
+}
 export async function performEncryptedSync(
   localState: RecallStateSnapshot,
   config: SyncConfig,
@@ -150,7 +185,7 @@ export async function performEncryptedSync(
     if (remotePayload) {
       // Step 2: Decrypt remote data
       const remoteJson = await decryptData(remotePayload, config.syncCode);
-      const remoteData = JSON.parse(remoteJson) as RecallExportPayload;
+      const remoteData = validateDecryptedPayload(remoteJson);
 
       // Step 3: Merge remote into local
       const beforeDecks = localState.decks.length;

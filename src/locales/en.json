@@ -42,10 +42,10 @@
     "mainNav": "Main navigation",
     "mobileNav": "Mobile navigation"
   },
-  "library": {
-    "title": "Library",
-    "decks": "{{count}} deck",
-    "decks_plural": "{{count}} decks",
+    "library": {
+      "title": "Library",
+      "decks_one": "{{count}} deck",
+      "decks_other": "{{count}} decks",
     "cards": "cards"
   },
   "level": {
@@ -88,8 +88,8 @@
   },
   "deckBrowser": {
     "title": "My Decks",
-    "count": "{{count}} deck",
-    "count_plural": "{{count}} decks",
+    "count_one": "{{count}} deck",
+    "count_other": "{{count}} decks",
     "searchPlaceholder": "Search decks...",
     "filterAria": "Filter decks",
     "filterAll": "All",
@@ -111,8 +111,8 @@
     "accuracy": "Accuracy",
     "cards": "Cards",
     "retention": "{{percent}}% retention",
-    "leech": "{{count}} leech",
-    "leech_plural": "{{count}} leeches",
+    "leech_one": "{{count}} leech",
+    "leech_other": "{{count}} leeches",
     "overdue": "{{count}} overdue",
     "newCards": "{{count}} new",
     "examToday": "Today!",

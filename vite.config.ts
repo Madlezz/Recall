@@ -62,6 +62,7 @@ export default defineConfig(({ mode }) => ({
             if (id.includes("i18next") || id.includes("react-i18next")) return "i18n";
             if (id.includes("@radix-ui")) return "ui";
             if (id.includes("react-markdown") || id.includes("remark") || id.includes("rehype") || id.includes("katex")) return "markdown";
+            if (id.includes("ts-fsrs")) return "fsrs";
           }
         },
       },

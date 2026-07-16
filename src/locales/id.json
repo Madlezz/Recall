@@ -42,8 +42,8 @@
   },
   "library": {
     "title": "Perpustakaan",
-    "decks": "{{count}} dek",
-    "decks_plural": "{{count}} dek",
+    "decks_one": "{{count}} dek",
+    "decks_other": "{{count}} dek",
     "cards": "kartu"
   },
   "level": {
@@ -86,7 +86,8 @@
   },
   "deckBrowser": {
     "title": "Dek Saya",
-    "count": "{{count}} dek",
+    "count_one": "{{count}} dek",
+    "count_other": "{{count}} dek",
     "searchPlaceholder": "Cari dek...",
     "filterAria": "Filter dek",
     "filterAll": "Semua",
@@ -108,8 +109,8 @@
     "accuracy": "Akurasi",
     "cards": "Kartu",
     "retention": "{{percent}}% retensi",
-    "leech": "{{count}} lintah",
-    "leech_plural": "{{count}} lintah",
+    "leech_one": "{{count}} lintah",
+    "leech_other": "{{count}} lintah",
     "overdue": "{{count}} terlambat",
     "newCards": "{{count}} baru",
     "examToday": "Hari ini!",

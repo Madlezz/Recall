@@ -143,7 +143,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
           >
             <Play className="h-4 w-4" />
             {dueCount > 0 && (
-              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-secondary px-1.5 text-[10px] font-semibold text-on-secondary">
+              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-secondary-container px-1.5 text-[10px] font-semibold text-on-secondary-container">
                 {dueCount}
               </span>
             )}
@@ -215,7 +215,7 @@ function BottomTab({ active, icon: Icon, label, onClick, badge }: BottomTabProps
           )}
         />
         {badge !== undefined && badge > 0 && (
-          <span className="absolute -right-2 -top-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-secondary px-1 text-[9px] font-bold text-on-secondary">
+          <span className="absolute -right-2 -top-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-secondary-container px-1 text-[9px] font-bold text-on-secondary-container">
             {badge}
           </span>
         )}
@@ -257,7 +257,7 @@ function NavButton({ active, icon: Icon, label, onClick, badge }: NavButtonProps
       <Icon className="h-4 w-4 shrink-0" />
       <span className="flex-1 text-left">{label}</span>
       {badge !== undefined && badge > 0 && (
-        <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-secondary px-1.5 text-[10px] font-semibold text-on-secondary">
+        <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-secondary-container px-1.5 text-[10px] font-semibold text-on-secondary-container">
           {badge}
         </span>
       )}
