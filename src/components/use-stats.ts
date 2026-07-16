@@ -69,7 +69,7 @@ function aggregateStats(
  * Sliding window over per-day buckets: O(n + days) instead of O(n × days).
  */
 function retentionOverTime(buckets: Map<string, RatingCounts>, days: string[]): number[] {
-  let w = { again: 0, hard: 0, good: 0, easy: 0 };
+  const w = { again: 0, hard: 0, good: 0, easy: 0 };
   const result: number[] = [];
 
   for (let i = 0; i < days.length; i++) {

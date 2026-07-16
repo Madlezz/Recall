@@ -21,7 +21,7 @@ export default tseslint.config(
           ...reactHooks.configs.recommended.rules,
           "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
           "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
-          "@typescript-eslint/no-explicit-any": "warn",
+          "@typescript-eslint/no-explicit-any": "error",
           "react-hooks/set-state-in-effect": "off",
           "react-hooks/preserve-manual-memoization": "off",
         },
@@ -30,6 +30,12 @@ export default tseslint.config(
     files: ["src/components/ui/**/*.{ts,tsx}"],
     rules: {
       "react-refresh/only-export-components": "off",
+    },
+  },
+  {
+    files: ["src/**/__tests__/**", "src/**/*.{test,spec}.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "warn",
     },
   },
 );

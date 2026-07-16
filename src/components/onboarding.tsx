@@ -37,8 +37,8 @@ export function Onboarding(): JSX.Element {
   async function handleImportAndFinish(): Promise<void> {
     try {
       if (selectedTemplates.size > 0) {
-        const allDecks: any[] = [];
-        const allCards: any[] = [];
+        const allDecks: Deck[] = [];
+        const allCards: Card[] = [];
         for (const templateId of selectedTemplates) {
           const template = TEMPLATE_DECKS.find((tpl) => tpl.id === templateId);
           if (template) {
