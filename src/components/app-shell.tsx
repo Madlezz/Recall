@@ -1,5 +1,5 @@
-import { Home, LayoutGrid, Library, Play, Settings, Shield, Star, Tag, Timer, TrendingUp, Zap, Download } from "lucide-react";
-import { type ReactNode } from "react";
+import { Home, LayoutGrid, Library, Play, Settings, Shield, Star, Tag, Timer, TrendingUp, Zap, Download, MoreHorizontal } from "lucide-react";
+import { type ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CommandPalette } from "@/components/command-palette";
 import { RecallLogo } from "@/components/recall-logo";
@@ -28,6 +28,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
   const showFocusTimer = useRecallStore((state) => state.showFocusTimer);
   const startReview = useRecallStore((state) => state.startReview);
   const startMatch = useRecallStore((state) => state.startMatch);
+  const [showMore, setShowMore] = useState(false);
 
   const dueCount = getDueTodayCount(cards);
 
@@ -182,11 +183,84 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         <BottomTab active={view === "deck-browser"} icon={Library} label={t("nav.decks")} onClick={showDeckBrowser} />
         <BottomTab active={view === "browser"} icon={LayoutGrid} label={t("nav.browser")} onClick={showBrowser} />
         <BottomTab active={view === "stats"} icon={TrendingUp} label={t("nav.stats")} onClick={showStats} />
+        <BottomTab active={showMore} icon={MoreHorizontal} label={t("nav.moreNav")} onClick={() => setShowMore(true)} />
       </nav>
 
       {/* ── Command Palette ── */}
       <CommandPalette />
+
+      {/* ── Mobile "More" overflow sheet ── */}
+      {showMore && (
+        <div
+          className="fixed inset-0 z-50 flex items-end lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t("nav.tools")}
+        >
+          <button
+            type="button"
+            aria-label={t("nav.closeNav")}
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setShowMore(false)}
+          />
+          <div className="relative w-full rounded-t-2xl border-t border-outline-variant bg-surface-container p-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] shadow-2xl">
+            <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-outline-variant" aria-hidden />
+            <MoreSheetItem
+              icon={Tag}
+              label={t("nav.tags")}
+              active={view === "tags"}
+              onClick={() => { showTags(); setShowMore(false); }}
+            />
+            <MoreSheetItem
+              icon={Download}
+              label={t("nav.importHub")}
+              active={view === "import-hub"}
+              onClick={() => { showImportHub(); setShowMore(false); }}
+            />
+            <MoreSheetItem
+              icon={Timer}
+              label={t("nav.focusTimer")}
+              active={view === "focus-timer"}
+              onClick={() => { showFocusTimer(); setShowMore(false); }}
+            />
+            <MoreSheetItem
+              icon={Settings}
+              label={t("nav.settings")}
+              active={view === "settings"}
+              onClick={() => { showSettings(); setShowMore(false); }}
+            />
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+function MoreSheetItem({
+  icon: Icon,
+  label,
+  active,
+  onClick,
+}: {
+  icon: typeof Tag;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}): JSX.Element {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-base font-medium transition-colors",
+        active
+          ? "bg-primary-soft text-on-primary-soft"
+          : "text-on-surface hover:bg-surface-variant",
+      )}
+    >
+      <Icon className="h-5 w-5" />
+      {label}
+    </button>
   );
 }
 
