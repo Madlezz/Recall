@@ -5,6 +5,8 @@ import { getStudyStreak } from "@/lib/streak";
 import { getLevel, getLevelTitle } from "@/lib/xp";
 import type { ReviewLog } from "@/types";
 
+type RatingCounts = { again: number; hard: number; good: number; easy: number };
+
 function lastNDays(n: number): string[] {
   const days: string[] = [];
   for (let i = n - 1; i >= 0; i--) {
@@ -13,60 +15,90 @@ function lastNDays(n: number): string[] {
   return days;
 }
 
-function reviewsByDay(logs: ReviewLog[]): Map<string, number> {
-  const map = new Map<string, number>();
-  for (const log of logs) {
-    const day = log.reviewDate.slice(0, 10);
-    map.set(day, (map.get(day) ?? 0) + 1);
-  }
-  return map;
-}
+// Exported for unit testing the aggregation logic.
+export { aggregateStats, retentionOverTime };
 
-function ratingsByDay(logs: ReviewLog[]): Map<string, { again: number; hard: number; good: number; easy: number }> {
-  const map = new Map<string, { again: number; hard: number; good: number; easy: number }>();
-  for (const log of logs) {
-    const day = log.reviewDate.slice(0, 10);
-    const entry = map.get(day) ?? { again: 0, hard: 0, good: 0, easy: 0 };
-    entry[log.rating]++;
-    map.set(day, entry);
-  }
-  return map;
-}
-
-function reviewsByHour(logs: ReviewLog[]): number[] {
-  const hours = new Array(24).fill(0) as number[];
-  for (const log of logs) {
-    const h = new Date(log.reviewDate).getHours();
-    hours[h]++;
-  }
-  return hours;
-}
-
-/** Compute rolling 7-day retention rate for each of the last N days. */
-function retentionOverTime(logs: ReviewLog[], days: string[]): number[] {
-  // Sort logs by date
-  const sorted = [...logs].sort((a, b) => a.reviewDate.localeCompare(b.reviewDate));
-
-  return days.map((day, idx) => {
-    // Get all reviews up to and including this day
-    const windowStart = idx >= 6 ? days[idx - 6] : days[0];
-    const windowLogs = sorted.filter(
-      (log) => log.reviewDate.slice(0, 10) >= windowStart && log.reviewDate.slice(0, 10) <= day
-    );
-    if (windowLogs.length < 3) return -1; // Not enough data
-    const goodEasy = windowLogs.filter((l) => l.rating === "good" || l.rating === "easy").length;
-    return Math.round((goodEasy / windowLogs.length) * 100);
-  });
-}
-
-function deckReviewCounts(logs: ReviewLog[], cards: { id: string; deckId: string }[]): Map<string, number> {
+/**
+ * Single-pass aggregation over reviewLogs.
+ * Replaces 6 separate O(n) scans (+1 O(n×30) nested filter) with one O(n) pass.
+ */
+function aggregateStats(
+  logs: ReviewLog[],
+  cards: { id: string; deckId: string }[],
+): {
+  byDay: Map<string, number>;
+  byDayRatings: Map<string, RatingCounts>;
+  byHour: number[];
+  deckCounts: Map<string, number>;
+  ratingDist: RatingCounts;
+  buckets: Map<string, RatingCounts>;
+} {
   const cardDeck = new Map(cards.map((c) => [c.id, c.deckId]));
-  const map = new Map<string, number>();
+  const byDay = new Map<string, number>();
+  const byDayRatings = new Map<string, RatingCounts>();
+  const byHour = new Array(24).fill(0) as number[];
+  const deckCounts = new Map<string, number>();
+  const ratingDist: RatingCounts = { again: 0, hard: 0, good: 0, easy: 0 };
+  const buckets = new Map<string, RatingCounts>();
+
   for (const log of logs) {
+    const day = log.reviewDate.slice(0, 10);
+    byDay.set(day, (byDay.get(day) ?? 0) + 1);
+
+    const rc = byDayRatings.get(day) ?? { again: 0, hard: 0, good: 0, easy: 0 };
+    rc[log.rating]++;
+    byDayRatings.set(day, rc);
+
+    byHour[new Date(log.reviewDate).getHours()]++;
+
     const deckId = cardDeck.get(log.cardId);
-    if (deckId) map.set(deckId, (map.get(deckId) ?? 0) + 1);
+    if (deckId) deckCounts.set(deckId, (deckCounts.get(deckId) ?? 0) + 1);
+
+    ratingDist[log.rating]++;
+
+    const b = buckets.get(day) ?? { again: 0, hard: 0, good: 0, easy: 0 };
+    b[log.rating]++;
+    buckets.set(day, b);
   }
-  return map;
+
+  return { byDay, byDayRatings, byHour, deckCounts, ratingDist, buckets };
+}
+
+/**
+ * Rolling 7-day retention (good+easy / total) per day.
+ * Sliding window over per-day buckets: O(n + days) instead of O(n × days).
+ */
+function retentionOverTime(buckets: Map<string, RatingCounts>, days: string[]): number[] {
+  let w = { again: 0, hard: 0, good: 0, easy: 0 };
+  const result: number[] = [];
+
+  for (let i = 0; i < days.length; i++) {
+    const cur = buckets.get(days[i]);
+    if (cur) {
+      w.again += cur.again;
+      w.hard += cur.hard;
+      w.good += cur.good;
+      w.easy += cur.easy;
+    }
+    // Drop the day that falls outside the 7-day window.
+    if (i >= 7) {
+      const old = buckets.get(days[i - 7]);
+      if (old) {
+        w.again -= old.again;
+        w.hard -= old.hard;
+        w.good -= old.good;
+        w.easy -= old.easy;
+      }
+    }
+    const total = w.again + w.hard + w.good + w.easy;
+    if (total < 3) {
+      result.push(-1);
+    } else {
+      result.push(Math.round(((w.good + w.easy) / total) * 100));
+    }
+  }
+
+  return result;
 }
 
 export function useStats() {
@@ -87,48 +119,32 @@ export function useStats() {
   const title = useMemo(() => getLevelTitle(level), [level]);
 
   const days = useMemo(() => lastNDays(30), []);
-  const byDay = useMemo(() => reviewsByDay(reviewLogs), [reviewLogs]);
-  const byDayRatings = useMemo(() => ratingsByDay(reviewLogs), [reviewLogs]);
-  const byHour = useMemo(() => reviewsByHour(reviewLogs), [reviewLogs]);
-  const deckCounts = useMemo(() => deckReviewCounts(reviewLogs, cards), [reviewLogs, cards]);
+  const stats = useMemo(() => aggregateStats(reviewLogs, cards), [reviewLogs, cards]);
 
-  const dayData = useMemo(() => days.map((d) => byDay.get(d) ?? 0), [days, byDay]);
+  const dayData = useMemo(() => days.map((d) => stats.byDay.get(d) ?? 0), [days, stats]);
   const dayRatingData = useMemo(
-    () => days.map((d) => byDayRatings.get(d) ?? { again: 0, hard: 0, good: 0, easy: 0 }),
-    [days, byDayRatings],
+    () => days.map((d) => stats.byDayRatings.get(d) ?? { again: 0, hard: 0, good: 0, easy: 0 }),
+    [days, stats],
   );
-  const retentionData = useMemo(
-    () => retentionOverTime(reviewLogs, days),
-    [reviewLogs, days],
-  );
+  const retentionData = useMemo(() => retentionOverTime(stats.buckets, days), [days, stats]);
 
   const totalReviews = reviewLogs.length;
-  const maxHour = Math.max(1, ...byHour);
+  const maxHour = Math.max(1, ...stats.byHour);
   const totalSessions = studySessions.length;
 
-  const ratingDist = useMemo(() => {
-    let again = 0, hard = 0, good = 0, easy = 0;
-    for (const log of reviewLogs) {
-      if (log.rating === "again") again++;
-      else if (log.rating === "hard") hard++;
-      else if (log.rating === "good") good++;
-      else easy++;
-    }
-    return { again, hard, good, easy };
-  }, [reviewLogs]);
-
+  const ratingDist = stats.ratingDist;
   const totalRated = ratingDist.again + ratingDist.hard + ratingDist.good + ratingDist.easy;
   const accuracy = totalRated > 0 ? Math.round(((ratingDist.good + ratingDist.easy) / totalRated) * 100) : 0;
 
   const topDecks = useMemo(() => {
-    return [...deckCounts.entries()]
+    return [...stats.deckCounts.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5)
       .map(([deckId, count]) => {
         const deck = decks.find((d) => d.id === deckId);
         return { name: deck?.name ?? "Unknown Deck", count };
       });
-  }, [deckCounts, decks]);
+  }, [stats, decks]);
 
   return {
     reviewLogs,
@@ -143,7 +159,7 @@ export function useStats() {
     dayData,
     dayRatingData,
     retentionData,
-    byHour,
+    byHour: stats.byHour,
     maxHour,
     totalReviews,
     totalSessions,
