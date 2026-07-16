@@ -141,7 +141,7 @@ Swipe gestures work natively - swipe left/right/up/down to rate cards after reve
 ### Testing
 
 ```bash
-pnpm test            # Unit tests (761 tests)
+pnpm test            # Unit tests (776 tests, 32% coverage gate)
 pnpm lint            # ESLint
 pnpm build           # Production build
 pnpm test:e2e        # Playwright E2E (requires `pnpm dev` running first)
