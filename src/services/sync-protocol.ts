@@ -22,12 +22,22 @@ import { buildExportPayload, mergeImportPayload, parseImportPayload } from "./im
 import { encryptData, decryptData, type EncryptedPayload } from "./crypto";
 
 /**
- * Sync relay URL.
- * Default is the official Recall relay. Users can self-host by setting syncRelayUrl in settings.
- * The official relay is deployed as a Cloudflare Worker - see sync-relay/ directory.
+ * Built-in default relay URL.
+ * Empty on purpose: Recall does not run a maintainer-funded public relay.
+ * Users self-host `sync-relay/` (Cloudflare Worker + R2) or use folder/file sync.
+ * See docs/DEPLOYMENT.md and AGENTS.md Cost / infra.
  */
 export function getDefaultRelayUrl(): string {
-  return "https://sync.recall.app";
+  return "";
+}
+
+/** Trim + require non-empty HTTPS relay (self-hosted). */
+export function resolveRelayUrl(relayUrl: string | null | undefined): string {
+  const trimmed = (relayUrl ?? "").trim().replace(/\/+$/, "");
+  if (!trimmed) {
+    throw new Error("Sync relay URL required (self-host sync-relay/ or set your worker URL)");
+  }
+  return enforceHttps(trimmed);
 }
 
 export interface SyncConfig {
@@ -221,7 +231,8 @@ async function syncOnce(
   deviceId: string,
   blobKey: string,
 ): Promise<Pick<SyncResult, "uploaded" | "downloaded" | "mergedSnapshot" | "changes">> {
-  const remote = await downloadEncrypted(blobKey, config.relayUrl, deviceId);
+  const relayUrl = resolveRelayUrl(config.relayUrl);
+  const remote = await downloadEncrypted(blobKey, relayUrl, deviceId);
 
   if (remote) {
     const remoteJson = await decryptData(remote.payload, config.syncCode);
@@ -229,7 +240,7 @@ async function syncOnce(
     const merged = mergeImportPayload(localState, remoteData);
     const exportPayload = buildExportPayload(merged);
     const encrypted = await encryptData(JSON.stringify(exportPayload), config.syncCode);
-    await uploadEncrypted(encrypted, blobKey, config.relayUrl, deviceId, remote.etag);
+    await uploadEncrypted(encrypted, blobKey, relayUrl, deviceId, remote.etag);
     return {
       downloaded: true,
       uploaded: true,
@@ -241,7 +252,7 @@ async function syncOnce(
   // First sync — create with If-Match: 0
   const exportPayload = buildExportPayload(localState);
   const encrypted = await encryptData(JSON.stringify(exportPayload), config.syncCode);
-  await uploadEncrypted(encrypted, blobKey, config.relayUrl, deviceId, "0");
+  await uploadEncrypted(encrypted, blobKey, relayUrl, deviceId, "0");
   return {
     downloaded: false,
     uploaded: true,
@@ -264,6 +275,8 @@ export async function performEncryptedSync(
   const blobKey = await getBlobKey(config.syncCode);
 
   try {
+    // Fail fast if relay missing/invalid before network
+    resolveRelayUrl(config.relayUrl);
     try {
       const once = await syncOnce(localState, config, deviceId, blobKey);
       Object.assign(result, once);
@@ -289,7 +302,7 @@ export async function performEncryptedSync(
  */
 export async function testSyncRelay(relayUrl: string): Promise<boolean> {
   try {
-    const safeUrl = enforceHttps(relayUrl);
+    const safeUrl = resolveRelayUrl(relayUrl);
     const response = await fetch(`${safeUrl}/health`, { method: "GET" });
     return response.ok;
   } catch {
@@ -305,7 +318,7 @@ export async function deleteSyncData(config: SyncConfig): Promise<boolean> {
   const blobKey = await getBlobKey(config.syncCode);
 
   try {
-    const safeUrl = enforceHttps(config.relayUrl);
+    const safeUrl = resolveRelayUrl(config.relayUrl);
     const response = await fetch(`${safeUrl}/sync/${blobKey}`, {
       method: "DELETE",
       headers: { "X-Device-Id": deviceId },
