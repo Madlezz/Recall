@@ -69,7 +69,7 @@ Status: open / partial / fixed (prior) / wontfix
 
 | ID | Sev | Finding | Evidence | Status |
 |---|---|---|---|---|
-| S1 | **H** | **`syncCode` stored in plaintext** in settings (SQLite `sync_code` / browser snapshot). Sync code *is* E2E key material. Disk theft / backup scrape = full account hijack for that pair. | `types.ts` settings; `db/mappers.ts` `sync_code`; no `src/services/sync-secret.ts` | open |
+| S1 | **H** | **`syncCode` stored in plaintext** → device-local AES-GCM wrap via `sync-secret.ts` on load/save. Not OS keychain yet. | `sync-secret.ts` + repository seal/unseal | **partial 2026-07-17** (wrap done; keyring later) |
 | S2 | **H** | **Docs lie about at-rest protection.** `docs/SYNC.md` describes `sync-secret.ts` wrapping key in IndexedDB; file was removed (`f9a0d998` "orphaned sync-secret.ts") and is **absent**. | `docs/SYNC.md` L74–89; `test -f` → NO | open (docs + product) |
 | S3 | **H** | **`enforceHttps` only on download path.** Fixed: upload/download/health/delete all use returned `safeUrl`. | `sync-protocol.ts` + `sync-protocol.test.ts` | **fixed 2026-07-17** |
 | S4 | **M** | **Relay last-writer-wins.** No ETag / revision / If-Match. Two devices syncing near-simultaneously can clobber. Merge is full-snapshot LWW after decrypt. | `worker.ts` PUT overwrite; `performEncryptedSync` | open (known) |

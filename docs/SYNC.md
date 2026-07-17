@@ -77,15 +77,16 @@ device.
 or logged. Import paths strip device sync fields via
 `preserveDeviceSyncSettings()` in `repository.ts`.
 
-**At-rest status (2026-07-17):** the sync code is still stored **in plaintext**
-in app settings (SQLite `sync_code` on desktop, snapshot/localStorage in the
-browser). There is no wrapping key / OS keychain integration yet.
-`sync-secret.ts` was removed as orphaned work and is **not** in the tree.
+**At-rest status (2026-07-17):** `syncCode` is wrapped before disk write via
+`src/services/sync-secret.ts` (AES-GCM with a random device key). Format:
+`enc:v1:` + base64(JSON ciphertext/iv). The device key is stored in IndexedDB
+(`recall-secrets`) with a `localStorage` mirror for restricted webviews.
 
-Treat disk encryption / full-disk access control as the current boundary for
-at-rest secrecy. Planned work (see [`AUDIT.md`](./AUDIT.md) item S1): wrap the
-code with a device-local AES-GCM key (IndexedDB on web; platform keyring on
-Tauri) and migrate existing plaintext on load.
+- In-memory / Zustand still holds **plaintext** so crypto + UI work unchanged.
+- Legacy plaintext values are accepted on load and rewritten sealed on the next
+  `saveSettings` / `saveSnapshot`.
+- Not yet OS keychain / Tauri stronghold — a stolen device key + DB still
+  reveals the code. Upgrade path: platform keyring (see AUDIT S1).
 
 ## Import safety boundary
 

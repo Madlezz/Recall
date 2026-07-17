@@ -28,9 +28,47 @@ import { isCardState, isCardType, isDeckColor, isReviewRating } from "@/lib/doma
 import { normalizeName } from "@/lib/utils";
 import { mergeImportPayload } from "@/services/import-export";
 import { DEFAULT_SHORTCUTS } from "@/lib/shortcuts";
+import { isWrappedSyncCode, sealSettingsSecrets, unsealSettingsSecrets } from "@/services/sync-secret";
 import type { Card, Deck, RecallExportPayload, RecallStateSnapshot, ReviewLog, StudySession, Theme } from "@/types";
 
 const STORAGE_KEY = "recall.snapshot.v1";
+
+type UnsealedLoad = {
+  snapshot: RecallStateSnapshot;
+  /** True when disk held legacy plaintext syncCode that should be rewritten sealed. */
+  needsSealMigration: boolean;
+};
+
+/** Decrypt device-local secrets after reading from disk. */
+async function unsealSnapshot(snapshot: RecallStateSnapshot): Promise<UnsealedLoad> {
+  const raw = snapshot.settings.syncCode;
+  const needsSealMigration = !!raw && !isWrappedSyncCode(raw);
+  const settings = await unsealSettingsSecrets(snapshot.settings);
+  if (settings === snapshot.settings) {
+    return { snapshot, needsSealMigration };
+  }
+  return { snapshot: { ...snapshot, settings }, needsSealMigration };
+}
+
+/**
+ * Clone snapshot with syncCode wrapped for disk write.
+ * Does not mutate the in-memory (plaintext) snapshot callers keep using.
+ */
+async function sealSnapshotForDisk(snapshot: RecallStateSnapshot): Promise<RecallStateSnapshot> {
+  const settings = await sealSettingsSecrets(snapshot.settings);
+  if (settings === snapshot.settings) return snapshot;
+  return { ...snapshot, settings };
+}
+
+/** Rewrite legacy plaintext syncCode once (in-memory is already plaintext). */
+async function migratePlaintextSyncCode(
+  repo: Pick<RecallRepository, "saveSettings">,
+  snapshot: RecallStateSnapshot,
+  needsSealMigration: boolean,
+): Promise<void> {
+  if (!needsSealMigration || !snapshot.settings.syncCode) return;
+  await repo.saveSettings(snapshot.settings, snapshot);
+}
 
 export interface RecallRepository {
   loadAppData(): Promise<RecallStateSnapshot>;
@@ -204,24 +242,27 @@ class SqliteRecallRepository implements RecallRepository {
         if (settingRows.length === 0) {
           return this.resetToSeedData();
         }
-        const snapshot: RecallStateSnapshot = {
+        const { snapshot, needsSealMigration } = await unsealSnapshot({
           decks: [],
           cards: [],
           studySessions: [],
           reviewLogs: [],
           settings: settingsFromRows(settingRows),
-        };
+        });
+        // ponytail: migration rewrite is best-effort; next saveSettings also seals
+        void migratePlaintextSyncCode(this, snapshot, needsSealMigration);
         return snapshot;
       }
 
-      const snapshot: RecallStateSnapshot = {
+      const { snapshot, needsSealMigration } = await unsealSnapshot({
         decks: deckRows.map(deckFromRow),
         cards: cardRows.map(cardFromRow),
         studySessions: sessionRows.map(studySessionFromRow),
         reviewLogs: reviewLogRows.map(reviewLogFromRow),
         settings: settingsFromRows(settingRows),
-      };
+      });
       validateImportSnapshot(snapshot);
+      void migratePlaintextSyncCode(this, snapshot, needsSealMigration);
       return snapshot;
     }
 
@@ -243,17 +284,18 @@ class SqliteRecallRepository implements RecallRepository {
 
     async saveSnapshot(snapshot: RecallStateSnapshot): Promise<void> {
       validateImportSnapshot(snapshot);
+      const disk = await sealSnapshotForDisk(snapshot);
 
       // Tauri runtime: Use Rust atomic command (no fallback - must be atomic for data integrity)
       if (isTauriRuntime()) {
         const { invoke } = await import("@tauri-apps/api/core");
         await invoke("save_snapshot_atomic", {
           data: {
-            decks: snapshot.decks.map(deckToRow),
-            cards: snapshot.cards.map(cardToRow),
-            study_sessions: snapshot.studySessions.map(studySessionToRow),
-            review_logs: snapshot.reviewLogs.map(reviewLogToRow),
-            settings: settingsToRows(snapshot.settings),
+            decks: disk.decks.map(deckToRow),
+            cards: disk.cards.map(cardToRow),
+            study_sessions: disk.studySessions.map(studySessionToRow),
+            review_logs: disk.reviewLogs.map(reviewLogToRow),
+            settings: settingsToRows(disk.settings),
           },
         });
         return;
@@ -267,14 +309,14 @@ class SqliteRecallRepository implements RecallRepository {
         await tx.execute("DELETE FROM decks");
         await tx.execute("DELETE FROM settings");
 
-        for (const deck of snapshot.decks.map(deckToRow)) {
+        for (const deck of disk.decks.map(deckToRow)) {
           await tx.execute(
             "INSERT INTO decks (id, name, description, color, exam_deadline, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
             [deck.id, deck.name, deck.description, deck.color, deck.exam_deadline, deck.created_at, deck.updated_at],
           );
         }
 
-        for (const card of snapshot.cards.map(cardToRow)) {
+        for (const card of disk.cards.map(cardToRow)) {
           await tx.execute(
             "INSERT INTO cards (id, deck_id, front, back, hint, source, tags, card_type, state, last_review_date, next_review_date, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, learning_steps, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             [
@@ -302,7 +344,7 @@ class SqliteRecallRepository implements RecallRepository {
           );
         }
 
-        for (const session of snapshot.studySessions.map(studySessionToRow)) {
+        for (const session of disk.studySessions.map(studySessionToRow)) {
           await tx.execute(
             "INSERT INTO study_sessions (id, deck_id, started_at, ended_at, cards_studied) VALUES (?, ?, ?, ?, ?)",
             [
@@ -315,14 +357,14 @@ class SqliteRecallRepository implements RecallRepository {
           );
         }
 
-        for (const reviewLog of snapshot.reviewLogs.map(reviewLogToRow)) {
+        for (const reviewLog of disk.reviewLogs.map(reviewLogToRow)) {
           await tx.execute(
             "INSERT INTO review_logs (id, card_id, rating, review_date, stability, difficulty, elapsed_days, scheduled_days) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             [reviewLog.id, reviewLog.card_id, reviewLog.rating, reviewLog.review_date, reviewLog.stability, reviewLog.difficulty, reviewLog.elapsed_days, reviewLog.scheduled_days],
           );
         }
 
-        for (const setting of settingsToRows(snapshot.settings)) {
+        for (const setting of settingsToRows(disk.settings)) {
           await tx.execute("INSERT INTO settings (key, value) VALUES (?, ?)", [setting.key, setting.value]);
         }
       });
@@ -444,10 +486,12 @@ class SqliteRecallRepository implements RecallRepository {
     }
 
     async saveSettings(settings: RecallStateSnapshot["settings"], current: RecallStateSnapshot): Promise<RecallStateSnapshot> {
+      // In-memory snapshot keeps plaintext syncCode; disk write seals.
       const snapshot = { ...current, settings };
       if (isTauriRuntime()) {
         const { invoke } = await import("@tauri-apps/api/core");
-        const settingRows = settingsToRows(settings);
+        const sealed = await sealSettingsSecrets(settings);
+        const settingRows = settingsToRows(sealed);
         for (const row of settingRows) {
           await invoke("upsert_setting_atomic", { setting: row });
         }
@@ -564,7 +608,9 @@ class LocalStorageRecallRepository implements RecallRepository {
   async loadAppData(): Promise<RecallStateSnapshot> {
     const existing = loadLocalSnapshot();
     if (existing) {
-      return existing;
+      const { snapshot, needsSealMigration } = await unsealSnapshot(existing);
+      void migratePlaintextSyncCode(this, snapshot, needsSealMigration);
+      return snapshot;
     }
 
     return this.resetToSeedData();
@@ -573,7 +619,8 @@ class LocalStorageRecallRepository implements RecallRepository {
   async saveSnapshot(snapshot: RecallStateSnapshot): Promise<void> {
     validateImportSnapshot(snapshot);
     if (typeof localStorage !== "undefined") {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+      const disk = await sealSnapshotForDisk(snapshot);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(disk));
     }
   }
 

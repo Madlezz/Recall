@@ -4,6 +4,22 @@ Append-only. Newest first.
 
 ---
 
+## 2026-07-17 — Batch D: syncCode at rest (S1 partial)
+
+**Branch:** `feat/sync-code-at-rest`
+
+### Done
+- New `src/services/sync-secret.ts` — AES-GCM wrap (`enc:v1:`), device key in IndexedDB + localStorage mirror
+- Repository load/save seals disk snapshot; memory stays plaintext
+- Legacy plaintext migrates on next save
+- Tests: 7 new (`sync-secret.test.ts`); suite **795** pass
+
+### Ceiling / next
+- OS keyring / Tauri stronghold for device wrapping key
+- S4 relay ETag concurrency still open
+
+---
+
 ## 2026-07-17 — Maintenance session (Batches A–C + security)
 
 **Main tip after merges:** `3eb6da0a` (+ pending #53)
