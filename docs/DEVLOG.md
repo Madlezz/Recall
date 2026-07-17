@@ -4,6 +4,27 @@ Append-only. Newest first.
 
 ---
 
+## 2026-07-18 — Batch G: coverage ratchet (T4)
+
+**Branch:** `chore/coverage-ratchet`
+
+### Done
+
+- Measured `pnpm test:coverage` after #51/#55/#56: **796** tests,
+  All files ~ **Stmts 35.63 / Branch 30.33 / Funcs 31.78 / Lines 36.37**
+- Ratchet vitest thresholds: lines 32→**35**, statements 32→**35**,
+  functions 28→**31**, branches 28→**29** (~0.5pt under floor)
+- Exclude `sync-relay/**` from vitest discovery so local `npm install` there
+  cannot pull wrangler tests into app suite
+
+### Next
+
+1. Free work: more service tests (`repository.ts`, `sync-secret.ts`, `sync.ts`)
+2. Docs-only PR #57 (self-host checklist + no owner-paid infra) if still open
+3. S1 ceiling (keyring) only if wanted later - still free/on-device
+
+---
+
 ## 2026-07-17 — Batch E: relay ETag concurrency (S4 partial)
 
 **Branch:** `feat/sync-relay-etag`
