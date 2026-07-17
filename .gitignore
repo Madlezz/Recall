@@ -39,9 +39,15 @@ graphify-out/
 .obsidian/
 .agents/
 .hermes/
+.zcode/
 
 # Playwright MCP session artifacts
 .playwright-mcp/
 
 # Root-level audit/screenshot artifacts
 /audit-dashboard.png
+
+# Temp files from agent work
+/_lint*.json
+/_lintbreak*.txt
+/_vtout.txt

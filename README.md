@@ -44,15 +44,17 @@ focus tools, and a polished UX that doesn't require hunting for add-ons.
 
 ![Dashboard](docs/screenshots/dashboard.png)
 
+![Deck Detail](docs/screenshots/deck-detail.png)
+
 ![Study Mode](docs/screenshots/study.png)
 
 ![Study — Answer Revealed](docs/screenshots/study-revealed.png)
 
 ![Stats](docs/screenshots/stats.png)
 
-![Card Browser](docs/screenshots/deck-browser.png)
-
 ![Tags](docs/screenshots/tags.png)
+
+![Card Browser](docs/screenshots/card-browser.png)
 
 ![Settings](docs/screenshots/settings.png)
 
