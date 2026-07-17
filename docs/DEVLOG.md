@@ -4,6 +4,37 @@ Append-only. Newest first.
 
 ---
 
+## 2026-07-17 — Maintenance session (Batches A–C + security)
+
+**Main tip after merges:** `3eb6da0a` (+ pending #53)
+
+### Merged
+| PR | What |
+|---|---|
+| #50 | Audit map + HTTPS all relay calls + SYNC.md truth |
+| #49 | `react-i18next` 17.0.10 |
+| #47 | GitHub Actions group bumps |
+| #51 | sync-protocol tests 4 → 10 (first upload, merge, delete, garbage) |
+| #52 | Manual dev-deps bump (supersedes conflicted #48) |
+| #53 | `serde_with` 3.21.0 — GHSA-7gcf-g7xr-8hxj / Dependabot #9 *(open at write-time)* |
+
+### Metrics
+- Tests: **788** pass (after #51)
+- Coverage gate still 32% lines / 28% branches
+- Lint: 0 errors
+
+### Still open (next)
+1. **S1** — `syncCode` at-rest wrap (IndexedDB / keyring)
+2. **S4** — relay ETag / revision concurrency
+3. Coverage ratchet after more service tests
+4. Confirm Dependabot alert #9 closes after #53
+
+### Notes
+- `gh` must use account **Madlezz** (not EasyUMKM) for merge/PR create on this repo
+- Dependabot #48 closed as superseded by #52
+
+---
+
 ## 2026-07-17 — Maintenance audit (Batch A start)
 
 **Branch:** `docs/audit-2026-07-17`  
