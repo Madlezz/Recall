@@ -93,7 +93,7 @@ Status: open / partial / fixed (prior) / wontfix
 
 | ID | Sev | Finding | Notes |
 |---|---|---|---|
-| T1 | **H** | **`sync-protocol.ts` coverage 0%** | highest-risk network path untested |
+| T1 | **H** | **`sync-protocol.ts` coverage 0%** → happy-path unit tests landed (#51, 10 cases) | partial — expand further as needed |
 | T2 | **H** | **`sync.ts` coverage 0%** | folder sync |
 | T3 | M | `repository.ts` ~25% lines — bulk of persistence untested outside helpers | raise targeted tests |
 | T4 | M | Coverage gate **32% lines** barely under actual 34% — little ratchet headroom abuse but also little pressure | bump after each test batch |
@@ -116,7 +116,7 @@ Status: open / partial / fixed (prior) / wontfix
 
 | ID | Sev | Finding | Action |
 |---|---|---|---|
-| Doc1 | **H** | SYNC.md documents non-existent `sync-secret.ts` as if present (even notes "untracked") | rewrite status truthfully |
+| Doc1 | **H** | SYNC.md documents non-existent `sync-secret.ts` as if present | **fixed 2026-07-17** (#50) |
 | Doc2 | M | `SESSION_HANDOFF.md` partially corrupted / stale vs `git log` | rewrite after next real session |
 | Doc3 | M | Vault `01 Current State` lagging (mentions mid-audit dirty tree) | human/vault refresh |
 | Doc4 | L | No `docs/AUDIT.md` / `docs/DEVLOG.md` before this file | this file |
@@ -142,12 +142,13 @@ Score: impact 1–5, effort 1–5 (lower effort better). **Do first = high impac
 
 | Pri | ID | Work | Impact | Effort | Why |
 |---|---|---|---|---|---|
-| **P0** | S3 | Call `enforceHttps` in `uploadEncrypted`, `testSyncRelay`, `deleteSyncData` (+ unit tests) | 5 | 1 | One-line class bug; ships same day |
-| **P0** | Doc1 | Fix `docs/SYNC.md` at-rest section to match code | 4 | 1 | Stop promising crypto that is not there |
-| **P1** | T1 | Unit tests for `sync-protocol` (HTTPS fail, validate payload, merge path with mocked fetch) | 5 | 2 | Locks S3 + prevents sync regressions |
+| ~~P0~~ | S3 | HTTPS on all relay entrypoints | 5 | 1 | **done** #50 |
+| ~~P0~~ | Doc1 | SYNC.md at-rest honesty | 4 | 1 | **done** #50 |
+| ~~P1~~ | T1 | Unit tests for `sync-protocol` happy paths | 5 | 2 | **done** #51 (10 cases) |
 | **P1** | S1 | Design + land at-rest protection for `syncCode` (minimal: WebCrypto wrap + IndexedDB key; Tauri keyring later) | 5 | 4 | Real threat for desktop backups |
 | **P1** | S4 | Relay optimistic concurrency: version/ETag on PUT, 409 on stale | 4 | 3 | Multi-device users |
-| **P2** | D1–D3 | Merge Dependabot PRs #47–#49 | 2 | 1 | Hygiene |
+| ~~P2~~ | D1–D3 | Merge Dependabot #47/#49 + manual #52 for #48 | 2 | 1 | **done** |
+| ~~P2~~ | Alert #9 | `serde_with` 3.21.0 | 3 | 1 | PR #53 |
 | **P2** | T3 | Targeted `repository` tests for snapshot preserve + batch move/upsert | 3 | 2 | Perf path already landed |
 | **P2** | T4 | Ratchet coverage gate lines 32→34, branches 28→29 after P1 tests | 2 | 1 | Prevent silent drop |
 | **P3** | Doc2 | Refresh `SESSION_HANDOFF.md` | 2 | 1 | Agent efficiency |
@@ -229,4 +230,4 @@ Record in `docs/DEVLOG.md`:
 
 Recall is **maintainable and already past the "zero tests" vibe stage**. Highest ROI work is **closing the gap between security story and code** (S1–S3, Doc1) and **putting a test harness around sync** (T1). Everything else is polish or roadmap.
 
-Next agent: start **Batch A** unless product owner reprioritizes.
+Next agent: start **Batch D (S1 syncCode at rest)** unless product owner reprioritizes.
