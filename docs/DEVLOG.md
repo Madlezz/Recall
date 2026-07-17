@@ -4,6 +4,22 @@ Append-only. Newest first.
 
 ---
 
+## 2026-07-17 — Batch E: relay ETag concurrency (S4 partial)
+
+**Branch:** `feat/sync-relay-etag`
+
+### Done
+- Worker: revision in R2 metadata, GET ETag, PUT If-Match, 409 on stale
+- Client: send If-Match from GET; retry once on SyncConflictError
+- Tests: If-Match on create/update + 409 retry path
+- Docs: SYNC/AUDIT/DEVLOG
+
+### Ceiling
+- Full-snapshot merge still LWW at field level; no CRDT
+- Deploy relay to production separately after merge
+
+---
+
 ## 2026-07-17 — Batch D: syncCode at rest (S1 partial)
 
 **Branch:** `feat/sync-code-at-rest`

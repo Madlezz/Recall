@@ -153,7 +153,10 @@ describe("sync-protocol happy paths", () => {
         return new Response(null, { status: 404 });
       }
       if (url.includes("/sync/") && init?.method === "PUT") {
-        return new Response(JSON.stringify({ success: true }), { status: 200 });
+        return new Response(JSON.stringify({ success: true, revision: "1" }), {
+          status: 200,
+          headers: { ETag: '"1"' },
+        });
       }
       return new Response(null, { status: 500 });
     });
@@ -172,6 +175,7 @@ describe("sync-protocol happy paths", () => {
     const put = calls.find((c) => c[1]?.method === "PUT");
     expect(put).toBeTruthy();
     expect(String(put![0])).toMatch(/^https:\/\/sync\.example\/sync\/[a-f0-9]{64}$/);
+    expect(put![1]?.headers).toMatchObject({ "If-Match": '"0"' });
   });
 
   it("download+merge+upload when remote blob exists", async () => {
@@ -200,10 +204,16 @@ describe("sync-protocol happy paths", () => {
     vi.mocked(globalThis.fetch).mockImplementation(async (input, init) => {
       const url = String(input);
       if (url.includes("/sync/") && (!init || init.method === "GET" || init.method === undefined)) {
-        return new Response(JSON.stringify(encrypted), { status: 200 });
+        return new Response(JSON.stringify(encrypted), {
+          status: 200,
+          headers: { ETag: '"3"' },
+        });
       }
       if (url.includes("/sync/") && init?.method === "PUT") {
-        return new Response(JSON.stringify({ success: true }), { status: 200 });
+        return new Response(JSON.stringify({ success: true, revision: "4" }), {
+          status: 200,
+          headers: { ETag: '"4"' },
+        });
       }
       return new Response(null, { status: 500 });
     });
@@ -219,6 +229,65 @@ describe("sync-protocol happy paths", () => {
     expect(result.mergedSnapshot).not.toBeNull();
     expect(result.mergedSnapshot!.decks.some((d) => d.id === "deck-remote")).toBe(true);
     expect(result.changes?.decks).toBeGreaterThanOrEqual(1);
+
+    const put = vi.mocked(globalThis.fetch).mock.calls.find((c) => c[1]?.method === "PUT");
+    expect(put![1]?.headers).toMatchObject({ "If-Match": '"3"' });
+  });
+
+  it("retries once on 409 conflict then succeeds", async () => {
+    const { code } = generateSyncCode();
+    const local = emptySnapshot({ syncCode: code });
+    const remotePayload = buildExportPayload({
+      ...emptySnapshot({ syncCode: code }),
+      decks: [
+        {
+          id: "deck-remote",
+          name: "Remote Deck",
+          description: "",
+          color: "blue",
+          createdAt: "2026-01-01T00:00:00.000Z",
+          updatedAt: "2026-01-01T00:00:00.000Z",
+        },
+      ],
+    });
+    const encrypted = await encryptData(JSON.stringify(remotePayload), code);
+
+    let putCount = 0;
+    vi.mocked(globalThis.fetch).mockImplementation(async (input, init) => {
+      const url = String(input);
+      if (url.includes("/sync/") && (!init || init.method === "GET" || init.method === undefined)) {
+        return new Response(JSON.stringify(encrypted), {
+          status: 200,
+          headers: { ETag: putCount === 0 ? '"1"' : '"2"' },
+        });
+      }
+      if (url.includes("/sync/") && init?.method === "PUT") {
+        putCount += 1;
+        if (putCount === 1) {
+          return new Response(JSON.stringify({ error: "Conflict", revision: "2" }), {
+            status: 409,
+            headers: { ETag: '"2"' },
+          });
+        }
+        return new Response(JSON.stringify({ success: true, revision: "3" }), {
+          status: 200,
+          headers: { ETag: '"3"' },
+        });
+      }
+      return new Response(null, { status: 500 });
+    });
+
+    const result = await performEncryptedSync(local, {
+      ...httpsConfig(),
+      syncCode: code,
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.uploaded).toBe(true);
+    expect(putCount).toBe(2);
+    const puts = vi.mocked(globalThis.fetch).mock.calls.filter((c) => c[1]?.method === "PUT");
+    expect(puts[0]![1]?.headers).toMatchObject({ "If-Match": '"1"' });
+    expect(puts[1]![1]?.headers).toMatchObject({ "If-Match": '"2"' });
   });
 
   it("fails when remote decrypt validates as garbage JSON", async () => {

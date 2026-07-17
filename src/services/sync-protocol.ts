@@ -10,6 +10,9 @@
  * The relay server NEVER sees plaintext or the encryption key.
  * It only stores opaque encrypted blobs, keyed by a hash of the sync code.
  *
+ * Optimistic concurrency: GET returns ETag (revision). PUT sends If-Match.
+ * 409 → re-download, re-merge, retry once.
+ *
  * For Tauri desktop, this can fall back to the existing folder-based sync
  * (sync.ts) if the user prefers local folder sync (Dropbox/Drive).
  */
@@ -50,6 +53,21 @@ export interface SyncResult {
   changes?: { decks: number; cards: number; reviewLogs: number };
 }
 
+type RemoteBlob = {
+  payload: EncryptedPayload;
+  /** Bare revision string (no quotes), "0" for legacy blobs without metadata */
+  etag: string;
+};
+
+export class SyncConflictError extends Error {
+  readonly etag: string | null;
+  constructor(message = "Sync conflict", etag: string | null = null) {
+    super(message);
+    this.name = "SyncConflictError";
+    this.etag = etag;
+  }
+}
+
 /**
  * Get the device ID for this device (persisted in localStorage).
  * Used for conflict detection (don't merge with ourselves).
@@ -75,25 +93,44 @@ async function getBlobKey(syncCode: string): Promise<string> {
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+function stripEtag(value: string | null): string | null {
+  if (value == null) return null;
+  const t = value.trim();
+  if (t.startsWith("W/")) return stripEtag(t.slice(2));
+  if (t.startsWith('"') && t.endsWith('"') && t.length >= 2) return t.slice(1, -1);
+  return t;
+}
+
 /**
- * Upload encrypted state to the relay.
+ * Upload encrypted state to the relay with If-Match concurrency.
+ * ifMatch "0" means create (or legacy empty).
  */
 async function uploadEncrypted(
   payload: EncryptedPayload,
   blobKey: string,
   relayUrl: string,
   deviceId: string,
-): Promise<boolean> {
+  ifMatch: string,
+): Promise<void> {
   const safeUrl = enforceHttps(relayUrl);
   const response = await fetch(`${safeUrl}/sync/${blobKey}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
       "X-Device-Id": deviceId,
+      "If-Match": `"${ifMatch}"`,
     },
     body: JSON.stringify(payload),
   });
-  return response.ok;
+  if (response.status === 409) {
+    throw new SyncConflictError(
+      "Sync conflict: remote changed",
+      stripEtag(response.headers.get("ETag")),
+    );
+  }
+  if (!response.ok) {
+    throw new Error(`Sync relay error: ${response.status}`);
+  }
 }
 
 /**
@@ -104,7 +141,7 @@ async function downloadEncrypted(
   blobKey: string,
   relayUrl: string,
   deviceId: string,
-): Promise<EncryptedPayload | null> {
+): Promise<RemoteBlob | null> {
   const safeUrl = enforceHttps(relayUrl);
   const response = await fetch(`${safeUrl}/sync/${blobKey}`, {
     method: "GET",
@@ -113,10 +150,9 @@ async function downloadEncrypted(
     },
   });
 
-  if (response.status === 404) return null; // No data yet
+  if (response.status === 404) return null;
   if (!response.ok) throw new Error(`Sync relay error: ${response.status}`);
 
-  // Cap response size to prevent resource exhaustion (max 5MB)
   const body = await response.text();
   if (body.length > 5 * 1024 * 1024) {
     throw new Error("Sync payload exceeds maximum size (5MB)");
@@ -129,7 +165,6 @@ async function downloadEncrypted(
     throw new Error("Invalid sync relay response: not valid JSON");
   }
 
-  // Validate required fields
   if (
     typeof payload !== "object" ||
     payload === null ||
@@ -141,7 +176,8 @@ async function downloadEncrypted(
     throw new Error("Invalid sync relay response: missing ciphertext/iv");
   }
 
-  return payload as EncryptedPayload;
+  const etag = stripEtag(response.headers.get("ETag")) ?? "0";
+  return { payload: payload as EncryptedPayload, etag };
 }
 
 /**
@@ -161,10 +197,58 @@ function enforceHttps(relayUrl: string): string {
  */
 function validateDecryptedPayload(raw: string): RecallExportPayload {
   const parsed = parseImportPayload(raw);
-  // mergeImportPayload already reconstructs a valid snapshot structure,
-  // and the final snapshot is validated via validateImportSnapshot at call-site.
   return parsed;
 }
+
+function mergeCounts(
+  local: RecallStateSnapshot,
+  merged: RecallStateSnapshot,
+): { decks: number; cards: number; reviewLogs: number } {
+  return {
+    decks: merged.decks.length - local.decks.length,
+    cards: merged.cards.length - local.cards.length,
+    reviewLogs: merged.reviewLogs.length - local.reviewLogs.length,
+  };
+}
+
+/**
+ * One download → merge → upload attempt.
+ * Returns partial SyncResult fields; throws SyncConflictError on 409.
+ */
+async function syncOnce(
+  localState: RecallStateSnapshot,
+  config: SyncConfig,
+  deviceId: string,
+  blobKey: string,
+): Promise<Pick<SyncResult, "uploaded" | "downloaded" | "mergedSnapshot" | "changes">> {
+  const remote = await downloadEncrypted(blobKey, config.relayUrl, deviceId);
+
+  if (remote) {
+    const remoteJson = await decryptData(remote.payload, config.syncCode);
+    const remoteData = validateDecryptedPayload(remoteJson);
+    const merged = mergeImportPayload(localState, remoteData);
+    const exportPayload = buildExportPayload(merged);
+    const encrypted = await encryptData(JSON.stringify(exportPayload), config.syncCode);
+    await uploadEncrypted(encrypted, blobKey, config.relayUrl, deviceId, remote.etag);
+    return {
+      downloaded: true,
+      uploaded: true,
+      mergedSnapshot: merged,
+      changes: mergeCounts(localState, merged),
+    };
+  }
+
+  // First sync — create with If-Match: 0
+  const exportPayload = buildExportPayload(localState);
+  const encrypted = await encryptData(JSON.stringify(exportPayload), config.syncCode);
+  await uploadEncrypted(encrypted, blobKey, config.relayUrl, deviceId, "0");
+  return {
+    downloaded: false,
+    uploaded: true,
+    mergedSnapshot: null,
+  };
+}
+
 export async function performEncryptedSync(
   localState: RecallStateSnapshot,
   config: SyncConfig,
@@ -180,44 +264,16 @@ export async function performEncryptedSync(
   const blobKey = await getBlobKey(config.syncCode);
 
   try {
-    // Step 1: Download remote blob
-    const remotePayload = await downloadEncrypted(blobKey, config.relayUrl, deviceId);
-
-    if (remotePayload) {
-      // Step 2: Decrypt remote data
-      const remoteJson = await decryptData(remotePayload, config.syncCode);
-      const remoteData = validateDecryptedPayload(remoteJson);
-
-      // Step 3: Merge remote into local
-      const beforeDecks = localState.decks.length;
-      const beforeCards = localState.cards.length;
-      const beforeLogs = localState.reviewLogs.length;
-
-      const merged = mergeImportPayload(localState, remoteData);
-
-      result.downloaded = true;
-      result.changes = {
-        decks: merged.decks.length - beforeDecks,
-        cards: merged.cards.length - beforeCards,
-        reviewLogs: merged.reviewLogs.length - beforeLogs,
-      };
-      result.mergedSnapshot = merged;
-
-      // Step 4: Encrypt merged state
-      const exportPayload = buildExportPayload(merged);
-      const encrypted = await encryptData(JSON.stringify(exportPayload), config.syncCode);
-
-      // Step 5: Upload
-      const uploaded = await uploadEncrypted(encrypted, blobKey, config.relayUrl, deviceId);
-      result.uploaded = uploaded;
-      result.success = uploaded;
-    } else {
-      // No remote data - first sync, just upload local state
-      const exportPayload = buildExportPayload(localState);
-      const encrypted = await encryptData(JSON.stringify(exportPayload), config.syncCode);
-      const uploaded = await uploadEncrypted(encrypted, blobKey, config.relayUrl, deviceId);
-      result.uploaded = uploaded;
-      result.success = uploaded;
+    try {
+      const once = await syncOnce(localState, config, deviceId, blobKey);
+      Object.assign(result, once);
+      result.success = true;
+    } catch (first) {
+      if (!(first instanceof SyncConflictError)) throw first;
+      // One retry: re-download + re-merge against latest remote
+      const once = await syncOnce(localState, config, deviceId, blobKey);
+      Object.assign(result, once);
+      result.success = true;
     }
   } catch (error) {
     result.error = error instanceof Error ? error.message : String(error);
