@@ -556,7 +556,11 @@ pub async fn move_cards_to_deck(
     let params: Vec<Box<dyn rusqlite::ToSql>> =
         vec![Box::new(&deck_id) as Box<dyn rusqlite::ToSql>]
             .into_iter()
-            .chain(card_ids.iter().map(|id| Box::new(id) as Box<dyn rusqlite::ToSql>))
+            .chain(
+                card_ids
+                    .iter()
+                    .map(|id| Box::new(id) as Box<dyn rusqlite::ToSql>),
+            )
             .collect();
 
     let param_refs: Vec<&dyn rusqlite::ToSql> = params.iter().map(|p| p.as_ref()).collect();
@@ -588,16 +592,16 @@ pub async fn update_cards_tags(
         .map_err(|e| format!("BEGIN failed: {}", e))?;
 
     let placeholders = card_ids.iter().map(|_| "?").collect::<Vec<_>>().join(", ");
-    let sql = format!(
-        "UPDATE cards SET tags = ? WHERE id IN ({})",
-        placeholders
-    );
+    let sql = format!("UPDATE cards SET tags = ? WHERE id IN ({})", placeholders);
 
-    let params: Vec<Box<dyn rusqlite::ToSql>> =
-        vec![Box::new(&tags) as Box<dyn rusqlite::ToSql>]
-            .into_iter()
-            .chain(card_ids.iter().map(|id| Box::new(id) as Box<dyn rusqlite::ToSql>))
-            .collect();
+    let params: Vec<Box<dyn rusqlite::ToSql>> = vec![Box::new(&tags) as Box<dyn rusqlite::ToSql>]
+        .into_iter()
+        .chain(
+            card_ids
+                .iter()
+                .map(|id| Box::new(id) as Box<dyn rusqlite::ToSql>),
+        )
+        .collect();
 
     let param_refs: Vec<&dyn rusqlite::ToSql> = params.iter().map(|p| p.as_ref()).collect();
 
@@ -628,16 +632,16 @@ pub async fn update_cards_state(
         .map_err(|e| format!("BEGIN failed: {}", e))?;
 
     let placeholders = card_ids.iter().map(|_| "?").collect::<Vec<_>>().join(", ");
-    let sql = format!(
-        "UPDATE cards SET state = ? WHERE id IN ({})",
-        placeholders
-    );
+    let sql = format!("UPDATE cards SET state = ? WHERE id IN ({})", placeholders);
 
-    let params: Vec<Box<dyn rusqlite::ToSql>> =
-        vec![Box::new(&state) as Box<dyn rusqlite::ToSql>]
-            .into_iter()
-            .chain(card_ids.iter().map(|id| Box::new(id) as Box<dyn rusqlite::ToSql>))
-            .collect();
+    let params: Vec<Box<dyn rusqlite::ToSql>> = vec![Box::new(&state) as Box<dyn rusqlite::ToSql>]
+        .into_iter()
+        .chain(
+            card_ids
+                .iter()
+                .map(|id| Box::new(id) as Box<dyn rusqlite::ToSql>),
+        )
+        .collect();
 
     let param_refs: Vec<&dyn rusqlite::ToSql> = params.iter().map(|p| p.as_ref()).collect();
 

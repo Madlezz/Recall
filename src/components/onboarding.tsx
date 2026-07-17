@@ -7,6 +7,7 @@ import { TEMPLATE_DECKS, createCardsFromTemplate, type TemplateDeck } from "@/da
 import { RecallLogo } from "@/components/recall-logo";
 import { cn } from "@/lib/utils";
 import { cardSurface, typeClass } from "@/lib/surface";
+import type { Card, Deck } from "@/types";
 
 type Step = "welcome" | "concept" | "system" | "templates" | "goal";
 
