@@ -66,20 +66,23 @@ Client (main tip `#56`) already sends `If-Match` and retries once on `409`.
 **Production only gets optimistic concurrency after this worker is redeployed.**
 Old workers ignore revision metadata and never return useful `ETag` / `409`.
 
-Default client URL: `https://sync.recall.app` (override in **Settings → Sync**).
+Default client URL string: `https://sync.recall.app` (override in **Settings → Sync**).
+That host is **not** a maintainer-funded SLA. OSS policy: **no owner-paid infra**
+(see `AGENTS.md` Cost / infra). Prefer **self-host** this folder on the user's
+Cloudflare account, or use folder/file sync. Checklist below is for whoever
+opts to run a relay (self-hoster / volunteer), not a bill on Madlezz.
 
-### Production deploy checklist (owner)
+### Deploy checklist (self-hoster / volunteer - not owner-paid)
 
-Run from a machine logged into the **production** Cloudflare account that owns
-the live worker + R2 bucket. Do **not** deploy from a personal sandbox account
-against prod bindings without confirming `wrangler whoami` + account id.
+Run from a machine logged into the Cloudflare account that will **own the bill
+and free-tier limits**. Confirm `wrangler whoami` + account id first.
 
 #### 0. Preconditions
 
 | Check | Command / note |
 |---|---|
 | Cloudflare login | `cd sync-relay && npx wrangler login` then `npx wrangler whoami` |
-| Account matches prod | Compare account id to dashboard for `recall-sync-relay` |
+| Account is yours | Free-tier OK; **you** own bill/limits - not Madlezz |
 | R2 bucket exists | Binding `RECALL_SYNC` → bucket `recall-sync-blobs` (`wrangler.toml`) |
 | Node deps | `cd sync-relay && npm install` |
 | Code on main | Worker source includes revision / ETag / If-Match (`#56`) |

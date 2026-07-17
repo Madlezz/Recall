@@ -147,7 +147,7 @@ Score: impact 1–5, effort 1–5 (lower effort better). **Do first = high impac
 | ~~P1~~ | T1 | Unit tests for `sync-protocol` happy paths | 5 | 2 | **done** #51 (10 cases) |
 | **P1** | S1 | At-rest `syncCode`: WebCrypto wrap + IndexedDB key **landed** #55; ceiling = OS keyring / Tauri stronghold | 5 | 3 | Device key still in IDB/localStorage |
 | ~~P1~~ | S4 code | ETag/If-Match + 409 retry | 4 | 3 | **done** #56 |
-| **P1** | S4 ops | Redeploy prod `sync-relay` + smoke checklist (`docs/DEPLOYMENT.md`) | 4 | 1 | Old worker = no concurrency |
+| **P3** | S4 ops | Redeploy public relay | - | - | **deferred (no owner-paid infra)** - self-host checklist only |
 | **P3** | S4 ceiling | Field-level CRDT / smarter merge (beyond full-snapshot LWW) | 3 | 5 | Only if multi-device clobber still hurts after ops |
 | ~~P2~~ | D1–D3 | Merge Dependabot #47/#49 + manual #52 for #48 | 2 | 1 | **done** |
 | ~~P2~~ | Alert #9 | `serde_with` 3.21.0 | 3 | 1 | PR #53 |
