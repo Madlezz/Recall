@@ -100,3 +100,13 @@ pnpm test:e2e      # playwright (starts pnpm dev via config)
 ## GitHub account
 
 This repo is **Madlezz/Recall**. Prefer `gh` as user `Madlezz` for PRs/issues/pushes that affect this repo.
+
+## Cost / infra (HARD)
+
+**Maintainer does not pay for hosted infra on this open-source project.**
+
+- **Do not** deploy, renew, or operate **owner-billed** cloud services (Cloudflare paid plans, custom domain DNS that bills the maintainer, paid Workers/R2 beyond free-tier play if it risks charges, hosted DBs, paid CI minutes beyond free GitHub Actions, etc.) unless the human **explicitly** says they accept the bill.
+- Default for sync: **self-host** (`sync-relay/` + user CF account) or **local folder sync** / file export. Code + docs for a public relay are fine; **running** a maintainer-funded production relay is **out of scope**.
+- Agents: if a task needs paid deploy, **stop**, document the checklist, mark backlog **deferred (no owner-paid infra)**, pick free work (tests, security-in-app, docs, self-host guides).
+- Free-tier experiments only when the human opts in and understands limits; never assume free forever.
+- Prefer features that work offline / on-device. Cloud is optional, never a paid maintainer dependency.

@@ -62,32 +62,133 @@ A Service Worker handles caching. `src/components/pwa-update-prompt.tsx` shows a
 ## Sync Relay
 
 The relay server is a standalone Cloudflare Worker in `sync-relay/`.
+Client (main tip `#56`) already sends `If-Match` and retries once on `409`.
+**Production only gets optimistic concurrency after this worker is redeployed.**
+Old workers ignore revision metadata and never return useful `ETag` / `409`.
 
-### Deploy
+Default client URL string: `https://sync.recall.app` (override in **Settings → Sync**).
+That host is **not** a maintainer-funded SLA. OSS policy: **no owner-paid infra**
+(see `AGENTS.md` Cost / infra). Prefer **self-host** this folder on the user's
+Cloudflare account, or use folder/file sync. Checklist below is for whoever
+opts to run a relay (self-hoster / volunteer), not a bill on Madlezz.
+
+### Deploy checklist (self-hoster / volunteer - not owner-paid)
+
+Run from a machine logged into the Cloudflare account that will **own the bill
+and free-tier limits**. Confirm `wrangler whoami` + account id first.
+
+#### 0. Preconditions
+
+| Check | Command / note |
+|---|---|
+| Cloudflare login | `cd sync-relay && npx wrangler login` then `npx wrangler whoami` |
+| Account is yours | Free-tier OK; **you** own bill/limits - not Madlezz |
+| R2 bucket exists | Binding `RECALL_SYNC` → bucket `recall-sync-blobs` (`wrangler.toml`) |
+| Node deps | `cd sync-relay && npm install` |
+| Code on main | Worker source includes revision / ETag / If-Match (`#56`) |
+
+#### 1. Pre-deploy smoke (optional local)
 
 ```bash
 cd sync-relay
-wrangler deploy
+npx wrangler dev
+# other terminal:
+curl -sS http://127.0.0.1:8787/health
+# expect 200 + JSON ok
 ```
 
-Requires:
+#### 2. Deploy
 
-- A Cloudflare account with an **R2 bucket** named `RECALL_SYNC`.
-- `wrangler.toml` references the bucket binding.
-- POSTDEPLOY: set `CORS` and blob TTL lifecycle rules (90 days) in the R2
-  bucket dashboard (or via Wrangler bucket config).
+```bash
+cd sync-relay
+npx wrangler deploy
+# note printed workers.dev / custom domain URL
+```
 
-The relay runs at `https://sync.recall-app` by default (configurable per
-device in **Settings → Sync**).
+#### 3. Post-deploy verification (required)
+
+Replace `$RELAY` with the live base URL (no trailing slash). Use a **throwaway**
+64-char hex key so you never touch a real user's blob key.
+
+```bash
+# Health
+curl -sS -D- "$RELAY/health" -o /tmp/relay-health.json
+# expect: HTTP 200
+
+# Create (If-Match 0)
+curl -sS -D- -X PUT "$RELAY/sync/$KEY" \
+  -H 'Content-Type: application/octet-stream' \
+  -H 'X-Device-Id: deploy-check' \
+  -H 'If-Match: "0"' \
+  --data-binary 'cipher-test-v1' -o /tmp/relay-put1.json
+# expect: 200, ETag: "1" (or higher if key already used)
+
+# Stale write must 409
+curl -sS -D- -X PUT "$RELAY/sync/$KEY" \
+  -H 'Content-Type: application/octet-stream' \
+  -H 'X-Device-Id: deploy-check' \
+  -H 'If-Match: "0"' \
+  --data-binary 'should-conflict' -o /tmp/relay-put-stale.json
+# expect: HTTP 409, body has revision, ETag header present
+
+# Fresh GET exposes ETag
+curl -sS -D- "$RELAY/sync/$KEY" -o /tmp/relay-get.bin
+# expect: 200, ETag header, body = last successful ciphertext
+
+# Cleanup test key
+curl -sS -D- -X DELETE "$RELAY/sync/$KEY" -o /tmp/relay-del.json
+# expect: 200 or 204
+```
+
+Pass criteria:
+
+1. `/health` 200
+2. Create PUT with `If-Match: "0"` succeeds and returns `ETag`
+3. Second PUT with stale `If-Match` returns **409** (not silent overwrite)
+4. GET returns matching `ETag` and body
+5. CORS still allows browser: response includes
+   `Access-Control-Allow-Origin: *` and
+   `Access-Control-Expose-Headers: ETag`
+
+#### 4. Client spot-check
+
+1. Point a **dev** device at `$RELAY` (or confirm default already is prod URL).
+2. Enable sync with a throwaway sync code.
+3. Sync on device A, change a card, sync on device B → no silent clobber.
+4. Optional: force two near-simultaneous uploads → one may 409-retry once; both
+   end consistent after refresh.
+
+#### 5. Rollback
+
+```bash
+cd sync-relay
+npx wrangler deployments list
+npx wrangler rollback
+# re-run section 3; expect no 409 if rolled back to pre-ETag worker
+```
+
+#### 6. Ops notes
+
+- **Blob size:** worker rejects PUT body > **50 MB**; client download path
+  rejects payloads > **5 MB**. Keep exports small; raise client cap only with
+  a deliberate product change.
+- **TTL:** set R2 lifecycle **90 days** since last update on `recall-sync-blobs`
+  (dashboard or bucket config). Not enforced in worker code alone.
+- **Secrets:** relay holds ciphertext only. No app secrets in `wrangler.toml`.
+- **CORS:** intentionally `*`; safe because blobs are E2E ciphertext.
+- After successful prod deploy, append a line to `docs/DEVLOG.md` with date,
+  worker version / deployment id, and "S4 prod active".
 
 ### Self-hosting
 
 Users who prefer self-hosted sync can point their client at a custom relay URL
 via `Settings → Sync`. The relay only needs:
 
-- GET/PUT/DELETE `/sync/:key` proxied to R2.
+- GET/PUT/DELETE `/sync/:key` proxied to R2 (or equivalent object store).
 - GET `/health` returning `200`.
 - CORS headers wide open for PWA browser access.
+- **Recommended:** same ETag / If-Match / 409 behavior as `sync-relay/src/worker.ts`
+  so multi-device clients do not silent-clobber.
 
 ## Updater flow
 
