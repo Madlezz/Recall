@@ -4,6 +4,31 @@ Append-only. Newest first.
 
 ---
 
+## 2026-07-18 — Batch H: self-host-first cloud sync
+
+**Branch:** `feat/self-host-sync-first`
+
+### Done
+
+- `getDefaultRelayUrl()` returns empty - no maintainer public relay
+- `resolveRelayUrl()` requires non-empty HTTPS before any sync call
+- Settings UI: relay URL required up front; self-host hint; save relay when paired
+- i18n en/id: relayRequired, selfHostHint, saveRelay, copy update
+- Tests: empty default, resolveRelayUrl, fail-fast missing URL (13 pass)
+- AGENTS.md Cost / infra + SYNC.md self-host wording
+
+### Product model
+
+Ship the **feature** (`sync-relay/` + client). Users own the bill (free tier OK).
+Folder/file sync still works with zero cloud.
+
+### Next
+
+1. More free tests / handoff refresh
+2. S1 ceiling (keyring) only if wanted later - still free/on-device
+
+---
+
 ## 2026-07-18 — Batch G: coverage ratchet (T4)
 
 **Branch:** `chore/coverage-ratchet`
@@ -20,8 +45,7 @@ Append-only. Newest first.
 ### Next
 
 1. Free work: more service tests (`repository.ts`, `sync-secret.ts`, `sync.ts`)
-2. Docs-only PR #57 (self-host checklist + no owner-paid infra) if still open
-3. S1 ceiling (keyring) only if wanted later - still free/on-device
+2. S1 ceiling (keyring) only if wanted later - still free/on-device
 
 ---
 

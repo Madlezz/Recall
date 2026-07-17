@@ -4,9 +4,9 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useRecallStore } from "@/stores/recall-store";
 import { generateSyncCode, formatSyncCodeInput, isValidSyncCode } from "@/services/crypto";
-import { performEncryptedSync, testSyncRelay, getDefaultRelayUrl, type SyncConfig } from "@/services/sync-protocol";
+import { performEncryptedSync, testSyncRelay, resolveRelayUrl, type SyncConfig } from "@/services/sync-protocol";
 
-const DEFAULT_RELAY_URL = getDefaultRelayUrl();
+const RELAY_PLACEHOLDER = "https://your-worker.workers.dev";
 
 export function SyncSection(): JSX.Element {
   const { t } = useTranslation();
@@ -20,15 +20,34 @@ export function SyncSection(): JSX.Element {
   const [isSyncing, setIsSyncing] = useState(false);
   const [showCodeInput, setShowCodeInput] = useState(false);
   const [codeInput, setCodeInput] = useState("");
-  const [relayInput, setRelayInput] = useState("");
+  const [relayInput, setRelayInput] = useState(settings.syncRelayUrl ?? "");
 
   const isPaired = !!settings.syncCode;
-  const relayUrl = settings.syncRelayUrl || DEFAULT_RELAY_URL;
+  const relayUrl = settings.syncRelayUrl?.trim() || "";
+
+  function readRelayInput(): string | null {
+    try {
+      return resolveRelayUrl(relayInput || settings.syncRelayUrl);
+    } catch {
+      toast.error(t("sync.relayRequired"));
+      return null;
+    }
+  }
 
   async function handleGenerateCode(): Promise<void> {
+    const url = readRelayInput();
+    if (!url) return;
+
+    const relayOk = await testSyncRelay(url);
+    if (!relayOk) {
+      toast.error(t("sync.relayUnreachable"));
+      return;
+    }
+
     const { code } = generateSyncCode();
     await updateSettings({
       syncCode: code,
+      syncRelayUrl: url,
       syncEnabled: true,
     });
     toast.success(t("sync.codeGenerated"));
@@ -41,9 +60,10 @@ export function SyncSection(): JSX.Element {
       return;
     }
 
-    // Test relay connectivity
-    const testUrl = relayInput || DEFAULT_RELAY_URL;
-    const relayOk = await testSyncRelay(testUrl);
+    const url = readRelayInput();
+    if (!url) return;
+
+    const relayOk = await testSyncRelay(url);
     if (!relayOk) {
       toast.error(t("sync.relayUnreachable"));
       return;
@@ -51,14 +71,13 @@ export function SyncSection(): JSX.Element {
 
     await updateSettings({
       syncCode: formatted,
-      syncRelayUrl: relayInput || null,
+      syncRelayUrl: url,
       syncEnabled: true,
     });
 
     toast.success(t("sync.devicePaired"));
     setShowCodeInput(false);
     setCodeInput("");
-    setRelayInput("");
   }
 
   async function handleUnlink(): Promise<void> {
@@ -73,6 +92,13 @@ export function SyncSection(): JSX.Element {
 
   async function handleSyncNow(): Promise<void> {
     if (!settings.syncCode) return;
+    let url: string;
+    try {
+      url = resolveRelayUrl(settings.syncRelayUrl);
+    } catch {
+      toast.error(t("sync.relayRequired"));
+      return;
+    }
     setIsSyncing(true);
 
     try {
@@ -85,7 +111,7 @@ export function SyncSection(): JSX.Element {
       };
 
       const config: SyncConfig = {
-        relayUrl,
+        relayUrl: url,
         syncCode: settings.syncCode,
         enabled: true,
         lastSyncAt: settings.syncLastAt,
@@ -149,8 +175,22 @@ export function SyncSection(): JSX.Element {
         {!isPaired ? (
           /* ── Not paired: show setup options ── */
           <div className="space-y-4">
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-on-surface-variant">
+                {t("sync.relayUrl")}
+              </label>
+              <input
+                type="url"
+                value={relayInput}
+                onChange={(e) => setRelayInput(e.target.value)}
+                placeholder={RELAY_PLACEHOLDER}
+                className="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-sm dark:border-outline dark:bg-surface-container"
+              />
+              <p className="mt-1.5 text-xs text-on-surface-variant">{t("sync.selfHostHint")}</p>
+            </div>
+
             <div className="flex flex-col gap-3 sm:flex-row">
-              <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all gap-2 min-h-[44px] flex-1" onClick={handleGenerateCode}>
+              <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all gap-2 min-h-[44px] flex-1" onClick={() => void handleGenerateCode()}>
                 <KeyRound className="h-4 w-4" />
                 {t("sync.generateCode")}
               </button>
@@ -176,18 +216,6 @@ export function SyncSection(): JSX.Element {
                     placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX"
                     className="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-sm font-mono tracking-wider dark:border-outline dark:bg-surface-container"
                     maxLength={59}
-                  />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium text-on-surface-variant">
-                    {t("sync.relayUrl")} <span className="text-on-surface-variant">({t("sync.optional")})</span>
-                  </label>
-                  <input
-                    type="url"
-                    value={relayInput}
-                    onChange={(e) => setRelayInput(e.target.value)}
-                    placeholder={DEFAULT_RELAY_URL}
-                    className="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-sm dark:border-outline dark:bg-surface-container"
                   />
                 </div>
                 <div className="flex gap-2">
@@ -268,14 +296,35 @@ export function SyncSection(): JSX.Element {
               </button>
             </div>
 
-            {/* Relay URL (advanced) */}
-            <details className="text-xs text-on-surface-variant">
+            {/* Relay URL (self-hosted) */}
+            <details className="text-xs text-on-surface-variant" open={!relayUrl}>
               <summary className="cursor-pointer hover:text-on-surface-variant dark:hover:text-text-secondary">
                 {t("sync.advanced")}
               </summary>
-              <p className="mt-2">
-                {t("sync.relayUrl")}: <code className="text-on-surface-variant dark:text-on-surface-variant">{relayUrl}</code>
-              </p>
+              <div className="mt-2 space-y-2">
+                <label className="block text-xs font-medium">{t("sync.relayUrl")}</label>
+                <input
+                  type="url"
+                  value={relayInput || relayUrl}
+                  onChange={(e) => setRelayInput(e.target.value)}
+                  placeholder={RELAY_PLACEHOLDER}
+                  className="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-sm dark:border-outline dark:bg-surface-container"
+                />
+                <p>{t("sync.selfHostHint")}</p>
+                <button
+                  type="button"
+                  className="inline-flex items-center rounded-lg border border-outline-variant px-3 py-1.5 text-xs font-semibold hover:bg-surface-container-low"
+                  onClick={() => {
+                    const url = readRelayInput();
+                    if (!url) return;
+                    void updateSettings({ syncRelayUrl: url }).then(() => {
+                      toast.success(t("sync.relaySaved"));
+                    });
+                  }}
+                >
+                  {t("sync.saveRelay")}
+                </button>
+              </div>
             </details>
           </div>
         )}

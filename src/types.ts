@@ -97,7 +97,7 @@ export interface RecallSettings {
   syncEnabled: boolean;
   // E2E encrypted cloud sync
   syncCode: string | null; // Human-readable sync code (encodes key material)
-  syncRelayUrl: string | null; // Self-hostable relay URL (null = default)
+  syncRelayUrl: string | null; // Required self-hosted relay URL when cloud sync enabled (null = unset)
   syncLastAt: string | null; // Last successful sync timestamp
   syncAutoInterval: number; // Auto-sync interval in minutes (0 = manual)
   ttsEnabled: boolean; // Enable text-to-speech in study mode

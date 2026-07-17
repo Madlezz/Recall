@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   deleteSyncData,
   getDefaultRelayUrl,
+  resolveRelayUrl,
   getDeviceId,
   performEncryptedSync,
   testSyncRelay,
@@ -132,8 +133,24 @@ describe("sync-protocol happy paths", () => {
     vi.restoreAllMocks();
   });
 
-  it("getDefaultRelayUrl is https", () => {
-    expect(getDefaultRelayUrl()).toMatch(/^https:\/\//);
+  it("getDefaultRelayUrl is empty (no public relay)", () => {
+    expect(getDefaultRelayUrl()).toBe("");
+  });
+
+  it("resolveRelayUrl requires https self-host URL", () => {
+    expect(() => resolveRelayUrl("")).toThrow(/required/i);
+    expect(() => resolveRelayUrl("http://insecure.example")).toThrow(/HTTPS/i);
+    expect(resolveRelayUrl("https://my-worker.example/")).toBe("https://my-worker.example");
+  });
+
+  it("performEncryptedSync fails fast without relay URL", async () => {
+    const { code } = generateSyncCode();
+    const result = await performEncryptedSync(emptySnapshot({ syncCode: code }), {
+      ...httpsConfig(""),
+      syncCode: code,
+    });
+    expect(result.success).toBe(false);
+    expect(result.error).toMatch(/required/i);
   });
 
   it("getDeviceId persists across calls", () => {

@@ -103,6 +103,9 @@ credentials.
 ## Self-hosting
 
 The `sync-relay/` folder is a standalone Cloudflare Worker. Deploy with
-`wrangler` (binding an R2 bucket named `RECALL_SYNC`). Point clients at your
-instance by setting `syncRelayUrl` in settings; the default is
-`https://sync.recall.app`. See [`DEPLOYMENT.md`](./DEPLOYMENT.md).
+`wrangler` (binding an R2 bucket named `RECALL_SYNC`) on **your** Cloudflare
+account. Point clients at that URL via **Settings → Sync → Relay URL**.
+
+There is **no** maintainer-funded public default (`getDefaultRelayUrl()` is
+empty). Folder/file sync stays available without a relay. See
+[`DEPLOYMENT.md`](./DEPLOYMENT.md) and `AGENTS.md` Cost / infra.
