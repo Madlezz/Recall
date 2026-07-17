@@ -72,7 +72,7 @@ Status: open / partial / fixed (prior) / wontfix
 | S1 | **H** | **`syncCode` stored in plaintext** → device-local AES-GCM wrap via `sync-secret.ts` on load/save. Not OS keychain yet. | `sync-secret.ts` + repository seal/unseal | **partial 2026-07-17** (wrap done; keyring later) |
 | S2 | **H** | **Docs lie about at-rest protection.** `docs/SYNC.md` describes `sync-secret.ts` wrapping key in IndexedDB; file was removed (`f9a0d998` "orphaned sync-secret.ts") and is **absent**. | `docs/SYNC.md` L74–89; `test -f` → NO | open (docs + product) |
 | S3 | **H** | **`enforceHttps` only on download path.** Fixed: upload/download/health/delete all use returned `safeUrl`. | `sync-protocol.ts` + `sync-protocol.test.ts` | **fixed 2026-07-17** |
-| S4 | **M** | **Relay last-writer-wins.** → ETag/revision + If-Match + 1 retry on 409. Merge still full-snapshot (not CRDT). | `worker.ts` + `sync-protocol.ts` | **partial 2026-07-17** |
+| S4 | **M** | **Relay last-writer-wins.** → ETag/revision + If-Match + 1 retry on 409 in code (#56). Merge still full-snapshot (not CRDT). **Prod worker must be redeployed** for 409 to fire live. | `worker.ts` + `sync-protocol.ts` + `docs/DEPLOYMENT.md` checklist | **partial 2026-07-17** (code); **ops open 2026-07-18** |
 | S5 | **M** | **DELETE + PUT authenticated only by knowledge of blob key** (SHA-256 of sync code). Expected for "code is the secret" design, but no rate-limit beyond CF defaults documented; no proof-of-possession beyond hash. | `worker.ts` | accepted design; document |
 | S6 | **L** | **CORS `*`** on relay — required for browser PWA; fine because ciphertext only. | `worker.ts` | accepted |
 | S7 | **partial** | Import hijack of device sync settings mitigated by `preserveDeviceSyncSettings`. | `repository.ts` + tests | fixed prior (`79ba715a`) |
@@ -145,8 +145,10 @@ Score: impact 1–5, effort 1–5 (lower effort better). **Do first = high impac
 | ~~P0~~ | S3 | HTTPS on all relay entrypoints | 5 | 1 | **done** #50 |
 | ~~P0~~ | Doc1 | SYNC.md at-rest honesty | 4 | 1 | **done** #50 |
 | ~~P1~~ | T1 | Unit tests for `sync-protocol` happy paths | 5 | 2 | **done** #51 (10 cases) |
-| **P1** | S1 | Design + land at-rest protection for `syncCode` (minimal: WebCrypto wrap + IndexedDB key; Tauri keyring later) | 5 | 4 | Real threat for desktop backups |
-| **P1** | S4 | Relay optimistic concurrency: version/ETag on PUT, 409 on stale | 4 | 3 | Multi-device users |
+| **P1** | S1 | At-rest `syncCode`: WebCrypto wrap + IndexedDB key **landed** #55; ceiling = OS keyring / Tauri stronghold | 5 | 3 | Device key still in IDB/localStorage |
+| ~~P1~~ | S4 code | ETag/If-Match + 409 retry | 4 | 3 | **done** #56 |
+| **P1** | S4 ops | Redeploy prod `sync-relay` + smoke checklist (`docs/DEPLOYMENT.md`) | 4 | 1 | Old worker = no concurrency |
+| **P3** | S4 ceiling | Field-level CRDT / smarter merge (beyond full-snapshot LWW) | 3 | 5 | Only if multi-device clobber still hurts after ops |
 | ~~P2~~ | D1–D3 | Merge Dependabot #47/#49 + manual #52 for #48 | 2 | 1 | **done** |
 | ~~P2~~ | Alert #9 | `serde_with` 3.21.0 | 3 | 1 | PR #53 |
 | **P2** | T3 | Targeted `repository` tests for snapshot preserve + batch move/upsert | 3 | 2 | Perf path already landed |

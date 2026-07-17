@@ -25,6 +25,37 @@ Append-only. Newest first.
 
 ---
 
+## 2026-07-18 — Batch F: relay production deploy checklist (S4 ops)
+
+**Branch:** `docs/relay-deploy-checklist`
+
+### Done
+
+- Expand `docs/DEPLOYMENT.md` Sync Relay section: preconditions, deploy,
+  post-deploy curl smoke (ETag create + 409 stale + GET + DELETE), client
+  spot-check, rollback via `wrangler rollback`, size/TTL/CORS notes
+- Align `sync-relay/README.md` API with ETag/If-Match/409 + link full checklist
+- Fix default URL typo (`sync.recall-app` → `sync.recall.app`)
+- Document client 5 MB download vs worker 50 MB PUT caps honestly
+- AUDIT: S4 note + ops open for **prod deploy** (code already on main #56)
+
+### Policy (2026-07-18)
+
+- **No owner-paid infra.** Maintainer does not fund Cloudflare/prod relay.
+- S4 ops public deploy = **deferred**. Checklist remains for **self-hosters**.
+- Rules written: `AGENTS.md` Cost / infra + vault Product and Engineering Rules.
+
+### Not done (intentionally)
+
+- Maintainer `wrangler deploy` / live `sync.recall.app` ops
+
+### Next
+
+1. Free work only: S1 keyring-in-app ceiling / coverage ratchet / handoff docs
+2. Self-hosters: use DEPLOYMENT checklist on **their** CF account
+
+---
+
 ## 2026-07-17 — Batch E: relay ETag concurrency (S4 partial)
 
 **Branch:** `feat/sync-relay-etag`
