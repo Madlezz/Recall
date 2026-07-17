@@ -45,8 +45,8 @@ throws if the relay URL is not `https://` (`enforceHttps`).
 | Method | Path | Purpose |
 |---|---|---|
 | `GET` | `/health` | Connectivity check (`testSyncRelay`). |
-| `GET` | `/sync/:key` | Download blob. `404` = no data yet (first sync). |
-| `PUT` | `/sync/:key` | Upload blob. `X-Device-Id` header. |
+| `GET` | `/sync/:key` | Download blob. `404` = no data yet (first sync). Returns `ETag` revision. |
+| `PUT` | `/sync/:key` | Upload blob. `X-Device-Id` + `If-Match` (optimistic concurrency). |
 | `DELETE` | `/sync/:key` | Unlink this sync code (`deleteSyncData`). |
 
 `:key` must match `^[a-f0-9]{64}$` (a SHA-256 hex blob key). Responses are
@@ -58,18 +58,23 @@ is 90 days since last update (R2 lifecycle rule).
 
 1. Compute `blobKey = SHA-256(normalize(syncCode))`.
 2. `GET /sync/:key`.
-   - **404** → first sync: encrypt local state, `PUT`, done.
-   - **200** → decrypt remote blob with the sync code, validate shape
+   - **404** → first sync: encrypt local state, `PUT` with `If-Match: "0"`.
+   - **200** → read `ETag` revision; decrypt remote blob; validate shape
      (`validateDecryptedPayload` → `parseImportPayload`).
 3. Merge remote into local via `mergeImportPayload(localState, remoteData)`.
-   The merge counts decks/cards/reviewLogs changed for the result.
-4. Re-encrypt the merged snapshot (`buildExportPayload` → `encryptData`) and
-   `PUT /sync/:key`.
-5. Return `SyncResult { success, uploaded, downloaded, mergedSnapshot, changes }`.
+4. Re-encrypt the merged snapshot and `PUT /sync/:key` with `If-Match` = that ETag.
+5. On **409 Conflict**: re-download, re-merge, retry **once**. Still 409 → fail.
+6. Return `SyncResult { success, uploaded, downloaded, mergedSnapshot, changes }`.
+
+### Optimistic concurrency
+
+Relay stores a monotonic `revision` in R2 `customMetadata`. GET returns it as
+`ETag`. PUT rejects stale writers with 409 + current ETag. Merge is still
+full-snapshot (not field-level CRDT); concurrency only prevents silent clobber
+of a concurrent upload.
 
 Each device carries a persistent `deviceId` (`localStorage` / web, used as
-`X-Device-Id`) so the relay can attribute writes; merges are idempotent per
-device.
+`X-Device-Id`) so the relay can attribute writes.
 
 ## Device-local key protection
 

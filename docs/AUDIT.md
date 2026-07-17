@@ -72,7 +72,7 @@ Status: open / partial / fixed (prior) / wontfix
 | S1 | **H** | **`syncCode` stored in plaintext** → device-local AES-GCM wrap via `sync-secret.ts` on load/save. Not OS keychain yet. | `sync-secret.ts` + repository seal/unseal | **partial 2026-07-17** (wrap done; keyring later) |
 | S2 | **H** | **Docs lie about at-rest protection.** `docs/SYNC.md` describes `sync-secret.ts` wrapping key in IndexedDB; file was removed (`f9a0d998` "orphaned sync-secret.ts") and is **absent**. | `docs/SYNC.md` L74–89; `test -f` → NO | open (docs + product) |
 | S3 | **H** | **`enforceHttps` only on download path.** Fixed: upload/download/health/delete all use returned `safeUrl`. | `sync-protocol.ts` + `sync-protocol.test.ts` | **fixed 2026-07-17** |
-| S4 | **M** | **Relay last-writer-wins.** No ETag / revision / If-Match. Two devices syncing near-simultaneously can clobber. Merge is full-snapshot LWW after decrypt. | `worker.ts` PUT overwrite; `performEncryptedSync` | open (known) |
+| S4 | **M** | **Relay last-writer-wins.** → ETag/revision + If-Match + 1 retry on 409. Merge still full-snapshot (not CRDT). | `worker.ts` + `sync-protocol.ts` | **partial 2026-07-17** |
 | S5 | **M** | **DELETE + PUT authenticated only by knowledge of blob key** (SHA-256 of sync code). Expected for "code is the secret" design, but no rate-limit beyond CF defaults documented; no proof-of-possession beyond hash. | `worker.ts` | accepted design; document |
 | S6 | **L** | **CORS `*`** on relay — required for browser PWA; fine because ciphertext only. | `worker.ts` | accepted |
 | S7 | **partial** | Import hijack of device sync settings mitigated by `preserveDeviceSyncSettings`. | `repository.ts` + tests | fixed prior (`79ba715a`) |
