@@ -1,3 +1,7 @@
+<div align="center">
+
+<img src="public/Lettermark_transparent.png" alt="Recall logo" width="160" height="160" />
+
 # Recall
 
 [![CI](https://github.com/Madlezz/Recall/actions/workflows/ci.yml/badge.svg)](https://github.com/Madlezz/Recall/actions/workflows/ci.yml)
@@ -6,6 +10,8 @@
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20PWA-blue)](https://github.com/Madlezz/Recall/releases/latest)
 
 **Recall** is a local-first flashcard app built for focused learning. It uses FSRS-based scheduling for modern spaced repetition - open it and start reviewing. Your data stays on your machine. Available as a desktop app (Windows / macOS / Linux) and a PWA on mobile.
+
+</div>
 
 ## Documentation
 
