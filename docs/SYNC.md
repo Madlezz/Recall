@@ -73,20 +73,19 @@ device.
 
 ## Device-local key protection
 
-`syncCode` is E2E key material and **must never** be persisted in plaintext,
-serialized into exports, or logged. `src/services/sync-secret.ts` wraps it
-at rest:
+`syncCode` is E2E key material. It **must never** be serialized into exports
+or logged. Import paths strip device sync fields via
+`preserveDeviceSyncSettings()` in `repository.ts`.
 
-- Generates a random **AES-GCM 256-bit wrapping key** stored in IndexedDB
-  (`recall_device_wrapping_key`).
-- `encryptSyncCode` / `decryptSyncCode` encrypt the sync code before it touches
-  the settings table and decrypt on read.
-- Tauri falls back to a protected file / `localStorage` when IndexedDB is
-  unavailable.
+**At-rest status (2026-07-17):** the sync code is still stored **in plaintext**
+in app settings (SQLite `sync_code` on desktop, snapshot/localStorage in the
+browser). There is no wrapping key / OS keychain integration yet.
+`sync-secret.ts` was removed as orphaned work and is **not** in the tree.
 
-> **Status:** `sync-secret.ts` is currently **untracked** and not yet wired into
-> the store/settings flow. Until it is, treat sync-code-at-rest protection as
-> not-yet-enforced.
+Treat disk encryption / full-disk access control as the current boundary for
+at-rest secrecy. Planned work (see [`AUDIT.md`](./AUDIT.md) item S1): wrap the
+code with a device-local AES-GCM key (IndexedDB on web; platform keyring on
+Tauri) and migrate existing plaintext on load.
 
 ## Import safety boundary
 
