@@ -94,7 +94,7 @@ Status: open / partial / fixed (prior) / wontfix
 | ID | Sev | Finding | Notes |
 |---|---|---|---|
 | T1 | **H** | **`sync-protocol.ts` coverage 0%** → happy-path unit tests landed (#51, 10 cases) | partial — expand further as needed |
-| T2 | **H** | **`sync.ts` coverage 0%** | folder sync |
+| T2 | **H** | **`sync.ts` coverage** → unit tests landed (8 cases, 2026-07-18) | partial |
 | T3 | M | `repository.ts` ~25% lines — bulk of persistence untested outside helpers | raise targeted tests |
 | T4 | M | Coverage gate **35% lines / 35% stmts / 31% funcs / 29% branches** (ratchet 2026-07-18; measured ~36.4L) | keep bumping after test batches |
 | T5 | M | E2E exists (`smoke`, `core-loop`, `card-crud`, `settings`) but no sync E2E | optional later |
