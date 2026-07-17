@@ -12,6 +12,18 @@ interface DeckCardProps {
   onOpen: () => void;
 }
 
+/** First 1-2 letter initials, ignoring emoji/symbol-only tokens. */
+export function deckInitials(name: string): string {
+  const words = name
+    .trim()
+    .split(/\s+/)
+    .map((w) => (w.match(/\p{L}/gu) ?? []).join(""))
+    .filter(Boolean);
+  if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return "?";
+}
+
 export function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
   const { t } = useTranslation();
   const cards = useRecallStore((state) => state.cards);
@@ -29,11 +41,8 @@ export function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
     return forecast.map((f) => ({ height: Math.max(Math.round((f.due / max) * 20), 1) }));
   }, [deckCards]);
 
-  const abbr = useMemo(() => {
-    const words = deck.name.trim().split(/\s+/);
-    if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
-    return deck.name.slice(0, 2).toUpperCase();
-  }, [deck.name]);
+  // Template decks prefix emoji in name ("👋 How This Works"); skip non-letters.
+  const abbr = useMemo(() => deckInitials(deck.name), [deck.name]);
 
   return (
     <button

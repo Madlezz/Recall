@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20PWA-blue)](https://github.com/Madlezz/Recall/releases/latest)
 
-**Recall** is a local-first flashcard app built for focused learning. It uses FSRS-based scheduling for modern spaced repetition — open it and start reviewing. Your data stays on your machine. Available as a desktop app (Windows / macOS / Linux) and a PWA on mobile.
+**Recall** is a local-first flashcard app built for focused learning. It uses FSRS-based scheduling for modern spaced repetition - open it and start reviewing. Your data stays on your machine. Available as a desktop app (Windows / macOS / Linux) and a PWA on mobile.
 
 ## Documentation
 
@@ -46,7 +46,7 @@ Anki pioneered spaced repetition and has an enormous add-on ecosystem. Recall ta
 
 ## Screenshots
 
-Dashboard — due cards, daily goal, deck grid:
+Dashboard - due cards, daily goal, deck grid:
 
 ![Dashboard](docs/screenshots/dashboard.png)
 
@@ -54,31 +54,31 @@ Deck browser:
 
 ![Deck Browser](docs/screenshots/deck-browser.png)
 
-Deck detail — stats, tags, card list:
+Deck detail - stats, tags, card list:
 
 ![Deck Detail](docs/screenshots/deck-detail.png)
 
-Study — card front:
+Study - card front:
 
 ![Study Mode](docs/screenshots/study.png)
 
-Study — answer revealed + FSRS interval preview:
+Study - answer revealed + FSRS interval preview:
 
-![Study — Answer Revealed](docs/screenshots/study-revealed.png)
+![Study - Answer Revealed](docs/screenshots/study-revealed.png)
 
-Stats — activity, retention, forecast:
+Stats - activity, retention, forecast:
 
 ![Stats](docs/screenshots/stats.png)
 
-Tags — hierarchical tree:
+Tags - hierarchical tree:
 
 ![Tags](docs/screenshots/tags.png)
 
-Card browser — search, filter, bulk actions:
+Card browser - search, filter, bulk actions:
 
 ![Card Browser](docs/screenshots/card-browser.png)
 
-Settings — theme, accent, language, TTS:
+Settings - theme, accent, language, TTS:
 
 ![Settings](docs/screenshots/settings.png)
 
@@ -89,49 +89,49 @@ Settings — theme, accent, language, TTS:
 ## Features
 
 ### Smart Study
-- **FSRS scheduling** — Again / Hard / Good / Easy
-- **Cloze deletion** — `{{c1::hidden text}}`
-- **Rich cards** — Markdown, LaTeX, syntax-highlighted code
-- **Anki import** — `.apkg` (review history + FSRS state)
+- **FSRS scheduling** - Again / Hard / Good / Easy
+- **Cloze deletion** - `{{c1::hidden text}}`
+- **Rich cards** - Markdown, LaTeX, syntax-highlighted code
+- **Anki import** - `.apkg` (review history + FSRS state)
 - **CSV / Markdown / `.recall` import**
-- **Custom study** — deck, count, tag filter, new-only
-- **Card browser** — search, filter, sort, bulk tag/delete/move
-- **Tags** — hierarchical tree, saved searches, autocomplete
+- **Custom study** - deck, count, tag filter, new-only
+- **Card browser** - search, filter, sort, bulk tag/delete/move
+- **Tags** - hierarchical tree, saved searches, autocomplete
 - **FSRS interval preview** on rating buttons
 - **FSRS optimizer** from review history
-- Keyboard-first: `Space` reveal, `1`–`4` rate, `R` review, `Ctrl+N` quick-add
+- Keyboard-first: `Space` reveal, `1`-`4` rate, `R` review, `Ctrl+N` quick-add
 
 ### Stay Motivated
-- **XP & levels** — Curious Mind → Legend
-- **Achievements** — streaks, volume, accuracy, time-based
+- **XP & levels** - Curious Mind → Legend
+- **Achievements** - streaks, volume, accuracy, time-based
 - **Daily goal** + confetti on completion
 - **Session summaries**
-- **Onboarding gallery** — 6 starter decks
+- **Onboarding gallery** - 6 starter decks
 
 ### Study Tools
-- **Focus timer** — 15 / 25 / 45m
-- **Ambient soundscapes** — Rain, Cafe, Lofi (synthesized, no assets)
+- **Focus timer** - 15 / 25 / 45m
+- **Ambient soundscapes** - Rain, Cafe, Lofi (synthesized, no assets)
 - **Match game**
 - **Review calendar** heatmap
 - **Sound effects** + optional TTS
 - **Swipe gestures** on mobile
 - **Voice input** in card editor (Web Speech API)
-- **Command palette** — `Ctrl+K`
+- **Command palette** - `Ctrl+K`
 
 ### Analytics
 - Review volume, rating distribution, time-of-day
-- Deck health — retention, leeches, overdue
+- Deck health - retention, leeches, overdue
 - Activity heatmap, retention curve, 30-day workload forecast
 
 ### Privacy First
 - No account, no telemetry by default
 - Offline SQLite on your machine
 - JSON / `.recall` export
-- **E2E encrypted sync** — AES-256-GCM + PBKDF2, sync-code pairing, self-hostable Cloudflare Worker
+- **E2E encrypted sync** - AES-256-GCM + PBKDF2, sync-code pairing, self-hostable Cloudflare Worker
 - Optional folder sync (Dropbox, Drive, etc.)
 
 ### Customization
-- **6 accent colors** — zinc, blue, green, rose, amber, violet
+- **6 accent colors** - zinc, blue, green, rose, amber, violet
 - **Dyslexia-friendly font**
 - **Dark / Light / High-contrast**
 - **English + Bahasa Indonesia**
@@ -144,15 +144,15 @@ Settings — theme, accent, language, TTS:
 
 - **Node.js** 22+ (dev pin: `.node-version` → 24.18.0) and **pnpm** 10+
 - **Rust** stable (`rustup install stable`) for desktop builds
-- Platform libraries — see [CONTRIBUTING.md](CONTRIBUTING.md#prerequisites)
+- Platform libraries - see [CONTRIBUTING.md](CONTRIBUTING.md#prerequisites)
 
 ### Run
 
 ```bash
 pnpm install
-pnpm tauri dev       # Desktop (Tauri)
+pnpm tauri dev # Desktop (Tauri)
 # or
-pnpm dev             # Browser preview (no Rust)
+pnpm dev # Browser preview (no Rust)
 ```
 
 ### PWA
@@ -164,10 +164,10 @@ Swipe left / right / up / down to rate after reveal.
 ### Testing
 
 ```bash
-pnpm test            # Unit tests (776)
-pnpm lint            # ESLint
-pnpm build           # tsc + Vite production build
-pnpm test:e2e        # Playwright (starts `pnpm dev` via config)
+pnpm test # Unit tests (778)
+pnpm lint # ESLint
+pnpm build # tsc + Vite production build
+pnpm test:e2e # Playwright (starts `pnpm dev` via config)
 ```
 
 ---
@@ -183,7 +183,7 @@ Pre-built binaries on [Releases](https://github.com/Madlezz/Recall/releases/late
 | macOS (Intel) | `.dmg` |
 | Linux | `.AppImage` |
 
-Or build from source — [Quick Start](#quick-start).
+Or build from source - [Quick Start](#quick-start).
 
 ---
 
@@ -194,7 +194,7 @@ Local-first: card data stays on device unless you enable sync.
 - **CI audits**: `cargo audit`, Dependabot, CodeQL on push/PR
 - **Disclosure**: [SECURITY.md](SECURITY.md)
 
-Sync codes are E2E key material — never put them in exports or screenshots.
+Sync codes are E2E key material - never put them in exports or screenshots.
 
 ---
 
@@ -203,7 +203,7 @@ Sync codes are E2E key material — never put them in exports or screenshots.
 | Keys | Action |
 |------|--------|
 | `Space` | Reveal answer |
-| `1`–`4` | Again / Hard / Good / Easy |
+| `1`-`4` | Again / Hard / Good / Easy |
 | `R` | Start review |
 | `B` | Bury card |
 | `S` | Snooze card |
