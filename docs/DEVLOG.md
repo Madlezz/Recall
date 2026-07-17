@@ -4,6 +4,23 @@ Append-only. Newest first.
 
 ---
 
+## 2026-07-18 — Batch I: folder-sync unit tests (T2)
+
+**Branch:** `test/folder-sync-coverage`
+
+### Done
+
+- 8 unit tests for `src/services/sync.ts` (export / import / performSync)
+- Mock Tauri fs + path; cover missing file, bad version, merge export, write fail
+- Refresh `SESSION_HANDOFF.md` + vault `01 Current State` (self-host policy)
+
+### Next
+
+1. More service tests / re-ratchet coverage if % rose
+2. S1 keyring ceiling (optional, free/on-device)
+
+---
+
 ## 2026-07-18 — Batch H: self-host-first cloud sync
 
 **Branch:** `feat/self-host-sync-first`
