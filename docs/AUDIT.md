@@ -96,7 +96,7 @@ Status: open / partial / fixed (prior) / wontfix
 | T1 | **H** | **`sync-protocol.ts` coverage 0%** → happy-path unit tests landed (#51, 10 cases) | partial — expand further as needed |
 | T2 | **H** | **`sync.ts` coverage 0%** | folder sync |
 | T3 | M | `repository.ts` ~25% lines — bulk of persistence untested outside helpers | raise targeted tests |
-| T4 | M | Coverage gate **32% lines** barely under actual 34% — little ratchet headroom abuse but also little pressure | bump after each test batch |
+| T4 | M | Coverage gate **35% lines / 35% stmts / 31% funcs / 29% branches** (ratchet 2026-07-18; measured ~36.4L) | keep bumping after test batches |
 | T5 | M | E2E exists (`smoke`, `core-loop`, `card-crud`, `settings`) but no sync E2E | optional later |
 | T6 | L | 130 `any` warnings concentrated in tests — `no-explicit-any` already error in `src` | defer mass cleanup |
 | T7 | I | 778 tests, solid domain/lib coverage (`src/lib` ~95% lines) | keep |
@@ -150,7 +150,7 @@ Score: impact 1–5, effort 1–5 (lower effort better). **Do first = high impac
 | ~~P2~~ | D1–D3 | Merge Dependabot #47/#49 + manual #52 for #48 | 2 | 1 | **done** |
 | ~~P2~~ | Alert #9 | `serde_with` 3.21.0 | 3 | 1 | PR #53 |
 | **P2** | T3 | Targeted `repository` tests for snapshot preserve + batch move/upsert | 3 | 2 | Perf path already landed |
-| **P2** | T4 | Ratchet coverage gate lines 32→34, branches 28→29 after P1 tests | 2 | 1 | Prevent silent drop |
+| ~~P2~~ | T4 | Ratchet coverage gate | 2 | 1 | **done 2026-07-18** lines/stmts 35, funcs 31, branches 29 |
 | **P3** | Doc2 | Refresh `SESSION_HANDOFF.md` | 2 | 1 | Agent efficiency |
 | **P3** | T6 | Chip away test `any`s | 1 | 3 | Noise only |
 | **P3** | Roadmap | Extra locales / folder auto-detect | 3 | 4 | Product, not firefight |

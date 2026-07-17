@@ -9,7 +9,7 @@ export default defineConfig({
   },
   test: {
     environment: "happy-dom",
-    exclude: ["e2e/**", "node_modules/**"],
+    exclude: ["e2e/**", "node_modules/**", "**/node_modules/**", "sync-relay/**"],
     setupFiles: ["./src/test-setup.ts"],
     coverage: {
       provider: "v8",
@@ -24,17 +24,19 @@ export default defineConfig({
         "src/**/*.d.ts",
         "node_modules/**",
         "e2e/**",
+        "sync-relay/**",
         "vitest.config.ts",
         "vite.config.ts",
         "playwright.config.ts",
       ],
       thresholds: {
-              // Ratchet: set to actual measured coverage (2026-07-14, 763 tests).
-              lines: 32,
-              functions: 28,
-              branches: 28,
-              statements: 32,
-            },
+        // Ratchet 2026-07-18 measured (796 tests): Stmts 35.63 / Branch 30.33 /
+        // Funcs 31.78 / Lines 36.37. Keep ~0.5pt under floor against flake.
+        lines: 35,
+        functions: 31,
+        branches: 29,
+        statements: 35,
+      },
     },
   },
 });
