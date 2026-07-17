@@ -133,7 +133,7 @@ export function RichCard({ content, isBack = false, cardType = "basic", revealed
 
   // Regular markdown rendering for basic cards and back side
   return (
-    <div className={`prose prose-invert max-w-none ${isBack ? 'border-t pt-4 mt-4' : ''}`}>
+    <div className={`prose prose-neutral dark:prose-invert max-w-none text-on-surface ${isBack ? "border-t pt-4 mt-4" : ""}`}>
       <ReactMarkdown
         remarkPlugins={[remarkMath, remarkGfm]}
         rehypePlugins={[

@@ -5,15 +5,22 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20PWA-blue)](https://github.com/Madlezz/Recall/releases/latest)
 
-**Recall** is a local-first flashcard app built for focused learning. It uses FSRS-based scheduling for modern spaced repetition - but you just open it and start reviewing. Your data stays on your machine, always. Available as a desktop app (Windows/macOS/Linux) and a PWA on mobile.
+**Recall** is a local-first flashcard app built for focused learning. It uses FSRS-based scheduling for modern spaced repetition — open it and start reviewing. Your data stays on your machine. Available as a desktop app (Windows / macOS / Linux) and a PWA on mobile.
 
-## 📚 Documentation
+## Documentation
 
-- **[Getting Started](docs/getting-started.md)** - New to Recall? Start here
-- **[Card Formatting](docs/card-formatting.md)** - Markdown, LaTeX, and code blocks
-- **[Accessibility](ACCESSIBILITY.md)** - Keyboard shortcuts and screen reader support
-- **[Roadmap](ROADMAP.md)** - Planned features and improvements
-- **[Changelog](CHANGELOG.md)** - Version history
+| Doc | What |
+|---|---|
+| [Getting Started](docs/getting-started.md) | First run, study loop, import |
+| [Architecture](docs/ARCHITECTURE.md) | App layers, DB, Tauri vs browser |
+| [Sync](docs/SYNC.md) | E2E encrypted relay + folder sync |
+| [Deployment](docs/DEPLOYMENT.md) | Releases, PWA Pages, Worker |
+| [Card Formatting](docs/card-formatting.md) | Markdown, LaTeX, code, cloze |
+| [i18n](docs/i18n.md) | English + Bahasa Indonesia |
+| [Accessibility](ACCESSIBILITY.md) | Keyboard + screen reader |
+| [Roadmap](ROADMAP.md) | Planned work |
+| [Changelog](CHANGELOG.md) | Version history |
+| [Contributing](CONTRIBUTING.md) | Dev setup |
 
 ---
 
@@ -33,85 +40,101 @@
 | Swipe gestures | **Yes** | Yes (AnkiDroid) | No | No |
 | Stack | **React + TypeScript** | Python + Qt | React | ClojureScript |
 
-Anki pioneered spaced repetition and has an enormous add-on ecosystem built over two decades.
-Recall takes a different approach: a **modern, privacy-first** app that implements FSRS
-as the default algorithm on a contributor-friendly TypeScript stack, with built-in gamification,
-focus tools, and a polished UX that doesn't require hunting for add-ons.
+Anki pioneered spaced repetition and has an enormous add-on ecosystem. Recall takes a different path: **modern, privacy-first** FSRS by default on a contributor-friendly TypeScript stack, with gamification and focus tools built in.
 
 ---
 
 ## Screenshots
 
+Dashboard — due cards, daily goal, deck grid:
+
 ![Dashboard](docs/screenshots/dashboard.png)
+
+Deck browser:
+
+![Deck Browser](docs/screenshots/deck-browser.png)
+
+Deck detail — stats, tags, card list:
 
 ![Deck Detail](docs/screenshots/deck-detail.png)
 
+Study — card front:
+
 ![Study Mode](docs/screenshots/study.png)
+
+Study — answer revealed + FSRS interval preview:
 
 ![Study — Answer Revealed](docs/screenshots/study-revealed.png)
 
+Stats — activity, retention, forecast:
+
 ![Stats](docs/screenshots/stats.png)
+
+Tags — hierarchical tree:
 
 ![Tags](docs/screenshots/tags.png)
 
+Card browser — search, filter, bulk actions:
+
 ![Card Browser](docs/screenshots/card-browser.png)
 
+Settings — theme, accent, language, TTS:
+
 ![Settings](docs/screenshots/settings.png)
+
+> Recapture after UI changes: `pnpm dev` in one terminal, then `node scripts/take-screenshots.js`.
 
 ---
 
 ## Features
 
-### 🧠 Smart Study
-- **FSRS scheduling** - Again / Hard / Good / Easy, the algorithm handles the rest
-- **Cloze deletion** - `{{c1::hidden text}}` fill-in-the-blank cards
-- **Rich cards** - Markdown, LaTeX, syntax-highlighted code blocks
-- **Anki import** - bring your `.apkg` decks (preserves review history & FSRS state)
-- **CSV import** - upload a spreadsheet, map columns
-- **Custom study** - deck, count, tag filter, new-only
-- **Card browser** - search, filter, sort, bulk tag/delete/move
-- **Tags** - hierarchical tag tree, saved searches, tag autocomplete
-- **FSRS interval preview** - rating buttons show predicted next intervals
-- **FSRS optimizer** - auto-tune scheduling from your review history
-- Keyboard-first: `Space` reveal, `1`-`4` rate, `R` to start review, `Ctrl+N` quick-add
+### Smart Study
+- **FSRS scheduling** — Again / Hard / Good / Easy
+- **Cloze deletion** — `{{c1::hidden text}}`
+- **Rich cards** — Markdown, LaTeX, syntax-highlighted code
+- **Anki import** — `.apkg` (review history + FSRS state)
+- **CSV / Markdown / `.recall` import**
+- **Custom study** — deck, count, tag filter, new-only
+- **Card browser** — search, filter, sort, bulk tag/delete/move
+- **Tags** — hierarchical tree, saved searches, autocomplete
+- **FSRS interval preview** on rating buttons
+- **FSRS optimizer** from review history
+- Keyboard-first: `Space` reveal, `1`–`4` rate, `R` review, `Ctrl+N` quick-add
 
-### 🎮 Stay Motivated
-- **XP & levels** - earn XP per review, climb from Curious Mind to Legend
-- **Achievements** - 14 milestones (streaks, volume, accuracy, time-based)
-- **Daily goal** - set a target, watch the progress bar, confetti on completion
-- **Session summaries** - ratings breakdown, XP earned, achievement unlocks
-- **Onboarding gallery** - choose from 6 starter decks (How This Works, UTBK Indonesia, Languages, Coding, GRE, Medical)
+### Stay Motivated
+- **XP & levels** — Curious Mind → Legend
+- **Achievements** — streaks, volume, accuracy, time-based
+- **Daily goal** + confetti on completion
+- **Session summaries**
+- **Onboarding gallery** — 6 starter decks
 
-### 🧘 Study Tools
-- **Focus timer** - Pomodoro with 15/25/45m presets
-- **Ambient soundscapes** - Rain, Cafe, Lofi (synthesized locally, zero files)
-- **Match game** - turn cards into a tile-matching puzzle
-- **Review calendar** - month grid showing study activity heatmap
-- **Sound effects** - card flip, correct/incorrect feedback, level-up fanfares
-- **Text-to-speech** - auto-read cards in study mode, configurable speed
-- **Swipe gestures** - swipe to reveal and rate cards on mobile (left=again, right=good, up=easy, down=hard)
-- **Voice input** - speak instead of type in card editor (Web Speech API, offline)
-- **Command palette** - `Ctrl+K` quick navigation
+### Study Tools
+- **Focus timer** — 15 / 25 / 45m
+- **Ambient soundscapes** — Rain, Cafe, Lofi (synthesized, no assets)
+- **Match game**
+- **Review calendar** heatmap
+- **Sound effects** + optional TTS
+- **Swipe gestures** on mobile
+- **Voice input** in card editor (Web Speech API)
+- **Command palette** — `Ctrl+K`
 
-### 📊 Analytics
-- **Stats dashboard** - review volume, rating distribution, time-of-day patterns
-- **Deck health** - retention %, leeches, overdue per deck
-- **Activity heatmap** - GitHub-style contribution graph
-- **Retention curve** - rolling 7-day retention visualization
-- **Workload forecast** - 30-day due card chart with new vs review breakdown
+### Analytics
+- Review volume, rating distribution, time-of-day
+- Deck health — retention, leeches, overdue
+- Activity heatmap, retention curve, 30-day workload forecast
 
-### 🔒 Privacy First
-- No account, no cloud, no telemetry
-- 100% offline, SQLite database on your machine
-- JSON export/import, portable and human-readable
-- **End-to-end encrypted sync** - AES-256-GCM + PBKDF2, sync code pairing, self-hostable Cloudflare Worker relay
-- Optional cloud sync, point to any folder (Dropbox, Google Drive, etc.)
+### Privacy First
+- No account, no telemetry by default
+- Offline SQLite on your machine
+- JSON / `.recall` export
+- **E2E encrypted sync** — AES-256-GCM + PBKDF2, sync-code pairing, self-hostable Cloudflare Worker
+- Optional folder sync (Dropbox, Drive, etc.)
 
-### 🎨 Customization
-- **6 accent colors** - zinc, blue, green, rose, amber, violet
-- **Dyslexia-friendly font** - optional OpenDyslexic/Comic Sans fallback
-- **Dark/Light/High-contrast themes** - three themes to match your preference
-- **Multi-language** - English and Bahasa Indonesia, switch anytime in Settings
+### Customization
+- **6 accent colors** — zinc, blue, green, rose, amber, violet
+- **Dyslexia-friendly font**
+- **Dark / Light / High-contrast**
+- **English + Bahasa Indonesia**
 
 ---
 
@@ -119,64 +142,59 @@ focus tools, and a polished UX that doesn't require hunting for add-ons.
 
 ### Prerequisites
 
-- **Node.js** 22+ and **pnpm** 10+
-- **Rust** stable toolchain (`rustup install stable`)
-- Platform-specific libraries (see [CONTRIBUTING.md](CONTRIBUTING.md#prerequisites) for full list)
+- **Node.js** 22+ (dev pin: `.node-version` → 24.18.0) and **pnpm** 10+
+- **Rust** stable (`rustup install stable`) for desktop builds
+- Platform libraries — see [CONTRIBUTING.md](CONTRIBUTING.md#prerequisites)
 
 ### Run
 
 ```bash
 pnpm install
-pnpm tauri dev       # Full desktop app
+pnpm tauri dev       # Desktop (Tauri)
 # or
-pnpm dev             # Browser-only preview (no Rust needed)
+pnpm dev             # Browser preview (no Rust)
 ```
 
-### PWA (Mobile)
+### PWA
 
-Recall is also available as an installable PWA. Visit the live site, tap "Add to Home Screen":
+Installable PWA: **https://madlezz.github.io/Recall**
 
-**https://madlezz.github.io/Recall**
-
-Swipe gestures work natively - swipe left/right/up/down to rate cards after revealing.
+Swipe left / right / up / down to rate after reveal.
 
 ### Testing
 
 ```bash
-pnpm test            # Unit tests (776 tests, 32% coverage gate)
+pnpm test            # Unit tests (776)
 pnpm lint            # ESLint
-pnpm build           # Production build
-pnpm test:e2e        # Playwright E2E (requires `pnpm dev` running first)
+pnpm build           # tsc + Vite production build
+pnpm test:e2e        # Playwright (starts `pnpm dev` via config)
 ```
-
-For full development guide, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
 ## Download
 
-Pre-built binaries are available on the [Releases page](https://github.com/Madlezz/Recall/releases/latest):
+Pre-built binaries on [Releases](https://github.com/Madlezz/Recall/releases/latest) (latest: **v1.1.0**):
 
 | Platform | File |
 |----------|------|
-| Windows | `.msi` installer |
+| Windows | `.msi` |
 | macOS (Apple Silicon) | `.dmg` |
 | macOS (Intel) | `.dmg` |
 | Linux | `.AppImage` |
 
-Or build from source, see [Quick Start](#quick-start).
+Or build from source — [Quick Start](#quick-start).
 
 ---
 
 ## Security
 
-Recall is a local-first application; your data never leaves your machine. We take security seriously:
+Local-first: card data stays on device unless you enable sync.
 
-- **Automated auditing**: `cargo audit` (Rust) and Dependabot (JS/TS) run on every CI push
-- **CodeQL analysis**: GitHub CodeQL scans for vulnerabilities on every PR
-- **Responsible disclosure**: See [SECURITY.md](SECURITY.md) for reporting vulnerabilities
+- **CI audits**: `cargo audit`, Dependabot, CodeQL on push/PR
+- **Disclosure**: [SECURITY.md](SECURITY.md)
 
-For known transitive vulnerabilities in upstream dependencies, see [SECURITY.md](SECURITY.md).
+Sync codes are E2E key material — never put them in exports or screenshots.
 
 ---
 
@@ -185,28 +203,26 @@ For known transitive vulnerabilities in upstream dependencies, see [SECURITY.md]
 | Keys | Action |
 |------|--------|
 | `Space` | Reveal answer |
-| `1`-`4` | Rate Again / Hard / Good / Easy |
+| `1`–`4` | Again / Hard / Good / Easy |
 | `R` | Start review |
 | `B` | Bury card |
 | `S` | Snooze card |
-| `Ctrl+N` | Quick-add card (in-app) |
-| `Ctrl+Shift+N` | Quick-add card (global, works when minimized) |
+| `Ctrl+N` | Quick-add (in-app) |
+| `Ctrl+Shift+N` | Quick-add (global, desktop) |
 | `Ctrl+Z` | Undo last review |
 | `Ctrl+K` | Command palette |
-| `T` | Toggle text-to-speech |
-| `?` | Show all shortcuts |
+| `T` | Toggle TTS |
+| `?` | All shortcuts |
 
 ---
 
 ## Contributing
 
-Recall is open to contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions,
-project structure, and code style guidelines.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-**Looking for a place to start?**
-- Browse [`good first issue`](https://github.com/Madlezz/Recall/labels/good%20first%20issue) tags
-- Check [ROADMAP.md](ROADMAP.md) for planned features
-- Open an issue to discuss before opening a large PR
+- [`good first issue`](https://github.com/Madlezz/Recall/labels/good%20first%20issue)
+- [ROADMAP.md](ROADMAP.md)
+- Open an issue before large PRs
 
 ---
 
@@ -214,14 +230,15 @@ project structure, and code style guidelines.
 
 | What | With |
 |------|------|
-| Desktop | Tauri 2 |
-| Mobile | PWA (vite-plugin-pwa) |
+| Desktop | Tauri 2 + Rust (rusqlite) |
+| Mobile | PWA (`vite-plugin-pwa`) |
 | UI | React 19 + TypeScript (strict) |
-| Styling | Tailwind CSS + shadcn/ui |
-| Storage | SQLite |
+| Styling | Tailwind CSS + shadcn/ui primitives |
+| Browser storage | Dexie |
+| Desktop storage | SQLite via Tauri |
 | State | Zustand |
-| Algorithm | FSRS (ts-fsrs) |
-| Sync | E2E encrypted (AES-256-GCM + PBKDF2), Cloudflare Worker relay |
+| Algorithm | FSRS (`ts-fsrs`) |
+| Sync | AES-256-GCM + PBKDF2, Cloudflare Worker relay |
 | i18n | react-i18next |
 | Icons | Lucide |
 
