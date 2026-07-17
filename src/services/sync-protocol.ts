@@ -84,7 +84,8 @@ async function uploadEncrypted(
   relayUrl: string,
   deviceId: string,
 ): Promise<boolean> {
-  const response = await fetch(`${relayUrl}/sync/${blobKey}`, {
+  const safeUrl = enforceHttps(relayUrl);
+  const response = await fetch(`${safeUrl}/sync/${blobKey}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -104,8 +105,8 @@ async function downloadEncrypted(
   relayUrl: string,
   deviceId: string,
 ): Promise<EncryptedPayload | null> {
-  enforceHttps(relayUrl);
-  const response = await fetch(`${relayUrl}/sync/${blobKey}`, {
+  const safeUrl = enforceHttps(relayUrl);
+  const response = await fetch(`${safeUrl}/sync/${blobKey}`, {
     method: "GET",
     headers: {
       "X-Device-Id": deviceId,
@@ -232,7 +233,8 @@ export async function performEncryptedSync(
  */
 export async function testSyncRelay(relayUrl: string): Promise<boolean> {
   try {
-    const response = await fetch(`${relayUrl}/health`, { method: "GET" });
+    const safeUrl = enforceHttps(relayUrl);
+    const response = await fetch(`${safeUrl}/health`, { method: "GET" });
     return response.ok;
   } catch {
     return false;
@@ -247,7 +249,8 @@ export async function deleteSyncData(config: SyncConfig): Promise<boolean> {
   const blobKey = await getBlobKey(config.syncCode);
 
   try {
-    const response = await fetch(`${config.relayUrl}/sync/${blobKey}`, {
+    const safeUrl = enforceHttps(config.relayUrl);
+    const response = await fetch(`${safeUrl}/sync/${blobKey}`, {
       method: "DELETE",
       headers: { "X-Device-Id": deviceId },
     });
