@@ -4,6 +4,27 @@ Append-only. Newest first.
 
 ---
 
+## 2026-07-18 — Batch J: README accuracy + v1.2.0 release prep
+
+**Branch:** `release/v1.2.0`
+
+### Done
+
+- README competitor table: Anki FSRS is **opt-in** (not default) per Anki manual
+- Softened RemNote/Mochi cells; disclaimer third-party products change
+- Privacy/sync copy: self-host only, no maintainer public relay
+- Test count 806; download tip **v1.2.0**
+- Version bump package.json / tauri.conf / Cargo.toml / Cargo.lock → 1.2.0
+- CHANGELOG 1.2.0 entry (self-host sync, tests, coverage, security batches)
+
+### Release ops (after merge)
+
+1. Tag `v1.2.0` → `release.yml` builds installers
+2. Delete GitHub releases/tags `v1.1.0` and `v1.0.16` once v1.2.0 assets are live
+3. Wipe local Tauri/target + dist caches
+
+---
+
 ## 2026-07-18 — Batch I: folder-sync unit tests (T2)
 
 **Branch:** `test/folder-sync-coverage`

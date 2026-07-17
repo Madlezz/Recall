@@ -19,7 +19,7 @@
 |---|---|
 | [Getting Started](docs/getting-started.md) | First run, study loop, import |
 | [Architecture](docs/ARCHITECTURE.md) | App layers, DB, Tauri vs browser |
-| [Sync](docs/SYNC.md) | E2E encrypted relay + folder sync |
+| [Sync](docs/SYNC.md) | Optional E2E self-host relay + folder sync |
 | [Deployment](docs/DEPLOYMENT.md) | Releases, PWA Pages, Worker |
 | [Card Formatting](docs/card-formatting.md) | Markdown, LaTeX, code, cloze |
 | [i18n](docs/i18n.md) | English + Bahasa Indonesia |
@@ -32,21 +32,22 @@
 
 ## Why Recall?
 
-| | Recall | Anki (v26.05) | RemNote | Mochi |
-|---|---|---|---|---|
-| Algorithm | **FSRS** (default) | FSRS (default for new users) or SM-2 | SM-2 (default) + FSRS option | SM-2 |
-| Storage | **Local SQLite** | Local SQLite | Cloud-first (offline cache) | Local files |
-| Account required | **No** | No | Yes | No (offline free) |
-| Open source | **Yes** (MIT) | Yes (AGPL) | No | No |
-| Add-on ecosystem | None (planned) | **Massive** (20+ years) | Plugins | Limited |
-| Built-in gamification | **Yes** (XP, levels, achievements) | Via add-ons | Basic | No |
-| Native desktop | **Yes** (Tauri, Rust) | Yes (Qt, Python) | Yes (Electron) | Yes (Electron) |
-| Mobile access | **PWA** (installable) | AnkiDroid (separate) | Yes | Yes |
-| End-to-end encrypted sync | **Yes** (AES-256-GCM) | Via add-on (third-party) | Yes (cloud) | No |
-| Swipe gestures | **Yes** | Yes (AnkiDroid) | No | No |
-| Stack | **React + TypeScript** | Python + Qt | React | ClojureScript |
+Snapshot comparison for orientation only. **Third-party products change** - verify Anki / RemNote / Mochi in their own docs before relying on a cell. Anki version pin: **26.05** (upstream release tag as of mid-2026).
 
-Anki pioneered spaced repetition and has an enormous add-on ecosystem. Recall takes a different path: **modern, privacy-first** FSRS by default on a contributor-friendly TypeScript stack, with gamification and focus tools built in.
+| | Recall | Anki | RemNote | Mochi |
+|---|---|---|---|---|
+| Algorithm | **FSRS** always on | Legacy **SM-2** by default; **FSRS opt-in** in deck options ([Anki manual](https://docs.ankiweb.net/deck-options.html#fsrs)) | Spaced repetition in a notes app (scheduler details product-defined; check in-app) | Spaced repetition (commonly SM-2-style; check Mochi docs) |
+| Storage | **Local-first** (SQLite desktop, IndexedDB browser) | Local SQLite (+ optional AnkiWeb sync) | Cloud-first product with offline use | Local-first files; optional Pro sync |
+| Account required | **No** | No for local use | Yes for the hosted product | No for offline free tier |
+| Open source | **Yes** (MIT) | Yes (AGPL) | No (proprietary) | App proprietary (some related OSS components) |
+| Add-on ecosystem | None (planned) | **Very large** (long history) | Extensions / plugins (product-defined) | Limited vs Anki |
+| Built-in gamification | **Yes** (XP, levels, achievements) | Via community add-ons | Some engagement features | Minimal |
+| Native desktop | **Yes** (Tauri + Rust) | Yes (Qt + Python) | Yes (desktop clients) | Yes (desktop clients) |
+| Mobile | **Installable PWA** | AnkiMobile / AnkiDroid (separate apps) | Mobile apps | Mobile apps |
+| Sync | Optional **E2E** (AES-256-GCM) via **self-hosted** relay, or folder/file sync - no maintainer-hosted cloud | AnkiWeb (not client-side E2E in the Anki sense); third-party options exist | Hosted product sync | Pro sync (see Mochi pricing/docs) |
+| Stack | **React + TypeScript** | Python + Qt | React-based web/desktop | ClojureScript (historically) |
+
+Anki pioneered desktop SRS and still has the deepest ecosystem. Recall is a smaller MIT app: **FSRS on by default**, local-first, TypeScript-friendly contributions, built-in XP/focus tools, optional self-hosted E2E sync.
 
 ---
 
@@ -131,9 +132,9 @@ Settings - theme, accent, language, TTS:
 
 ### Privacy First
 - No account, no telemetry by default
-- Offline SQLite on your machine
+- Offline on your machine (SQLite desktop / IndexedDB browser)
 - JSON / `.recall` export
-- **E2E encrypted sync** - AES-256-GCM + PBKDF2, sync-code pairing, self-hostable Cloudflare Worker
+- **Optional E2E cloud sync** - AES-256-GCM + PBKDF2; you deploy `sync-relay/` (Cloudflare Worker + R2) yourself - no maintainer-funded public relay
 - Optional folder sync (Dropbox, Drive, etc.)
 
 ### Customization
@@ -170,7 +171,7 @@ Swipe left / right / up / down to rate after reveal.
 ### Testing
 
 ```bash
-pnpm test # Unit tests (778)
+pnpm test # Unit tests (806 as of 2026-07-18; count drifts)
 pnpm lint # ESLint
 pnpm build # tsc + Vite production build
 pnpm test:e2e # Playwright (starts `pnpm dev` via config)
@@ -180,7 +181,7 @@ pnpm test:e2e # Playwright (starts `pnpm dev` via config)
 
 ## Download
 
-Pre-built binaries on [Releases](https://github.com/Madlezz/Recall/releases/latest) (latest: **v1.1.0**):
+Pre-built binaries on [Releases](https://github.com/Madlezz/Recall/releases/latest) (latest: **v1.2.0**):
 
 | Platform | File |
 |----------|------|
@@ -244,7 +245,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 | Desktop storage | SQLite via Tauri |
 | State | Zustand |
 | Algorithm | FSRS (`ts-fsrs`) |
-| Sync | AES-256-GCM + PBKDF2, Cloudflare Worker relay |
+| Sync | AES-256-GCM + PBKDF2; self-hosted Worker relay or folder sync |
 | i18n | react-i18next |
 | Icons | Lucide |
 

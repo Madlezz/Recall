@@ -6,21 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-18
+
 ### Added
-- **Material 3 design system:** Complete UI redesign with M3-inspired semantic tokens — surface tiers, text hierarchy, outline variants, primary/secondary/tertiary containers, review rating colors, light/dark/high-contrast themes. All 38 components migrated from legacy zinc classes to semantic tokens. CSS custom properties in `index.css`, Tailwind config extended, `src/lib/surface.ts` helpers (`cardSurface`, `softSurface`, `brandSurface`, `typeClass`). New components: `RecallLogo`, `Mascot`, `ui/surface.tsx`. 767 tests pass, typecheck clean.
-- **Color-blind friendly UI:** Settings → Study toggle swaps rating buttons for an Okabe-Ito color-blind-safe palette and adds a distinct shape + text glyph (✕ ◑ ✓ ★) per rating, so ratings are never conveyed by color alone (WCAG 1.4.1). The stats rating-distribution chart and legend follow the same palette.
-- **Customizable keyboard shortcuts:** Rebindable study shortcuts (reveal, rate Again/Hard/Good/Easy, bury, snooze, read aloud, undo) with live conflict detection. Shortcuts persist in settings; a single source of truth in `src/lib/shortcuts.ts` drives both the study handler and the help dialog. Reset-to-defaults button included.
+- **Self-host-first cloud sync:** no maintainer public relay; Settings requires HTTPS relay URL; `resolveRelayUrl()`; i18n self-host hints.
+- **Folder-sync unit tests** for `sync.ts` (export / import / performSync).
+- **README:** transparent lettermark + centered hero.
 
 ### Changed
-- **README overhaul:** Updated feature comparison table (added mobile access, E2E encrypted sync, swipe gestures rows), PWA section with live URL, test count corrected to 761, tech stack table updated with PWA + sync entries.
+- **Coverage gate ratchet:** lines/statements 35%, functions 31%, branches 29% (measured ~36.4% lines).
+- **Sync docs / policy:** no owner-paid infra; deploy checklist is for self-hosters (`docs/DEPLOYMENT.md`, `AGENTS.md`).
+- **README competitor table:** corrected Anki FSRS (opt-in, not default per Anki manual); softened third-party cells; honest self-host E2E wording; test count 806.
+
+### Security / sync (already on main before tag)
+- Wrap `syncCode` at rest (`enc:v1:` device AES-GCM) - #55.
+- Relay optimistic concurrency (ETag / If-Match / 409 retry) - #56.
 
 ### Maintenance
-- Bumped GitHub Actions (`all-actions` group) and production dependencies (radix-ui, i18next, lucide-react, virtua) via Dependabot. Closes #42. Closes #44.
-- **Line ending normalization:** Added `.gitattributes` with `* text=auto eol=lf` to prevent phantom "modified" status from `core.autocrlf=true` on Windows. All text files now use LF consistently.
-
-### Removed
-- **Untracked internal audit doc:** `recall-vision-and-roadmap-realignment.md` was tracked despite being in `.gitignore` - now removed from the repo.
-- **Tauri auto-generated schemas:** `src-tauri/gen/schemas/*.json` (~950KB) were tracked despite being in `.gitignore` - now removed. These are regenerated on every build.
+- Dependabot bumps (actions, vitest/vite/eslint/playwright, serde_with security).
+- Exclude `sync-relay/**` from vitest discovery.
 
 ## [1.1.0] - 2026-07-04
 
