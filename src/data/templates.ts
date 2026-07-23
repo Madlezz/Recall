@@ -14,6 +14,7 @@ export interface TemplateDeck {
     type: CardType;
     tags: string[];
   }>;
+  defaultTryDeck?: boolean;
 }
 
 const today = new Date();
@@ -22,6 +23,7 @@ const iso = today.toISOString();
 export const TEMPLATE_DECKS: TemplateDeck[] = [
   {
     id: "template_how_it_works",
+    defaultTryDeck: true,
     name: "How This Works",
     description: "Learn spaced repetition by doing it - 5 quick cards",
     icon: "👋",
