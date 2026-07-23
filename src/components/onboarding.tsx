@@ -1,15 +1,16 @@
 import { ArrowRight, BookCheck, Brain, ChevronLeft, ChevronRight, Shield, Sparkles } from "lucide-react";
 import { useRecallStore } from "@/stores/recall-store";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { TEMPLATE_DECKS, createCardsFromTemplate, type TemplateDeck } from "@/data/templates";
+import { TryCard } from "@/components/onboarding/try-card";
 import { RecallLogo } from "@/components/recall-logo";
 import { cn } from "@/lib/utils";
 import { cardSurface, typeClass } from "@/lib/surface";
 import type { Card, Deck } from "@/types";
 
-type Step = "welcome" | "concept" | "system" | "templates" | "goal";
+type Step = "welcome" | "concept" | "system" | "try" | "templates" | "goal";
 
 export function Onboarding(): JSX.Element {
   const { t } = useTranslation();
@@ -20,6 +21,12 @@ export function Onboarding(): JSX.Element {
   const [visible, setVisible] = useState(false);
   const [selectedTemplates, setSelectedTemplates] = useState<Set<string>>(new Set());
   const [goal, setGoal] = useState(20);
+
+  const tryCard = useMemo(() => {
+    const tpl = TEMPLATE_DECKS.find((t) => t.defaultTryDeck) ?? TEMPLATE_DECKS[0];
+    const { cards } = createCardsFromTemplate(tpl);
+    return cards[0];
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 50);
@@ -59,7 +66,7 @@ export function Onboarding(): JSX.Element {
     }
   }
 
-  const steps: Step[] = ["welcome", "concept", "system", "templates", "goal"];
+  const steps: Step[] = ["welcome", "concept", "system", "try", "templates", "goal"];
   const stepIndex = steps.indexOf(step);
 
   return (
@@ -285,10 +292,26 @@ export function Onboarding(): JSX.Element {
               </button>
               <button
                 className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
-                onClick={() => setStep("templates")}
+                onClick={() => setStep("try")}
               >
                 {t("onboarding.systemNext")}
                 <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Step: Try ── */}
+        {step === "try" && (
+          <div className="space-y-6">
+            <TryCard card={tryCard} onContinue={() => setStep("templates")} />
+            <div className="flex gap-3">
+              <button
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-outline-variant bg-surface px-6 py-3 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+                onClick={() => setStep("system")}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                {t("onboarding.back")}
               </button>
             </div>
           </div>
@@ -319,7 +342,7 @@ export function Onboarding(): JSX.Element {
             <div className="flex gap-3">
               <button
                 className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-outline-variant bg-surface px-6 py-3 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
-                onClick={() => setStep("welcome")}
+                onClick={() => setStep("try")}
               >
                 <ChevronLeft className="h-4 w-4" />
                 {t("onboarding.back")}
