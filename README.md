@@ -9,7 +9,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20PWA-blue)](https://github.com/Madlezz/Recall/releases/latest)
 
-**Recall** is a local-first flashcard app built for focused learning. It uses FSRS-based scheduling for modern spaced repetition - open it and start reviewing. Your data stays on your machine. Available as a desktop app (Windows / macOS / Linux) and a PWA on mobile.
+**Recall** is FSRS-grade spaced repetition that makes you want to come back. No manual, no account, your data stays yours. Built-in streaks, XP, and focus rituals turn review into a habit - not a chore. Available as a desktop app (Windows / macOS / Linux) and a PWA on mobile.
 
 </div>
 
@@ -36,18 +36,17 @@ Snapshot comparison for orientation only. **Third-party products change** - veri
 
 | | Recall | Anki | RemNote | Mochi |
 |---|---|---|---|---|
-| Algorithm | **FSRS** always on | Legacy **SM-2** by default; **FSRS opt-in** in deck options ([Anki manual](https://docs.ankiweb.net/deck-options.html#fsrs)) | Spaced repetition in a notes app (scheduler details product-defined; check in-app) | Spaced repetition (commonly SM-2-style; check Mochi docs) |
-| Storage | **Local-first** (SQLite desktop, IndexedDB browser) | Local SQLite (+ optional AnkiWeb sync) | Cloud-first product with offline use | Local-first files; optional Pro sync |
-| Account required | **No** | No for local use | Yes for the hosted product | No for offline free tier |
+| Built-in engagement | **Yes** (XP, streaks, levels, achievements, focus timer, match game) | Via community add-ons | Some engagement features | Minimal |
+| No account, local-first | **Yes** (SQLite desktop, IndexedDB browser) | Local SQLite (+ optional AnkiWeb sync) | Cloud-first product with offline use | Local-first files; optional Pro sync |
+| FSRS on by default | **Yes** | Legacy **SM-2** by default; **FSRS opt-in** in deck options ([Anki manual](https://docs.ankiweb.net/deck-options.html#fsrs)) | Spaced repetition in a notes app (scheduler details product-defined; check in-app) | Spaced repetition (commonly SM-2-style; check Mochi docs) |
 | Open source | **Yes** (MIT) | Yes (AGPL) | No (proprietary) | App proprietary (some related OSS components) |
 | Add-on ecosystem | None (planned) | **Very large** (long history) | Extensions / plugins (product-defined) | Limited vs Anki |
-| Built-in gamification | **Yes** (XP, levels, achievements) | Via community add-ons | Some engagement features | Minimal |
 | Native desktop | **Yes** (Tauri + Rust) | Yes (Qt + Python) | Yes (desktop clients) | Yes (desktop clients) |
 | Mobile | **Installable PWA** | AnkiMobile / AnkiDroid (separate apps) | Mobile apps | Mobile apps |
 | Sync | Optional **E2E** (AES-256-GCM) via **self-hosted** relay, or folder/file sync - no maintainer-hosted cloud | AnkiWeb (not client-side E2E in the Anki sense); third-party options exist | Hosted product sync | Pro sync (see Mochi pricing/docs) |
 | Stack | **React + TypeScript** | Python + Qt | React-based web/desktop | ClojureScript (historically) |
 
-Anki pioneered desktop SRS and still has the deepest ecosystem. Recall is a smaller MIT app: **FSRS on by default**, local-first, TypeScript-friendly contributions, built-in XP/focus tools, optional self-hosted E2E sync.
+Anki pioneered desktop SRS and still has the deepest add-on ecosystem - that is an honest concession. Recall's edge is the habit loop: engagement features are native, not bolted on. **FSRS on by default**, local-first, MIT, TypeScript-friendly contributions, optional self-hosted E2E sync.
 
 ---
 
