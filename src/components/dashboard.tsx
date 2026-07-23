@@ -6,7 +6,7 @@ import { DailyGoal } from "@/components/daily-goal";
 import { DeckDialog } from "@/components/deck-dialog";
 import { DeckCard } from "@/components/deck-card";
 import { RecentActivity } from "@/components/recent-activity";
-import { getDueTodayCount } from "@/lib/stats";
+import { getDueTodayCount, isCardDueToday } from "@/lib/stats";
 import { applyStreakGrace } from "@/lib/streak";
 import { cn } from "@/lib/utils";
 import { cardSurface, typeClass } from "@/lib/surface";
@@ -32,7 +32,7 @@ export function Dashboard(): JSX.Element {
   const sortedDecks = useMemo(() => {
     const withStats = decks.map((deck) => {
       const deckCards = cards.filter((c) => c.deckId === deck.id);
-      const due = deckCards.filter((c) => getDueForCard(c)).length;
+      const due = deckCards.filter((c) => isCardDueToday(c)).length;
       return { ...deck, dueCount: due, totalCards: deckCards.length, deckCards };
     });
     withStats.sort((a, b) => b.dueCount - a.dueCount);
@@ -43,7 +43,7 @@ export function Dashboard(): JSX.Element {
   const greeting = useMemo(() => getGreeting(t), [t]);
 
   const handleStartReview = () => {
-    const anyDue = cards.some((c) => isCardDue(c));
+    const anyDue = cards.some((c) => isCardDueToday(c));
     if (!anyDue) {
       toast.info(t("dashboard.noCardsDue"));
       return;
@@ -193,14 +193,6 @@ export function Dashboard(): JSX.Element {
 // ═══════════════════════════════════════════════
 // Helpers
 // ═══════════════════════════════════════════════
-
-function getDueForCard(c: { state: string }): boolean {
-  return c.state === "review" || c.state === "learning" || c.state === "relearning";
-}
-
-function isCardDue(c: { state: string }): boolean {
-  return getDueForCard(c);
-}
 
 function getGreeting(t: (key: string) => string): string {
   const hour = new Date().getHours();

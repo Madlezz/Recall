@@ -128,6 +128,7 @@ describe("Dashboard", () => {
 
   it("shows toast when startReview returns false", () => {
     mockToastInfo.mockClear();
+    mockStore.cards = [];
     mockStore.startReview = vi.fn(() => false);
     render(React.createElement(Dashboard));
     // Task 8 ritual hero: button label changed from "Start Review" to "Start today's ritual"
