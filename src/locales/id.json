@@ -78,7 +78,12 @@
     "cardsReady": "Kamu punya {{count}} kartu siap direview hari ini.",
     "cardsReady_one": "Kamu punya 1 kartu siap direview hari ini.",
     "searchDecks": "Cari deck kamu...",
-    "viewAll": "Lihat Semua"
+    "viewAll": "Lihat Semua",
+    "ritualReady": "Siap?",
+    "ritualStartSession": "Mulai sesi hari ini",
+    "ritualFirstSession": "Siap untuk sesi pertama?",
+    "ritualStartRitual": "Mulai ritual hari ini",
+    "ritualGrace": "Streak terselamatkan - jangan lewatkan hari ini!"
   },
   "todayBand": {
     "due": "Jatuh tempo",

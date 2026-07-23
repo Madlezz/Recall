@@ -80,7 +80,12 @@
     "cardsReady": "You have {{count}} cards ready today.",
     "cardsReady_one": "You have 1 card ready today.",
     "searchDecks": "Search your decks...",
-    "viewAll": "View All"
+    "viewAll": "View All",
+    "ritualReady": "Ready?",
+    "ritualStartSession": "Start today's session",
+    "ritualFirstSession": "Ready for your first session?",
+    "ritualStartRitual": "Start today's ritual",
+    "ritualGrace": "Streak saved - don't miss today!"
   },
   "todayBand": {
     "due": "Due",
