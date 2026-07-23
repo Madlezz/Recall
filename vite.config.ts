@@ -18,9 +18,9 @@ export default defineConfig(({ mode }) => ({
         navigateFallbackDenylist: [/^\/api/],
       },
       manifest: {
-        name: "Recall - Spaced Repetition Flashcards",
+        name: "Recall - Spaced Repetition That Makes You Come Back",
         short_name: "Recall",
-        description: "FSRS-based flashcard app for focused learning. Your data stays on your device, always.",
+        description: "FSRS-grade spaced repetition that makes you want to come back. No manual, no account, your data stays yours.",
         theme_color: "#0f172a",
         background_color: "#0f172a",
         display: "standalone",
