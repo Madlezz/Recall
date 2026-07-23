@@ -80,7 +80,12 @@
     "cardsReady": "You have {{count}} cards ready today.",
     "cardsReady_one": "You have 1 card ready today.",
     "searchDecks": "Search your decks...",
-    "viewAll": "View All"
+    "viewAll": "View All",
+    "ritualReady": "Ready?",
+    "ritualStartSession": "Start today's session",
+    "ritualFirstSession": "Ready for your first session?",
+    "ritualStartRitual": "Start today's ritual",
+    "ritualGrace": "Streak saved - don't miss today!"
   },
   "todayBand": {
     "due": "Due",
@@ -137,6 +142,11 @@
     "studyToday": "Study today!",
     "oneDay": "1 day",
     "days": "{{count}} days"
+  },
+  "share": {
+    "recallTagline": "FSRS-grade spaced repetition that makes you want to come back. No manual, no account, your data stays yours.",
+    "copyLink": "Share Recall",
+    "copied": "Link copied!"
   },
   "study": {
     "reveal": "Reveal",
@@ -788,7 +798,12 @@
     "systemFsrs": "FSRS Algorithm",
     "systemFsrsDesc": "The latest memory science automatically adjusts to your pace.",
     "systemTrust": "Trust yourself",
-    "systemTrustDesc": "There are no wrong ratings. Just your personal learning curve."
+    "systemTrustDesc": "There are no wrong ratings. Just your personal learning curve.",
+    "tryTitle": "Try it now",
+    "tryDesc": "Here is a real card. Press Space or Reveal, then rate how well you knew it.",
+    "tryHint": "This is exactly how every review works.",
+    "tryAhaMessage": "That's it. You just used FSRS. Recall will reschedule this card based on how you rated.",
+    "continueSetup": "Continue setup"
   },
   "focusTimer": {
     "title": "Focus Timer",
@@ -1146,7 +1161,12 @@
     "continue": "Continue",
     "againHeavy": "Again-heavy",
     "accuracy": "Accuracy",
-    "backToDashboard": "Back to Dashboard"
+    "backToDashboard": "Back to Dashboard",
+    "todaysWin": "Today's win",
+    "streakHeld": "Streak held: {{count}} days",
+    "streakHeld_one": "Streak held: {{count}} day",
+    "streakHeld_other": "Streak held: {{count}} days",
+    "levelProgress": "Level progress"
   },
   "pwa": {
     "updateAvailable": "Update available",

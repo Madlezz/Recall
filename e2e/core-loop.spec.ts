@@ -15,11 +15,15 @@ test("empty dashboard shows friendly empty state", async ({ page }) => {
   await expect(page.getByRole("button", { name: /Continue/i })).toBeVisible({ timeout: 15000 });
   await page.getByRole("button", { name: /Continue/i }).click();
 
-  // System → Next
+  // System -> Next (lands on try step)
   await expect(page.getByRole("button", { name: /^Next$/i })).toBeVisible({ timeout: 15000 });
   await page.getByRole("button", { name: /^Next$/i }).click();
 
-  // Templates → Skip (footer button)
+  // Try -> skip to templates (header Skip)
+  await expect(page.getByRole("button", { name: /^Skip$/i }).last()).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: /^Skip$/i }).last().click();
+
+  // Templates -> skip to goal (header or footer Skip)
   await expect(page.getByRole("button", { name: /^Skip$/i }).last()).toBeVisible({ timeout: 15000 });
   await page.getByRole("button", { name: /^Skip$/i }).last().click();
 

@@ -6,7 +6,8 @@ import { DailyGoal } from "@/components/daily-goal";
 import { DeckDialog } from "@/components/deck-dialog";
 import { DeckCard } from "@/components/deck-card";
 import { RecentActivity } from "@/components/recent-activity";
-import { getStudyStreak, getDueTodayCount } from "@/lib/stats";
+import { getDueTodayCount, isCardDueToday } from "@/lib/stats";
+import { applyStreakGrace } from "@/lib/streak";
 import { cn } from "@/lib/utils";
 import { cardSurface, typeClass } from "@/lib/surface";
 import { useRecallStore } from "@/stores/recall-store";
@@ -21,10 +22,17 @@ export function Dashboard(): JSX.Element {
   const startReview = useRecallStore((state) => state.startReview);
   const dueCount = getDueTodayCount(cards);
 
+  const reviewLogs = useRecallStore((state) => state.reviewLogs);
+  const onboardingComplete = useRecallStore((state) => state.settings.onboardingComplete);
+  const { streak, graceUsed } = useMemo(
+    () => applyStreakGrace(reviewLogs),
+    [reviewLogs],
+  );
+
   const sortedDecks = useMemo(() => {
     const withStats = decks.map((deck) => {
       const deckCards = cards.filter((c) => c.deckId === deck.id);
-      const due = deckCards.filter((c) => getDueForCard(c)).length;
+      const due = deckCards.filter((c) => isCardDueToday(c)).length;
       return { ...deck, dueCount: due, totalCards: deckCards.length, deckCards };
     });
     withStats.sort((a, b) => b.dueCount - a.dueCount);
@@ -35,7 +43,7 @@ export function Dashboard(): JSX.Element {
   const greeting = useMemo(() => getGreeting(t), [t]);
 
   const handleStartReview = () => {
-    const anyDue = cards.some((c) => isCardDue(c));
+    const anyDue = cards.some((c) => isCardDueToday(c));
     if (!anyDue) {
       toast.info(t("dashboard.noCardsDue"));
       return;
@@ -46,24 +54,41 @@ export function Dashboard(): JSX.Element {
   return (
     <div className="animate-fade-in max-w-[1152px] mx-auto px-gutter-mobile py-6">
       {/* ── Hero ── */}
-      <section className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-          <h1 className={cn(typeClass["title-lg"], "text-text-primary")}>
-            {greeting}
-          </h1>
-          <p className={cn(typeClass["body-lg"], "text-text-secondary mt-2")}>
-            {dueCount > 0
-              ? t("dashboard.cardsReady", { count: dueCount })
-              : t("dashboard.description")}
-          </p>
+      <section className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex items-center gap-5">
+          {/* Streak flame */}
+          <div className={cn(
+            "flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl",
+            streak > 0 ? "bg-primary-soft" : "bg-surface-container-low",
+          )}>
+            <Flame className={cn(
+              "h-8 w-8 transition-all",
+              streak > 0 ? "text-primary" : "text-on-surface-variant opacity-50",
+            )} aria-hidden="true" />
+          </div>
+          <div>
+            <p className={cn(typeClass["label-lg"], "text-on-surface-variant uppercase tracking-[0.15em]")}>
+              {greeting}
+            </p>
+            <h1 className={cn(typeClass["title-lg"], "text-text-primary")}>
+              {dueCount > 0
+                ? t("dashboard.ritualReady")
+                : onboardingComplete ? t("dashboard.ritualFirstSession") : t("dashboard.description")}
+            </h1>
+            <p className={cn(typeClass["body-lg"], "text-text-secondary mt-1")}>
+              {dueCount > 0
+                ? t("dashboard.cardsReady", { count: dueCount })
+                : graceUsed ? t("dashboard.ritualGrace") : t("dashboard.description")}
+            </p>
+          </div>
         </div>
         <button
           onClick={handleStartReview}
           className="inline-flex items-center gap-2 rounded-2xl bg-primary px-8 py-4 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all min-h-[48px] w-full md:w-auto justify-center"
-          aria-label={t("deck.startReview")}
+          aria-label={dueCount > 0 ? t("dashboard.ritualStartSession") : t("dashboard.ritualStartRitual")}
         >
           <RotateCw className="h-5 w-5" aria-hidden="true" />
-          {t("dashboard.startReview")}
+          {dueCount > 0 ? t("dashboard.ritualStartSession") : t("dashboard.ritualStartRitual")}
         </button>
       </section>
 
@@ -75,7 +100,7 @@ export function Dashboard(): JSX.Element {
         </div>
 
         {/* Streak — span 4 */}
-        <StreakWidget />
+        <StreakWidget streak={streak} />
 
         {/* Your Decks header */}
         <div className="col-span-12 mt-4">
@@ -169,14 +194,6 @@ export function Dashboard(): JSX.Element {
 // Helpers
 // ═══════════════════════════════════════════════
 
-function getDueForCard(c: { state: string }): boolean {
-  return c.state === "review" || c.state === "learning" || c.state === "relearning";
-}
-
-function isCardDue(c: { state: string }): boolean {
-  return getDueForCard(c);
-}
-
 function getGreeting(t: (key: string) => string): string {
   const hour = new Date().getHours();
   if (hour < 12) return t("dashboard.greetingMorning");
@@ -188,15 +205,12 @@ function getGreeting(t: (key: string) => string): string {
 // StreakWidget
 // ═══════════════════════════════════════════════
 
-function StreakWidget(): JSX.Element {
+function StreakWidget({ streak }: { streak: number }): JSX.Element {
   const { t } = useTranslation();
-  const reviewLogs = useRecallStore((state) => state.reviewLogs);
-  const streak = useMemo(() => getStudyStreak(reviewLogs), [reviewLogs]);
-
   return (
     <div className="col-span-12 md:col-span-4 bg-primary-soft p-6 rounded-2xl border border-primary/10 flex flex-col justify-center items-center text-center">
       <div className="bg-white/40 dark:bg-white/10 p-4 rounded-full mb-4">
-        <Flame className="h-9 w-9 text-primary" />
+        <Flame className={cn("h-9 w-9", streak > 0 ? "text-primary" : "text-primary/30")} />
       </div>
       <h3 className="font-headline-mobile text-[1.5rem] font-bold leading-8 tracking-tight text-primary">
         {streak} {streak === 1 ? t("streak.oneDay") : t("streak.days", { count: streak })}

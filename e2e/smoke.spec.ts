@@ -22,15 +22,19 @@ test.describe("Recall Smoke Tests", () => {
     await expect(page.getByRole("button", { name: /Continue/i })).toBeVisible({ timeout: 15000 });
     await page.getByRole("button", { name: /Continue/i }).click();
 
-    // Step 3: How to Rate — next
+    // Step 3: How to Rate - next (lands on try step)
     await expect(page.getByRole("button", { name: /^Next$/i })).toBeVisible({ timeout: 15000 });
     await page.getByRole("button", { name: /^Next$/i }).click();
 
-    // Step 4: Templates — skip without selecting (use last Skip = footer button)
+    // Step 4: Try - skip to templates (header Skip)
     await expect(page.getByRole("button", { name: /^Skip$/i }).last()).toBeVisible({ timeout: 15000 });
     await page.getByRole("button", { name: /^Skip$/i }).last().click();
 
-    // Step 5: Daily Goal — accept default
+    // Step 5: Templates - skip to goal (header or footer Skip)
+    await expect(page.getByRole("button", { name: /^Skip$/i }).last()).toBeVisible({ timeout: 15000 });
+    await page.getByRole("button", { name: /^Skip$/i }).last().click();
+
+    // Step 6: Daily Goal - accept default
     await expect(page.getByRole("button", { name: /Start Learning/i })).toBeVisible({ timeout: 15000 });
     await page.getByRole("button", { name: /Start Learning/i }).click();
 

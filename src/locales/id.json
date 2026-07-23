@@ -78,7 +78,12 @@
     "cardsReady": "Kamu punya {{count}} kartu siap direview hari ini.",
     "cardsReady_one": "Kamu punya 1 kartu siap direview hari ini.",
     "searchDecks": "Cari deck kamu...",
-    "viewAll": "Lihat Semua"
+    "viewAll": "Lihat Semua",
+    "ritualReady": "Siap?",
+    "ritualStartSession": "Mulai sesi hari ini",
+    "ritualFirstSession": "Siap untuk sesi pertama?",
+    "ritualStartRitual": "Mulai ritual hari ini",
+    "ritualGrace": "Streak terselamatkan - jangan lewatkan hari ini!"
   },
   "todayBand": {
     "due": "Jatuh tempo",
@@ -134,6 +139,11 @@
     "studyToday": "Belajar hari ini!",
     "oneDay": "1 hari",
     "days": "{{count}} hari"
+  },
+  "share": {
+    "recallTagline": "Spaced repetition FSRS yang bikin kamu balik lagi. Tanpa manual, tanpa akun, data tetap milikmu.",
+    "copyLink": "Bagikan Recall",
+    "copied": "Tautan tersalin!"
   },
   "study": {
     "reveal": "Tampilkan Jawaban",
@@ -787,7 +797,12 @@
     "systemFsrs": "Algoritma FSRS",
     "systemFsrsDesc": "Ilmu memori terbaru yang otomatis menyesuaikan denganmu.",
     "systemTrust": "Percaya diri",
-    "systemTrustDesc": "Tidak ada penilaian salah. Ini kurva belajarmu sendiri."
+    "systemTrustDesc": "Tidak ada penilaian salah. Ini kurva belajarmu sendiri.",
+    "tryTitle": "Coba sekarang",
+    "tryDesc": "Ini kartu sungguhan. Tekan Space atau Reveal, lalu nilai seberapa baik kamu tahu.",
+    "tryHint": "Beginilah cara setiap review bekerja.",
+    "tryAhaMessage": "Itu saja. Kamu baru saja memakai FSRS. Recall akan menjadwal ulang kartu ini berdasarkan penilaianmu.",
+    "continueSetup": "Lanjutkan setup"
   },
   "focusTimer": {
     "title": "Timer Fokus",
@@ -1145,7 +1160,12 @@
     "continue": "Lanjutkan Belajar",
     "backToDashboard": "Kembali ke Dasbor",
     "accuracy": "Akurasi",
-    "againHeavy": "Didominasi Again"
+    "againHeavy": "Didominasi Again",
+    "todaysWin": "Kemenangan hari ini",
+    "streakHeld": "Streak bertahan: {{count}} hari",
+    "streakHeld_one": "Streak bertahan: {{count}} hari",
+    "streakHeld_other": "Streak bertahan: {{count}} hari",
+    "levelProgress": "Progres level"
   },
   "pwa": {
     "updateAvailable": "Pembaruan tersedia",

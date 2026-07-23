@@ -6,24 +6,28 @@ async function goToDashboard(page: import("@playwright/test").Page) {
   await page.reload();
   await page.waitForSelector("[role='region'][aria-label='Welcome to Recall']", { timeout: 10000 });
 
-  // Multi-step onboarding: Welcome → Concept → System → Templates → Goal
+  // Multi-step onboarding: Welcome -> Concept -> System -> Try -> Templates -> Goal
   // Step 1: Welcome
   await expect(page.getByRole("button", { name: /Get Started/i })).toBeVisible({ timeout: 15000 });
   await page.getByRole("button", { name: /Get Started/i }).click();
 
-  // Step 2: How It Works — continue
+  // Step 2: How It Works - continue
   await expect(page.getByRole("button", { name: /Continue/i })).toBeVisible({ timeout: 15000 });
   await page.getByRole("button", { name: /Continue/i }).click();
 
-  // Step 3: How to Rate — next
+  // Step 3: How to Rate - next (lands on try step)
   await expect(page.getByRole("button", { name: /^Next$/i })).toBeVisible({ timeout: 15000 });
   await page.getByRole("button", { name: /^Next$/i }).click();
 
-  // Step 4: Templates — skip without selecting (use last Skip = footer button)
+  // Step 4: Try - skip to templates (header Skip)
   await expect(page.getByRole("button", { name: /^Skip$/i }).last()).toBeVisible({ timeout: 15000 });
   await page.getByRole("button", { name: /^Skip$/i }).last().click();
 
-  // Step 5: Daily Goal — accept default
+  // Step 5: Templates - skip to goal (header or footer Skip)
+  await expect(page.getByRole("button", { name: /^Skip$/i }).last()).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: /^Skip$/i }).last().click();
+
+  // Step 6: Daily Goal - accept default
   await expect(page.getByRole("button", { name: /Start Learning/i })).toBeVisible({ timeout: 15000 });
   await page.getByRole("button", { name: /Start Learning/i }).click();
 

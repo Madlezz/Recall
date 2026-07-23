@@ -111,7 +111,8 @@ describe("Dashboard", () => {
 
   it("renders Start Review button", () => {
     render(React.createElement(Dashboard));
-    const btns = screen.getAllByText("Start Review");
+    // Task 8 ritual hero: button label is now "Start today's ritual" (no due cards) or "Start today's session"
+    const btns = screen.getAllByRole("button").filter((b) => /Start today/i.test(b.textContent ?? ""));
     expect(btns.length).toBeGreaterThan(0);
   });
 
@@ -127,9 +128,12 @@ describe("Dashboard", () => {
 
   it("shows toast when startReview returns false", () => {
     mockToastInfo.mockClear();
+    mockStore.cards = [];
     mockStore.startReview = vi.fn(() => false);
     render(React.createElement(Dashboard));
-    screen.getAllByText("Start Review")[0].click();
+    // Task 8 ritual hero: button label changed from "Start Review" to "Start today's ritual"
+    const btn = screen.getAllByRole("button").find((b) => /Start today/i.test(b.textContent ?? ""));
+    btn?.click();
     expect(mockToastInfo).toHaveBeenCalledWith("No cards due right now");
   });
 
