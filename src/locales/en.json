@@ -798,7 +798,12 @@
     "systemFsrs": "FSRS Algorithm",
     "systemFsrsDesc": "The latest memory science automatically adjusts to your pace.",
     "systemTrust": "Trust yourself",
-    "systemTrustDesc": "There are no wrong ratings. Just your personal learning curve."
+    "systemTrustDesc": "There are no wrong ratings. Just your personal learning curve.",
+    "tryTitle": "Try it now",
+    "tryDesc": "Here is a real card. Press Space or Reveal, then rate how well you knew it.",
+    "tryHint": "This is exactly how every review works.",
+    "tryAhaMessage": "That's it. You just used FSRS. Recall will reschedule this card based on how you rated.",
+    "continueSetup": "Continue setup"
   },
   "focusTimer": {
     "title": "Focus Timer",

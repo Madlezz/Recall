@@ -797,7 +797,12 @@
     "systemFsrs": "Algoritma FSRS",
     "systemFsrsDesc": "Ilmu memori terbaru yang otomatis menyesuaikan denganmu.",
     "systemTrust": "Percaya diri",
-    "systemTrustDesc": "Tidak ada penilaian salah. Ini kurva belajarmu sendiri."
+    "systemTrustDesc": "Tidak ada penilaian salah. Ini kurva belajarmu sendiri.",
+    "tryTitle": "Coba sekarang",
+    "tryDesc": "Ini kartu sungguhan. Tekan Space atau Reveal, lalu nilai seberapa baik kamu tahu.",
+    "tryHint": "Beginilah cara setiap review bekerja.",
+    "tryAhaMessage": "Itu saja. Kamu baru saja memakai FSRS. Recall akan menjadwal ulang kartu ini berdasarkan penilaianmu.",
+    "continueSetup": "Lanjutkan setup"
   },
   "focusTimer": {
     "title": "Timer Fokus",
