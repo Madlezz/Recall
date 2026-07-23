@@ -1156,7 +1156,12 @@
     "continue": "Continue",
     "againHeavy": "Again-heavy",
     "accuracy": "Accuracy",
-    "backToDashboard": "Back to Dashboard"
+    "backToDashboard": "Back to Dashboard",
+    "todaysWin": "Today's win",
+    "streakHeld": "Streak held: {{count}} days",
+    "streakHeld_one": "Streak held: {{count}} day",
+    "streakHeld_other": "Streak held: {{count}} days",
+    "levelProgress": "Level progress"
   },
   "pwa": {
     "updateAvailable": "Update available",

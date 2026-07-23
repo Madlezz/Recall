@@ -1,9 +1,10 @@
 import confetti from "canvas-confetti";
 import { Check } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AchievementDetail } from "@/components/achievement-detail";
 import { useRecallStore } from "@/stores/recall-store";
+import { getStudyStreak } from "@/lib/streak";
 import { CONFETTI_COLORS, prefersReducedMotion } from "@/lib/xp";
 import type { SessionSummary } from "@/types";
 
@@ -18,6 +19,8 @@ export function SessionSummaryModal({ summary, onContinue }: { summary: SessionS
   const [achievementIndex, setAchievementIndex] = useState(0);
   const newAchievements = summary.newAchievements;
   const showDashboard = useRecallStore((s) => s.showDashboard);
+  const reviewLogs = useRecallStore((state) => state.reviewLogs);
+  const streak = useMemo(() => getStudyStreak(reviewLogs), [reviewLogs]);
   const accuracy = total > 0 ? Math.round(((summary.goodCount + summary.easyCount) / total) * 100) : 0;
 
   useEffect(() => {
@@ -60,8 +63,10 @@ export function SessionSummaryModal({ summary, onContinue }: { summary: SessionS
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container dark:bg-surface-container">
             <Check className="h-7 w-7 text-on-surface-variant" />
           </div>
-          <h2 id="session-summary-title" className="mt-5 text-xl font-bold text-text-primary">{t("sessionSummary.sessionComplete")}</h2>
-          <p className="mt-1 text-sm text-on-surface-variant">{t("sessionSummary.cardsReviewed", { count: summary.cardsStudied })}</p>
+          <h2 id="session-summary-title" className="mt-5 text-xl font-bold text-text-primary">{t("sessionSummary.todaysWin")}</h2>
+          <p className="mt-1 text-sm text-on-surface-variant">
+            {streak > 0 ? t("sessionSummary.streakHeld", { count: streak }) : t("sessionSummary.cardsReviewed", { count: summary.cardsStudied })}
+          </p>
         </div>
 
         {summary.sessionXp > 0 && (

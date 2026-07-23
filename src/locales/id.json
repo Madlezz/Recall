@@ -1155,7 +1155,12 @@
     "continue": "Lanjutkan Belajar",
     "backToDashboard": "Kembali ke Dasbor",
     "accuracy": "Akurasi",
-    "againHeavy": "Didominasi Again"
+    "againHeavy": "Didominasi Again",
+    "todaysWin": "Kemenangan hari ini",
+    "streakHeld": "Streak bertahan: {{count}} hari",
+    "streakHeld_one": "Streak bertahan: {{count}} hari",
+    "streakHeld_other": "Streak bertahan: {{count}} hari",
+    "levelProgress": "Progres level"
   },
   "pwa": {
     "updateAvailable": "Pembaruan tersedia",
