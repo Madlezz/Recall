@@ -135,6 +135,11 @@
     "oneDay": "1 hari",
     "days": "{{count}} hari"
   },
+  "share": {
+    "recallTagline": "Spaced repetition FSRS yang bikin kamu balik lagi. Tanpa manual, tanpa akun, data tetap milikmu.",
+    "copyLink": "Bagikan Recall",
+    "copied": "Tautan tersalin!"
+  },
   "study": {
     "reveal": "Tampilkan Jawaban",
     "again": "Ulangi",

@@ -138,6 +138,11 @@
     "oneDay": "1 day",
     "days": "{{count}} days"
   },
+  "share": {
+    "recallTagline": "FSRS-grade spaced repetition that makes you want to come back. No manual, no account, your data stays yours.",
+    "copyLink": "Share Recall",
+    "copied": "Link copied!"
+  },
   "study": {
     "reveal": "Reveal",
     "again": "Again",

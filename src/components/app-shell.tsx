@@ -1,6 +1,7 @@
-import { Home, LayoutGrid, Library, Play, Settings, Shield, Star, Tag, Timer, TrendingUp, Zap, Download, MoreHorizontal } from "lucide-react";
+import { Home, LayoutGrid, Library, Play, Settings, Share2, Shield, Star, Tag, Timer, TrendingUp, Zap, Download, MoreHorizontal } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { CommandPalette } from "@/components/command-palette";
 import { RecallLogo } from "@/components/recall-logo";
 import { getDueTodayCount } from "@/lib/stats";
@@ -124,6 +125,11 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
             {t("nav.pressForShortcuts")}
           </button>
         </div>
+
+        {/* Share Recall */}
+        <div className="px-5 pb-4">
+          <ShareRecallButton />
+        </div>
       </aside>
 
       {/* ── Mobile header ── */}
@@ -228,6 +234,12 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
               label={t("nav.settings")}
               active={view === "settings"}
               onClick={() => { showSettings(); setShowMore(false); }}
+            />
+            <MoreSheetItem
+              icon={Share2}
+              label={t("share.copyLink")}
+              active={false}
+              onClick={() => { void shareRecall(t, t("share.copyLink")); setShowMore(false); }}
             />
           </div>
         </div>
@@ -335,6 +347,33 @@ function NavButton({ active, icon: Icon, label, onClick, badge }: NavButtonProps
           {badge}
         </span>
       )}
+    </button>
+  );
+}
+
+// ── ShareRecallButton ──
+
+async function shareRecall(t: (key: string) => string, errorLabel: string): Promise<void> {
+  const text = `${t("share.recallTagline")}\nhttps://github.com/Madlezz/Recall`;
+  try {
+    await navigator.clipboard.writeText(text);
+    toast.success(t("share.copied"));
+  } catch {
+    toast.error(errorLabel);
+  }
+}
+
+function ShareRecallButton(): JSX.Element {
+  const { t } = useTranslation();
+  return (
+    <button
+      type="button"
+      onClick={() => void shareRecall(t, t("share.copyLink"))}
+      className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-3 py-1.5 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+      aria-label={t("share.copyLink")}
+    >
+      <Share2 className="h-4 w-4" />
+      <span className="hidden sm:inline">{t("share.copyLink")}</span>
     </button>
   );
 }
