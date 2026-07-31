@@ -352,6 +352,22 @@ select {
 .study-card-face {
   transition: opacity 180ms ease-out, transform 180ms ease-out;
   will-change: opacity, transform;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Long markdown content (KaTeX, code blocks, unbroken URLs) must wrap/clip
+   inside the face instead of pushing it wider than the card. */
+.study-card-face pre,
+.study-card-face code,
+.study-card-face .katex-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-wrap: anywhere;
+}
+.study-card-face p,
+.study-card-face li {
+  overflow-wrap: anywhere;
 }
 
 .study-card[data-revealed="false"] .study-card-face.study-card-back,

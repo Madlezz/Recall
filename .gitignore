@@ -51,3 +51,5 @@ graphify-out/
 /_lint*.json
 /_lintbreak*.txt
 /_vtout.txt
+.codebase-memory/
+.impeccable/

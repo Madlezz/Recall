@@ -292,9 +292,11 @@ export function StudyMode(): JSX.Element {
         />
       )}
 
-      {/* Screen reader announcements */}
-      <div className="sr-only" role="status" aria-live="polite">
+      {/* Screen reader announcements — split so SR doesn't read one long grunt */}
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {t("study.cardProgress", { answered: activeStudy.currentIndex + 1, total })}
+      </div>
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {activeStudy.revealed ? t("study.answerRevealedSr") : t("study.pressSpaceSr")}
       </div>
 
@@ -399,11 +401,11 @@ export function StudyMode(): JSX.Element {
             }}
           >
 {/* Front */}
-		          <div
-			            className={cn("study-card-face absolute inset-0 flex flex-col justify-center", cardSurface("p-5 shadow-sm sm:p-10"))}
-		            aria-hidden={activeStudy.revealed}
-		            inert={activeStudy.revealed || undefined}
-		          >
+			          <div
+			            className={cn("study-card-face absolute inset-0 flex flex-col justify-center overflow-y-auto", cardSurface("p-5 shadow-sm sm:p-10"))}
+			            aria-hidden={activeStudy.revealed}
+			            inert={activeStudy.revealed || undefined}
+			          >
 	              <div className="flex items-center gap-2">
 		        <span className={cn(typeClass["label-lg"], "rounded-full bg-primary-soft px-3 py-1 text-primary")}>
 	                  {card.cardType === "cloze" ? t("study.clozeType") : card.cardType === "image-occlusion" ? t("study.imageOcclusionType") : t("study.basicType")}
@@ -419,7 +421,7 @@ export function StudyMode(): JSX.Element {
             </div>
             {/* Back */}
             <div
-              className={cn("study-card-face study-card-back absolute inset-0 flex flex-col justify-center", cardSurface("p-5 shadow-sm sm:p-10"))}
+              className={cn("study-card-face study-card-back absolute inset-0 flex flex-col justify-center overflow-y-auto", cardSurface("p-5 shadow-sm sm:p-10"))}
               aria-hidden={!activeStudy.revealed}
               inert={!activeStudy.revealed || undefined}
             >
