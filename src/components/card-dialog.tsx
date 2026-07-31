@@ -1,8 +1,9 @@
-import { ImageIcon, Mic, MicOff, Plus, Zap } from "lucide-react";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { ImageIcon, Mic, MicOff, Plus } from "lucide-react";
+import { type ReactNode, useDeferredValue, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { RichCard } from "@/components/RichCard";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -58,6 +59,8 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
   const [cardType, setCardType] = useState<CardType>(card?.cardType ?? "basic");
   const [front, setFront] = useState(card?.front ?? "");
   const [back, setBack] = useState(card?.back ?? "");
+  const deferredFront = useDeferredValue(front);
+  const deferredBack = useDeferredValue(back);
   const [hint, setHint] = useState(card?.hint ?? "");
   const [source, setSource] = useState(card?.source ?? "");
   const [tags, setTags] = useState<string[]>(card?.tags ?? []);
@@ -162,10 +165,10 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger ?? (
-          <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all">
+          <Button>
             <Plus className="h-4 w-4" />
             {t("cardDialog.addCard")}
-          </button>
+          </Button>
         )}
       </DialogTrigger>
       <DialogContent className="w-[min(92vw,900px)] max-h-[90vh] overflow-y-auto">
@@ -178,12 +181,6 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
               <code className="bg-surface-container dark:bg-surface-container px-1.5 py-0.5 rounded font-mono text-xs">{"{{c1::hidden answer}}"}</code>
             </DialogDescription>
           </DialogHeader>
-
-          {/* Quick Add info banner */}
-          <div className="bg-primary-soft rounded-2xl border border-primary/10 p-4 mb-4 text-sm text-on-primary-fixed-variant flex items-center gap-3">
-            <Zap className="h-5 w-5 text-primary shrink-0" />
-            <span>{t("cardDialog.markdownHelp")} {t("cardDialog.clozeAutoDetect")}</span>
-          </div>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -260,14 +257,14 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
                       value={front}
                       onChange={(event) => { setFront(event.target.value); frontValueRef.current = event.target.value; }}
                       placeholder="# Question\n\n```python\nprint('hello')\n```"
-                      className="min-h-[200px] border-outline-variant border-l-4 border-l-primary font-mono text-sm dark:border-outline-variant"
+                      className="min-h-[200px] border-outline-variant font-mono text-sm dark:border-outline-variant"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-text-secondary dark:text-text-secondary">{t("cardDialog.preview")}</Label>
                     <div className="min-h-[200px] rounded border border-outline-variant bg-background p-4 dark:border-outline-variant dark:bg-surface">
                       {front ? (
-                        <RichCard content={front} />
+                        <RichCard content={deferredFront} />
                       ) : (
                         <p className="text-sm text-on-surface-variant italic">{t("cardDialog.previewPlaceholder")}</p>
                       )}
@@ -308,14 +305,14 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
                       value={back}
                       onChange={(event) => { setBack(event.target.value); backValueRef.current = event.target.value; }}
                       placeholder="## Answer\n\nThe solution is:\n\n$$E = mc^2$$"
-                      className="min-h-[200px] border-outline-variant border-l-4 border-l-secondary font-mono text-sm dark:border-outline-variant"
+                      className="min-h-[200px] border-outline-variant font-mono text-sm dark:border-outline-variant"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-text-secondary dark:text-text-secondary">{t("cardDialog.preview")}</Label>
                     <div className="min-h-[200px] rounded border border-outline-variant bg-background p-4 dark:border-outline-variant dark:bg-surface">
                       {back ? (
-                        <RichCard content={back} isBack />
+                        <RichCard content={deferredBack} isBack />
                       ) : (
                         <p className="text-sm text-on-surface-variant italic">{t("cardDialog.previewPlaceholder")}</p>
                       )}
@@ -364,10 +361,10 @@ export function CardDialog({ card, deckId, trigger }: CardDialogProps): JSX.Elem
           </div>
 
           <DialogFooter>
-            <button type="button" className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all border-outline-variant text-text-secondary hover:bg-surface-container-high hover:text-text-primary dark:border-outline-variant dark:text-text-secondary dark:hover:bg-surface-container dark:hover:text-text-primary" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               {t("cardDialog.cancel")}
-            </button>
-            <button type="submit" className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all bg-primary text-on-primary hover:bg-primary-hover dark:bg-primary dark:text-on-primary dark:hover:bg-primary-container">{card ? t("cardDialog.saveChanges") : t("cardDialog.createCard")}</button>
+            </Button>
+            <Button type="submit">{card ? t("cardDialog.saveChanges") : t("cardDialog.createCard")}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

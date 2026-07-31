@@ -111,7 +111,7 @@ export function ImportHub(): JSX.Element {
         onDrop={handleDrop}
       >
         {dragOver ? (
-          <FileDown className="h-10 w-10 text-primary mb-4 animate-bounce" />
+          <FileDown className="h-10 w-10 text-primary mb-4 animate-pulse" />
         ) : (
           <Upload className="h-10 w-10 text-outline mb-4" />
         )}

@@ -14,9 +14,13 @@ interface TouchPoint {
   y: number;
 }
 
-const SWIPE_THRESHOLD = 80; // min pixels to register a swipe
-const SWIPE_VELOCITY_THRESHOLD = 0.5; // px/ms - fast flick counts even if short
-const SWIPE_MAX_OFF_AXIS = 60; // max perpendicular drift to still count as directional
+// Higher committed distance + stronger on-axis rule guard against accidental
+// ratings (mis-swipes write real FSRS reviews). Visual preview should start
+// signaling intent well before SWIPE_COMMIT_DISTANCE.
+const SWIPE_PREVIEW_DISTANCE = 30; // px at which UI should start showing intent
+const SWIPE_COMMIT_DISTANCE = 120; // px required to commit a rating
+const SWIPE_VELOCITY_THRESHOLD = 0.7; // px/ms - must also be fast to commit early
+const SWIPE_MAX_OFF_AXIS = 40; // px of perpendicular drift before it stops being directional
 
 /**
  * Hook for detecting swipe gestures on touch devices.
@@ -100,17 +104,17 @@ export function useSwipeGesture(
 
     if (absDx > absDy) {
       // Horizontal swipe
-      if (absDx >= SWIPE_THRESHOLD || (velocity >= SWIPE_VELOCITY_THRESHOLD && absDx > 30)) {
-        if (absDy < SWIPE_MAX_OFF_AXIS) {
-          direction = dx > 0 ? "right" : "left";
-        }
+      const longEnough = absDx >= SWIPE_COMMIT_DISTANCE;
+      const fastEnough = velocity >= SWIPE_VELOCITY_THRESHOLD && absDx > SWIPE_PREVIEW_DISTANCE;
+      if ((longEnough || fastEnough) && absDy < SWIPE_MAX_OFF_AXIS) {
+        direction = dx > 0 ? "right" : "left";
       }
     } else {
       // Vertical swipe
-      if (absDy >= SWIPE_THRESHOLD || (velocity >= SWIPE_VELOCITY_THRESHOLD && absDy > 30)) {
-        if (absDx < SWIPE_MAX_OFF_AXIS) {
-          direction = dy > 0 ? "down" : "up";
-        }
+      const longEnough = absDy >= SWIPE_COMMIT_DISTANCE;
+      const fastEnough = velocity >= SWIPE_VELOCITY_THRESHOLD && absDy > SWIPE_PREVIEW_DISTANCE;
+      if ((longEnough || fastEnough) && absDx < SWIPE_MAX_OFF_AXIS) {
+        direction = dy > 0 ? "down" : "up";
       }
     }
 

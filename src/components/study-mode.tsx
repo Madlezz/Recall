@@ -1,5 +1,5 @@
 import * as React from "react";
-import { AlertCircle, ArrowLeft, BookOpen, Check, Clock, Edit3, EyeOff, RotateCcw, RotateCw, Timer, Volume2, VolumeX } from "lucide-react";
+import { AlertCircle, ArrowLeft, BookOpen, Clock, Edit3, EyeOff, MoreHorizontal, RotateCcw, RotateCw, Timer, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { cardSurface, typeClass } from "@/lib/surface";
 import { matchesShortcut, shortcutLabel, DEFAULT_SHORTCUTS } from "@/lib/shortcuts";
 import { SessionSummaryModal } from "./study-mode/session-summary-modal";
-import { AnswerButton, CompletionStat } from "./study-mode/study-helpers";
+import { AnswerButton } from "./study-mode/study-helpers";
 
 function formatElapsed(seconds: number): string {
   const m = Math.floor(seconds / 60)
@@ -137,7 +137,7 @@ export function StudyMode(): JSX.Element {
       if (matchesShortcut(event, sc.reveal) && !activeStudy.revealed) { event.preventDefault(); revealAnswer(); }
 
       if (!activeStudy.revealed) return;
-      if (matchesShortcut(event, sc.rateAgain)) { event.preventDefault(); void answerCurrentCard("again"); }
+      if (matchesShortcut(event, sc.rateAgain)) { event.preventDefault(); void answerCurrentCard("again"); toast.info(t("study.againComfort"), { duration: 2500 }); }
       if (matchesShortcut(event, sc.rateHard)) { event.preventDefault(); void answerCurrentCard("hard"); }
       if (matchesShortcut(event, sc.rateGood)) { event.preventDefault(); void answerCurrentCard("good"); }
       if (matchesShortcut(event, sc.rateEasy)) { event.preventDefault(); void answerCurrentCard("easy"); }
@@ -168,6 +168,7 @@ export function StudyMode(): JSX.Element {
         playAgainSound();
         setRatingFlash("again");
         void answerCurrentCard("again");
+        toast.info(t("study.againComfort"), { duration: 2500 });
         break;
       case "right":
         playCorrectSound();
@@ -193,7 +194,14 @@ export function StudyMode(): JSX.Element {
     swipeEnabled,
   );
 
-  // ── Session complete (no summary) ──
+  // ── Completed: auto-exit straight into the summary modal (single end-moment) ──
+  useEffect(() => {
+    if (activeStudy?.completed) {
+      void exitStudy();
+    }
+  }, [activeStudy?.completed, exitStudy]);
+
+  // ── Session complete (summary modal) ──
   if (!activeStudy && lastSessionSummary) {
     return (
       <SessionSummaryModal
@@ -224,45 +232,6 @@ export function StudyMode(): JSX.Element {
     );
   }
 
-  // ── Completed but still showing inline ──
-  if (activeStudy.completed) {
-    const totalReviews = answered;
-    const goodAndEasy = activeStudy.ratings.good + activeStudy.ratings.easy;
-    const accuracy = totalReviews === 0 ? 0 : Math.round((goodAndEasy / totalReviews) * 100);
-
-    return (
-      <div className="flex min-h-[76vh] items-center justify-center">
-        <div className="w-full max-w-sm text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container dark:bg-surface-container">
-            <Check className="h-7 w-7 text-on-surface-variant dark:text-on-surface-variant" />
-          </div>
-          <h1 className="mt-5 text-2xl font-bold text-text-primary dark:text-text-primary">{t("study.sessionComplete")}</h1>
-          <p className="mt-1 text-sm text-on-surface-variant">{deck?.name ?? t("study.allDueCards")}</p>
-
-          <div className="mt-6 grid grid-cols-5 gap-2">
-            <CompletionStat label={t("study.cards")} value={totalReviews} />
-            <CompletionStat label={t("study.again")} value={activeStudy.ratings.again} />
-            <CompletionStat label={t("study.hard")} value={activeStudy.ratings.hard} />
-            <CompletionStat label={t("study.good")} value={activeStudy.ratings.good} />
-            <CompletionStat label={t("study.easy")} value={activeStudy.ratings.easy} />
-          </div>
-
-          <div className="mt-4 flex items-center justify-center gap-3 text-sm">
-            <span className="text-on-surface-variant">{t("study.accuracy")}</span>
-            <span className="font-bold tabular-nums text-text-primary dark:text-text-primary">{accuracy}%</span>
-          </div>
-
-          <button
-            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all"
-            onClick={exitStudy}
-          >
-            <ArrowLeft className="h-4 w-4" /> {t("study.return")}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   // ── No card found ──
   if (!card) {
     return (
@@ -284,7 +253,7 @@ export function StudyMode(): JSX.Element {
     );
   }
 
-  const progress = ((activeStudy.currentIndex) / total) * 100;
+  const progress = (answered / total) * 100;
 
   // Compute interval preview when answer is revealed
   const intervals = activeStudy.revealed && card
@@ -380,6 +349,16 @@ export function StudyMode(): JSX.Element {
               {isSpeaking ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
             </button>
           )}
+
+          {!activeStudy.revealed && (
+            <MoreActionsMenu
+              buryLabel={t("study.bury")}
+              snoozeLabel={t("study.snooze")}
+              menuLabel={t("study.moreCardActions")}
+              onBury={buryCard}
+              onSnooze={() => void snoozeCard(120).then(() => toast.info(t("study.snoozed")))}
+            />
+          )}
         </div>
       </header>
 
@@ -408,7 +387,6 @@ export function StudyMode(): JSX.Element {
       <section className="flex flex-1 items-center justify-center py-4 sm:py-6">
         <div
           className="w-full max-w-3xl"
-          style={{ perspective: "1400px" }}
           {...(swipeEnabled ? touchHandlers : {})}
         >
           <div
@@ -445,7 +423,6 @@ export function StudyMode(): JSX.Element {
               aria-hidden={!activeStudy.revealed}
               inert={!activeStudy.revealed || undefined}
             >
-              <p className={cn(typeClass.caption, "text-on-surface-variant uppercase tracking-[0.15em]")}>{t("study.answer")}</p>
               <div className="mt-4 text-balance text-lg font-semibold leading-relaxed text-text-primary dark:text-text-primary sm:mt-5 sm:text-2xl">
                 <RichCard content={card.back} isBack allowHtml={settings?.allowHtml} />
               </div>
@@ -475,7 +452,7 @@ export function StudyMode(): JSX.Element {
         ) : (
           /* 2x2 grid on mobile, inline row on desktop */
           <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center">
-            <AnswerButton label={t("study.again")} keyHint={shortcutLabel(settings?.shortcuts?.rateAgain ?? DEFAULT_SHORTCUTS.rateAgain)} variant="again" interval={intervals?.again} colorBlind={settings?.colorBlindMode} onClick={() => { playAgainSound(); setRatingFlash("again"); void answerCurrentCard("again"); }} />
+            <AnswerButton label={t("study.again")} keyHint={shortcutLabel(settings?.shortcuts?.rateAgain ?? DEFAULT_SHORTCUTS.rateAgain)} variant="again" interval={intervals?.again} colorBlind={settings?.colorBlindMode} onClick={() => { playAgainSound(); setRatingFlash("again"); void answerCurrentCard("again"); toast.info(t("study.againComfort"), { duration: 2500 }); }} />
             <AnswerButton label={t("study.hard")} keyHint={shortcutLabel(settings?.shortcuts?.rateHard ?? DEFAULT_SHORTCUTS.rateHard)} variant="hard" interval={intervals?.hard} colorBlind={settings?.colorBlindMode} onClick={() => { playHardSound(); setRatingFlash("hard"); void answerCurrentCard("hard"); }} />
             <AnswerButton label={t("study.good")} keyHint={shortcutLabel(settings?.shortcuts?.rateGood ?? DEFAULT_SHORTCUTS.rateGood)} variant="good" interval={intervals?.good} colorBlind={settings?.colorBlindMode} onClick={() => { playCorrectSound(); setRatingFlash("good"); void answerCurrentCard("good"); }} />
             <AnswerButton label={t("study.easy")} keyHint={shortcutLabel(settings?.shortcuts?.rateEasy ?? DEFAULT_SHORTCUTS.rateEasy)} variant="easy" interval={intervals?.easy} colorBlind={settings?.colorBlindMode} onClick={() => { playCorrectSound(); setRatingFlash("easy"); void answerCurrentCard("easy"); }} />
@@ -504,24 +481,74 @@ export function StudyMode(): JSX.Element {
             }
           />
         )}
-
-        {!activeStudy.revealed && (
-          <div className="flex gap-2 self-start">
-            <button
-              onClick={buryCard}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-3 py-1.5 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all min-h-[44px]"
-            >
-              <EyeOff className="h-3.5 w-3.5" /> <span className="hidden sm:inline">{t("study.bury")}</span>
-            </button>
-            <button
-              onClick={() => { void snoozeCard(120); toast.info(t("study.snoozed")); }}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface px-3 py-1.5 text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all min-h-[44px]"
-            >
-              <Clock className="h-3.5 w-3.5" /> <span className="hidden sm:inline">{t("study.snooze")}</span>
-            </button>
-          </div>
-        )}
       </footer>
+    </div>
+  );
+}
+
+interface MoreActionsMenuProps {
+  buryLabel: string;
+  snoozeLabel: string;
+  menuLabel: string;
+  onBury: () => void;
+  onSnooze: () => void;
+}
+
+function MoreActionsMenu({ buryLabel, snoozeLabel, menuLabel, onBury, onSnooze }: MoreActionsMenuProps) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function onDocClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        aria-label={menuLabel}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className="flex h-11 w-11 items-center justify-center rounded-xl border border-outline-variant bg-surface text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-all"
+      >
+        <MoreHorizontal className="h-5 w-5" />
+      </button>
+      {open && (
+        <div
+          role="menu"
+          className="absolute right-0 bottom-full z-50 mb-1 min-w-[160px] overflow-hidden rounded-xl border border-outline-variant bg-surface shadow-sm"
+        >
+          <button
+            role="menuitem"
+            type="button"
+            className="flex w-full items-center gap-2 px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low"
+            onClick={() => { setOpen(false); onBury(); }}
+          >
+            <EyeOff className="h-4 w-4" /> {buryLabel}
+          </button>
+          <button
+            role="menuitem"
+            type="button"
+            className="flex w-full items-center gap-2 px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low"
+            onClick={() => { setOpen(false); onSnooze(); }}
+          >
+            <Clock className="h-4 w-4" /> {snoozeLabel}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

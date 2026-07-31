@@ -194,7 +194,9 @@
     "editCardTitle": "Edit kartu ini (E)",
     "basicType": "Dasar",
     "clozeType": "Cloze",
-    "imageOcclusionType": "Oklusi Gambar"
+    "imageOcclusionType": "Oklusi Gambar",
+    "moreCardActions": "Aksi kartu lainnya",
+    "againComfort": "Kartu ini akan muncul lagi sebentar lagi — pengulangan memang tujuannya."
   },
   "cardDialog": {
     "newCard": "Kartu baru",
@@ -484,13 +486,13 @@
     "noResults": "Tidak ada perintah yang ditemukan",
     "title": "Palet Perintah",
     "commands": {
-"dashboard": "Buka Dasbor",
-        "decks": "Buka Dek",
-        "browser": "Buka Browser Kartu",
-"tags": "Kelola Tag",
-	      "import": "Impor",
-	      "focus": "Timer Fokus",
-	      "stats": "Buka Statistik",
+      "dashboard": "Buka Dasbor",
+      "decks": "Buka Dek",
+      "browser": "Buka Browser Kartu",
+      "tags": "Kelola Tag",
+      "import": "Impor",
+      "focus": "Timer Fokus",
+      "stats": "Buka Statistik",
       "settings": "Buka Pengaturan",
       "review": "Mulai Ulangan",
       "themeLight": "Ganti ke Tema Terang",

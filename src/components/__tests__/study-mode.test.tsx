@@ -106,34 +106,15 @@ describe("StudyMode", () => {
     expect(screen.getByText("Session Summary")).toBeTruthy();
   });
 
-  it("renders 'Session complete' when activeStudy.completed", () => {
+  it("auto-exits into summary modal when activeStudy.completed", () => {
     mockStore.activeStudy = makeActiveStudy({
       completed: true,
       ratings: { again: 1, hard: 0, good: 2, easy: 0 },
     });
     render(React.createElement(StudyMode));
-    expect(screen.getByText("Session complete")).toBeTruthy();
-  });
-
-  it("renders completion stats when session completed", () => {
-    mockStore.activeStudy = makeActiveStudy({
-      completed: true,
-      ratings: { again: 1, hard: 0, good: 2, easy: 0 },
-    });
-    render(React.createElement(StudyMode));
-    expect(screen.getByText("Cards: 3")).toBeTruthy();
-    expect(screen.getByText("Again: 1")).toBeTruthy();
-    expect(screen.getByText("Good: 2")).toBeTruthy();
-  });
-
-  it("renders accuracy when session completed", () => {
-    mockStore.activeStudy = makeActiveStudy({
-      completed: true,
-      ratings: { again: 1, hard: 0, good: 2, easy: 0 },
-    });
-    render(React.createElement(StudyMode));
-    // good+easy=2, total=3, accuracy=67%
-    expect(screen.getByText("67%")).toBeTruthy();
+    // Unified end-moment: completed sessions immediately trigger exitStudy(),
+    // which renders the SessionSummaryModal on the next tick.
+    expect(mockStore.exitStudy).toHaveBeenCalled();
   });
 
   it("renders 'Card not found' when card doesn't exist", () => {
@@ -169,11 +150,11 @@ describe("StudyMode", () => {
     expect(screen.getByText("Exit")).toBeTruthy();
   });
 
-  it("renders Bury and Snooze buttons when not revealed", () => {
+  it("renders MoreActions menu trigger when not revealed", () => {
     mockStore.activeStudy = makeActiveStudy({ revealed: false });
     render(React.createElement(StudyMode));
-    expect(screen.getByText("Bury")).toBeTruthy();
-    expect(screen.getByText("Snooze")).toBeTruthy();
+    // Bury/Snooze moved into a dropdown menu trigger
+    expect(screen.getByLabelText(/more card actions/i)).toBeTruthy();
   });
 
   it("renders Undo button when currentIndex > 0 and not revealed", () => {
@@ -223,10 +204,14 @@ describe("StudyMode", () => {
     expect(mockStore.revealAnswer).toHaveBeenCalled();
   });
 
-  it("calls buryCard when Bury clicked", () => {
+  it("opens MoreActions menu and calls buryCard when Bury clicked", async () => {
     mockStore.activeStudy = makeActiveStudy({ revealed: false });
     render(React.createElement(StudyMode));
-    screen.getByText("Bury").click();
+    const trigger = screen.getByLabelText(/more card actions/i);
+    trigger.click();
+    // menu opens on next tick (setState)
+    const buryItem = await screen.findByRole("menuitem", { name: /bury/i });
+    buryItem.click();
     expect(mockStore.buryCard).toHaveBeenCalled();
   });
 
@@ -280,10 +265,11 @@ describe("StudyMode", () => {
     mockStore.decks[0].examDeadline = null;
   });
 
-  it("renders Return button when session completed", () => {
+  it("completed session triggers exitStudy so the unified summary modal renders", () => {
     mockStore.activeStudy = makeActiveStudy({ completed: true });
     render(React.createElement(StudyMode));
-    expect(screen.getByText("Return")).toBeTruthy();
+    // The single end-moment is the confetti modal; exitStudy transitions into it.
+    expect(mockStore.exitStudy).toHaveBeenCalled();
   });
 
   it("renders 'Press Space to reveal' screen reader text", () => {

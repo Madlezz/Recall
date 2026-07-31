@@ -39,7 +39,7 @@ function ClozeContent({ content, revealed }: { content: string; revealed: boolea
           return (
             <span
               key={i}
-              className="inline rounded bg-primary/20 px-1 font-bold text-primary border-b-2 border-primary/50"
+              className="inline rounded bg-primary/20 px-1 font-bold text-primary"
             >
               {seg.text}
             </span>

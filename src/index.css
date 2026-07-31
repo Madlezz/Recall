@@ -341,20 +341,36 @@ select {
 }
 
 .study-card {
-  transform-style: preserve-3d;
-  transition: transform 320ms ease;
+  position: relative;
 }
 
-.study-card[data-revealed="true"] {
-  transform: rotateY(180deg);
-}
-
+/*
+ * Cross-fade between faces instead of a 3D flip.
+ * Flip is 320ms ornamental rotation; this 180ms fade+shift matches the
+ * 150-250ms "motion conveys state" budget and reads calmer.
+ */
 .study-card-face {
-  backface-visibility: hidden;
+  transition: opacity 180ms ease-out, transform 180ms ease-out;
+  will-change: opacity, transform;
 }
 
-.study-card-back {
-  transform: rotateY(180deg);
+.study-card[data-revealed="false"] .study-card-face.study-card-back,
+.study-card[data-revealed="true"] .study-card-face:not(.study-card-back) {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+}
+
+.study-card[data-revealed="true"] .study-card-face.study-card-back,
+.study-card[data-revealed="false"] .study-card-face:not(.study-card-back) {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .study-card-face {
+    transition: opacity 0.01ms linear;
+    transform: none !important;
+  }
 }
 
 @keyframes fade-in {

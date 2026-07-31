@@ -22,10 +22,10 @@
     "decks": "Decks",
     "review": "Review",
     "browser": "Browser",
-"tags": "Tags",
-        "import": "Import Hub",
-        "focus": "Focus Timer",
-        "stats": "Stats",
+    "tags": "Tags",
+    "import": "Import Hub",
+    "focus": "Focus Timer",
+    "stats": "Stats",
     "settings": "Settings",
     "tools": "Tools",
     "moreNav": "More",
@@ -43,10 +43,10 @@
     "mainNav": "Main navigation",
     "mobileNav": "Mobile navigation"
   },
-    "library": {
-      "title": "Library",
-      "decks_one": "{{count}} deck",
-      "decks_other": "{{count}} decks",
+  "library": {
+    "title": "Library",
+    "decks_one": "{{count}} deck",
+    "decks_other": "{{count}} decks",
     "cards": "cards"
   },
   "level": {
@@ -197,7 +197,9 @@
     "editCardTitle": "Edit this card (E)",
     "basicType": "Basic",
     "clozeType": "Cloze",
-    "imageOcclusionType": "Image Occlusion"
+    "imageOcclusionType": "Image Occlusion",
+    "moreCardActions": "More card actions",
+    "againComfort": "You'll see this one again shortly — repetition is the point."
   },
   "cardDialog": {
     "newCard": "New card",
@@ -487,9 +489,9 @@
     "noResults": "No commands found",
     "title": "Command Palette",
     "commands": {
-"dashboard": "Go to Dashboard",
-        "decks": "Go to Decks",
-        "browser": "Open Card Browser",
+      "dashboard": "Go to Dashboard",
+      "decks": "Go to Decks",
+      "browser": "Open Card Browser",
       "tags": "Manage Tags",
       "stats": "Go to Stats",
       "settings": "Go to Settings",
