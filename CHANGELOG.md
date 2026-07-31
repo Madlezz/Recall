@@ -6,6 +6,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-07-31
+
+### Added
+- **Differentiation: habit-first SRS repositioning.** New tagline across README, `index.html` meta/OG/Twitter, PWA manifest: "FSRS-grade spaced repetition that makes you want to come back."
+- **Daily Ritual dashboard hero:** streak flame + greeting + "Ready?" CTA that starts the review session. Dim flame when streak at 0.
+- **Streak grace:** miss 1 day = streak retained (dim flame), miss 2 days = reset. Prevents guilt-quit. Unit tested.
+- **First-run "Try" step in onboarding:** welcome -> concept -> system -> **try** -> templates -> goal. User experiences FSRS (reveal + rate + interval preview) before committing to decks or goal. Uses `template_how_it_works` deck as default.
+- **Share Recall button:** copies repo URL + tagline to clipboard. In sidebar footer (desktop) and More sheet (mobile). Zero infra.
+- **Session summary "Today's win":** streak callout in subtitle when streak > 0.
+- **OG/Twitter meta tags + og-image.png** for social sharing previews.
+
+### Changed
+- **README "Why Recall?" table reordered:** engagement strengths first (XP, streaks, focus timer, match game), FSRS at position 3, Anki add-on ecosystem as honest concession.
+- **Dependabot:** katex semver-major ignored until rehype-katex releases 0.18-compatible version.
+
+### Fixed
+- **White screen on PWA deploy:** `manualChunks` in `vite.config.ts` created circular cross-chunk `__commonJS` bindings causing `TypeError: t is not a function` at runtime. Pre-existing bug (v1.2.0 also affected). Fix: `manualChunks: undefined` (let Vite handle chunking).
+- **Dashboard CTA bug:** `handleStartReview` used local `isCardDue` that excluded `new`-state cards, breaking the first-run ritual CTA on fresh decks. Replaced with `isCardDueToday` from `@/lib/stats`.
+- **KaTeX 0.18 crash:** pinned to `^0.17.0` (rehype-katex 7.x incompatible with 0.18 breaking API change).
+- **Dependabot alerts:** brace-expansion bumped to 5.0.8, fast-uri to 3.1.4 (both HIGH, dev-only transitive).
+
+### Tests
+- Unit: 809/809 pass (including new streak grace tests).
+- E2E: 10/10 pass (including new onboarding-try and share specs).
+- Existing E2E tests updated for new try step.
+
 ## [1.2.0] - 2026-07-18
 
 ### Added
