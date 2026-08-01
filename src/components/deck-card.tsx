@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { RotateCw } from "lucide-react";
 import { getDeckColorClass } from "@/lib/deck-colors";
 import { forecastDueByDay, getDeckStats } from "@/lib/stats";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,7 @@ export function deckInitials(name: string): string {
 export function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
   const { t } = useTranslation();
   const cards = useRecallStore((state) => state.cards);
+  const startReview = useRecallStore((state) => state.startReview);
   const deckCards = useMemo(() => cards.filter((c) => c.deckId === deck.id), [cards, deck.id]);
   const stats = getDeckStats(deck, deckCards);
   const due = deck.dueCount ?? stats.due;
@@ -45,14 +47,15 @@ export function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
   const abbr = useMemo(() => deckInitials(deck.name), [deck.name]);
 
   return (
-    <button
-      onClick={onOpen}
-      className={cn(
-        cardSurface("p-5 text-left"),
-        "hover:shadow-md cursor-pointer group",
-      )}
-      aria-label={t("deck.openDeck", { name: deck.name })}
-    >
+    <div className="relative">
+      <button
+        onClick={onOpen}
+        className={cn(
+          cardSurface("p-5 text-left w-full h-full"),
+          "hover:shadow-md cursor-pointer group",
+        )}
+        aria-label={t("deck.openDeck", { name: deck.name })}
+      >
       <div className="flex justify-between items-start mb-4">
         <div
           className={cn(
@@ -113,11 +116,24 @@ export function DeckCard({ deck, onOpen }: DeckCardProps): JSX.Element {
           <span className={cn(typeClass.caption, "text-outline")}>{t("deck.newCardsLabel")}</span>
           <span className={cn(typeClass["label-lg"], "text-sm font-semibold text-text-primary")}>{newCards}</span>
         </div>
-        <div className="flex flex-col border-l border-outline-variant pl-4">
+        <div className="flex flex-col">
           <span className={cn(typeClass.caption, "text-outline")}>{t("deck.learningLabel")}</span>
           <span className={cn(typeClass["label-lg"], "text-sm font-semibold text-text-primary")}>{learning}</span>
         </div>
       </div>
-    </button>
+      </button>
+
+      {due > 0 && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); startReview(deck.id); }}
+          aria-label={t("deck.startReview")}
+          title={t("deck.startReview")}
+          className="absolute bottom-4 right-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary text-on-primary shadow-lg hover:shadow-xl hover:bg-primary-hover active:scale-95 transition-all"
+        >
+          <RotateCw className="h-4 w-4" />
+        </button>
+      )}
+    </div>
   );
 }

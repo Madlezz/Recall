@@ -44,6 +44,11 @@ export function Dashboard(): JSX.Element {
 
   const handleStartReview = () => {
     const anyDue = cards.some((c) => isCardDueToday(c));
+    if (!hasAnyContent) {
+      // No decks at all: take the user to create their first one instead of dead-end toast.
+      showDeckBrowser();
+      return;
+    }
     if (!anyDue) {
       toast.info(t("dashboard.noCardsDue"));
       return;
@@ -56,18 +61,8 @@ export function Dashboard(): JSX.Element {
       {/* ── Hero ── */}
       <section className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-5">
-          {/* Streak flame */}
-          <div className={cn(
-            "flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl",
-            streak > 0 ? "bg-primary-soft" : "bg-surface-container-low",
-          )}>
-            <Flame className={cn(
-              "h-8 w-8 transition-all",
-              streak > 0 ? "text-primary" : "text-on-surface-variant opacity-50",
-            )} aria-hidden="true" />
-          </div>
           <div>
-            <p className={cn(typeClass["label-lg"], "text-on-surface-variant uppercase tracking-[0.15em]")}>
+            <p className={cn(typeClass["label-lg"], "text-on-surface-variant")}>
               {greeting}
             </p>
             <h1 className={cn(typeClass["title-lg"], "text-text-primary")}>
@@ -85,10 +80,10 @@ export function Dashboard(): JSX.Element {
         <button
           onClick={handleStartReview}
           className="inline-flex items-center gap-2 rounded-2xl bg-primary px-8 py-4 text-sm font-semibold text-on-primary shadow-lg hover:shadow-xl active:scale-95 transition-all min-h-[48px] w-full md:w-auto justify-center"
-          aria-label={dueCount > 0 ? t("dashboard.ritualStartSession") : t("dashboard.ritualStartRitual")}
+          aria-label={!hasAnyContent ? t("dashboard.createDeck") : dueCount > 0 ? t("dashboard.ritualStartSession") : t("dashboard.ritualStartRitual")}
         >
-          <RotateCw className="h-5 w-5" aria-hidden="true" />
-          {dueCount > 0 ? t("dashboard.ritualStartSession") : t("dashboard.ritualStartRitual")}
+          {!hasAnyContent ? <Plus className="h-5 w-5" aria-hidden="true" /> : <RotateCw className="h-5 w-5" aria-hidden="true" />}
+          {!hasAnyContent ? t("dashboard.createDeck") : dueCount > 0 ? t("dashboard.ritualStartSession") : t("dashboard.ritualStartRitual")}
         </button>
       </section>
 
@@ -104,17 +99,9 @@ export function Dashboard(): JSX.Element {
 
         {/* Your Decks header */}
         <div className="col-span-12 mt-4">
-          <div className="flex items-center justify-between">
-            <h2 className={cn(typeClass["title-lg"], "text-text-primary")}>
-              {t("dashboard.yourDecks")}
-            </h2>
-            <button
-              onClick={showDeckBrowser}
-              className="text-primary font-label-lg text-label-lg flex items-center gap-1 hover:underline"
-            >
-              {t("dashboard.viewAll")} <ArrowRight className="h-4 w-4" />
-            </button>
-          </div>
+          <h2 className={cn(typeClass["title-lg"], "text-text-primary")}>
+            {t("dashboard.yourDecks")}
+          </h2>
         </div>
 
         {/* Deck Cards */}
@@ -180,6 +167,18 @@ export function Dashboard(): JSX.Element {
           )}
         </div>
 
+        {/* View all decks — footer action, below the grid */}
+        {hasAnyContent && !isLoading && (
+          <div className="col-span-12 mt-2 flex justify-center">
+            <button
+              onClick={showDeckBrowser}
+              className="text-primary font-label-lg text-label-lg flex items-center gap-1 hover:underline"
+            >
+              {t("dashboard.viewAll")} <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
         {/* Recent Activity */}
         <div className="col-span-12 mt-6">
           <RecentActivity />
@@ -212,7 +211,7 @@ function StreakWidget({ streak }: { streak: number }): JSX.Element {
       <div className="bg-white/40 dark:bg-white/10 p-4 rounded-full mb-4">
         <Flame className={cn("h-9 w-9", streak > 0 ? "text-primary" : "text-primary/30")} />
       </div>
-      <h3 className="font-headline-mobile text-[1.5rem] font-bold leading-8 tracking-tight text-primary">
+      <h3 className={cn(typeClass["title-lg"], "text-primary")}>
         {streak} {streak === 1 ? t("streak.oneDay") : t("streak.days", { count: streak })}
       </h3>
       <p className="font-label-lg text-label-lg text-on-primary-fixed-variant mt-1">
