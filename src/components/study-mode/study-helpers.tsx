@@ -58,11 +58,11 @@ export function AnswerButton({
         {colorBlind && (
           <span className="text-base leading-none" aria-hidden="true">{answerGlyphs[variant]}</span>
         )}
-        <span className="text-[10px] font-medium opacity-60 w-4" aria-hidden="true">{keyHint}</span>
+        <span className="text-xs font-medium opacity-70 w-4" aria-hidden="true">{keyHint}</span>
         {label}
       </span>
       {interval && (
-        <span className="text-[10px] font-normal opacity-60" aria-label={`Next interval: ${interval}`}>{interval}</span>
+        <span className="text-xs font-normal opacity-70" aria-label={`Next interval: ${interval}`}>{interval}</span>
       )}
     </button>
   );
@@ -72,7 +72,7 @@ export function CompletionStat({ label, value }: { label: string; value: number 
   return (
 <div className="rounded-lg bg-surface-container-low py-2.5 px-1 dark:bg-surface-container">
 	      <div className="text-lg font-bold tabular-nums text-text-primary">{value}</div>
-	      <div className="mt-0.5 text-[10px] font-medium text-on-surface-variant">{label}</div>
+	      <div className="mt-0.5 text-xs font-medium text-on-surface-variant">{label}</div>
     </div>
   );
 }
