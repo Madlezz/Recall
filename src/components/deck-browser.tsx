@@ -18,7 +18,7 @@ export function DeckBrowser(): JSX.Element {
   const showDeck = useRecallStore((state) => state.showDeck);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<DeckFilter>("all");
-  const [sortBy, setSortBy] = useState<DeckSort>("name");
+  const [sortBy, setSortBy] = useState<DeckSort>("due");
   const [showCreateDeck, setShowCreateDeck] = useState(false);
 
   const deckStats = useMemo(() => {
@@ -57,7 +57,7 @@ export function DeckBrowser(): JSX.Element {
         result = result.filter((d) => d.total > 0 && d.mastered === 0);
         break;
       case "mastered":
-        result = result.filter((d) => d.total > 0 && d.due === 0 && d.total === d.mastered);
+        result = result.filter((d) => d.total > 0 && d.due === 0 && d.mastered > 0);
         break;
       // "all" — no filter
     }
@@ -85,8 +85,8 @@ export function DeckBrowser(): JSX.Element {
   ];
 
   const sorts: { key: DeckSort; label: string }[] = [
-    { key: "name", label: t("deckBrowser.sortName") },
     { key: "due", label: t("deckBrowser.sortDue") },
+    { key: "name", label: t("deckBrowser.sortName") },
     { key: "cards", label: t("deckBrowser.sortCards") },
   ];
 
