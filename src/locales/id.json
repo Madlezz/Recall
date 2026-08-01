@@ -1199,7 +1199,8 @@
     "manualDesc": "Tempel atau ketik banyak kartu sekaligus.",
     "recall": "Recall (.recall)",
     "recallDesc": "Impor paket dek Recall yang dapat dibagikan.",
-    "privacyNote": "Semua impor terjadi secara lokal. Tidak ada yang diunggah ke server."
+    "privacyNote": "Semua impor terjadi secara lokal. Tidak ada yang diunggah ke server.",
+    "fileTooLarge": "File lebih dari 50 MB. Coba pecah dulu atau gunakan aplikasi desktop untuk impor besar."
   },
   "sync": {
     "encryptedSync": "Sinkronisasi Terenkripsi",

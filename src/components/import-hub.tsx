@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Eye, FileSpreadsheet, FileText, FileDown, Package, Plus, Upload, X } from "lucide-react";
 import { AnkiImportDialog } from "@/components/anki-import-dialog";
@@ -29,6 +29,12 @@ export function ImportHub(): JSX.Element {
     setDragOver(false);
     const file = e.dataTransfer.files[0];
     if (!file) return;
+    // Guard: browser import is FileReader-based; cap before we hang the tab.
+    const MAX_BYTES = 50 * 1024 * 1024;
+    if (file.size > MAX_BYTES) {
+      toast.error(t("importHub.fileTooLarge"));
+      return;
+    }
     const ext = file.name.split(".").pop()?.toLowerCase();
     if (ext === "csv") {
       setCsvFile(file);
@@ -55,6 +61,16 @@ export function ImportHub(): JSX.Element {
   const [manualText, setManualText] = useState("");
   const [manualImporting, setManualImporting] = useState(false);
   const manualParsed = useMemo(() => parseBulkCards(manualText), [manualText]);
+
+  // Manual entry dialog: Escape key closes
+  useEffect(() => {
+    if (!showManual) return;
+    function onKey(e: KeyboardEvent): void {
+      if (e.key === "Escape") setShowManual(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [showManual]);
 
   async function handleManualImport(): Promise<void> {
     if (manualParsed.length === 0 || !manualDeckId) return;
@@ -123,50 +139,47 @@ export function ImportHub(): JSX.Element {
         </p>
       </div>
 
-      {/* Import method cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+      {/* Import method cards: primary methods full-width row, secondary 2-up */}
+      <div className="space-y-4 mb-8">
         <ImportCard
           icon={Package}
           title={t("importHub.anki")}
           desc={t("importHub.ankiDesc")}
           dialog={<AnkiImportDialog />}
+          emphasized
         />
-        <ImportCard
-          icon={FileSpreadsheet}
-          title={t("importHub.csv")}
-          desc={t("importHub.csvDesc")}
-          dialog={<CsvImportDialog open={showCsv} onClose={() => { setShowCsv(false); setCsvFile(null); }} file={csvFile} />}
-          onClick={() => setShowCsv(true)}
-        />
-        <ImportCard
-          icon={FileText}
-          title={t("importHub.markdown")}
-          desc={t("importHub.markdownDesc")}
-          dialog={<MarkdownImportDialog open={showMd} onOpenChange={(v) => { setShowMd(v); if (!v) setMdText(""); }} initialText={mdText} />}
-        />
-        <ImportCard
-          icon={Plus}
-          title={t("importHub.manual")}
-          desc={t("importHub.manualDesc")}
-          onClick={() => setShowManual(true)}
-        />
-      </div>
-
-      {/* Recall import */}
-      <div className={cardSurface("p-5 mb-6")}>
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-primary-soft flex items-center justify-center shrink-0">
-            <ArrowRight className="h-5 w-5 text-primary" />
-          </div>
-          <div className="flex-1">
-            <p className={cn(typeClass["label-lg"], "text-sm font-semibold text-text-primary")}>{t("importHub.recall")}</p>
-            <p className="text-xs text-on-surface-variant">{t("importHub.recallDesc")}</p>
-          </div>
-          <RecallImportDialog />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <ImportCard
+            icon={FileSpreadsheet}
+            title={t("importHub.csv")}
+            desc={t("importHub.csvDesc")}
+            dialog={<CsvImportDialog open={showCsv} onClose={() => { setShowCsv(false); setCsvFile(null); }} file={csvFile} />}
+            onClick={() => setShowCsv(true)}
+          />
+          <ImportCard
+            icon={FileText}
+            title={t("importHub.markdown")}
+            desc={t("importHub.markdownDesc")}
+            dialog={<MarkdownImportDialog open={showMd} onOpenChange={(v) => { setShowMd(v); if (!v) setMdText(""); }} initialText={mdText} />}
+          />
+          <ImportCard
+            icon={Plus}
+            title={t("importHub.manual")}
+            desc={t("importHub.manualDesc")}
+            onClick={() => setShowManual(true)}
+          />
         </div>
       </div>
 
-      <div className="text-center">
+      {/* Recall import — same card language as the rest */}
+      <ImportCard
+        icon={ArrowRight}
+        title={t("importHub.recall")}
+        desc={t("importHub.recallDesc")}
+        dialog={<RecallImportDialog />}
+      />
+
+      <div className="text-center mt-6">
         <p className="text-xs text-on-surface-variant">
           {t("importHub.privacyNote")}
         </p>
@@ -208,7 +221,7 @@ export function ImportHub(): JSX.Element {
             </p>
 
             <textarea
-              className="w-full h-48 rounded-md border bg-background p-4 text-sm font-mono resize-y focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600"
+              className="w-full h-48 rounded-md border border-outline-variant bg-background p-4 text-sm font-mono resize-y focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               placeholder={t("bulkAdd.placeholder")}
               value={manualText}
               onChange={(e) => setManualText(e.target.value)}
@@ -234,7 +247,7 @@ export function ImportHub(): JSX.Element {
             {/* Preview */}
             {manualParsed.length > 0 && (
               <div className="mt-4 space-y-2">
-                <h3 className="text-sm font-semibold uppercase tracking-wide text-on-surface-variant dark:text-on-surface-variant">{t("bulkAdd.preview")}</h3>
+                <h3 className="text-sm font-semibold text-on-surface-variant dark:text-on-surface-variant">{t("bulkAdd.preview")}</h3>
                 <div className="max-h-60 overflow-y-auto space-y-2">
                   {manualParsed.map((card, i) => (
                     <div key={i} className="rounded-md border bg-background dark:bg-surface-container/50 p-3 text-sm">
@@ -264,21 +277,47 @@ function ImportCard({
   desc,
   dialog,
   onClick,
+  emphasized,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   desc: string;
   dialog?: React.ReactNode;
   onClick?: () => void;
+  emphasized?: boolean;
 }): JSX.Element {
-  return (
-    <div className={cn(cardSurface("p-5"), "group cursor-pointer")} onClick={onClick}>
-      <div className="w-12 h-12 rounded-xl bg-primary-soft flex items-center justify-center mb-4 group-hover:bg-primary-container transition-colors">
-        <Icon className="h-5 w-5 text-primary" />
+  const inner = (
+    <>
+      <div className={cn("rounded-xl bg-primary-soft flex items-center justify-center mb-4 group-hover:bg-primary-container transition-colors", emphasized ? "w-14 h-14" : "w-12 h-12")}>
+        <Icon className={cn(emphasized ? "h-6 w-6" : "h-5 w-5", "text-primary")} />
       </div>
-      <h3 className={cn(typeClass["label-lg"], "text-sm font-semibold text-text-primary mb-1")}>{title}</h3>
-      <p className="text-xs text-on-surface-variant mb-3">{desc}</p>
+      <h3 className={cn(typeClass["label-lg"], emphasized ? "text-base font-semibold" : "text-sm font-semibold", "text-text-primary mb-1")}>{title}</h3>
+      <p className={cn(emphasized ? "text-sm" : "text-xs", "text-on-surface-variant mb-3")}>{desc}</p>
       {dialog}
+    </>
+  );
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={cn(
+          cardSurface("p-5 text-left w-full"),
+          "group transition-colors hover:bg-surface-container-low focus-visible:ring-2 focus-visible:ring-ring",
+          emphasized && "border-primary/30",
+        )}
+      >
+        {inner}
+      </button>
+    );
+  }
+
+  return (
+    <div
+      className={cn(cardSurface("p-5"), "group", emphasized && "border-primary/30")}
+    >
+      {inner}
     </div>
   );
 }

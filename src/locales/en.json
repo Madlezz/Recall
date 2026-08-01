@@ -1200,7 +1200,8 @@
     "manualDesc": "Paste or type multiple cards at once.",
     "recall": "Recall (.recall)",
     "recallDesc": "Import a shareable Recall deck package.",
-    "privacyNote": "All imports happen locally. Nothing is uploaded to any server."
+    "privacyNote": "All imports happen locally. Nothing is uploaded to any server.",
+    "fileTooLarge": "File is over 50 MB. Try splitting it or use the desktop app for large imports."
   },
   "sync": {
     "encryptedSync": "Encrypted Sync",
